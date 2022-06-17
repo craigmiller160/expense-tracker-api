@@ -1,4 +1,5 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import com.diffplug.gradle.spotless.SpotlessExtension
 
 plugins {
     val kotlinVersion = "1.6.21"
@@ -8,6 +9,7 @@ plugins {
     kotlin("jvm") version kotlinVersion
     kotlin("plugin.spring") version kotlinVersion
     kotlin("plugin.jpa") version kotlinVersion
+    id("com.diffplug.spotless") version "6.6.1"
 }
 
 group = "io.craigmiller160"
@@ -52,5 +54,11 @@ tasks {
 
     withType<Test> {
         useJUnitPlatform()
+    }
+}
+
+configure<SpotlessExtension> {
+    kotlin {
+        ktfmt()
     }
 }
