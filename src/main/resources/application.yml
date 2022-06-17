@@ -36,4 +36,3 @@ oauth2:
   cookie-max-age-secs: 86400
   cookie-path: "/expense-tracker"
   insecure-paths: "/actuator/health"
-  refresh-token-schema: ${spring.jpa.properties.hibernate.default_schema}
