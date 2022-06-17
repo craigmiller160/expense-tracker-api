@@ -21,11 +21,20 @@ java {
 
 repositories {
     mavenCentral()
+    maven {
+        url = uri("https://craigmiller160.ddns.net:30003/repository/maven-public")
+    }
 }
 
 val testContainersVersion = "1.17.2"
 
 dependencies {
+    val arrowVersion = "1.0.1"
+    val kotestArrowVersion = "1.2.5"
+    val springArrowKtVersion = "1.0.0-SNAPSHOT"
+    val springOAuth2UtilsVersion = "1.9.0"
+    val springWebUtilsVersion = "1.1.3"
+
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
@@ -36,6 +45,9 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.testcontainers:junit-jupiter")
     testImplementation("org.testcontainers:postgresql")
+    implementation("io.github.craigmiller160:spring-arrow-kt:$springArrowKtVersion")
+    implementation("io.craigmiller160:spring-oauth2-utils:$springOAuth2UtilsVersion")
+    implementation("io.craigmiller160:spring-web-utils:$springWebUtilsVersion")
 }
 
 dependencyManagement {
