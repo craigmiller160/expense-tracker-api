@@ -25,6 +25,8 @@ spring:
     host: craigmiller160.ddns.net
     port: "30001"
     db_name: "expense_tracker_dev"
+    username: postgres_root
+    password: ${POSTGRES_ROOT_PASSWORD}
     url: jdbc:postgresql://${spring.datasource.host}:${spring.datasource.port}/${spring.datasource.db_name}
 
 oauth2:
@@ -36,3 +38,6 @@ oauth2:
   cookie-max-age-secs: 86400
   cookie-path: "/expense-tracker"
   insecure-paths: "/actuator/health"
+  auth-server-host: https://localhost:7003
+  client-key: 33adb74a-1239-4d49-95d2-a2006aa2503f
+  client-secret: 4f97c36c-1323-414a-b16c-310cd69709c6
