@@ -2,8 +2,8 @@ server:
   servlet:
     session:
       cookie:
-        name: AUTH-MANAGE-SESSIONID
-        path: /auth-management
+        name: EXPENSE-TRACKER-SESSIONID
+        path: /expense-tracker
   ssl:
     key-store-type: PKCS12
     key-store: classpath:expense-tracker.p12
