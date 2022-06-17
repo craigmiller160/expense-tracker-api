@@ -41,3 +41,9 @@ oauth2:
   auth-server-host: https://localhost:7003
   client-key: 33adb74a-1239-4d49-95d2-a2006aa2503f
   client-secret: 4f97c36c-1323-414a-b16c-310cd69709c6
+
+logging:
+  level:
+    io.craigmiller160.expensetrackerapi: DEBUG
+    io.craigmiller160.webutils: DEBUG
+    io.craigmiller160.oauth2: DEBUG
