@@ -1,4 +1,4 @@
-package io.craigmiller160.expensetrackerapi.data.model.typeid
+package io.craigmiller160.expensetrackerapi.common.data.typeid
 
 import java.util.UUID
 
