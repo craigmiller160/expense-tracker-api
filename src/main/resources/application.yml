@@ -6,7 +6,7 @@ server:
         path: /auth-management
   ssl:
     key-store-type: PKCS12
-    key-store: classpath:keys/auth-manage.p12
+    key-store: classpath:expense-tracker.p12
     key-store-password: auth-manage-pass
     use-ssl: true
     enabled: true
