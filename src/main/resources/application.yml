@@ -1,1 +1,39 @@
+server:
+  servlet:
+    session:
+      cookie:
+        name: AUTH-MANAGE-SESSIONID
+        path: /auth-management
+  ssl:
+    key-store-type: PKCS12
+    key-store: classpath:keys/auth-manage.p12
+    key-store-password: auth-manage-pass
+    use-ssl: true
+    enabled: true
+    protocol: TLS
+    enabled-protocols: TLSv1.2,TLSv1.3
+    ciphers: ECDHE-ECDSA-AES256-GCM-SHA384,ECDHE-RSA-AES256-GCM-SHA384,ECDHE-ECDSA-CHACHA20-POLY1305,ECDHE-RSA-CHACHA20-POLY1305,ECDHE-ECDSA-AES128-GCM-SHA256,ECDHE-RSA-AES128-GCM-SHA256,ECDHE-ECDSA-AES256-SHA384,ECDHE-RSA-AES256-SHA384,ECDHE-ECDSA-AES128-SHA256,ECDHE-RSA-AES128-SHA256
 
+spring:
+  jpa:
+    properties:
+      hibernate.jdbc.time_zone: UTC
+      hibernate.dialect: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: none
+  datasource:
+    host: craigmiller160.ddns.net
+    port: "30001"
+    db_name: "expense_tracker_dev"
+    url: jdbc:postgresql://${spring.datasource.host}:${spring.datasource.port}/${spring.datasource.db_name}
+
+oauth2:
+  auth-login-base-uri: "/expense-tracker/oauth2"
+  auth-code-redirect-uri: "/expense-tracker/api/oauth/authcode/code"
+  post-auth-redirect: "/expense-tracker"
+  client-name: expense-tracker-api
+  cookie-name: expense-tracker-token
+  cookie-max-age-secs: 86400
+  cookie-path: "/expense-tracker"
+  insecure-paths: "/actuator/health"
+  refresh-token-schema: ${spring.jpa.properties.hibernate.default_schema}
