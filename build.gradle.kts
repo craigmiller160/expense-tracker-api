@@ -1,22 +1,27 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
+    val kotlinVersion = "1.6.21"
+
     id("org.springframework.boot") version "2.7.0"
     id("io.spring.dependency-management") version "1.0.11.RELEASE"
-    kotlin("jvm") version "1.6.21"
-    kotlin("plugin.spring") version "1.6.21"
-    kotlin("plugin.jpa") version "1.6.21"
+    kotlin("jvm") version kotlinVersion
+    kotlin("plugin.spring") version kotlinVersion
+    kotlin("plugin.jpa") version kotlinVersion
 }
 
 group = "io.craigmiller160"
-version = "0.0.1-SNAPSHOT"
-java.sourceCompatibility = JavaVersion.VERSION_17
+version = "1.0.0-SNAPSHOT"
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_18
+}
 
 repositories {
     mavenCentral()
 }
 
-extra["testcontainersVersion"] = "1.17.2"
+val testContainersVersion = "1.17.2"
 
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
@@ -25,7 +30,7 @@ dependencies {
     implementation("org.flywaydb:flyway-core")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
-    runtimeOnly("org.postgresql:postgresql")
+    implementation("org.postgresql:postgresql")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.testcontainers:junit-jupiter")
     testImplementation("org.testcontainers:postgresql")
@@ -33,17 +38,19 @@ dependencies {
 
 dependencyManagement {
     imports {
-        mavenBom("org.testcontainers:testcontainers-bom:${property("testcontainersVersion")}")
+        mavenBom("org.testcontainers:testcontainers-bom:$testContainersVersion")
     }
 }
 
-tasks.withType<KotlinCompile> {
-    kotlinOptions {
-        freeCompilerArgs = listOf("-Xjsr305=strict")
-        jvmTarget = "17"
+tasks {
+    withType<KotlinCompile> {
+        kotlinOptions {
+            freeCompilerArgs = listOf("-Xjsr305=strict")
+            jvmTarget = "17"
+        }
     }
-}
 
-tasks.withType<Test> {
-    useJUnitPlatform()
+    withType<Test> {
+        useJUnitPlatform()
+    }
 }
