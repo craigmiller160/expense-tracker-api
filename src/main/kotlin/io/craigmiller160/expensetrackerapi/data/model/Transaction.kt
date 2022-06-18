@@ -3,6 +3,7 @@ package io.craigmiller160.expensetrackerapi.data.model
 import io.craigmiller160.expensetrackerapi.common.data.typedid.TypedId
 import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.CategoryId
 import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.TransactionId
+import io.craigmiller160.expensetrackerapi.data.model.core.AbstractMutableEntity
 import java.math.BigDecimal
 import java.time.LocalDate
 import javax.persistence.Entity
