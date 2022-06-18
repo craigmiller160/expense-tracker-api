@@ -1,12 +1,10 @@
 package io.craigmiller160.expensetrackerapi
 
-import io.craigmiller160.expensetrackerapi.data.repository.CategoryRepository
 import io.craigmiller160.webutils.tls.TlsConfigurer
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
 
-@SpringBootApplication
-class ExpenseTrackerApiApplication(private val categoryRepository: CategoryRepository)
+@SpringBootApplication class ExpenseTrackerApiApplication
 
 private const val TRUST_STORE_TYPE = "JKS"
 private const val TRUST_STORE_PATH = "truststore.jks"

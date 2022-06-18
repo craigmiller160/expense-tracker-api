@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.module.SimpleModule
 import io.craigmiller160.expensetrackerapi.common.data.typedid.TypedId
 import org.springframework.stereotype.Component
 
+@Suppress("LeakingThis")
 @Component
 class TypedIdModule : SimpleModule("TypedIdModule") {
   init {
