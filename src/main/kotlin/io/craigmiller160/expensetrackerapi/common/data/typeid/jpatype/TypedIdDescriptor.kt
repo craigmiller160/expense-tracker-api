@@ -6,6 +6,7 @@ import org.hibernate.type.descriptor.java.AbstractTypeDescriptor
 import org.hibernate.type.descriptor.java.UUIDTypeDescriptor
 
 class TypedIdDescriptor : AbstractTypeDescriptor<TypedId>(TypedId::class.java) {
+  // TODO delete if unused
   companion object {
     val INSTANCE = TypedIdDescriptor()
   }
