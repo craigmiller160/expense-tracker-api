@@ -1,8 +1,9 @@
 package io.craigmiller160.expensetrackerapi.web.controller
 
+import io.craigmiller160.expensetrackerapi.BaseIntegrationTest
 import org.junit.jupiter.api.Test
 
-class TransactionImportControllerTest {
+class TransactionImportControllerTest : BaseIntegrationTest() {
   @Test
   fun getImportTypes() {
     TODO()
