@@ -11,13 +11,14 @@ import javax.persistence.Table
 
 @Entity
 @Table(name = "transactions")
+@Suppress("JpaMissingIdInspection")
 data class Transaction(
     val userId: Long,
     val expenseDate: LocalDate,
     val description: String,
     val amount: BigDecimal,
     val confirmed: Boolean,
-    val categoryId: CategoryId? = null,
+    val categoryId: TypedId<CategoryId>? = null,
     override val id: TypedId<TransactionId> = TypedId(),
     override val created: ZonedDateTime = ZonedDateTime.now(),
     override var updated: ZonedDateTime = ZonedDateTime.now(),
