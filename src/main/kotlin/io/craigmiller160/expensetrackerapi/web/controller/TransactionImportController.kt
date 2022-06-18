@@ -1,7 +1,9 @@
 package io.craigmiller160.expensetrackerapi.web.controller
 
+import io.craigmiller160.expensetrackerapi.service.TransactionImportType
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.multipart.MultipartFile
 
@@ -9,7 +11,10 @@ import org.springframework.web.multipart.MultipartFile
 @RequestMapping("/transaction-import")
 class TransactionImportController {
   @PostMapping
-  fun importTransactions(file: MultipartFile) {
+  fun importTransactions(
+      @RequestParam("type") type: TransactionImportType,
+      @RequestParam("file") file: MultipartFile
+  ) {
     TODO()
   }
 }
