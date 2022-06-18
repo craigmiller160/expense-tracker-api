@@ -6,4 +6,4 @@ import javax.persistence.Table
 
 @Entity
 @Table(name = "categories")
-data class Category(val name: String) : AbstractEntity<CategoryId>()
+data class Category(val name: String, val userId: Long) : AbstractEntity<CategoryId>()
