@@ -12,13 +12,14 @@ import org.springframework.data.annotation.ReadOnlyProperty
 
 @MappedSuperclass
 @OptimisticLocking
-abstract class AbstractEntity<T> {
-  @get:Id
-  @get:Type(type = "io.craigmiller160.expensetrackerapi.common.data.typedid.jpatype.TypedIdJpaType")
-  abstract val id: TypedId<T>
-  abstract val created: ZonedDateTime
-  abstract var updated: ZonedDateTime
-  @get:Version @get:ReadOnlyProperty abstract val version: Long
+abstract class AbstractEntity<T>(
+    @Id
+    @Type(type = "io.craigmiller160.expensetrackerapi.common.data.typedid.jpatype.TypedIdJpaType")
+    val id: TypedId<T> = TypedId(),
+    val created: ZonedDateTime = ZonedDateTime.now(),
+    var updated: ZonedDateTime = ZonedDateTime.now(),
+    @Version @ReadOnlyProperty val version: Long = 1
+) {
 
   @PreUpdate
   fun onPreUpdate() {

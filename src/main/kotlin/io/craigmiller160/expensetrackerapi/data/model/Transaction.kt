@@ -5,7 +5,6 @@ import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.CategoryId
 import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.TransactionId
 import java.math.BigDecimal
 import java.time.LocalDate
-import java.time.ZonedDateTime
 import javax.persistence.Entity
 import javax.persistence.Table
 
@@ -18,9 +17,5 @@ data class Transaction(
     val description: String,
     val amount: BigDecimal,
     val confirmed: Boolean,
-    val categoryId: TypedId<CategoryId>? = null,
-    override val id: TypedId<TransactionId> = TypedId(),
-    override val created: ZonedDateTime = ZonedDateTime.now(),
-    override var updated: ZonedDateTime = ZonedDateTime.now(),
-    override val version: Long = 1
+    val categoryId: TypedId<CategoryId>? = null
 ) : AbstractEntity<TransactionId>()
