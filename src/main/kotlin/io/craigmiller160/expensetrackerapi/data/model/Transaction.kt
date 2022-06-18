@@ -17,4 +17,4 @@ data class Transaction(
     val amount: BigDecimal,
     val confirmed: Boolean,
     val categoryId: TypedId<CategoryId>? = null
-) : AbstractEntity<TransactionId>()
+) : AbstractImmutableEntity<TransactionId>()
