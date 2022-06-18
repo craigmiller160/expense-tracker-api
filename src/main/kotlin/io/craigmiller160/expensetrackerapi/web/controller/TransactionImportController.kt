@@ -2,6 +2,7 @@ package io.craigmiller160.expensetrackerapi.web.controller
 
 import io.craigmiller160.expensetrackerapi.service.TransactionImportService
 import io.craigmiller160.expensetrackerapi.service.TransactionImportType
+import io.craigmiller160.expensetrackerapi.web.types.ImportTransactionsResponse
 import io.craigmiller160.expensetrackerapi.web.types.ImportTypeResponse
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
@@ -17,9 +18,8 @@ class TransactionImportController(private val transactionImportService: Transact
   fun importTransactions(
       @RequestParam("type") type: TransactionImportType,
       @RequestParam("file") file: MultipartFile
-  ) {
-    transactionImportService.importTransactions(type, file.inputStream)
-  }
+  ): ImportTransactionsResponse =
+      file.inputStream.use { transactionImportService.importTransactions(type, it) }
 
   @GetMapping("/types")
   fun getImportTypes(): List<ImportTypeResponse> = transactionImportService.getImportTypes()
