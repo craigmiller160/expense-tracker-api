@@ -1,6 +1,6 @@
-package io.craigmiller160.expensetrackerapi.common.data.typeid.jpatype
+package io.craigmiller160.expensetrackerapi.common.data.typedid.jpatype
 
-import io.craigmiller160.expensetrackerapi.common.data.typeid.TypedId
+import io.craigmiller160.expensetrackerapi.common.data.typedid.TypedId
 import org.hibernate.type.AbstractSingleColumnStandardBasicType
 import org.hibernate.type.PostgresUUIDType.PostgresUUIDSqlTypeDescriptor
 

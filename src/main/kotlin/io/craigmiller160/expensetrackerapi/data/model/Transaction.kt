@@ -1,8 +1,8 @@
 package io.craigmiller160.expensetrackerapi.data.model
 
-import io.craigmiller160.expensetrackerapi.common.data.typeid.TypedId
-import io.craigmiller160.expensetrackerapi.common.data.typeid.ids.CategoryId
-import io.craigmiller160.expensetrackerapi.common.data.typeid.ids.TransactionId
+import io.craigmiller160.expensetrackerapi.common.data.typedid.TypedId
+import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.CategoryId
+import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.TransactionId
 import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.ZonedDateTime

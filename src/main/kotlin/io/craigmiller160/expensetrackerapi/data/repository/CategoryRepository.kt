@@ -1,7 +1,7 @@
 package io.craigmiller160.expensetrackerapi.data.repository
 
-import io.craigmiller160.expensetrackerapi.common.data.typeid.TypedId
-import io.craigmiller160.expensetrackerapi.common.data.typeid.ids.CategoryId
+import io.craigmiller160.expensetrackerapi.common.data.typedid.TypedId
+import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.CategoryId
 import io.craigmiller160.expensetrackerapi.data.model.Category
 import org.springframework.data.jpa.repository.JpaRepository
 
