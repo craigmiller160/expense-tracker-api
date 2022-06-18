@@ -6,6 +6,6 @@ import javax.persistence.EnumType
 import javax.persistence.Enumerated
 
 data class TransactionImportType(
-    val company: String,
+    @Enumerated(EnumType.STRING) val company: ImportCompany,
     @Enumerated(EnumType.STRING) val fileFormat: ImportFileFormat
 ) : AbstractImmutableEntity<ImportTypeId>()
