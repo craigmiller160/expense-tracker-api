@@ -11,8 +11,8 @@ import org.springframework.data.annotation.ReadOnlyProperty
 
 @MappedSuperclass
 @OptimisticLocking
-abstract class AbstractEntity<ID : TypedId> {
-  @get:Id abstract val id: ID
+abstract class AbstractEntity<T> {
+  @get:Id abstract val id: TypedId<T>
   abstract val created: ZonedDateTime
   abstract var updated: ZonedDateTime
   @get:Version @get:ReadOnlyProperty abstract val version: Long

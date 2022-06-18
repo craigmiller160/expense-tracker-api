@@ -1,5 +1,6 @@
 package io.craigmiller160.expensetrackerapi.data.model
 
+import io.craigmiller160.expensetrackerapi.common.data.typeid.TypedId
 import io.craigmiller160.expensetrackerapi.common.data.typeid.ids.CategoryId
 import io.craigmiller160.expensetrackerapi.common.data.typeid.ids.TransactionId
 import java.math.BigDecimal
@@ -17,7 +18,7 @@ data class Transaction(
     val amount: BigDecimal,
     val confirmed: Boolean,
     val categoryId: CategoryId? = null,
-    override val id: TransactionId = TransactionId(),
+    override val id: TypedId<TransactionId> = TypedId(),
     override val created: ZonedDateTime = ZonedDateTime.now(),
     override var updated: ZonedDateTime = ZonedDateTime.now(),
     override val version: Long = 1
