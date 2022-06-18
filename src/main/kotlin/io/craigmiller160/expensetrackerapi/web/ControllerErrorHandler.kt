@@ -14,9 +14,9 @@ import org.springframework.web.context.request.ServletRequestAttributes
 class ControllerErrorHandler {
   private val log = LoggerFactory.getLogger(ControllerErrorHandler::class.java)
   @ExceptionHandler(Exception::class)
-  fun exception(ex: Exception): ErrorResponse {
+  fun exception(ex: Exception): ResponseEntity<ErrorResponse> {
     log.error(ex.message, ex)
-    createErrorResponse(500, ex.message)
+    return createErrorResponse(500, ex.message ?: "")
   }
 
   private fun createErrorResponse(status: Int, message: String): ResponseEntity<ErrorResponse> {
