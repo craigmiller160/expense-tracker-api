@@ -18,7 +18,7 @@ class TransactionImportController(private val transactionImportService: Transact
       @RequestParam("type") type: TransactionImportType,
       @RequestParam("file") file: MultipartFile
   ) {
-    TODO()
+    transactionImportService.importTransactions(type, file.inputStream)
   }
 
   @GetMapping("/types")
