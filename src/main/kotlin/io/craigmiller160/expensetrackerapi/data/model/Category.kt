@@ -6,5 +6,4 @@ import javax.persistence.Table
 
 @Entity
 @Table(name = "categories")
-@Suppress("JpaMissingIdInspection")
 data class Category(val name: String) : AbstractEntity<CategoryId>()

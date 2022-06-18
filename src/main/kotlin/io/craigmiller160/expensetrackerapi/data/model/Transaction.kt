@@ -10,7 +10,6 @@ import javax.persistence.Table
 
 @Entity
 @Table(name = "transactions")
-@Suppress("JpaMissingIdInspection")
 data class Transaction(
     val userId: Long,
     val expenseDate: LocalDate,
