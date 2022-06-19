@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired
 
 /** Special test class for validating that the TypedId & parent model types work. */
 class ModelValidationTest : BaseIntegrationTest() {
-  // TODO need testcontainers working for this
   @Autowired private lateinit var countryRepository: CountryRepository
   @Autowired private lateinit var residentRepository: ResidentRepository
   private val NOW = ZonedDateTime.now()
