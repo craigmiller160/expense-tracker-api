@@ -39,6 +39,7 @@ class ModelValidationTest : BaseIntegrationTest() {
 
     val dbResident = residentRepository.findById(resident.id).orElseThrow()
     assertThat(dbResident).isEqualTo(resident)
+    assertThat(dbResident.version).isEqualTo(1)
 
     val newResident = dbResident.copy(name = "Sally")
     residentRepository.save(newResident)
@@ -46,5 +47,6 @@ class ModelValidationTest : BaseIntegrationTest() {
     val dbResident2 = residentRepository.findById(resident.id).orElseThrow()
     assertThat(dbResident2.name).isEqualTo(newResident.name)
     assertThat(dbResident2.updated).isAfterOrEqualTo(resident.updated)
+    assertThat(dbResident2.version).isEqualTo(2)
   }
 }
