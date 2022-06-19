@@ -28,7 +28,7 @@ class BaseIntegrationTest {
     protected val keyPair: KeyPair = KeyUtils.createKeyPair()
     protected val jwkSet: JWKSet = KeyUtils.createJwkSet(keyPair)
 
-    @Container val postgresContainer = PostgresContainer()
+    @Container val postgresContainer = PostgresContainer.INSTANCE
   }
 
   @MockBean private lateinit var oAuth2Config: OAuth2Config
