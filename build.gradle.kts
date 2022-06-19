@@ -34,6 +34,7 @@ dependencies {
     val springArrowKtVersion = "1.0.0-SNAPSHOT"
     val springOAuth2UtilsVersion = "1.9.0"
     val springWebUtilsVersion = "1.1.3"
+    val mockitoKotlinVersion = "4.0.0"
 
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.springframework.boot:spring-boot-starter-web")
@@ -48,6 +49,7 @@ dependencies {
     implementation("io.github.craigmiller160:spring-arrow-kt:$springArrowKtVersion")
     implementation("io.craigmiller160:spring-oauth2-utils:$springOAuth2UtilsVersion")
     implementation("io.craigmiller160:spring-web-utils:$springWebUtilsVersion")
+    testImplementation("org.mockito.kotlin:mockito-kotlin$mockitoKotlinVersion")
 }
 
 dependencyManagement {

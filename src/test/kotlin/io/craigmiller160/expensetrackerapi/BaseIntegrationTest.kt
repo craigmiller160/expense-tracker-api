@@ -2,6 +2,7 @@ package io.craigmiller160.expensetrackerapi
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.nimbusds.jose.jwk.JWKSet
+import io.craigmiller160.expensetrackerapi.testutils.JwtUtils
 import io.craigmiller160.expensetrackerapi.testutils.KeyUtils
 import io.craigmiller160.oauth2.config.OAuth2Config
 import java.security.KeyPair
@@ -29,5 +30,9 @@ class BaseIntegrationTest {
 
   private lateinit var token: String
 
-  @BeforeEach fun baseSetup() {}
+  @BeforeEach
+  fun baseSetup() {
+    token = JwtUtils.createJwt(keyPair)
+    //    whenever(oAuth2Config)
+  }
 }
