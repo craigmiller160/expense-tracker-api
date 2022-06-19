@@ -36,6 +36,7 @@ dependencies {
     val springWebUtilsVersion = "1.1.3"
     val mockitoKotlinVersion = "4.0.0"
     val arrowKtVersion = "1.1.2"
+    val assertJVersion = "3.23.1"
 
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.springframework.boot:spring-boot-starter-web")
@@ -52,6 +53,7 @@ dependencies {
     implementation("io.craigmiller160:spring-oauth2-utils:$springOAuth2UtilsVersion")
     implementation("io.craigmiller160:spring-web-utils:$springWebUtilsVersion")
     testImplementation("org.mockito.kotlin:mockito-kotlin:$mockitoKotlinVersion")
+    testImplementation("org.assertj:assertj-core:$assertJVersion")
 }
 
 dependencyManagement {
@@ -70,7 +72,6 @@ tasks {
 
     withType<Test> {
         useJUnitPlatform()
-        environment("spring.config.location", "classpath:application.yml,classpath:application.test.yml")
     }
 }
 
