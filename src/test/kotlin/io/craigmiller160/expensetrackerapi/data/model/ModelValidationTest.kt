@@ -20,7 +20,10 @@ class ModelValidationTest : BaseIntegrationTest() {
     assertThat(country.created).isAfterOrEqualTo(NOW)
     assertThat(dbCountry).isEqualTo(country)
 
-    assertThrows<IllegalStateException> { countryRepository.save(dbCountry) }
+    val newCountry = dbCountry.copy(name = "CAN")
+    assertThat(newCountry.id).isEqualTo(country.id)
+
+    assertThrows<IllegalStateException> { countryRepository.save(newCountry) }
   }
 
   @Test
