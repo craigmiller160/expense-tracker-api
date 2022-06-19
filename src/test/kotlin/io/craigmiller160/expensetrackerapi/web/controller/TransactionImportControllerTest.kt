@@ -11,10 +11,12 @@ class TransactionImportControllerTest : BaseIntegrationTest() {
   fun getImportTypes() {
     val expectedResponse =
         TransactionImportType.values().map { ImportTypeResponse(it.name, it.displayName) }
-    mockMvc.get("/transaction-import/types").andExpect {
-      status { isOk() }
-      content { json(objectMapper.writeValueAsString(expectedResponse)) }
-    }
+    mockMvc
+        .get("/transaction-import/types") { secure = true }
+        .andExpect {
+          status { isOk() }
+          content { json(objectMapper.writeValueAsString(expectedResponse)) }
+        }
   }
 
   @Test
