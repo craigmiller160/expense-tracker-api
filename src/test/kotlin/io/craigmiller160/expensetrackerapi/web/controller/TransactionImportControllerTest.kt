@@ -12,7 +12,10 @@ class TransactionImportControllerTest : BaseIntegrationTest() {
     val expectedResponse =
         TransactionImportType.values().map { ImportTypeResponse(it.name, it.displayName) }
     mockMvc
-        .get("/transaction-import/types") { secure = true }
+        .get("/transaction-import/types") {
+          secure = true
+          header("Authorization", "Bearer $token")
+        }
         .andExpect {
           status { isOk() }
           content { json(objectMapper.writeValueAsString(expectedResponse)) }

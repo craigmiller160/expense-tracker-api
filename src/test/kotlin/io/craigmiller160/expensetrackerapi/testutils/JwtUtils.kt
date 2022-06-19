@@ -18,12 +18,12 @@ object JwtUtils {
   const val LAST_NAME_CLAIM = "lastName"
   const val USER_ID_CLAIM = "userId"
   const val USERNAME = "user@example.com"
-  val CLIENT_KEY = UUID.randomUUID()
+  val CLIENT_KEY = UUID.randomUUID().toString()
   const val USER_ID = 1L
   const val CLIENT_NAME = "clientName"
   const val FIRST_NAME = "firstName"
   const val LAST_NAME = "lastName"
-  val TOKEN_ID = UUID.randomUUID()
+  val TOKEN_ID = UUID.randomUUID().toString()
 
   fun createJwt(keyPair: KeyPair, configure: JwtConfig.() -> Unit = {}): String {
     val header = JWSHeader.Builder(JWSAlgorithm.RS256).build()
@@ -35,7 +35,7 @@ object JwtUtils {
 
     val claims =
         JWTClaimsSet.Builder()
-            .jwtID(UUID.randomUUID().toString())
+            .jwtID(TOKEN_ID)
             .issueTime(Date())
             .subject(USERNAME)
             .expirationTime(expDate)
