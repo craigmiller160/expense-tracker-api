@@ -39,6 +39,7 @@ class TransactionImportControllerTest : BaseIntegrationTest() {
                 file("content.txt", bytes)
               }
               .andExpect { status { isOk() } }
+          // TODO test content
         }
         .getOrHandle { throw it }
   }
