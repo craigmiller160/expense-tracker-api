@@ -16,11 +16,8 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import org.springframework.test.web.servlet.MockMvc
-import org.testcontainers.junit.jupiter.Container
-import org.testcontainers.junit.jupiter.Testcontainers
 
 @SpringBootTest
-@Testcontainers
 @AutoConfigureMockMvc
 @ExtendWith(SpringExtension::class)
 class BaseIntegrationTest {
@@ -28,7 +25,9 @@ class BaseIntegrationTest {
     protected val keyPair: KeyPair = KeyUtils.createKeyPair()
     protected val jwkSet: JWKSet = KeyUtils.createJwkSet(keyPair)
 
-    @Container val postgresContainer = PostgresContainer.INSTANCE
+    init {
+      PostgresContainer.INSTANCE.start()
+    }
   }
 
   @MockBean private lateinit var oAuth2Config: OAuth2Config
