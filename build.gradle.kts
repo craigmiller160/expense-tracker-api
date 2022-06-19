@@ -70,6 +70,7 @@ tasks {
 
     withType<Test> {
         useJUnitPlatform()
+        environment("spring.config.location", "classpath:application.yml,classpath:application.test.yml")
     }
 }
 
