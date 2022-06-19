@@ -11,13 +11,16 @@ import org.springframework.beans.factory.annotation.Autowired
 class ModelValidationTest : BaseIntegrationTest() {
   // TODO need testcontainers working for this
   @Autowired private lateinit var countryRepository: CountryRepository
+  @Autowired private lateinit var residentRepository: ResidentRepository
   private val NOW = ZonedDateTime.now()
   @Test
   fun `immutable entity inserts but cannot be updated`() {
     val country = Country("USA")
     countryRepository.save(country)
-    val dbCountry = countryRepository.findById(country.id).orElseThrow()
+
     assertThat(country.created).isAfterOrEqualTo(NOW)
+
+    val dbCountry = countryRepository.findById(country.id).orElseThrow()
     assertThat(dbCountry).isEqualTo(country)
 
     val newCountry = dbCountry.copy(name = "CAN")
@@ -28,6 +31,20 @@ class ModelValidationTest : BaseIntegrationTest() {
 
   @Test
   fun `mutable entity inserts & can be updated`() {
-    TODO("Finish this")
+    val resident = Resident("Bob")
+    residentRepository.save(resident)
+
+    assertThat(resident.created).isAfterOrEqualTo(NOW)
+    assertThat(resident.updated).isAfterOrEqualTo(resident.created)
+
+    val dbResident = residentRepository.findById(resident.id).orElseThrow()
+    assertThat(dbResident).isEqualTo(resident)
+
+    val newResident = dbResident.copy(name = "Sally")
+    residentRepository.save(newResident)
+
+    val dbResident2 = residentRepository.findById(resident.id).orElseThrow()
+    assertThat(dbResident2.name).isEqualTo(newResident.name)
+    assertThat(dbResident2.updated).isAfterOrEqualTo(resident.updated)
   }
 }
