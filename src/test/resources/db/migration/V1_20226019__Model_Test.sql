@@ -1,11 +1,11 @@
-CREATE TABLE country (
+CREATE TABLE countries (
     id UUID NOT NULL,
     name VARCHAR(255) NOT NULL,
     created TIMESTAMP NOT NULL,
     PRIMARY KEY (id)
 );
 
-CREATE TABLE resident (
+CREATE TABLE residents (
     id UUID NOT NULL,
     name VARCHAR(255) NOT NULL,
     created TIMESTAMP NOT NULL,
