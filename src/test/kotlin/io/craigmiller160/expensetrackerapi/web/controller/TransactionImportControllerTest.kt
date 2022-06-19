@@ -2,6 +2,7 @@ package io.craigmiller160.expensetrackerapi.web.controller
 
 import io.craigmiller160.expensetrackerapi.BaseIntegrationTest
 import io.craigmiller160.expensetrackerapi.service.TransactionImportType
+import io.craigmiller160.expensetrackerapi.testutils.ResourceUtils
 import io.craigmiller160.expensetrackerapi.web.types.ImportTypeResponse
 import org.junit.jupiter.api.Test
 import org.springframework.test.web.servlet.get
@@ -24,6 +25,7 @@ class TransactionImportControllerTest : BaseIntegrationTest() {
 
   @Test
   fun `importTransactions - DISCOVER_CSV`() {
+    ResourceUtils.getResourceBytes("data/discover1.csv")
     TODO()
   }
 }
