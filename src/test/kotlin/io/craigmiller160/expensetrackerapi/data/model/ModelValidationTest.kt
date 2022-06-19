@@ -6,6 +6,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.dao.InvalidDataAccessApiUsageException
 
 /** Special test class for validating that the TypedId & parent model types work. */
 class ModelValidationTest : BaseIntegrationTest() {
@@ -25,7 +26,8 @@ class ModelValidationTest : BaseIntegrationTest() {
     val newCountry = dbCountry.copy(name = "CAN")
     assertThat(newCountry.id).isEqualTo(country.id)
 
-    assertThrows<IllegalStateException> { countryRepository.save(newCountry) }
+    val ex = assertThrows<InvalidDataAccessApiUsageException> { countryRepository.save(newCountry) }
+    assertThat(ex.cause).isNotNull.isInstanceOf(IllegalStateException::class.java)
   }
 
   @Test
