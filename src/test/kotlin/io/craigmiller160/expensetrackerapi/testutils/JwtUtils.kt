@@ -2,8 +2,10 @@ package io.craigmiller160.expensetrackerapi.testutils
 
 import com.nimbusds.jose.JWSAlgorithm
 import com.nimbusds.jose.JWSHeader
+import com.nimbusds.jose.crypto.RSASSASigner
 import com.nimbusds.jwt.JWTClaimsSet
 import com.nimbusds.jwt.SignedJWT
+import java.security.KeyPair
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.util.Date
@@ -23,10 +25,12 @@ object JwtUtils {
   const val LAST_NAME = "lastName"
   val TOKEN_ID = UUID.randomUUID()
 
-  fun createJwt(expMinutes: Long = 100): SignedJWT {
+  fun createJwt(keyPair: KeyPair, configure: JwtConfig.() -> Unit = {}): String {
     val header = JWSHeader.Builder(JWSAlgorithm.RS256).build()
+    val config = JwtConfig()
+    config.configure()
 
-    val exp = ZonedDateTime.now(ZoneId.of("UTC")).plusMinutes(expMinutes)
+    val exp = ZonedDateTime.now(ZoneId.of("UTC")).plusMinutes(config.expMinutes)
     val expDate = Date.from(exp.toInstant())
 
     val claims =
@@ -42,6 +46,13 @@ object JwtUtils {
             .claim(LAST_NAME_CLAIM, LAST_NAME)
             .claim(USER_ID_CLAIM, USER_ID)
             .build()
-    return SignedJWT(header, claims)
+    val jwt = SignedJWT(header, claims)
+    val signer = RSASSASigner(keyPair.private)
+    jwt.sign(signer)
+    return jwt.serialize()
+  }
+
+  class JwtConfig {
+    var expMinutes = 100L
   }
 }
