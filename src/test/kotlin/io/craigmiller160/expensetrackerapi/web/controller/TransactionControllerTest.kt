@@ -159,6 +159,7 @@ class TransactionControllerTest : BaseIntegrationTest() {
 
   @Test
   fun categorizeTransactions() {
+    val user2Category = dataHelper.createCategory(2L, "Other")
     val uncategorizedTransaction = user1Transactions[5]
     assertThat(uncategorizedTransaction.categoryId).isNull()
 
@@ -173,7 +174,8 @@ class TransactionControllerTest : BaseIntegrationTest() {
                     TransactionAndCategory(uncategorizedTransaction.id, user1Categories.first().id),
                     TransactionAndCategory(categorizedTransaction.id, user1Categories.first().id),
                     TransactionAndCategory(
-                        user2Transactions.first().id, user1Categories.first().id)))
+                        user2Transactions.first().id, user1Categories.first().id),
+                    TransactionAndCategory(user1Transactions[2].id, user2Category.id)))
 
     mockMvc
         .put("/transactions/categorize") {

@@ -7,13 +7,15 @@ import io.craigmiller160.expensetrackerapi.web.types.CategorizeTransactionsReque
 import io.craigmiller160.expensetrackerapi.web.types.DeleteTransactionsRequest
 import io.craigmiller160.expensetrackerapi.web.types.SearchTransactionsRequest
 import io.craigmiller160.expensetrackerapi.web.types.TransactionResponse
+import io.craigmiller160.oauth2.service.OAuth2Service
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 @Service
 class TransactionService(
     private val transactionRepository: TransactionRepository,
-    private val categoryRepository: CategoryRepository
+    private val categoryRepository: CategoryRepository,
+    private val oAuth2Service: OAuth2Service
 ) {
   @Transactional
   fun categorizeTransactions(request: CategorizeTransactionsRequest): TryEither<Unit> {
