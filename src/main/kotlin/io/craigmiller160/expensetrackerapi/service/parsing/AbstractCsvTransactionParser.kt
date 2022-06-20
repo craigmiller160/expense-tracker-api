@@ -20,7 +20,7 @@ abstract class AbstractCsvTransactionParser : TransactionParser {
           .map { prepareFieldExtractor(it) }
           .mapIndexed { index, fieldExtractor ->
             getTransaction(userId, fieldExtractor).mapLeft {
-              InvalidImportException("Error parsing record at index $index", it)
+              InvalidImportException("Error parsing CSV record, row ${index + 2}", it)
             }
           }
           .sequence()
