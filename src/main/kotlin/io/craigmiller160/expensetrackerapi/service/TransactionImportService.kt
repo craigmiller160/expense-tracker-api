@@ -1,9 +1,8 @@
 package io.craigmiller160.expensetrackerapi.service
 
-import arrow.core.Either
-import arrow.core.continuations.either
 import io.craigmiller160.expensetrackerapi.data.repository.TransactionRepository
 import io.craigmiller160.expensetrackerapi.function.TryEither
+import io.craigmiller160.expensetrackerapi.function.flatMapCatch
 import io.craigmiller160.expensetrackerapi.service.parsing.TransactionParserManager
 import io.craigmiller160.expensetrackerapi.web.types.ImportTransactionsResponse
 import io.craigmiller160.expensetrackerapi.web.types.ImportTypeResponse
@@ -23,13 +22,12 @@ class TransactionImportService(
   fun importTransactions(
       type: TransactionImportType,
       stream: InputStream
-  ): TryEither<ImportTransactionsResponse> =
-      either.eager {
-        val rawTxns = Either.catch { stream.use { it.reader().readText() } }.bind()
-        val parser = transactionParserManager.getParserForType(type)
-        val authUser = oAuth2Service.getAuthenticatedUser()
-        val transactions = parser.parse(authUser.userId, rawTxns).bind()
-        Either.catch { transactionRepository.saveAll(transactions) }.bind()
-        ImportTransactionsResponse(transactions.size)
-      }
+  ): TryEither<ImportTransactionsResponse> {
+    val parser = transactionParserManager.getParserForType(type)
+    val authUser = oAuth2Service.getAuthenticatedUser()
+    return parser
+        .parse(authUser.userId, stream)
+        .flatMapCatch { transactions -> transactionRepository.saveAll(transactions) }
+        .map { transactions -> ImportTransactionsResponse(transactions.size) }
+  }
 }

@@ -6,15 +6,15 @@ import com.opencsv.CSVReader
 import io.craigmiller160.expensetrackerapi.common.error.InvalidImportException
 import io.craigmiller160.expensetrackerapi.data.model.Transaction
 import io.craigmiller160.expensetrackerapi.function.TryEither
-import java.io.StringReader
+import java.io.InputStream
+import java.io.InputStreamReader
 
 typealias FieldExtractor = (index: Int, name: String) -> TryEither<String>
 
 abstract class AbstractCsvTransactionParser : TransactionParser {
 
-  // TODO no need to convert to string first
-  override fun parse(userId: Long, transactions: String): TryEither<List<Transaction>> =
-      CSVReader(StringReader(transactions))
+  override fun parse(userId: Long, stream: InputStream): TryEither<List<Transaction>> =
+      CSVReader(InputStreamReader(stream))
           .readAll()
           .asSequence()
           .drop(1)
