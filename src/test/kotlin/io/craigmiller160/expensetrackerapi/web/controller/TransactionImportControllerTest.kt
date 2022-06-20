@@ -8,7 +8,6 @@ import io.craigmiller160.expensetrackerapi.testutils.ResourceUtils
 import io.craigmiller160.expensetrackerapi.web.types.ImportTypeResponse
 import org.junit.jupiter.api.Test
 import org.springframework.http.MediaType
-import org.springframework.mock.web.MockMultipartFile
 import org.springframework.test.web.servlet.get
 import org.springframework.test.web.servlet.multipart
 
@@ -33,14 +32,13 @@ class TransactionImportControllerTest : BaseIntegrationTest() {
     tryEither
         .eager {
           val bytes = ResourceUtils.getResourceBytes("data/discover1.csv").bind()
-          val file = MockMultipartFile("name", "originalName", MediaType.TEXT_PLAIN_VALUE, bytes)
 
           mockMvc
               .multipart("/transaction-import?type=${TransactionImportType.DISCOVER_CSV.name}") {
                 secure = true
                 header("Authorization", "Bearer $token")
                 header("Content-Type", MediaType.MULTIPART_FORM_DATA_VALUE)
-                file(file)
+                file("file", bytes)
               }
               .andExpect { status { isOk() } }
           // TODO test content
