@@ -85,7 +85,8 @@ class TransactionControllerTest : BaseIntegrationTest() {
             TransactionResponse.from(user1Transactions[2]),
             TransactionResponse.from(user1Transactions[3], user1Categories[1]),
             TransactionResponse.from(user1Transactions[4]),
-            TransactionResponse.from(user1Transactions[5], user1Categories[2]))
+            TransactionResponse.from(user1Transactions[5], user1Categories[2]),
+            TransactionResponse.from(user1Transactions[6]))
 
     mockMvc
         .get("/transactions") {
