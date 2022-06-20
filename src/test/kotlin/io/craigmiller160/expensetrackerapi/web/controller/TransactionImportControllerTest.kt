@@ -82,17 +82,17 @@ class TransactionImportControllerTest : BaseIntegrationTest() {
                 }
                 .andExpect {
                   status { isOk() }
-                  content { json("""{"transactionsImported":23}""") }
+                  content { json("""{"transactionsImported":19}""") }
                 }
           }
         }
         .shouldBeRight()
 
     val transactions = transactionRepository.findAllByOrderByExpenseDateAsc()
-    assertThat(transactions).hasSize(57)
+    assertThat(transactions).hasSize(19)
 
     assertThat(transactions.first())
-        .hasFieldOrPropertyWithValue("expenseDate", LocalDate.of(2022, 5, 31))
+        .hasFieldOrPropertyWithValue("expenseDate", LocalDate.of(2022, 5, 23))
         .hasFieldOrPropertyWithValue(
             "description", "FID BKG SVC LLC  MONEYLINE                  PPD ID: 1035141383")
         .hasFieldOrPropertyWithValue("amount", BigDecimal("250.00"))
