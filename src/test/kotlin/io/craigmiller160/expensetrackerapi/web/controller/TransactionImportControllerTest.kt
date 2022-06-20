@@ -67,4 +67,40 @@ class TransactionImportControllerTest : BaseIntegrationTest() {
         .hasFieldOrPropertyWithValue("description", "PANDA EXPRESS 1679 RIVERVIEW FL")
         .hasFieldOrPropertyWithValue("amount", BigDecimal("5.81"))
   }
+
+  @Test
+  fun `importTransactions - CHASE_CSV`() {
+    ResourceUtils.getResourceBytes("data/chase1.csv")
+        .flatMap { bytes ->
+          Either.catch {
+            mockMvc
+                .multipart("/transaction-import?type=${TransactionImportType.CHASE_CSV.name}") {
+                  secure = true
+                  header("Authorization", "Bearer $token")
+                  header("Content-Type", MediaType.MULTIPART_FORM_DATA_VALUE)
+                  file("file", bytes)
+                }
+                .andExpect {
+                  status { isOk() }
+                  content { json("""{"transactionsImported":19}""") }
+                }
+          }
+        }
+        .shouldBeRight()
+
+    val transactions = transactionRepository.findAllByOrderByExpenseDateAsc()
+    assertThat(transactions).hasSize(19)
+
+    assertThat(transactions.first())
+        .hasFieldOrPropertyWithValue("expenseDate", LocalDate.of(2022, 5, 23))
+        .hasFieldOrPropertyWithValue(
+            "description", "FID BKG SVC LLC  MONEYLINE                  PPD ID: 1035141383")
+        .hasFieldOrPropertyWithValue("amount", BigDecimal("250.00"))
+
+    assertThat(transactions.last())
+        .hasFieldOrPropertyWithValue("expenseDate", LocalDate.of(2022, 6, 15))
+        .hasFieldOrPropertyWithValue(
+            "description", "FRONTIER COMM CORP WE 800-921-8101 CT        06/14")
+        .hasFieldOrPropertyWithValue("amount", BigDecimal("64.99"))
+  }
 }

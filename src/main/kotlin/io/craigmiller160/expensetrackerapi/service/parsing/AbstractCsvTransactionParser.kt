@@ -24,12 +24,15 @@ abstract class AbstractCsvTransactionParser : TransactionParser {
               InvalidImportException("Error parsing CSV record, row ${index + 2}", it)
             }
           }
+          .filter { either -> either.exists { includeTransaction(it) } }
           .sequence()
 
   private fun prepareFieldExtractor(fields: Array<String>): FieldExtractor = { index, name ->
     Either.catch { fields[index] }
         .mapLeft { InvalidImportException("Missing field $name at CSV row index $index") }
   }
+
+  protected open fun includeTransaction(transaction: Transaction): Boolean = true
 
   protected abstract fun getTransaction(
       userId: Long,
