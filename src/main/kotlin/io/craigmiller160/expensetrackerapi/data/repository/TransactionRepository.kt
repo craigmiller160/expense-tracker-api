@@ -28,7 +28,7 @@ interface TransactionRepository : JpaRepository<Transaction, TypedId<Transaction
     AND t.userId = :userId
   """)
   @Modifying(flushAutomatically = true, clearAutomatically = true)
-  fun confirmTransactionCategory(
+  fun setTransactionCategory(
       @Param("transactionId") transactionId: TypedId<TransactionId>,
       @Param("categoryId") categoryId: TypedId<CategoryId>,
       @Param("userId") userId: Long
