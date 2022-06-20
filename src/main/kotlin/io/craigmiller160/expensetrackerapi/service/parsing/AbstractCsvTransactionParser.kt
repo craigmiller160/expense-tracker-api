@@ -10,13 +10,13 @@ typealias FieldExtractor = (index: Int, name: String) -> TryEither<String>
 
 abstract class AbstractCsvTransactionParser : TransactionParser {
 
-  override fun parse(transactions: String): TryEither<List<Transaction>> =
+  override fun parse(userId: Long, transactions: String): TryEither<List<Transaction>> =
       transactions
           .split("\n")
           .asSequence()
           .map { line -> line.split(",").map { it.trim() } }
           .map { prepareFieldExtractor(it) }
-          .map { getTransaction(it) }
+          .map { getTransaction(userId, it) }
           .sequence()
 
   private fun prepareFieldExtractor(fields: List<String>): FieldExtractor = { index, name ->
@@ -24,5 +24,8 @@ abstract class AbstractCsvTransactionParser : TransactionParser {
         .mapLeft { InvalidImportException("Missing field $name at CSV row index $index") }
   }
 
-  protected abstract fun getTransaction(fieldExtractor: FieldExtractor): TryEither<Transaction>
+  protected abstract fun getTransaction(
+      userId: Long,
+      fieldExtractor: FieldExtractor
+  ): TryEither<Transaction>
 }
