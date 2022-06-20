@@ -18,7 +18,11 @@ abstract class AbstractCsvTransactionParser : TransactionParser {
           .drop(1)
           .map { line -> line.split(",").map { it.trim() } }
           .map { prepareFieldExtractor(it) }
-          .map { getTransaction(userId, it) }
+          .mapIndexed { index, fieldExtractor ->
+            getTransaction(userId, fieldExtractor).mapLeft {
+              InvalidImportException("Error parsing record at index $index", it)
+            }
+          }
           .sequence()
 
   private fun prepareFieldExtractor(fields: List<String>): FieldExtractor = { index, name ->
