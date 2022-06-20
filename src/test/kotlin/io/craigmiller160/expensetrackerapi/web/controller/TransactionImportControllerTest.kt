@@ -1,8 +1,8 @@
 package io.craigmiller160.expensetrackerapi.web.controller
 
 import arrow.core.Either
+import arrow.core.flatMap
 import io.craigmiller160.expensetrackerapi.BaseIntegrationTest
-import io.craigmiller160.expensetrackerapi.function.tryEither
 import io.craigmiller160.expensetrackerapi.service.TransactionImportType
 import io.craigmiller160.expensetrackerapi.testutils.ResourceUtils
 import io.craigmiller160.expensetrackerapi.web.types.ImportTypeResponse
@@ -30,23 +30,18 @@ class TransactionImportControllerTest : BaseIntegrationTest() {
 
   @Test
   fun `importTransactions - DISCOVER_CSV`() {
-    tryEither
-        .eager {
-          val bytes = ResourceUtils.getResourceBytes("data/discover1.csv").bind()
-
+    ResourceUtils.getResourceBytes("data/discover1.csv")
+        .flatMap { bytes ->
           Either.catch {
-                mockMvc
-                    .multipart(
-                        "/transaction-import?type=${TransactionImportType.DISCOVER_CSV.name}") {
-                      secure = true
-                      header("Authorization", "Bearer $token")
-                      header("Content-Type", MediaType.MULTIPART_FORM_DATA_VALUE)
-                      file("file", bytes)
-                    }
-                    .andExpect { status { isOk() } }
-                // TODO test content
-              }
-              .bind()
+            mockMvc
+                .multipart("/transaction-import?type=${TransactionImportType.DISCOVER_CSV.name}") {
+                  secure = true
+                  header("Authorization", "Bearer $token")
+                  header("Content-Type", MediaType.MULTIPART_FORM_DATA_VALUE)
+                  file("file", bytes)
+                }
+                .andExpect { status { isOk() } }
+          }
         }
         .shouldBeRight()
   }
