@@ -7,12 +7,15 @@ import io.craigmiller160.expensetrackerapi.data.repository.TransactionRepository
 import io.craigmiller160.expensetrackerapi.web.types.CategorizeTransactionsRequest
 import io.craigmiller160.expensetrackerapi.web.types.DeleteTransactionsRequest
 import io.craigmiller160.expensetrackerapi.web.types.TransactionAndCategory
+import io.craigmiller160.expensetrackerapi.web.types.TransactionResponse
+import io.craigmiller160.expensetrackerapi.web.types.TransactionSearchRequest
 import javax.persistence.EntityManager
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.test.web.servlet.delete
+import org.springframework.test.web.servlet.get
 import org.springframework.test.web.servlet.put
 
 class TransactionControllerTest : BaseIntegrationTest() {
@@ -50,7 +53,25 @@ class TransactionControllerTest : BaseIntegrationTest() {
   }
   @Test
   fun `search - confirmed transactions only`() {
-    TODO()
+    val txn1 = transactionRepository.saveAndFlush(user1Transactions.first().copy(confirmed = true))
+    val txn2 = transactionRepository.saveAndFlush(user1Transactions[1].copy(confirmed = true))
+    transactionRepository.saveAndFlush(user2Transactions.first().copy(confirmed = true))
+    val request = TransactionSearchRequest(confirmed = true, pageNumber = 0, pageSize = 100)
+
+    val response =
+        listOf(
+            TransactionResponse.from(txn1), TransactionResponse.from(txn2, user1Categories.first()))
+
+    mockMvc
+        .get("/transactions") {
+          secure = true
+          header("Authorization", "Bearer $token")
+          content = objectMapper.writeValueAsString(request)
+        }
+        .andExpect {
+          status { isOk() }
+          content { json(objectMapper.writeValueAsString(response)) }
+        }
   }
 
   @Test
@@ -70,7 +91,7 @@ class TransactionControllerTest : BaseIntegrationTest() {
             ids = listOf(user1Transactions.first().id, user2Transactions.first().id))
 
     mockMvc
-        .delete("transactions") {
+        .delete("/transactions") {
           secure = true
           header("Authorization", "Bearer $token")
           content = objectMapper.writeValueAsString(request)
