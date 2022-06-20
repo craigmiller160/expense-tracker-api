@@ -67,4 +67,25 @@ class TransactionImportControllerTest : BaseIntegrationTest() {
         .hasFieldOrPropertyWithValue("description", "PANDA EXPRESS 1679 RIVERVIEW FL")
         .hasFieldOrPropertyWithValue("amount", BigDecimal("5.81"))
   }
+
+  @Test
+  fun `importTransactions - CHASE_CSV`() {
+    ResourceUtils.getResourceBytes("data/chase1.csv")
+        .flatMap { bytes ->
+          Either.catch {
+            mockMvc
+                .multipart("/transaction-import?type=${TransactionImportType.CHASE_CSV.name}") {
+                  secure = true
+                  header("Authorization", "Bearer $token")
+                  header("Content-Type", MediaType.MULTIPART_FORM_DATA_VALUE)
+                  file("file", bytes)
+                }
+                .andExpect {
+                  status { isOk() }
+                  content { json("""{"transactionsImported":23}""") }
+                }
+          }
+        }
+        .shouldBeRight()
+  }
 }
