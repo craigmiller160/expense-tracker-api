@@ -6,9 +6,9 @@ import io.craigmiller160.expensetrackerapi.data.model.Transaction
 import io.craigmiller160.expensetrackerapi.data.repository.TransactionRepository
 import io.craigmiller160.expensetrackerapi.web.types.CategorizeTransactionsRequest
 import io.craigmiller160.expensetrackerapi.web.types.DeleteTransactionsRequest
+import io.craigmiller160.expensetrackerapi.web.types.SearchTransactionsRequest
 import io.craigmiller160.expensetrackerapi.web.types.TransactionAndCategory
 import io.craigmiller160.expensetrackerapi.web.types.TransactionResponse
-import io.craigmiller160.expensetrackerapi.web.types.TransactionSearchRequest
 import java.time.LocalDate
 import javax.persistence.EntityManager
 import org.assertj.core.api.Assertions.assertThat
@@ -57,7 +57,7 @@ class TransactionControllerTest : BaseIntegrationTest() {
     val txn1 = transactionRepository.saveAndFlush(user1Transactions.first().copy(confirmed = true))
     val txn2 = transactionRepository.saveAndFlush(user1Transactions[1].copy(confirmed = true))
     transactionRepository.saveAndFlush(user2Transactions.first().copy(confirmed = true))
-    val request = TransactionSearchRequest(confirmed = true, pageNumber = 0, pageSize = 100)
+    val request = SearchTransactionsRequest(confirmed = true, pageNumber = 0, pageSize = 100)
 
     val response =
         listOf(
@@ -79,7 +79,7 @@ class TransactionControllerTest : BaseIntegrationTest() {
   fun `search - unconfirmed transactions only`() {
     transactionRepository.saveAndFlush(user1Transactions.first().copy(confirmed = true))
     transactionRepository.saveAndFlush(user1Transactions[1].copy(confirmed = true))
-    val request = TransactionSearchRequest(confirmed = false, pageNumber = 0, pageSize = 100)
+    val request = SearchTransactionsRequest(confirmed = false, pageNumber = 0, pageSize = 100)
 
     val response =
         listOf(
@@ -112,7 +112,7 @@ class TransactionControllerTest : BaseIntegrationTest() {
             .filter { it.expenseDate.isAfter(LocalDate.now().minusDays(2)) }
 
     val request =
-        TransactionSearchRequest(
+        SearchTransactionsRequest(
             startDate = LocalDate.now().minusDays(2),
             endDate = LocalDate.now(),
             pageNumber = 0,
@@ -130,6 +130,11 @@ class TransactionControllerTest : BaseIntegrationTest() {
           status { isOk() }
           content { json(objectMapper.writeValueAsString(response)) }
         }
+  }
+
+  @Test
+  fun `search - categories`() {
+    TODO()
   }
 
   @Test
