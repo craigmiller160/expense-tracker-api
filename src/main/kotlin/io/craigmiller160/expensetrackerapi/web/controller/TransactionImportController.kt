@@ -1,5 +1,6 @@
 package io.craigmiller160.expensetrackerapi.web.controller
 
+import io.craigmiller160.expensetrackerapi.function.TryEither
 import io.craigmiller160.expensetrackerapi.service.TransactionImportService
 import io.craigmiller160.expensetrackerapi.service.TransactionImportType
 import io.craigmiller160.expensetrackerapi.web.types.ImportTransactionsResponse
@@ -20,8 +21,8 @@ class TransactionImportController(private val transactionImportService: Transact
   fun importTransactions(
       @RequestParam("type") type: TransactionImportType,
       @RequestPart("file") file: MultipartFile
-  ): ImportTransactionsResponse =
-      file.inputStream.use { transactionImportService.importTransactions(type, it) }
+  ): TryEither<ImportTransactionsResponse> =
+      transactionImportService.importTransactions(type, file.inputStream)
 
   @GetMapping("/types")
   fun getImportTypes(): List<ImportTypeResponse> = transactionImportService.getImportTypes()
