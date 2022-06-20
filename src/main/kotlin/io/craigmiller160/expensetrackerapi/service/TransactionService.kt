@@ -1,6 +1,7 @@
 package io.craigmiller160.expensetrackerapi.service
 
 import arrow.core.Either
+import arrow.core.sequence
 import io.craigmiller160.expensetrackerapi.data.repository.CategoryRepository
 import io.craigmiller160.expensetrackerapi.data.repository.TransactionRepository
 import io.craigmiller160.expensetrackerapi.function.TryEither
@@ -19,12 +20,16 @@ class TransactionService(
     private val oAuth2Service: OAuth2Service
 ) {
   @Transactional
-  fun categorizeTransactions(request: CategorizeTransactionsRequest): TryEither<Unit> {
+  fun categorizeTransactions(request: CategorizeTransactionsRequest): TryEither<List<Unit>> {
     val userId = oAuth2Service.getAuthenticatedUser().userId
-    request.transactionsAndCategories.forEach {
-      transactionRepository.setTransactionCategory(it.transactionId, it.categoryId, userId)
-    }
-    return Either.Right(Unit)
+    return request.transactionsAndCategories
+        .map { txnAndCat ->
+          Either.catch {
+            transactionRepository.setTransactionCategory(
+                txnAndCat.transactionId, txnAndCat.categoryId, userId)
+          }
+        }
+        .sequence()
   }
 
   @Transactional
