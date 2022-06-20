@@ -38,8 +38,12 @@ dependencies {
     val arrowKtVersion = "1.1.2"
     val assertJVersion = "3.23.1"
     val openCsvVersion = "5.6"
+    val fakerVersion = "1.0.2"
 
     implementation("com.opencsv:opencsv:$openCsvVersion")
+    implementation("com.github.javafaker:javafaker:$fakerVersion") {
+        exclude("org.yaml")
+    }
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
