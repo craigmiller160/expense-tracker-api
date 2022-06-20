@@ -14,6 +14,7 @@ abstract class AbstractCsvTransactionParser : TransactionParser {
       transactions
           .split("\n")
           .asSequence()
+          .drop(1)
           .map { line -> line.split(",").map { it.trim() } }
           .map { prepareFieldExtractor(it) }
           .map { getTransaction(userId, it) }
