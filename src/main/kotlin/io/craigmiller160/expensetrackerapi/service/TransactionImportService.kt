@@ -2,6 +2,7 @@ package io.craigmiller160.expensetrackerapi.service
 
 import arrow.core.Either
 import arrow.core.rightIfNotNull
+import io.craigmiller160.expensetrackerapi.common.error.InvalidImportException
 import io.craigmiller160.expensetrackerapi.data.repository.TransactionRepository
 import io.craigmiller160.expensetrackerapi.function.TryEither
 import io.craigmiller160.expensetrackerapi.function.tryEither
@@ -28,7 +29,7 @@ class TransactionImportService(private val transactionRepository: TransactionRep
         val rawTxns = Either.catch { stream.use { it.reader().readText() } }.bind()
         val parser =
             parsers[type]
-                .rightIfNotNull { IllegalArgumentException("No parser for type: $type") }
+                .rightIfNotNull { InvalidImportException("No parser for import type: $type") }
                 .bind()
         val transactions = parser.parse(rawTxns).bind()
         Either.catch { transactionRepository.saveAll(transactions) }.bind()
