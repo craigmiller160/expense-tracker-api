@@ -2,7 +2,7 @@ package io.craigmiller160.expensetrackerapi.service.parsing
 
 import io.craigmiller160.expensetrackerapi.data.model.Transaction
 import io.craigmiller160.expensetrackerapi.function.TryEither
-import io.craigmiller160.expensetrackerapi.function.flatMapCatch
+import java.math.BigDecimal
 import org.springframework.stereotype.Component
 
 @Component
@@ -14,7 +14,7 @@ class ChaseCsvTransactionParser : AbstractCsvTransactionParser() {
     TODO("Not yet implemented")
   }
 
-  /** Include only negative amounts to prevent adding deposits as expenses */
-  override fun includeRecord(fieldExtractor: FieldExtractor): TryEither<Boolean> =
-      fieldExtractor(3, "amount").flatMapCatch { amount -> amount.toDouble() < 0 }
+  /** Because of parsing logic, negative amounts are deposits, not expenses */
+  override fun includeTransaction(transaction: Transaction): Boolean =
+      transaction.amount >= BigDecimal("0")
 }
