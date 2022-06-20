@@ -9,6 +9,7 @@ import io.craigmiller160.expensetrackerapi.web.types.DeleteTransactionsRequest
 import io.craigmiller160.expensetrackerapi.web.types.TransactionAndCategory
 import io.craigmiller160.expensetrackerapi.web.types.TransactionResponse
 import io.craigmiller160.expensetrackerapi.web.types.TransactionSearchRequest
+import java.time.LocalDate
 import javax.persistence.EntityManager
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
@@ -102,7 +103,33 @@ class TransactionControllerTest : BaseIntegrationTest() {
 
   @Test
   fun `search - start and end dates`() {
-    TODO()
+    val expected =
+        user1Transactions
+            .mapIndexed { index, txn ->
+              transactionRepository.saveAndFlush(
+                  txn.copy(expenseDate = LocalDate.now().minusDays(index.toLong())))
+            }
+            .filter { it.expenseDate.isAfter(LocalDate.now().minusDays(2)) }
+
+    val request =
+        TransactionSearchRequest(
+            startDate = LocalDate.now().minusDays(2),
+            endDate = LocalDate.now(),
+            pageNumber = 0,
+            pageSize = 100)
+
+    val response = expected.map { TransactionResponse.from(it) }
+
+    mockMvc
+        .get("/transactions") {
+          secure = true
+          header("Authorization", "Bearer $token")
+          content = objectMapper.writeValueAsString(request)
+        }
+        .andExpect {
+          status { isOk() }
+          content { json(objectMapper.writeValueAsString(response)) }
+        }
   }
 
   @Test
