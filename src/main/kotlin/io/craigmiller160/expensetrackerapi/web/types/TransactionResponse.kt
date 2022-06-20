@@ -18,7 +18,7 @@ data class TransactionResponse(
     val categoryName: String?
 ) {
   companion object {
-    fun from(transaction: Transaction, category: Category?): TransactionResponse =
+    fun from(transaction: Transaction, category: Category? = null): TransactionResponse =
         TransactionResponse(
             id = transaction.id,
             expenseDate = transaction.expenseDate,

@@ -76,7 +76,27 @@ class TransactionControllerTest : BaseIntegrationTest() {
 
   @Test
   fun `search - unconfirmed transactions only`() {
-    TODO()
+    transactionRepository.saveAndFlush(user1Transactions.first().copy(confirmed = true))
+    transactionRepository.saveAndFlush(user1Transactions[1].copy(confirmed = true))
+    val request = TransactionSearchRequest(confirmed = false, pageNumber = 0, pageSize = 100)
+
+    val response =
+        listOf(
+            TransactionResponse.from(user1Transactions[2]),
+            TransactionResponse.from(user1Transactions[3], user1Categories[1]),
+            TransactionResponse.from(user1Transactions[4]),
+            TransactionResponse.from(user1Transactions[5], user1Categories[2]))
+
+    mockMvc
+        .get("/transactions") {
+          secure = true
+          header("Authorization", "Bearer $token")
+          content = objectMapper.writeValueAsString(request)
+        }
+        .andExpect {
+          status { isOk() }
+          content { json(objectMapper.writeValueAsString(response)) }
+        }
   }
 
   @Test
