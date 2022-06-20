@@ -28,6 +28,10 @@ spring:
     username: postgres_root
     password: ${POSTGRES_ROOT_PASSWORD}
     url: jdbc:postgresql://${spring.datasource.host}:${spring.datasource.port}/${spring.datasource.db_name}
+  http:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 11MB
 
 oauth2:
   auth-login-base-uri: "/expense-tracker/oauth2"
