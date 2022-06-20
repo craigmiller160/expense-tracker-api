@@ -4,6 +4,8 @@ import arrow.core.Either
 import arrow.core.continuations.either
 import io.craigmiller160.expensetrackerapi.data.model.Transaction
 import io.craigmiller160.expensetrackerapi.function.TryEither
+import java.math.BigDecimal
+import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import org.springframework.stereotype.Component
 
@@ -18,8 +20,11 @@ class DiscoverCsvTransactionParser : AbstractCsvTransactionParser() {
   ): TryEither<Transaction> =
       either.eager {
         val transactionDate = fieldExtractor(0, "transactionDate").bind()
-        val expenseDate = Either.catch { DATE_FORMAT.parse(transactionDate) }.bind()
-
-        TODO()
+        val expenseDate = Either.catch { LocalDate.parse(transactionDate, DATE_FORMAT) }.bind()
+        val description = fieldExtractor(2, "description").bind()
+        val rawAmount = fieldExtractor(3, "amount").bind()
+        val amount = Either.catch { BigDecimal(rawAmount) }.bind()
+        Transaction(
+            userId = userId, expenseDate = expenseDate, description = description, amount = amount)
       }
 }
