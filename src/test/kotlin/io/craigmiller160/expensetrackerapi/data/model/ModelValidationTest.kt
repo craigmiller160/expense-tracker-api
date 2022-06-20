@@ -2,6 +2,7 @@ package io.craigmiller160.expensetrackerapi.data.model
 
 import io.craigmiller160.expensetrackerapi.BaseIntegrationTest
 import java.time.ZonedDateTime
+import javax.persistence.EntityManager
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
@@ -12,11 +13,14 @@ import org.springframework.dao.InvalidDataAccessApiUsageException
 class ModelValidationTest : BaseIntegrationTest() {
   @Autowired private lateinit var countryRepository: CountryRepository
   @Autowired private lateinit var residentRepository: ResidentRepository
+  @Autowired private lateinit var entityManager: EntityManager
   private val NOW = ZonedDateTime.now()
   @Test
   fun `immutable entity inserts but cannot be updated`() {
     val country = Country("USA")
     countryRepository.save(country)
+
+    entityManager.flush()
 
     assertThat(country.created).isAfterOrEqualTo(NOW)
 
@@ -26,7 +30,10 @@ class ModelValidationTest : BaseIntegrationTest() {
     val newCountry = dbCountry.copy(name = "CAN")
     assertThat(newCountry.id).isEqualTo(country.id)
 
-    val ex = assertThrows<InvalidDataAccessApiUsageException> { countryRepository.save(newCountry) }
+    val ex =
+        assertThrows<InvalidDataAccessApiUsageException> {
+          countryRepository.saveAndFlush(newCountry)
+        }
     assertThat(ex.cause).isNotNull.isInstanceOf(IllegalStateException::class.java)
   }
 
@@ -44,6 +51,8 @@ class ModelValidationTest : BaseIntegrationTest() {
 
     val newResident = dbResident.copy(name = "Sally")
     residentRepository.save(newResident)
+
+    entityManager.flush()
 
     val dbResident2 = residentRepository.findById(resident.id).orElseThrow()
     assertThat(dbResident2.name).isEqualTo(newResident.name)
