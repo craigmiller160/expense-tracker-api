@@ -16,8 +16,10 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import org.springframework.test.web.servlet.MockMvc
+import org.springframework.transaction.annotation.Transactional
 
 @SpringBootTest
+@Transactional
 @AutoConfigureMockMvc
 @ExtendWith(SpringExtension::class)
 class BaseIntegrationTest {
