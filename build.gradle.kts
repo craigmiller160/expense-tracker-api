@@ -37,7 +37,9 @@ dependencies {
     val mockitoKotlinVersion = "4.0.0"
     val arrowKtVersion = "1.1.2"
     val assertJVersion = "3.23.1"
+    val openCsvVersion = "5.6"
 
+    implementation("com.opencsv:opencsv:$openCsvVersion")
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
