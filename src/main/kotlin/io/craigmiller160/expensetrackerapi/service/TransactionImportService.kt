@@ -1,11 +1,11 @@
 package io.craigmiller160.expensetrackerapi.service
 
 import arrow.core.Either
+import arrow.core.continuations.either
 import arrow.core.rightIfNotNull
 import io.craigmiller160.expensetrackerapi.common.error.InvalidImportException
 import io.craigmiller160.expensetrackerapi.data.repository.TransactionRepository
 import io.craigmiller160.expensetrackerapi.function.TryEither
-import io.craigmiller160.expensetrackerapi.function.tryEither
 import io.craigmiller160.expensetrackerapi.service.parsing.DiscoverCsvTransactionParser
 import io.craigmiller160.expensetrackerapi.service.parsing.TransactionParser
 import io.craigmiller160.expensetrackerapi.web.types.ImportTransactionsResponse
@@ -25,7 +25,7 @@ class TransactionImportService(private val transactionRepository: TransactionRep
       type: TransactionImportType,
       stream: InputStream
   ): TryEither<ImportTransactionsResponse> =
-      tryEither.eager {
+      either.eager {
         val rawTxns = Either.catch { stream.use { it.reader().readText() } }.bind()
         val parser =
             parsers[type]
