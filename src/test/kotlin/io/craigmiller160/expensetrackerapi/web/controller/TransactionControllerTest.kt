@@ -5,15 +5,19 @@ import io.craigmiller160.expensetrackerapi.data.model.Category
 import io.craigmiller160.expensetrackerapi.data.model.Transaction
 import io.craigmiller160.expensetrackerapi.data.repository.TransactionRepository
 import io.craigmiller160.expensetrackerapi.web.types.CategorizeTransactionsRequest
+import io.craigmiller160.expensetrackerapi.web.types.DeleteTransactionsRequest
 import io.craigmiller160.expensetrackerapi.web.types.TransactionAndCategory
+import javax.persistence.EntityManager
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.test.web.servlet.delete
 import org.springframework.test.web.servlet.put
 
 class TransactionControllerTest : BaseIntegrationTest() {
   @Autowired private lateinit var transactionRepository: TransactionRepository
+  @Autowired private lateinit var entityManager: EntityManager
 
   private lateinit var user1Categories: List<Category>
   private lateinit var user1Transactions: List<Transaction>
@@ -61,7 +65,22 @@ class TransactionControllerTest : BaseIntegrationTest() {
 
   @Test
   fun deleteTransactions() {
-    TODO()
+    val request =
+        DeleteTransactionsRequest(
+            ids = listOf(user1Transactions.first().id, user2Transactions.first().id))
+
+    mockMvc
+        .delete("transactions") {
+          secure = true
+          header("Authorization", "Bearer $token")
+          content = objectMapper.writeValueAsString(request)
+        }
+        .andExpect { status { isNoContent() } }
+
+    entityManager.flush()
+
+    assertThat(transactionRepository.findById(user1Transactions.first().id)).isEmpty
+    assertThat(transactionRepository.findById(user2Transactions.first().id)).isPresent
   }
 
   @Test
@@ -88,7 +107,9 @@ class TransactionControllerTest : BaseIntegrationTest() {
           header("Authorization", "Bearer $token")
           content = objectMapper.writeValueAsString(request)
         }
-        .andExpect { status { isOk() } }
+        .andExpect { status { isNoContent() } }
+
+    entityManager.flush()
 
     assertThat(transactionRepository.findById(uncategorizedTransaction.id))
         .isPresent
