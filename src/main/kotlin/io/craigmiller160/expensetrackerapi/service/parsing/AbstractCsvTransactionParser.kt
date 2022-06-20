@@ -12,6 +12,7 @@ abstract class AbstractCsvTransactionParser : TransactionParser {
 
   override fun parse(userId: Long, transactions: String): TryEither<List<Transaction>> =
       transactions
+          .trim()
           .split("\n")
           .asSequence()
           .drop(1)
