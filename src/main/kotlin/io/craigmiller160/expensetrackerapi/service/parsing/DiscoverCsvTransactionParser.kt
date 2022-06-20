@@ -5,7 +5,9 @@ import arrow.core.continuations.either
 import io.craigmiller160.expensetrackerapi.data.model.Transaction
 import io.craigmiller160.expensetrackerapi.function.TryEither
 import java.time.format.DateTimeFormatter
+import org.springframework.stereotype.Component
 
+@Component
 class DiscoverCsvTransactionParser : AbstractCsvTransactionParser() {
   companion object {
     private val DATE_FORMAT = DateTimeFormatter.ofPattern("MM/dd/yyyy")
