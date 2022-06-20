@@ -8,6 +8,8 @@ import io.craigmiller160.expensetrackerapi.service.TransactionImportType
 import io.craigmiller160.expensetrackerapi.testutils.ResourceUtils
 import io.craigmiller160.expensetrackerapi.web.types.ImportTypeResponse
 import io.kotest.assertions.arrow.core.shouldBeRight
+import java.math.BigDecimal
+import java.time.LocalDate
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -54,5 +56,15 @@ class TransactionImportControllerTest : BaseIntegrationTest() {
 
     val transactions = transactionRepository.findAllByOrderByExpenseDateAsc()
     assertThat(transactions).hasSize(57)
+
+    assertThat(transactions.first())
+        .hasFieldOrPropertyWithValue("expenseDate", LocalDate.of(2022, 4, 18))
+        .hasFieldOrPropertyWithValue("description", "WAWA 5127 TAMPA FL")
+        .hasFieldOrPropertyWithValue("amount", BigDecimal("44.72"))
+
+    assertThat(transactions.last())
+        .hasFieldOrPropertyWithValue("expenseDate", LocalDate.of(2022, 5, 18))
+        .hasFieldOrPropertyWithValue("description", "PANDA EXPRESS 1679 RIVERVIEW FL")
+        .hasFieldOrPropertyWithValue("amount", BigDecimal("5.81"))
   }
 }
