@@ -52,23 +52,23 @@ class TransactionService(
     val pageable = PageRequest.of(request.pageNumber, request.pageSize)
     return either.eager {
       val categories = getCategoryMap(userId).bind()
-      val page =
-          Either.catch {
-                transactionRepository.searchTransactions(
-                    userId,
-                    //                    request.categoryIds ?: setOf(),
-                    request.startDate,
-                    request.endDate,
-                    request.confirmed,
-                    pageable)
-              }
-              .bind()
       //      val page =
       //          Either.catch {
-      //                transactionRepository.findAll(
-      //                    createSearchSpec(userId, request, categories.keys), pageable)
+      //                transactionRepository.searchTransactions(
+      //                    userId,
+      //                    //                    request.categoryIds ?: setOf(),
+      //                    request.startDate,
+      //                    request.endDate,
+      //                    request.confirmed,
+      //                    pageable)
       //              }
       //              .bind()
+      val page =
+          Either.catch {
+                transactionRepository.findAll(
+                    createSearchSpec(userId, request, categories.keys), pageable)
+              }
+              .bind()
 
       SearchTransactionsResponse.from(page, categories)
     }
@@ -80,8 +80,9 @@ class TransactionService(
       categories: Set<TypedId<CategoryId>>
   ): Specification<Transaction> {
     val userIdSpec = SpecBuilder.equals<Transaction>(userId, "userId")
-    val startDateSpec = SpecBuilder.equals<Transaction>(request.startDate, "startDate")
-    val endDateSpec = SpecBuilder.equals<Transaction>(request.endDate, "endDate")
+    val startDateSpec =
+        SpecBuilder.greaterThanOrEqualTo<Transaction>(request.startDate, "expenseDate")
+    val endDateSpec = SpecBuilder.lessThanOrEqualTo<Transaction>(request.endDate, "expenseDate")
     val confirmedSpec = SpecBuilder.equals<Transaction>(request.confirmed, "confirmed")
     val filteredCategoryIds =
         request.categoryIds?.let { ids -> ids.filter { categories.contains(it) } }
