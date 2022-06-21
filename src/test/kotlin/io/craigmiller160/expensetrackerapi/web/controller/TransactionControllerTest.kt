@@ -7,6 +7,7 @@ import io.craigmiller160.expensetrackerapi.data.repository.TransactionRepository
 import io.craigmiller160.expensetrackerapi.web.types.CategorizeTransactionsRequest
 import io.craigmiller160.expensetrackerapi.web.types.DeleteTransactionsRequest
 import io.craigmiller160.expensetrackerapi.web.types.SearchTransactionsRequest
+import io.craigmiller160.expensetrackerapi.web.types.SearchTransactionsResponse
 import io.craigmiller160.expensetrackerapi.web.types.TransactionAndCategory
 import io.craigmiller160.expensetrackerapi.web.types.TransactionResponse
 import java.time.LocalDate
@@ -61,8 +62,13 @@ class TransactionControllerTest : BaseIntegrationTest() {
     val request = SearchTransactionsRequest(confirmed = true, pageNumber = 0, pageSize = 100)
 
     val response =
-        listOf(
-            TransactionResponse.from(txn1), TransactionResponse.from(txn2, user1Categories.first()))
+        SearchTransactionsResponse(
+            transactions =
+                listOf(
+                    TransactionResponse.from(txn1),
+                    TransactionResponse.from(txn2, user1Categories.first())),
+            pageNumber = 0,
+            totalItems = 2)
 
     mockMvc
         .get("/transactions") {
@@ -84,12 +90,16 @@ class TransactionControllerTest : BaseIntegrationTest() {
     val request = SearchTransactionsRequest(confirmed = false, pageNumber = 0, pageSize = 100)
 
     val response =
-        listOf(
-            TransactionResponse.from(user1Transactions[2]),
-            TransactionResponse.from(user1Transactions[3], user1Categories[1]),
-            TransactionResponse.from(user1Transactions[4]),
-            TransactionResponse.from(user1Transactions[5], user1Categories[2]),
-            TransactionResponse.from(user1Transactions[6]))
+        SearchTransactionsResponse(
+            transactions =
+                listOf(
+                    TransactionResponse.from(user1Transactions[2]),
+                    TransactionResponse.from(user1Transactions[3], user1Categories[1]),
+                    TransactionResponse.from(user1Transactions[4]),
+                    TransactionResponse.from(user1Transactions[5], user1Categories[2]),
+                    TransactionResponse.from(user1Transactions[6])),
+            pageNumber = 0,
+            totalItems = 5)
 
     mockMvc
         .get("/transactions") {
@@ -121,7 +131,11 @@ class TransactionControllerTest : BaseIntegrationTest() {
             pageNumber = 0,
             pageSize = 100)
 
-    val response = expected.map { TransactionResponse.from(it) }
+    val response =
+        SearchTransactionsResponse(
+            transactions = expected.map { TransactionResponse.from(it) },
+            pageNumber = 0,
+            totalItems = expected.size.toLong())
 
     mockMvc
         .get("/transactions") {
@@ -144,13 +158,23 @@ class TransactionControllerTest : BaseIntegrationTest() {
     val categories =
         listOf(user1Categories.first().id.toString(), user2Cat.id.toString()).joinToString(",")
 
+    val response =
+        SearchTransactionsResponse(
+            transactions =
+                listOf(
+                    TransactionResponse.from(user1Transactions.first(), user1Categories.first())),
+            pageNumber = 0,
+            totalItems = 1)
+
     mockMvc
         .get("/transactions?categories=$categories") {
           secure = true
           header("Authorization", "Bearer $token")
         }
-        .andExpect { status { isOk() } }
-    // TODO test response
+        .andExpect {
+          status { isOk() }
+          content { json(objectMapper.writeValueAsString(response)) }
+        }
   }
 
   @Test
