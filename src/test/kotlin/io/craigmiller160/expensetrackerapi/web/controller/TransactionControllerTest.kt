@@ -200,6 +200,9 @@ class TransactionControllerTest : BaseIntegrationTest() {
         .isPresent
         .get()
         .hasFieldOrPropertyWithValue("categoryId", null)
-    // TODO validate that user 2 category was not added
+    assertThat(transactionRepository.findById(user1Transactions[2].id))
+        .isPresent
+        .get()
+        .hasFieldOrPropertyWithValue("categoryId", null)
   }
 }
