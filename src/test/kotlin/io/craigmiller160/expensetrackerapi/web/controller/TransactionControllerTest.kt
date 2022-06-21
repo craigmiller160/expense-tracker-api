@@ -138,7 +138,19 @@ class TransactionControllerTest : BaseIntegrationTest() {
 
   @Test
   fun `search - categories`() {
-    TODO()
+    val user2Cat = dataHelper.createCategory(2L, "User2 Cat")
+    transactionRepository.saveAndFlush(user2Transactions.first().copy(categoryId = user2Cat.id))
+
+    val categories =
+        listOf(user1Categories.first().id.toString(), user2Cat.id.toString()).joinToString(",")
+
+    mockMvc
+        .get("/transactions?categories=$categories") {
+          secure = true
+          header("Authorization", "Bearer $token")
+        }
+        .andExpect { status { isOk() } }
+    // TODO test response
   }
 
   @Test
