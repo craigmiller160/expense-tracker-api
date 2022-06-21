@@ -151,8 +151,7 @@ class TransactionControllerTest : BaseIntegrationTest() {
     val user2Cat = dataHelper.createCategory(2L, "User2 Cat")
     transactionRepository.saveAndFlush(user2Transactions.first().copy(categoryId = user2Cat.id))
 
-    val categories =
-        listOf(user1Categories.first().id.toString(), user2Cat.id.toString()).joinToString(",")
+    val categories = setOf(user1Categories.first().id, user2Cat.id)
 
     val response =
         SearchTransactionsResponse(
