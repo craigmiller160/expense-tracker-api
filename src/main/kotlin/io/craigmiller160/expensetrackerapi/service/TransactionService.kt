@@ -50,6 +50,7 @@ class TransactionService(
   fun search(request: SearchTransactionsRequest): TryEither<SearchTransactionsResponse> {
     val userId = oAuth2Service.getAuthenticatedUser().userId
     val pageable = PageRequest.of(request.pageNumber, request.pageSize)
+    // TODO clean this up once its all working
     return either.eager {
       val categories = getCategoryMap(userId).bind()
       //      val page =
