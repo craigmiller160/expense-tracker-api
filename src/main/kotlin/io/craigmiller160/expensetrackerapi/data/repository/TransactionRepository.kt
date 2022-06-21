@@ -51,16 +51,25 @@ interface TransactionRepository : JpaRepository<Transaction, TypedId<Transaction
 
   @Query(
       """
-      SELECT t.*
+      SELECT t
       FROM Transaction t
-      WHERE (:startDate IS NULL OR t.expenseDate >= :startDate)
+      WHERE t.userId = :userId
+      AND (:startDate IS NULL OR t.expenseDate >= :startDate)
       AND (:endDate IS NULL OR t.expenseDate <= :endDate)
       AND (:confirmed IS NULL OR t.confirmed = :confirmed)
+      AND (:categoryIds IS NULL OR t.categoryId IN (
+        SELECT c.id
+        FROM Category c
+        WHERE c.userId = :userId
+        AND c.id IN (:categoryIds)
+      ))
   """)
   fun searchTransactions(
+      @Param("userId") userId: Long,
       @Param("startDate") startDate: LocalDate?,
       @Param("endDate") endDate: LocalDate?,
       @Param("confirmed") confirmed: Boolean?,
+      @Param("categoryIds") categoryIds: Set<TypedId<CategoryId>>?,
       page: Pageable
   ): Page<Transaction>
 }
