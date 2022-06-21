@@ -53,10 +53,10 @@ class TransactionService(
           Either.catch {
                 transactionRepository.searchTransactions(
                     userId,
+                    request.categoryIds ?: setOf(),
                     request.startDate,
                     request.endDate,
                     request.confirmed,
-                    request.categoryIds,
                     pageable)
               }
               .bind()
