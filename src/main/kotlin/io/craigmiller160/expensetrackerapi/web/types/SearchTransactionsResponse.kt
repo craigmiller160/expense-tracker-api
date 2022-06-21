@@ -9,14 +9,20 @@ import org.springframework.data.domain.Page
 data class SearchTransactionsResponse(
     val transactions: List<TransactionResponse>,
     val pageNumber: Int,
-    val totalItems: Long
+    val totalItems: Int
 ) {
   companion object {
     fun from(
         page: Page<Transaction>,
         categories: Map<TypedId<CategoryId>, Category>
     ): SearchTransactionsResponse {
-      TODO()
+      val transactions =
+          page.content.map { txn ->
+            val category = txn.categoryId?.let { categories[it] }
+            TransactionResponse.from(txn, category)
+          }
+      return SearchTransactionsResponse(
+          transactions = transactions, pageNumber = page.number, totalItems = page.numberOfElements)
     }
   }
 }
