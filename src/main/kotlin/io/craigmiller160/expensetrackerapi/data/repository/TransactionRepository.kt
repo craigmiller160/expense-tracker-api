@@ -33,4 +33,16 @@ interface TransactionRepository : JpaRepository<Transaction, TypedId<Transaction
       @Param("categoryId") categoryId: TypedId<CategoryId>,
       @Param("userId") userId: Long
   )
+
+  @Query(
+      """
+      DELETE FROM Transaction t
+      WHERE t.id IN (:transactionIds)
+      AND t.userId = :userId
+  """)
+  @Modifying(flushAutomatically = true, clearAutomatically = true)
+  fun deleteTransactions(
+      @Param("transactionIds") transactionIds: Set<TypedId<TransactionId>>,
+      @Param("userId") userId: Long
+  )
 }
