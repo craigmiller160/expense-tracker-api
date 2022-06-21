@@ -141,7 +141,7 @@ class TransactionControllerTest : BaseIntegrationTest() {
   fun deleteTransactions() {
     val request =
         DeleteTransactionsRequest(
-            ids = listOf(user1Transactions.first().id, user2Transactions.first().id))
+            ids = setOf(user1Transactions.first().id, user2Transactions.first().id))
 
     mockMvc
         .delete("/transactions") {
