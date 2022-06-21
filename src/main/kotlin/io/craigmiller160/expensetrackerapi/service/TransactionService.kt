@@ -34,7 +34,8 @@ class TransactionService(
 
   @Transactional
   fun deleteTransactions(request: DeleteTransactionsRequest): TryEither<Unit> {
-    TODO()
+    val userId = oAuth2Service.getAuthenticatedUser().userId
+    return Either.catch { transactionRepository.deleteTransactions(request.ids, userId) }
   }
 
   fun search(request: SearchTransactionsRequest): TryEither<List<TransactionResponse>> {
