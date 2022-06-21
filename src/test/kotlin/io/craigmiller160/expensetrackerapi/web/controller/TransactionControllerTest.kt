@@ -15,6 +15,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.http.MediaType
 import org.springframework.test.web.servlet.delete
 import org.springframework.test.web.servlet.get
 import org.springframework.test.web.servlet.put
@@ -163,9 +164,8 @@ class TransactionControllerTest : BaseIntegrationTest() {
     val uncategorizedTransaction = user1Transactions[5]
     assertThat(uncategorizedTransaction.categoryId).isNull()
 
-    val categorizedTransaction = user1Transactions[6]
-    assertThat(uncategorizedTransaction.categoryId)
-        .isNotNull.isNotEqualTo(user1Categories.first().id)
+    val categorizedTransaction = user1Transactions[4]
+    assertThat(categorizedTransaction.categoryId).isNotNull.isNotEqualTo(user1Categories.first().id)
 
     val request =
         CategorizeTransactionsRequest(
@@ -181,6 +181,7 @@ class TransactionControllerTest : BaseIntegrationTest() {
         .put("/transactions/categorize") {
           secure = true
           header("Authorization", "Bearer $token")
+          contentType = MediaType.APPLICATION_JSON
           content = objectMapper.writeValueAsString(request)
         }
         .andExpect { status { isNoContent() } }
@@ -199,5 +200,6 @@ class TransactionControllerTest : BaseIntegrationTest() {
         .isPresent
         .get()
         .hasFieldOrPropertyWithValue("categoryId", null)
+    // TODO validate that user 2 category was not added
   }
 }
