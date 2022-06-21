@@ -1,6 +1,7 @@
 package io.craigmiller160.expensetrackerapi.service
 
 import arrow.core.Either
+import arrow.core.continuations.either
 import io.craigmiller160.expensetrackerapi.common.data.typedid.TypedId
 import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.CategoryId
 import io.craigmiller160.expensetrackerapi.data.model.Category
@@ -45,19 +46,25 @@ class TransactionService(
   @Transactional
   fun search(request: SearchTransactionsRequest): TryEither<SearchTransactionsResponse> {
     val userId = oAuth2Service.getAuthenticatedUser().userId
-    val categories = getCategoryMap(userId)
     val pageable = PageRequest.of(request.pageNumber, request.pageSize)
-    val page =
-        transactionRepository.searchTransactions(
-            userId,
-            request.startDate,
-            request.endDate,
-            request.confirmed,
-            request.categoryIds,
-            pageable)
-    return SearchTransactionsResponse.from(page, categories)
+    return either.eager {
+      val categories = getCategoryMap(userId).bind()
+      val page =
+          Either.catch {
+                transactionRepository.searchTransactions(
+                    userId,
+                    request.startDate,
+                    request.endDate,
+                    request.confirmed,
+                    request.categoryIds,
+                    pageable)
+              }
+              .bind()
+
+      SearchTransactionsResponse.from(page, categories)
+    }
   }
 
-  private fun getCategoryMap(userId: Long): Map<TypedId<CategoryId>, Category> =
-      categoryRepository.findAllByUserId(userId).associateBy { it.id }
+  private fun getCategoryMap(userId: Long): TryEither<Map<TypedId<CategoryId>, Category>> =
+      Either.catch { categoryRepository.findAllByUserId(userId).associateBy { it.id } }
 }
