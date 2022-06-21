@@ -5,8 +5,10 @@ import arrow.core.continuations.either
 import io.craigmiller160.expensetrackerapi.common.data.typedid.TypedId
 import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.CategoryId
 import io.craigmiller160.expensetrackerapi.data.model.Category
+import io.craigmiller160.expensetrackerapi.data.model.Transaction
 import io.craigmiller160.expensetrackerapi.data.repository.CategoryRepository
 import io.craigmiller160.expensetrackerapi.data.repository.TransactionRepository
+import io.craigmiller160.expensetrackerapi.data.specification.SpecBuilder
 import io.craigmiller160.expensetrackerapi.function.TryEither
 import io.craigmiller160.expensetrackerapi.function.flatMapCatch
 import io.craigmiller160.expensetrackerapi.web.types.CategorizeTransactionsRequest
@@ -16,6 +18,7 @@ import io.craigmiller160.expensetrackerapi.web.types.SearchTransactionsResponse
 import io.craigmiller160.expensetrackerapi.web.types.TransactionAndCategory
 import io.craigmiller160.oauth2.service.OAuth2Service
 import org.springframework.data.domain.PageRequest
+import org.springframework.data.jpa.domain.Specification
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -63,6 +66,22 @@ class TransactionService(
 
       SearchTransactionsResponse.from(page, categories)
     }
+  }
+
+  private fun createSearchSpec(
+      userId: Long,
+      request: SearchTransactionsRequest,
+      categories: Set<TypedId<CategoryId>>
+  ): Specification<Transaction> {
+    val userIdSpec = SpecBuilder.equals<Transaction>(userId, "userId")
+    val startDateSpec = SpecBuilder.equals<Transaction>(request.startDate, "startDate")
+    val endDateSpec = SpecBuilder.equals<Transaction>(request.endDate, "endDate")
+    val confirmedSpec = SpecBuilder.equals<Transaction>(request.confirmed, "confirmed")
+    val filteredCategoryIds =
+        request.categoryIds?.let { ids -> ids.filter { categories.contains(it) } }
+    val categoryIdSpec = SpecBuilder.`in`<Transaction>(filteredCategoryIds, "categoryId")
+
+    return userIdSpec.and(startDateSpec).and(endDateSpec).and(confirmedSpec).and(categoryIdSpec)
   }
 
   private fun getCategoryMap(userId: Long): TryEither<Map<TypedId<CategoryId>, Category>> =
