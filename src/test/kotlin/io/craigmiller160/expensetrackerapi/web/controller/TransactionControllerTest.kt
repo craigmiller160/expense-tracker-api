@@ -1,6 +1,8 @@
 package io.craigmiller160.expensetrackerapi.web.controller
 
 import io.craigmiller160.expensetrackerapi.BaseIntegrationTest
+import io.craigmiller160.expensetrackerapi.common.data.typedid.TypedId
+import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.CategoryId
 import io.craigmiller160.expensetrackerapi.data.model.Category
 import io.craigmiller160.expensetrackerapi.data.model.Transaction
 import io.craigmiller160.expensetrackerapi.data.repository.TransactionRepository
@@ -28,6 +30,7 @@ class TransactionControllerTest : BaseIntegrationTest() {
   private lateinit var entityManager: EntityManager
 
   private lateinit var user1Categories: List<Category>
+  private lateinit var user1CategoriesMap: Map<TypedId<CategoryId>, Category>
   private lateinit var user1Transactions: List<Transaction>
   private lateinit var user2Transactions: List<Transaction>
 
@@ -55,6 +58,7 @@ class TransactionControllerTest : BaseIntegrationTest() {
           }
         }
     user2Transactions = user2Txns
+    user1CategoriesMap = user1Categories.associateBy { it.id }
   }
   @Test
   fun `search - confirmed transactions only`() {
@@ -120,7 +124,7 @@ class TransactionControllerTest : BaseIntegrationTest() {
               transactionRepository.saveAndFlush(
                   txn.copy(expenseDate = LocalDate.now().minusDays(index.toLong())))
             }
-            .filter { it.expenseDate.isAfter(LocalDate.now().minusDays(2)) }
+            .filter { it.expenseDate.isAfter(LocalDate.now().minusDays(3)) }
 
     val request =
         SearchTransactionsRequest(
@@ -131,7 +135,10 @@ class TransactionControllerTest : BaseIntegrationTest() {
 
     val response =
         SearchTransactionsResponse(
-            transactions = expected.map { TransactionResponse.from(it) },
+            transactions =
+                expected.map { txn ->
+                  TransactionResponse.from(txn, txn.categoryId?.let { user1CategoriesMap[it] })
+                },
             pageNumber = 0,
             totalItems = expected.size)
 
