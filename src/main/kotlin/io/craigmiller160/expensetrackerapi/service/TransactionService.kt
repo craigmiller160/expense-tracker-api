@@ -52,15 +52,21 @@ class TransactionService(
     val pageable = PageRequest.of(request.pageNumber, request.pageSize)
     return either.eager {
       val categories = getCategoryMap(userId).bind()
+      //      val page =
+      //          Either.catch {
+      //                transactionRepository.searchTransactions(
+      //                    userId,
+      //                    request.categoryIds ?: setOf(),
+      //                    request.startDate,
+      //                    request.endDate,
+      //                    request.confirmed,
+      //                    pageable)
+      //              }
+      //              .bind()
       val page =
           Either.catch {
-                transactionRepository.searchTransactions(
-                    userId,
-                    request.categoryIds ?: setOf(),
-                    request.startDate,
-                    request.endDate,
-                    request.confirmed,
-                    pageable)
+                transactionRepository.findAll(
+                    createSearchSpec(userId, request, categories.keys), pageable)
               }
               .bind()
 

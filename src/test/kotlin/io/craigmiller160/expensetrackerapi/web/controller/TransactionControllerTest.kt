@@ -93,11 +93,11 @@ class TransactionControllerTest : BaseIntegrationTest() {
         SearchTransactionsResponse(
             transactions =
                 listOf(
-                    TransactionResponse.from(user1Transactions[2]),
-                    TransactionResponse.from(user1Transactions[3], user1Categories[1]),
-                    TransactionResponse.from(user1Transactions[4]),
-                    TransactionResponse.from(user1Transactions[5], user1Categories[2]),
-                    TransactionResponse.from(user1Transactions[6])),
+                    TransactionResponse.from(user1Transactions[2], user1Categories[2]),
+                    TransactionResponse.from(user1Transactions[3]),
+                    TransactionResponse.from(user1Transactions[4], user1Categories[1]),
+                    TransactionResponse.from(user1Transactions[5]),
+                    TransactionResponse.from(user1Transactions[6], user1Categories[0])),
             pageNumber = 0,
             totalItems = 5)
 
