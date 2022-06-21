@@ -4,12 +4,13 @@ import io.craigmiller160.expensetrackerapi.common.data.typedid.TypedId
 import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.CategoryId
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
+import org.springframework.format.annotation.DateTimeFormat
 
 data class SearchTransactionsRequest(
     override val pageNumber: Int,
     override val pageSize: Int,
-    val startDate: LocalDate? = null,
-    val endDate: LocalDate? = null,
+    @field:DateTimeFormat(pattern = "yyyy-MM-dd") val startDate: LocalDate? = null,
+    @field:DateTimeFormat(pattern = "yyyy-MM-dd") val endDate: LocalDate? = null,
     val confirmed: Boolean? = null,
     val categoryIds: Set<TypedId<CategoryId>>? = null
 ) : PageableRequest {
