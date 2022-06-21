@@ -11,4 +11,16 @@ data class SearchTransactionsRequest(
     val endDate: LocalDate? = null,
     val confirmed: Boolean? = null,
     val categoryIds: Set<TypedId<CategoryId>>? = null
-) : PageableRequest
+) : PageableRequest {
+  fun toQueryString(): String =
+      sequenceOf(
+              "pageNumber" to pageNumber,
+              "pageSize" to pageSize,
+              "startDate" to startDate,
+              "endDate" to endDate,
+              "confirmed" to confirmed,
+              "categoryIds" to categoryIds)
+          .filter { it.second != null }
+          .map { "${it.first}=${it.second}" }
+          .joinToString("&")
+}

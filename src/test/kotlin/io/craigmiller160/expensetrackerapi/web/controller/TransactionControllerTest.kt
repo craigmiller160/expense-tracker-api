@@ -73,11 +73,9 @@ class TransactionControllerTest : BaseIntegrationTest() {
             totalItems = 2)
 
     mockMvc
-        .get("/transactions") {
+        .get("/transactions?${request.toQueryString()}") {
           secure = true
           header("Authorization", "Bearer $token")
-          contentType = MediaType.APPLICATION_JSON
-          content = objectMapper.writeValueAsString(request)
         }
         .andExpect {
           status { isOk() }
@@ -104,11 +102,9 @@ class TransactionControllerTest : BaseIntegrationTest() {
             totalItems = 5)
 
     mockMvc
-        .get("/transactions") {
+        .get("/transactions?${request.toQueryString()}") {
           secure = true
           header("Authorization", "Bearer $token")
-          contentType = MediaType.APPLICATION_JSON
-          content = objectMapper.writeValueAsString(request)
         }
         .andExpect {
           status { isOk() }
@@ -140,11 +136,9 @@ class TransactionControllerTest : BaseIntegrationTest() {
             totalItems = expected.size)
 
     mockMvc
-        .get("/transactions") {
+        .get("/transactions?${request.toQueryString()}") {
           secure = true
           header("Authorization", "Bearer $token")
-          contentType = MediaType.APPLICATION_JSON
-          content = objectMapper.writeValueAsString(request)
         }
         .andExpect {
           status { isOk() }
@@ -168,8 +162,11 @@ class TransactionControllerTest : BaseIntegrationTest() {
             pageNumber = 0,
             totalItems = 1)
 
+    val request =
+        SearchTransactionsRequest(categoryIds = categories, pageNumber = 0, pageSize = 100)
+
     mockMvc
-        .get("/transactions?categories=$categories") {
+        .get("/transactions?${request.toQueryString()}") {
           secure = true
           header("Authorization", "Bearer $token")
         }
