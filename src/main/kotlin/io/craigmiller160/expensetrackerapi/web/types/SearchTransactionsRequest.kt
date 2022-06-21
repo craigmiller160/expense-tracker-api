@@ -19,7 +19,7 @@ data class SearchTransactionsRequest(
               "startDate" to startDate,
               "endDate" to endDate,
               "confirmed" to confirmed,
-              "categoryIds" to categoryIds)
+              "categoryIds" to categoryIds?.map { it.toString() })
           .filter { it.second != null }
           .map { "${it.first}=${it.second}" }
           .joinToString("&")
