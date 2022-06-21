@@ -68,6 +68,7 @@ class TransactionControllerTest : BaseIntegrationTest() {
         .get("/transactions") {
           secure = true
           header("Authorization", "Bearer $token")
+          contentType = MediaType.APPLICATION_JSON
           content = objectMapper.writeValueAsString(request)
         }
         .andExpect {
@@ -94,6 +95,7 @@ class TransactionControllerTest : BaseIntegrationTest() {
         .get("/transactions") {
           secure = true
           header("Authorization", "Bearer $token")
+          contentType = MediaType.APPLICATION_JSON
           content = objectMapper.writeValueAsString(request)
         }
         .andExpect {
@@ -125,6 +127,7 @@ class TransactionControllerTest : BaseIntegrationTest() {
         .get("/transactions") {
           secure = true
           header("Authorization", "Bearer $token")
+          contentType = MediaType.APPLICATION_JSON
           content = objectMapper.writeValueAsString(request)
         }
         .andExpect {
@@ -148,6 +151,7 @@ class TransactionControllerTest : BaseIntegrationTest() {
         .delete("/transactions") {
           secure = true
           header("Authorization", "Bearer $token")
+          contentType = MediaType.APPLICATION_JSON
           content = objectMapper.writeValueAsString(request)
         }
         .andExpect { status { isNoContent() } }
