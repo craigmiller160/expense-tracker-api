@@ -23,7 +23,9 @@ import org.springframework.test.web.servlet.put
 
 class TransactionControllerTest : BaseIntegrationTest() {
   @Autowired private lateinit var transactionRepository: TransactionRepository
-  @Autowired private lateinit var entityManager: EntityManager
+  @Suppress("SpringJavaInjectionPointsAutowiringInspection")
+  @Autowired
+  private lateinit var entityManager: EntityManager
 
   private lateinit var user1Categories: List<Category>
   private lateinit var user1Transactions: List<Transaction>
@@ -135,7 +137,7 @@ class TransactionControllerTest : BaseIntegrationTest() {
         SearchTransactionsResponse(
             transactions = expected.map { TransactionResponse.from(it) },
             pageNumber = 0,
-            totalItems = expected.size.toLong())
+            totalItems = expected.size)
 
     mockMvc
         .get("/transactions") {
