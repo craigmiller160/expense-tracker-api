@@ -7,8 +7,8 @@ import io.craigmiller160.expensetrackerapi.function.flatMapCatch
 import io.craigmiller160.expensetrackerapi.web.types.CategorizeTransactionsRequest
 import io.craigmiller160.expensetrackerapi.web.types.DeleteTransactionsRequest
 import io.craigmiller160.expensetrackerapi.web.types.SearchTransactionsRequest
+import io.craigmiller160.expensetrackerapi.web.types.SearchTransactionsResponse
 import io.craigmiller160.expensetrackerapi.web.types.TransactionAndCategory
-import io.craigmiller160.expensetrackerapi.web.types.TransactionResponse
 import io.craigmiller160.oauth2.service.OAuth2Service
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -36,7 +36,7 @@ class TransactionService(
     return Either.catch { transactionRepository.deleteTransactions(request.ids, userId) }
   }
 
-  fun search(request: SearchTransactionsRequest): TryEither<List<TransactionResponse>> {
+  fun search(request: SearchTransactionsRequest): TryEither<SearchTransactionsResponse> {
     TODO()
   }
 }
