@@ -1,6 +1,8 @@
 package io.craigmiller160.expensetrackerapi.web.controller
 
 import io.craigmiller160.expensetrackerapi.BaseIntegrationTest
+import io.craigmiller160.expensetrackerapi.common.data.typedid.TypedId
+import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.CategoryId
 import io.craigmiller160.expensetrackerapi.data.repository.CategoryRepository
 import io.craigmiller160.expensetrackerapi.web.types.CategoryRequest
 import io.craigmiller160.expensetrackerapi.web.types.CategoryResponse
@@ -10,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.MediaType
 import org.springframework.test.web.servlet.get
 import org.springframework.test.web.servlet.post
+import org.springframework.test.web.servlet.put
 
 class CategoryControllerTest : BaseIntegrationTest() {
   @Autowired private lateinit var categoryRepository: CategoryRepository
@@ -64,7 +67,29 @@ class CategoryControllerTest : BaseIntegrationTest() {
 
   @Test
   fun updateCategory() {
-    TODO()
+    val cat1 = dataHelper.createCategory(1L, "Category 1")
+    val cat2 = dataHelper.createCategory(2L, "Category 2")
+
+    val request = CategoryRequest("Category B")
+    val action: (TypedId<CategoryId>) -> Unit = { id ->
+      mockMvc
+          .put("/categories/$id") {
+            secure = true
+            header("Authorization", "Bearer $token")
+            contentType = MediaType.APPLICATION_JSON
+            content = objectMapper.writeValueAsString(request)
+          }
+          .andExpect { status { isNoContent() } }
+    }
+
+    action(cat1.id)
+    action(cat2.id)
+
+    val dbCat1 = categoryRepository.findById(cat1.id).orElseThrow()
+    assertThat(dbCat1).hasFieldOrPropertyWithValue("name", "Category B")
+
+    val dbCat2 = categoryRepository.findById(cat2.id).orElseThrow()
+    assertThat(dbCat2).hasFieldOrPropertyWithValue("name", "Category 2")
   }
 
   @Test
