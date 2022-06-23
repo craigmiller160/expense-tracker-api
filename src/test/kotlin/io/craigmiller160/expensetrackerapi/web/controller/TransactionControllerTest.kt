@@ -13,7 +13,6 @@ import io.craigmiller160.expensetrackerapi.web.types.SearchTransactionsResponse
 import io.craigmiller160.expensetrackerapi.web.types.TransactionAndCategory
 import io.craigmiller160.expensetrackerapi.web.types.TransactionResponse
 import java.time.LocalDate
-import javax.persistence.EntityManager
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -25,9 +24,6 @@ import org.springframework.test.web.servlet.put
 
 class TransactionControllerTest : BaseIntegrationTest() {
   @Autowired private lateinit var transactionRepository: TransactionRepository
-  @Suppress("SpringJavaInjectionPointsAutowiringInspection")
-  @Autowired
-  private lateinit var entityManager: EntityManager
 
   private lateinit var user1Categories: List<Category>
   private lateinit var user1CategoriesMap: Map<TypedId<CategoryId>, Category>
