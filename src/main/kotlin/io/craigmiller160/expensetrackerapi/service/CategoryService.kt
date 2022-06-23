@@ -42,5 +42,9 @@ class CategoryService(
         }
   }
 
-  fun deleteCategory(categoryId: TypedId<CategoryId>): TryEither<Unit> = TODO()
+  @Transactional
+  fun deleteCategory(categoryId: TypedId<CategoryId>): TryEither<Unit> {
+    val userId = oAuth2Service.getAuthenticatedUser().userId
+    return Either.catch { categoryRepository.deleteByIdAndUserId(categoryId, userId) }
+  }
 }
