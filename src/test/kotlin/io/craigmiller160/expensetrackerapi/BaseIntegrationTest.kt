@@ -39,7 +39,7 @@ class BaseIntegrationTest {
   @Autowired protected lateinit var mockMvc: MockMvc
   @Autowired protected lateinit var objectMapper: ObjectMapper
   @Autowired protected lateinit var dataHelper: DataHelper
-  @Autowired private lateinit var entityManager: EntityManager
+  @Autowired protected lateinit var entityManager: EntityManager
 
   protected lateinit var token: String
 
