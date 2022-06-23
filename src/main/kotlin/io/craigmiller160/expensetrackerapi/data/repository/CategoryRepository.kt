@@ -7,4 +7,6 @@ import org.springframework.data.jpa.repository.JpaRepository
 
 interface CategoryRepository : JpaRepository<Category, TypedId<CategoryId>> {
   fun findAllByUserId(userId: Long): List<Category>
+
+  fun findByIdAndUserId(id: TypedId<CategoryId>, userId: Long): Category?
 }

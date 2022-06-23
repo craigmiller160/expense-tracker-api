@@ -3,12 +3,15 @@ package io.craigmiller160.expensetrackerapi.service
 import arrow.core.Either
 import io.craigmiller160.expensetrackerapi.common.data.typedid.TypedId
 import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.CategoryId
+import io.craigmiller160.expensetrackerapi.data.model.Category
 import io.craigmiller160.expensetrackerapi.data.repository.CategoryRepository
 import io.craigmiller160.expensetrackerapi.function.TryEither
+import io.craigmiller160.expensetrackerapi.function.flatMapCatch
 import io.craigmiller160.expensetrackerapi.web.types.CategoryRequest
 import io.craigmiller160.expensetrackerapi.web.types.CategoryResponse
 import io.craigmiller160.oauth2.service.OAuth2Service
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 
 @Service
 class CategoryService(
@@ -22,10 +25,22 @@ class CategoryService(
     }
   }
 
-  fun createCategory(request: CategoryRequest): TryEither<CategoryResponse> = TODO()
+  fun createCategory(request: CategoryRequest): TryEither<CategoryResponse> {
+    val userId = oAuth2Service.getAuthenticatedUser().userId
+    return Either.catch { categoryRepository.save(Category(name = request.name, userId = userId)) }
+        .map { CategoryResponse.from(it) }
+  }
 
-  fun updateCategory(categoryId: TypedId<CategoryId>, request: CategoryRequest): TryEither<Unit> =
-      TODO()
+  @Transactional
+  fun updateCategory(categoryId: TypedId<CategoryId>, request: CategoryRequest): TryEither<Unit> {
+    val userId = oAuth2Service.getAuthenticatedUser().userId
+    return Either.catch { categoryRepository.findByIdAndUserId(categoryId, userId) }
+        .flatMapCatch { nullableCategory ->
+          nullableCategory?.let { category ->
+            categoryRepository.save(category.copy(name = request.name))
+          }
+        }
+  }
 
   fun deleteCategory(categoryId: TypedId<CategoryId>): TryEither<Unit> = TODO()
 }
