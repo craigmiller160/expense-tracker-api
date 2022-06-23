@@ -53,17 +53,6 @@ class TransactionService(
     // TODO clean this up once its all working
     return either.eager {
       val categories = getCategoryMap(userId).bind()
-      //      val page =
-      //          Either.catch {
-      //                transactionRepository.searchTransactions(
-      //                    userId,
-      //                    //                    request.categoryIds ?: setOf(),
-      //                    request.startDate,
-      //                    request.endDate,
-      //                    request.confirmed,
-      //                    pageable)
-      //              }
-      //              .bind()
       val page =
           Either.catch {
                 transactionRepository.findAll(
