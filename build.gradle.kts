@@ -1,5 +1,6 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import com.diffplug.gradle.spotless.SpotlessExtension
+import io.spring.gradle.dependencymanagement.dsl.DependencyManagementExtension
 
 plugins {
     val kotlinVersion = "1.6.21"
@@ -10,6 +11,12 @@ plugins {
     kotlin("plugin.spring") version kotlinVersion
     kotlin("plugin.jpa") version kotlinVersion
     id("com.diffplug.spotless") version "6.6.1"
+}
+
+the<DependencyManagementExtension>().apply {
+    resolutionStrategy {
+        cacheChangingModulesFor(0, TimeUnit.SECONDS)
+    }
 }
 
 group = "io.craigmiller160"
@@ -38,8 +45,12 @@ dependencies {
     val arrowKtVersion = "1.1.2"
     val assertJVersion = "3.23.1"
     val openCsvVersion = "5.6"
+    val fakerVersion = "1.0.2"
 
     implementation("com.opencsv:opencsv:$openCsvVersion")
+    implementation("com.github.javafaker:javafaker:$fakerVersion") {
+        exclude("org.yaml")
+    }
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
@@ -48,7 +59,9 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     implementation("org.postgresql:postgresql")
-    testImplementation("org.springframework.boot:spring-boot-starter-test")
+    testImplementation("org.springframework.boot:spring-boot-starter-test") {
+        exclude("org.junit.vintage", "junit-vintage-engine")
+    }
     testImplementation("org.testcontainers:junit-jupiter")
     testImplementation("org.testcontainers:postgresql")
     implementation("io.arrow-kt:arrow-core:$arrowKtVersion")

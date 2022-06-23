@@ -5,4 +5,6 @@ import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.CategoryId
 import io.craigmiller160.expensetrackerapi.data.model.Category
 import org.springframework.data.jpa.repository.JpaRepository
 
-interface CategoryRepository : JpaRepository<Category, TypedId<CategoryId>>
+interface CategoryRepository : JpaRepository<Category, TypedId<CategoryId>> {
+  fun findAllByUserId(userId: Long): List<Category>
+}

@@ -3,6 +3,7 @@ package io.craigmiller160.expensetrackerapi
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.nimbusds.jose.jwk.JWKSet
 import io.craigmiller160.expensetrackerapi.testcontainers.PostgresContainer
+import io.craigmiller160.expensetrackerapi.testutils.DataHelper
 import io.craigmiller160.expensetrackerapi.testutils.JwtUtils
 import io.craigmiller160.expensetrackerapi.testutils.KeyUtils
 import io.craigmiller160.oauth2.config.OAuth2Config
@@ -35,6 +36,7 @@ class BaseIntegrationTest {
   @MockBean private lateinit var oAuth2Config: OAuth2Config
   @Autowired protected lateinit var mockMvc: MockMvc
   @Autowired protected lateinit var objectMapper: ObjectMapper
+  @Autowired protected lateinit var dataHelper: DataHelper
 
   protected lateinit var token: String
 
