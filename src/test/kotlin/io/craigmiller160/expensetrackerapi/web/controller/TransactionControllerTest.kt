@@ -164,9 +164,10 @@ class TransactionControllerTest : BaseIntegrationTest() {
         SearchTransactionsResponse(
             transactions =
                 listOf(
-                    TransactionResponse.from(user1Transactions.first(), user1Categories.first())),
+                    TransactionResponse.from(user1Transactions.first(), user1Categories.first()),
+                    TransactionResponse.from(user1Transactions.last(), user1Categories.first())),
             pageNumber = 0,
-            totalItems = 1)
+            totalItems = 2)
 
     val request =
         SearchTransactionsRequest(categoryIds = categories, pageNumber = 0, pageSize = 100)
