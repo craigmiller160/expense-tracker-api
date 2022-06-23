@@ -10,6 +10,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.MediaType
+import org.springframework.test.web.servlet.delete
 import org.springframework.test.web.servlet.get
 import org.springframework.test.web.servlet.post
 import org.springframework.test.web.servlet.put
@@ -94,6 +95,22 @@ class CategoryControllerTest : BaseIntegrationTest() {
 
   @Test
   fun deleteCategory() {
-    TODO()
+    val cat1 = dataHelper.createCategory(1L, "Category 1")
+    val cat2 = dataHelper.createCategory(2L, "Category 2")
+
+    val action: (TypedId<CategoryId>) -> Unit = { id ->
+      mockMvc
+          .delete("/categories/$id") {
+            secure = true
+            header("Authorization", "Bearer $token")
+          }
+          .andExpect { status { isNoContent() } }
+    }
+
+    action(cat1.id)
+    action(cat2.id)
+
+    assertThat(categoryRepository.findById(cat1.id)).isEmpty
+    assertThat(categoryRepository.findById(cat2.id)).isPresent
   }
 }
