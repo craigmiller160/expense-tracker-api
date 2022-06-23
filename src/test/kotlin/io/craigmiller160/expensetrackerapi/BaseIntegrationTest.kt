@@ -8,6 +8,7 @@ import io.craigmiller160.expensetrackerapi.testutils.JwtUtils
 import io.craigmiller160.expensetrackerapi.testutils.KeyUtils
 import io.craigmiller160.oauth2.config.OAuth2Config
 import java.security.KeyPair
+import javax.persistence.EntityManager
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.kotlin.whenever
@@ -23,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional
 @Transactional
 @AutoConfigureMockMvc
 @ExtendWith(SpringExtension::class)
+@Suppress("SpringJavaInjectionPointsAutowiringInspection")
 class BaseIntegrationTest {
   companion object {
     protected val keyPair: KeyPair = KeyUtils.createKeyPair()
@@ -37,6 +39,7 @@ class BaseIntegrationTest {
   @Autowired protected lateinit var mockMvc: MockMvc
   @Autowired protected lateinit var objectMapper: ObjectMapper
   @Autowired protected lateinit var dataHelper: DataHelper
+  @Autowired protected lateinit var entityManager: EntityManager
 
   protected lateinit var token: String
 

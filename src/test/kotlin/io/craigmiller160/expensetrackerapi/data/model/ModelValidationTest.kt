@@ -2,7 +2,6 @@ package io.craigmiller160.expensetrackerapi.data.model
 
 import io.craigmiller160.expensetrackerapi.BaseIntegrationTest
 import java.time.ZonedDateTime
-import javax.persistence.EntityManager
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
@@ -13,7 +12,6 @@ import org.springframework.dao.InvalidDataAccessApiUsageException
 class ModelValidationTest : BaseIntegrationTest() {
   @Autowired private lateinit var countryRepository: CountryRepository
   @Autowired private lateinit var residentRepository: ResidentRepository
-  @Autowired private lateinit var entityManager: EntityManager
   private val NOW = ZonedDateTime.now()
   @Test
   fun `immutable entity inserts but cannot be updated`() {
