@@ -1,6 +1,5 @@
 package io.craigmiller160.expensetrackerapi.config
 
-import io.craigmiller160.expensetrackerapi.common.data.typedid.spring.TypedIdSetConverter
 import org.springframework.context.annotation.Configuration
 import org.springframework.format.FormatterRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
@@ -11,6 +10,6 @@ class SpringWebConfig : WebMvcConfigurer {
   override fun addFormatters(registry: FormatterRegistry) {
     // TODO probably want to have both if this works
     //    registry.addConverter(TypedIdConverter())
-    registry.addConverter(TypedIdSetConverter())
+    //    registry.addConverter(TypedIdSetConverter())
   }
 }
