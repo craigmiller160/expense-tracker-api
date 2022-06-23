@@ -86,7 +86,7 @@ class TransactionService(
     val endDateSpec = SpecBuilder.lessThanOrEqualTo<Transaction>(request.endDate, "expenseDate")
     val confirmedSpec = SpecBuilder.equals<Transaction>(request.confirmed, "confirmed")
     val filteredCategoryIds =
-        request.typedCategoryIds?.let { ids -> ids.filter { categories.contains(it) } }
+        request.categoryIds?.let { ids -> ids.filter { categories.contains(it) } }
     val categoryIdSpec = SpecBuilder.`in`<Transaction>(filteredCategoryIds, "categoryId")
 
     return userIdSpec.and(startDateSpec).and(endDateSpec).and(confirmedSpec).and(categoryIdSpec)
