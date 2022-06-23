@@ -1,7 +1,7 @@
 package io.craigmiller160.expensetrackerapi.service
 
 import arrow.core.Either
-import arrow.core.continuations.either
+import arrow.core.flatMap
 import io.craigmiller160.expensetrackerapi.common.data.typedid.TypedId
 import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.CategoryId
 import io.craigmiller160.expensetrackerapi.data.model.Category
@@ -50,18 +50,12 @@ class TransactionService(
   fun search(request: SearchTransactionsRequest): TryEither<SearchTransactionsResponse> {
     val userId = oAuth2Service.getAuthenticatedUser().userId
     val pageable = PageRequest.of(request.pageNumber, request.pageSize)
-    // TODO clean this up once its all working
-    return either.eager {
-      val categories = getCategoryMap(userId).bind()
-      val page =
-          Either.catch {
-                transactionRepository.findAll(
-                    createSearchSpec(userId, request, categories.keys), pageable)
-              }
-              .bind()
-
-      SearchTransactionsResponse.from(page, categories)
-    }
+    val categoryMapEither = getCategoryMap(userId)
+    return categoryMapEither
+        .map { categories -> createSearchSpec(userId, request, categories.keys) }
+        .flatMapCatch { spec -> transactionRepository.findAll(spec, pageable) }
+        .flatMap { page -> categoryMapEither.map { Pair(page, it) } }
+        .map { (page, categories) -> SearchTransactionsResponse.from(page, categories) }
   }
 
   private fun createSearchSpec(

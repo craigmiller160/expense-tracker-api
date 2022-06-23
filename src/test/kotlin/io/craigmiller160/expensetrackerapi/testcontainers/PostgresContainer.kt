@@ -15,7 +15,6 @@ class PostgresContainer : PostgreSQLContainer<PostgresContainer>("postgres:12.5"
 
   override fun start() {
     super.start()
-    println("JDBC URL: $jdbcUrl") // TODO delete this
     System.setProperty("spring.datasource.url", jdbcUrl)
     System.setProperty("spring.datasource.password", password)
     System.setProperty("spring.datasource.username", username)
