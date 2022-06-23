@@ -6,16 +6,18 @@ import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import org.springframework.format.annotation.DateTimeFormat
 
+const val DATE_PATTERN = "yyyy-MM-dd"
+
 data class SearchTransactionsRequest(
     override val pageNumber: Int,
     override val pageSize: Int,
-    @field:DateTimeFormat(pattern = "yyyy-MM-dd") val startDate: LocalDate? = null,
-    @field:DateTimeFormat(pattern = "yyyy-MM-dd") val endDate: LocalDate? = null,
+    @field:DateTimeFormat(pattern = DATE_PATTERN) val startDate: LocalDate? = null,
+    @field:DateTimeFormat(pattern = DATE_PATTERN) val endDate: LocalDate? = null,
     val confirmed: Boolean? = null,
     val categoryIds: Set<TypedId<CategoryId>>? = null
 ) : PageableRequest {
   companion object {
-    private val DATE_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+    private val DATE_FORMAT = DateTimeFormatter.ofPattern(DATE_PATTERN)
   }
 
   fun toQueryString(): String =
