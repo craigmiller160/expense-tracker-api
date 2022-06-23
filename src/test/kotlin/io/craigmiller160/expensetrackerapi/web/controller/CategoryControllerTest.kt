@@ -1,11 +1,18 @@
 package io.craigmiller160.expensetrackerapi.web.controller
 
 import io.craigmiller160.expensetrackerapi.BaseIntegrationTest
+import io.craigmiller160.expensetrackerapi.data.repository.CategoryRepository
+import io.craigmiller160.expensetrackerapi.web.types.CategoryRequest
 import io.craigmiller160.expensetrackerapi.web.types.CategoryResponse
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.http.MediaType
 import org.springframework.test.web.servlet.get
+import org.springframework.test.web.servlet.post
 
 class CategoryControllerTest : BaseIntegrationTest() {
+  @Autowired private lateinit var categoryRepository: CategoryRepository
 
   @Test
   fun getAllCategories() {
@@ -30,7 +37,29 @@ class CategoryControllerTest : BaseIntegrationTest() {
 
   @Test
   fun createCategory() {
-    TODO()
+    val request = CategoryRequest("The Category")
+
+    val responseString =
+        mockMvc
+            .post("/categories") {
+              secure = true
+              header("Authorization", "Bearer $token")
+              contentType = MediaType.APPLICATION_JSON
+              content = objectMapper.writeValueAsString(request)
+            }
+            .andExpect { status { isOk() } }
+            .andReturn()
+            .response.contentAsString
+    val response = objectMapper.readValue(responseString, CategoryResponse::class.java)
+
+    assertThat(response).hasFieldOrPropertyWithValue("name", request.name)
+
+    assertThat(categoryRepository.count()).isEqualTo(1)
+    assertThat(categoryRepository.findById(response.id))
+        .isPresent
+        .get()
+        .hasFieldOrPropertyWithValue("name", request.name)
+        .hasFieldOrPropertyWithValue("userId", 1L)
   }
 
   @Test
