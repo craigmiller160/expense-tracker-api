@@ -60,6 +60,37 @@ class TransactionControllerTest : BaseIntegrationTest() {
   }
 
   @Test
+  fun `search - with no categories, sort by EXPENSE_DATE DESC`() {
+    val request =
+        SearchTransactionsRequest(
+            withNoCategory = true,
+            pageNumber = 0,
+            pageSize = 100,
+            sortKey = TransactionSortKey.EXPENSE_DATE,
+            sortDirection = SortDirection.DESC)
+
+    val response =
+        SearchTransactionsResponse(
+            transactions =
+                listOf(
+                    TransactionResponse.from(user1Transactions[5]),
+                    TransactionResponse.from(user1Transactions[3]),
+                    TransactionResponse.from(user1Transactions[1])),
+            pageNumber = 0,
+            totalItems = 3)
+
+    mockMvc
+        .get("/transactions?${request.toQueryString()}") {
+          secure = true
+          header("Authorization", "Bearer $token")
+        }
+        .andExpect {
+          status { isOk() }
+          content { json(objectMapper.writeValueAsString(response)) }
+        }
+  }
+
+  @Test
   fun `search - with no categories`() {
     val request =
         SearchTransactionsRequest(
