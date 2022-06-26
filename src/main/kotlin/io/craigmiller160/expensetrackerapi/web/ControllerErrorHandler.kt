@@ -1,5 +1,6 @@
 package io.craigmiller160.expensetrackerapi.web
 
+import io.craigmiller160.expensetrackerapi.common.error.BadRequestException
 import io.craigmiller160.expensetrackerapi.web.types.ErrorResponse
 import java.time.ZoneId
 import java.time.ZonedDateTime
@@ -19,6 +20,12 @@ class ControllerErrorHandler {
   fun exception(ex: Exception): ResponseEntity<ErrorResponse> {
     log.error(ex.message, ex)
     return createErrorResponse(500, ex.message ?: "")
+  }
+
+  @ExceptionHandler(BadRequestException::class)
+  fun badRequestException(ex: BadRequestException): ResponseEntity<ErrorResponse> {
+    log.error(ex.message, ex)
+    return createErrorResponse(400, ex.message ?: "")
   }
 
   @ExceptionHandler(AccessDeniedException::class)

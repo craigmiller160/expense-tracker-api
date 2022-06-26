@@ -56,6 +56,32 @@ class TransactionControllerTest : BaseIntegrationTest() {
     user2Transactions = user2Txns
     user1CategoriesMap = user1Categories.associateBy { it.id }
   }
+
+  @Test
+  fun `search - with no categories`() {
+    val request = SearchTransactionsRequest(withNoCategory = true, pageNumber = 0, pageSize = 100)
+
+    val response =
+        SearchTransactionsResponse(
+            transactions =
+                listOf(
+                    TransactionResponse.from(user1Transactions[1]),
+                    TransactionResponse.from(user1Transactions[3]),
+                    TransactionResponse.from(user1Transactions[5])),
+            pageNumber = 0,
+            totalItems = 3)
+
+    mockMvc
+        .get("/transactions?${request.toQueryString()}") {
+          secure = true
+          header("Authorization", "Bearer $token")
+        }
+        .andExpect {
+          status { isOk() }
+          content { json(objectMapper.writeValueAsString(response)) }
+        }
+  }
+
   @Test
   fun `search - confirmed transactions only`() {
     val txn1 = transactionRepository.saveAndFlush(user1Transactions.first().copy(confirmed = true))
