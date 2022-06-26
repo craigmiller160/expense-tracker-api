@@ -6,6 +6,8 @@ import io.craigmiller160.expensetrackerapi.common.data.typedid.TypedId
 import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.CategoryId
 import io.craigmiller160.expensetrackerapi.data.model.Category
 import io.craigmiller160.expensetrackerapi.data.model.Transaction
+import io.craigmiller160.expensetrackerapi.data.model.toColumnName
+import io.craigmiller160.expensetrackerapi.data.model.toSpringSortDirection
 import io.craigmiller160.expensetrackerapi.data.repository.CategoryRepository
 import io.craigmiller160.expensetrackerapi.data.repository.TransactionRepository
 import io.craigmiller160.expensetrackerapi.data.specification.SpecBuilder
@@ -18,6 +20,7 @@ import io.craigmiller160.expensetrackerapi.web.types.SearchTransactionsResponse
 import io.craigmiller160.expensetrackerapi.web.types.TransactionAndCategory
 import io.craigmiller160.oauth2.service.OAuth2Service
 import org.springframework.data.domain.PageRequest
+import org.springframework.data.domain.Sort
 import org.springframework.data.jpa.domain.Specification
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -49,7 +52,9 @@ class TransactionService(
   @Transactional
   fun search(request: SearchTransactionsRequest): TryEither<SearchTransactionsResponse> {
     val userId = oAuth2Service.getAuthenticatedUser().userId
-    val pageable = PageRequest.of(request.pageNumber, request.pageSize)
+    val sort =
+        Sort.by(request.sortDirection.toSpringSortDirection(), request.sortKey.toColumnName())
+    val pageable = PageRequest.of(request.pageNumber, request.pageSize, sort)
     val categoryMapEither = getCategoryMap(userId)
     return categoryMapEither
         .map { categories -> createSearchSpec(userId, request, categories.keys) }
