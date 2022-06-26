@@ -35,5 +35,6 @@ class TransactionController(private val transactionService: TransactionService) 
       transactionService.categorizeTransactions(request).map { ResponseEntity.noContent().build() }
 
   @GetMapping("/unconfirmed-count")
-  fun getUnconfirmedCount(): TryEither<UnconfirmedTransactionCountResponse> = TODO()
+  fun getUnconfirmedCount(): TryEither<UnconfirmedTransactionCountResponse> =
+      transactionService.getUnconfirmedCount()
 }
