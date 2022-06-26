@@ -10,8 +10,10 @@ import io.craigmiller160.expensetrackerapi.web.types.CategorizeTransactionsReque
 import io.craigmiller160.expensetrackerapi.web.types.DeleteTransactionsRequest
 import io.craigmiller160.expensetrackerapi.web.types.SearchTransactionsRequest
 import io.craigmiller160.expensetrackerapi.web.types.SearchTransactionsResponse
+import io.craigmiller160.expensetrackerapi.web.types.SortDirection
 import io.craigmiller160.expensetrackerapi.web.types.TransactionAndCategory
 import io.craigmiller160.expensetrackerapi.web.types.TransactionResponse
+import io.craigmiller160.expensetrackerapi.web.types.TransactionSortKey
 import java.time.LocalDate
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
@@ -59,7 +61,13 @@ class TransactionControllerTest : BaseIntegrationTest() {
 
   @Test
   fun `search - with no categories`() {
-    val request = SearchTransactionsRequest(withNoCategory = true, pageNumber = 0, pageSize = 100)
+    val request =
+        SearchTransactionsRequest(
+            withNoCategory = true,
+            pageNumber = 0,
+            pageSize = 100,
+            sortKey = TransactionSortKey.EXPENSE_DATE,
+            sortDirection = SortDirection.ASC)
 
     val response =
         SearchTransactionsResponse(
@@ -87,7 +95,13 @@ class TransactionControllerTest : BaseIntegrationTest() {
     val txn1 = transactionRepository.saveAndFlush(user1Transactions.first().copy(confirmed = true))
     val txn2 = transactionRepository.saveAndFlush(user1Transactions[1].copy(confirmed = true))
     transactionRepository.saveAndFlush(user2Transactions.first().copy(confirmed = true))
-    val request = SearchTransactionsRequest(confirmed = true, pageNumber = 0, pageSize = 100)
+    val request =
+        SearchTransactionsRequest(
+            confirmed = true,
+            pageNumber = 0,
+            pageSize = 100,
+            sortKey = TransactionSortKey.EXPENSE_DATE,
+            sortDirection = SortDirection.ASC)
 
     val response =
         SearchTransactionsResponse(
@@ -113,7 +127,13 @@ class TransactionControllerTest : BaseIntegrationTest() {
   fun `search - unconfirmed transactions only`() {
     transactionRepository.saveAndFlush(user1Transactions.first().copy(confirmed = true))
     transactionRepository.saveAndFlush(user1Transactions[1].copy(confirmed = true))
-    val request = SearchTransactionsRequest(confirmed = false, pageNumber = 0, pageSize = 100)
+    val request =
+        SearchTransactionsRequest(
+            confirmed = false,
+            pageNumber = 0,
+            pageSize = 100,
+            sortKey = TransactionSortKey.EXPENSE_DATE,
+            sortDirection = SortDirection.ASC)
 
     val response =
         SearchTransactionsResponse(
@@ -153,7 +173,9 @@ class TransactionControllerTest : BaseIntegrationTest() {
             startDate = LocalDate.now().minusDays(2),
             endDate = LocalDate.now(),
             pageNumber = 0,
-            pageSize = 100)
+            pageSize = 100,
+            sortKey = TransactionSortKey.EXPENSE_DATE,
+            sortDirection = SortDirection.ASC)
 
     val response =
         SearchTransactionsResponse(
@@ -192,7 +214,12 @@ class TransactionControllerTest : BaseIntegrationTest() {
             totalItems = 2)
 
     val request =
-        SearchTransactionsRequest(categoryIds = categories, pageNumber = 0, pageSize = 100)
+        SearchTransactionsRequest(
+            categoryIds = categories,
+            pageNumber = 0,
+            pageSize = 100,
+            sortKey = TransactionSortKey.EXPENSE_DATE,
+            sortDirection = SortDirection.ASC)
 
     mockMvc
         .get("/transactions?${request.toQueryString()}") {
