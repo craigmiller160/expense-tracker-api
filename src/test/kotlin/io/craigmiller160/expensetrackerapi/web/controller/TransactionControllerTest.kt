@@ -56,6 +56,12 @@ class TransactionControllerTest : BaseIntegrationTest() {
     user2Transactions = user2Txns
     user1CategoriesMap = user1Categories.associateBy { it.id }
   }
+
+  @Test
+  fun `search - with no categories`() {
+    TODO()
+  }
+
   @Test
   fun `search - confirmed transactions only`() {
     val txn1 = transactionRepository.saveAndFlush(user1Transactions.first().copy(confirmed = true))
