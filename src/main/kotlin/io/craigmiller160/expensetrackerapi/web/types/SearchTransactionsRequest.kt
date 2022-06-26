@@ -20,6 +20,8 @@ data class SearchTransactionsRequest(
     private val DATE_FORMAT = DateTimeFormatter.ofPattern(DATE_PATTERN)
   }
 
+  init {}
+
   fun toQueryString(): String =
       sequenceOf(
               "pageNumber" to pageNumber,
