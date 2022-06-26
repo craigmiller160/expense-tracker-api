@@ -35,6 +35,7 @@ data class SearchTransactionsRequest(
               "startDate" to startDate?.let { DATE_FORMAT.format(it) },
               "endDate" to endDate?.let { DATE_FORMAT.format(it) },
               "confirmed" to confirmed,
+              "withNoCategory" to withNoCategory,
               "categoryIds" to categoryIds?.joinToString(",") { it.toString() })
           .filter { it.second != null }
           .map { "${it.first}=${it.second}" }
