@@ -34,6 +34,8 @@ data class SearchTransactionsRequest(
       sequenceOf(
               "pageNumber" to pageNumber,
               "pageSize" to pageSize,
+              "sortKey" to sortKey.name,
+              "sortDirection" to sortDirection.name,
               "startDate" to startDate?.let { DATE_FORMAT.format(it) },
               "endDate" to endDate?.let { DATE_FORMAT.format(it) },
               "confirmed" to confirmed,
