@@ -12,12 +12,14 @@ const val DATE_PATTERN = "yyyy-MM-dd"
 data class SearchTransactionsRequest(
     override val pageNumber: Int,
     override val pageSize: Int,
+    override val sortKey: TransactionSortKey,
+    override val sortDirection: SortDirection,
     @field:DateTimeFormat(pattern = DATE_PATTERN) val startDate: LocalDate? = null,
     @field:DateTimeFormat(pattern = DATE_PATTERN) val endDate: LocalDate? = null,
     val confirmed: Boolean? = null,
     val withNoCategory: Boolean? = null,
     val categoryIds: Set<TypedId<CategoryId>>? = null
-) : PageableRequest {
+) : PageableRequest, SortableRequest<TransactionSortKey> {
   companion object {
     private val DATE_FORMAT = DateTimeFormatter.ofPattern(DATE_PATTERN)
   }
