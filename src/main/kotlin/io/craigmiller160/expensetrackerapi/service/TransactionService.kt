@@ -50,9 +50,11 @@ class TransactionService(
     return Either.catch { transactionRepository.deleteTransactions(request.ids, userId) }
   }
 
-  fun getUnconfirmedCount(): TryEither<UnconfirmedTransactionCountResponse> =
-      Either.catch { transactionRepository.countAllByConfirmed(false) }
-          .map { UnconfirmedTransactionCountResponse(it) }
+  fun getUnconfirmedCount(): TryEither<UnconfirmedTransactionCountResponse> {
+    val userId = oAuth2Service.getAuthenticatedUser().userId
+    return Either.catch { transactionRepository.countAllByUserIdAndConfirmed(userId, false) }
+        .map { UnconfirmedTransactionCountResponse(it) }
+  }
 
   @Transactional
   fun search(request: SearchTransactionsRequest): TryEither<SearchTransactionsResponse> {
