@@ -14,6 +14,7 @@ import io.craigmiller160.expensetrackerapi.web.types.SortDirection
 import io.craigmiller160.expensetrackerapi.web.types.TransactionAndCategory
 import io.craigmiller160.expensetrackerapi.web.types.TransactionResponse
 import io.craigmiller160.expensetrackerapi.web.types.TransactionSortKey
+import io.craigmiller160.expensetrackerapi.web.types.UnconfirmedTransactionCountResponse
 import java.time.LocalDate
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
@@ -145,6 +146,24 @@ class TransactionControllerTest : BaseIntegrationTest() {
 
     mockMvc
         .get("/transactions?${request.toQueryString()}") {
+          secure = true
+          header("Authorization", "Bearer $token")
+        }
+        .andExpect {
+          status { isOk() }
+          content { json(objectMapper.writeValueAsString(response)) }
+        }
+  }
+
+  @Test
+  fun `get count of unconfirmed transactions`() {
+    transactionRepository.saveAndFlush(user1Transactions.first().copy(confirmed = true))
+    transactionRepository.saveAndFlush(user1Transactions[1].copy(confirmed = true))
+
+    val response = UnconfirmedTransactionCountResponse(unconfirmedTransactionCount = 5)
+
+    mockMvc
+        .get("/transactions/unconfirmed-count") {
           secure = true
           header("Authorization", "Bearer $token")
         }
