@@ -71,8 +71,16 @@ class TransactionService(
     val filteredCategoryIds =
         request.categoryIds?.let { ids -> ids.filter { categories.contains(it) } }
     val categoryIdSpec = SpecBuilder.`in`<Transaction>(filteredCategoryIds, "categoryId")
+    val withNoCategorySpec =
+        if (request.withNoCategory == true) SpecBuilder.isNull<Transaction>("categoryId")
+        else SpecBuilder.emptySpec()
 
-    return userIdSpec.and(startDateSpec).and(endDateSpec).and(confirmedSpec).and(categoryIdSpec)
+    return userIdSpec
+        .and(startDateSpec)
+        .and(endDateSpec)
+        .and(confirmedSpec)
+        .and(categoryIdSpec)
+        .and(withNoCategorySpec)
   }
 
   private fun getCategoryMap(userId: Long): TryEither<Map<TypedId<CategoryId>, Category>> =

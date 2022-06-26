@@ -3,7 +3,7 @@ package io.craigmiller160.expensetrackerapi.data.specification
 import org.springframework.data.jpa.domain.Specification
 
 object SpecBuilder {
-  private fun <T> emptySpec(): Specification<T> =
+  fun <T> emptySpec(): Specification<T> =
       Specification.where { root, query, builder -> builder.conjunction() }
 
   fun <T> equals(value: Any?, fieldName: String): Specification<T> =
@@ -13,6 +13,9 @@ object SpecBuilder {
         }
       }
           ?: emptySpec()
+
+  fun <T> isNull(fieldName: String): Specification<T> =
+      Specification.where { root, query, builder -> builder.isNull(root.get<Any>(fieldName)) }
 
   fun <T> greaterThanOrEqualTo(value: Comparable<*>?, fieldName: String): Specification<T> =
       value?.let { nonNullValue ->
