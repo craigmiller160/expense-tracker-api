@@ -51,6 +51,8 @@ interface TransactionRepository :
       @Param("userId") userId: Long
   )
 
+  fun countAllByUserIdAndConfirmed(userId: Long, confirmed: Boolean): Long
+
   @Query(
       """
         SELECT t

@@ -18,6 +18,7 @@ import io.craigmiller160.expensetrackerapi.web.types.DeleteTransactionsRequest
 import io.craigmiller160.expensetrackerapi.web.types.SearchTransactionsRequest
 import io.craigmiller160.expensetrackerapi.web.types.SearchTransactionsResponse
 import io.craigmiller160.expensetrackerapi.web.types.TransactionAndCategory
+import io.craigmiller160.expensetrackerapi.web.types.UnconfirmedTransactionCountResponse
 import io.craigmiller160.oauth2.service.OAuth2Service
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
@@ -47,6 +48,12 @@ class TransactionService(
   fun deleteTransactions(request: DeleteTransactionsRequest): TryEither<Unit> {
     val userId = oAuth2Service.getAuthenticatedUser().userId
     return Either.catch { transactionRepository.deleteTransactions(request.ids, userId) }
+  }
+
+  fun getUnconfirmedCount(): TryEither<UnconfirmedTransactionCountResponse> {
+    val userId = oAuth2Service.getAuthenticatedUser().userId
+    return Either.catch { transactionRepository.countAllByUserIdAndConfirmed(userId, false) }
+        .map { UnconfirmedTransactionCountResponse(it) }
   }
 
   @Transactional
