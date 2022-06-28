@@ -90,6 +90,10 @@ tasks {
         useJUnitPlatform()
         environment("spring.config.location", "classpath:application.yml,classpath:application.test.yml")
     }
+
+    bootRun {
+        environment("spring.flyway.locations", "classpath:db/migration,classpath:db/dev/migration")
+    }
 }
 
 configure<SpotlessExtension> {
