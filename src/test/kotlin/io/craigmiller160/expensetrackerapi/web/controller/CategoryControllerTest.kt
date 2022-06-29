@@ -99,7 +99,9 @@ class CategoryControllerTest : BaseIntegrationTest() {
   fun deleteCategory() {
     val cat1 = dataHelper.createCategory(1L, "Category 1")
     val cat2 = dataHelper.createCategory(2L, "Category 2")
+    val cat3 = dataHelper.createCategory(3L, "Category 3")
     val txn1 = dataHelper.createTransaction(1L, cat1.id)
+    val txn2 = dataHelper.createTransaction(1L, cat3.id)
 
     val action: (TypedId<CategoryId>) -> Unit = { id ->
       mockMvc
@@ -119,5 +121,9 @@ class CategoryControllerTest : BaseIntegrationTest() {
         .isPresent
         .get()
         .hasFieldOrPropertyWithValue("categoryId", null)
+    assertThat(transactionRepository.findById(txn2.id))
+        .isPresent
+        .get()
+        .hasFieldOrPropertyWithValue("categoryId", cat3.id)
   }
 }
