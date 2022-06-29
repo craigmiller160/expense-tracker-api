@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Modifying
 
 interface CategoryRepository : JpaRepository<Category, TypedId<CategoryId>> {
-  fun findAllByUserId(userId: Long): List<Category>
+  fun findAllByUserIdOrderByName(userId: Long): List<Category>
 
   fun findByIdAndUserId(id: TypedId<CategoryId>, userId: Long): Category?
 

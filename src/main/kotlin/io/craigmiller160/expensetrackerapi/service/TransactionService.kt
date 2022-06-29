@@ -96,5 +96,5 @@ class TransactionService(
   }
 
   private fun getCategoryMap(userId: Long): TryEither<Map<TypedId<CategoryId>, Category>> =
-      Either.catch { categoryRepository.findAllByUserId(userId).associateBy { it.id } }
+      Either.catch { categoryRepository.findAllByUserIdOrderByName(userId).associateBy { it.id } }
 }

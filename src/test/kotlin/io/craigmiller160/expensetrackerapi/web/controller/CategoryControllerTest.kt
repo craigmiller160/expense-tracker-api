@@ -4,6 +4,7 @@ import io.craigmiller160.expensetrackerapi.BaseIntegrationTest
 import io.craigmiller160.expensetrackerapi.common.data.typedid.TypedId
 import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.CategoryId
 import io.craigmiller160.expensetrackerapi.data.repository.CategoryRepository
+import io.craigmiller160.expensetrackerapi.data.repository.TransactionRepository
 import io.craigmiller160.expensetrackerapi.web.types.CategoryRequest
 import io.craigmiller160.expensetrackerapi.web.types.CategoryResponse
 import org.assertj.core.api.Assertions.assertThat
@@ -17,6 +18,7 @@ import org.springframework.test.web.servlet.put
 
 class CategoryControllerTest : BaseIntegrationTest() {
   @Autowired private lateinit var categoryRepository: CategoryRepository
+  @Autowired private lateinit var transactionRepository: TransactionRepository
 
   @Test
   fun getAllCategories() {
@@ -97,6 +99,9 @@ class CategoryControllerTest : BaseIntegrationTest() {
   fun deleteCategory() {
     val cat1 = dataHelper.createCategory(1L, "Category 1")
     val cat2 = dataHelper.createCategory(2L, "Category 2")
+    val cat3 = dataHelper.createCategory(3L, "Category 3")
+    val txn1 = dataHelper.createTransaction(1L, cat1.id)
+    val txn2 = dataHelper.createTransaction(1L, cat3.id)
 
     val action: (TypedId<CategoryId>) -> Unit = { id ->
       mockMvc
@@ -112,5 +117,13 @@ class CategoryControllerTest : BaseIntegrationTest() {
 
     assertThat(categoryRepository.findById(cat1.id)).isEmpty
     assertThat(categoryRepository.findById(cat2.id)).isPresent
+    assertThat(transactionRepository.findById(txn1.id))
+        .isPresent
+        .get()
+        .hasFieldOrPropertyWithValue("categoryId", null)
+    assertThat(transactionRepository.findById(txn2.id))
+        .isPresent
+        .get()
+        .hasFieldOrPropertyWithValue("categoryId", cat3.id)
   }
 }
