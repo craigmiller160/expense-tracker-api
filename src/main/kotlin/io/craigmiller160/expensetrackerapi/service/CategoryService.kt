@@ -21,7 +21,7 @@ class CategoryService(
   fun getAllCategories(): TryEither<List<CategoryResponse>> {
     val userId = oAuth2Service.getAuthenticatedUser().userId
     return Either.catch {
-      categoryRepository.findAllByUserId(userId).map { CategoryResponse.from(it) }
+      categoryRepository.findAllByUserIdOrderByName(userId).map { CategoryResponse.from(it) }
     }
   }
 
