@@ -1,10 +1,10 @@
 package io.craigmiller160.expensetrackerapi.web
 
 import io.craigmiller160.expensetrackerapi.common.error.BadRequestException
+import io.craigmiller160.expensetrackerapi.common.error.InvalidImportException
 import io.craigmiller160.expensetrackerapi.web.types.ErrorResponse
 import java.time.ZoneId
 import java.time.ZonedDateTime
-import javax.transaction.InvalidTransactionException
 import org.slf4j.LoggerFactory
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.AccessDeniedException
@@ -30,8 +30,8 @@ class ControllerErrorHandler {
     return createErrorResponse(400, ex.message ?: "")
   }
 
-  @ExceptionHandler(InvalidTransactionException::class)
-  fun invalidTransactionException(ex: InvalidTransactionException): ResponseEntity<ErrorResponse> {
+  @ExceptionHandler(InvalidImportException::class)
+  fun invalidImportException(ex: InvalidImportException): ResponseEntity<ErrorResponse> {
     log.error(ex.message, ex)
     return createErrorResponse(400, ex.message ?: "")
   }
