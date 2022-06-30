@@ -29,8 +29,8 @@ abstract class AbstractCsvTransactionParser : TransactionParser {
               }
             }
           }
-          .filter { either -> either.exists { includeTransaction(it) } }
           .sequence()
+          .map { list -> list.filter { includeTransaction(it) } }
 
   private fun prepareFieldExtractor(fields: Array<String>): TryEither<FieldExtractor> {
     if (fields.size != numberOfColumns) {
