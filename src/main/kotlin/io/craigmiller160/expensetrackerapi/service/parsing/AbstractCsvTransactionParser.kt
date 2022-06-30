@@ -13,6 +13,8 @@ typealias FieldExtractor = (index: Int, name: String) -> TryEither<String>
 
 abstract class AbstractCsvTransactionParser : TransactionParser {
 
+  protected abstract val numberOfColumns: Int
+
   override fun parse(userId: Long, stream: InputStream): TryEither<List<Transaction>> =
       CSVReader(InputStreamReader(stream))
           .readAll()
