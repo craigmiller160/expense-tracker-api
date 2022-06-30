@@ -15,7 +15,7 @@ class ChaseCsvTransactionParser : AbstractCsvTransactionParser() {
     private val DATE_FORMAT = DateTimeFormatter.ofPattern("MM/dd/yyyy")
   }
 
-  override val numberOfColumns: Int = 7
+  override val numberOfColumns: Int = 8
 
   override fun getTransaction(
       userId: Long,
