@@ -126,7 +126,36 @@ class TransactionControllerTest : BaseIntegrationTest() {
 
   @Test
   fun `search - with categories, but with more items than on the first page`() {
-    TODO()
+    dataHelper.createTransaction(1L, user1Categories[0].id)
+    dataHelper.createTransaction(1L, user1Categories[0].id)
+    val request =
+        SearchTransactionsRequest(
+            categoryType = TransactionCategoryType.WITH_CATEGORY,
+            pageNumber = 0,
+            pageSize = 4,
+            sortKey = TransactionSortKey.EXPENSE_DATE,
+            sortDirection = SortDirection.ASC)
+
+    val response =
+        SearchTransactionsResponse(
+            transactions =
+                listOf(
+                    TransactionResponse.from(user1Transactions[0], user1Categories[0]),
+                    TransactionResponse.from(user1Transactions[2], user1Categories[2]),
+                    TransactionResponse.from(user1Transactions[4], user1Categories[1]),
+                    TransactionResponse.from(user1Transactions[6], user1Categories[0])),
+            pageNumber = 0,
+            totalItems = 6)
+
+    mockMvc
+        .get("/transactions?${request.toQueryString()}") {
+          secure = true
+          header("Authorization", "Bearer $token")
+        }
+        .andExpect {
+          status { isOk() }
+          content { json(objectMapper.writeValueAsString(response)) }
+        }
   }
 
   @Test
