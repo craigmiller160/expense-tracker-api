@@ -18,6 +18,7 @@ import io.craigmiller160.expensetrackerapi.web.types.DeleteTransactionsRequest
 import io.craigmiller160.expensetrackerapi.web.types.SearchTransactionsRequest
 import io.craigmiller160.expensetrackerapi.web.types.SearchTransactionsResponse
 import io.craigmiller160.expensetrackerapi.web.types.TransactionAndCategory
+import io.craigmiller160.expensetrackerapi.web.types.TransactionCategoryType
 import io.craigmiller160.expensetrackerapi.web.types.UnconfirmedTransactionCountResponse
 import io.craigmiller160.oauth2.service.OAuth2Service
 import org.springframework.data.domain.PageRequest
@@ -83,16 +84,19 @@ class TransactionService(
     val filteredCategoryIds =
         request.categoryIds?.let { ids -> ids.filter { categories.contains(it) } }
     val categoryIdSpec = SpecBuilder.`in`<Transaction>(filteredCategoryIds, "categoryId")
-    val withNoCategorySpec =
-        if (request.withNoCategory == true) SpecBuilder.isNull<Transaction>("categoryId")
-        else SpecBuilder.emptySpec()
+    val categoryTypeSpec =
+        when (request.categoryType) {
+          null -> SpecBuilder.emptySpec()
+          TransactionCategoryType.WITH_CATEGORY -> SpecBuilder.isNotNull<Transaction>("categoryId")
+          TransactionCategoryType.WITHOUT_CATEGORY -> SpecBuilder.isNull<Transaction>("categoryId")
+        }
 
     return userIdSpec
         .and(startDateSpec)
         .and(endDateSpec)
         .and(confirmedSpec)
         .and(categoryIdSpec)
-        .and(withNoCategorySpec)
+        .and(categoryTypeSpec)
   }
 
   private fun getCategoryMap(userId: Long): TryEither<Map<TypedId<CategoryId>, Category>> =

@@ -17,6 +17,9 @@ object SpecBuilder {
   fun <T> isNull(fieldName: String): Specification<T> =
       Specification.where { root, query, builder -> builder.isNull(root.get<Any>(fieldName)) }
 
+  fun <T> isNotNull(fieldName: String): Specification<T> =
+      Specification.where { root, query, builder -> builder.isNotNull(root.get<Any>(fieldName)) }
+
   fun <T> greaterThanOrEqualTo(value: Comparable<*>?, fieldName: String): Specification<T> =
       value?.let { nonNullValue ->
         Specification.where { root, query, builder ->

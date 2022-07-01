@@ -17,7 +17,7 @@ data class SearchTransactionsRequest(
     @field:DateTimeFormat(pattern = DATE_PATTERN) val startDate: LocalDate? = null,
     @field:DateTimeFormat(pattern = DATE_PATTERN) val endDate: LocalDate? = null,
     val confirmed: Boolean? = null,
-    val withNoCategory: Boolean? = null,
+    val categoryType: TransactionCategoryType? = null,
     val categoryIds: Set<TypedId<CategoryId>>? = null
 ) : PageableRequest, SortableRequest<TransactionSortKey> {
   companion object {
@@ -25,8 +25,9 @@ data class SearchTransactionsRequest(
   }
 
   init {
-    if (withNoCategory == true && categoryIds?.isNotEmpty() == true) {
-      throw BadRequestException("Cannot set withNoCategory and specify categoryIds")
+    if (categoryType == TransactionCategoryType.WITHOUT_CATEGORY &&
+        categoryIds?.isNotEmpty() == true) {
+      throw BadRequestException("Cannot set WITHOUT_CATEGORY and specify categoryIds")
     }
   }
 
@@ -39,7 +40,7 @@ data class SearchTransactionsRequest(
               "startDate" to startDate?.let { DATE_FORMAT.format(it) },
               "endDate" to endDate?.let { DATE_FORMAT.format(it) },
               "confirmed" to confirmed,
-              "withNoCategory" to withNoCategory,
+              "categoryType" to categoryType?.name,
               "categoryIds" to categoryIds?.joinToString(",") { it.toString() })
           .filter { it.second != null }
           .map { "${it.first}=${it.second}" }

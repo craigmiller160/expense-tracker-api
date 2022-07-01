@@ -12,6 +12,7 @@ import io.craigmiller160.expensetrackerapi.web.types.SearchTransactionsRequest
 import io.craigmiller160.expensetrackerapi.web.types.SearchTransactionsResponse
 import io.craigmiller160.expensetrackerapi.web.types.SortDirection
 import io.craigmiller160.expensetrackerapi.web.types.TransactionAndCategory
+import io.craigmiller160.expensetrackerapi.web.types.TransactionCategoryType
 import io.craigmiller160.expensetrackerapi.web.types.TransactionResponse
 import io.craigmiller160.expensetrackerapi.web.types.TransactionSortKey
 import io.craigmiller160.expensetrackerapi.web.types.UnconfirmedTransactionCountResponse
@@ -64,7 +65,7 @@ class TransactionControllerTest : BaseIntegrationTest() {
   fun `search - with no categories, sort by EXPENSE_DATE DESC`() {
     val request =
         SearchTransactionsRequest(
-            withNoCategory = true,
+            categoryType = TransactionCategoryType.WITHOUT_CATEGORY,
             pageNumber = 0,
             pageSize = 100,
             sortKey = TransactionSortKey.EXPENSE_DATE,
@@ -92,10 +93,42 @@ class TransactionControllerTest : BaseIntegrationTest() {
   }
 
   @Test
+  fun `search - with categories`() {
+    val request =
+        SearchTransactionsRequest(
+            categoryType = TransactionCategoryType.WITH_CATEGORY,
+            pageNumber = 0,
+            pageSize = 100,
+            sortKey = TransactionSortKey.EXPENSE_DATE,
+            sortDirection = SortDirection.ASC)
+
+    val response =
+        SearchTransactionsResponse(
+            transactions =
+                listOf(
+                    TransactionResponse.from(user1Transactions[0], user1Categories[0]),
+                    TransactionResponse.from(user1Transactions[2], user1Categories[2]),
+                    TransactionResponse.from(user1Transactions[4], user1Categories[1]),
+                    TransactionResponse.from(user1Transactions[6], user1Categories[0])),
+            pageNumber = 0,
+            totalItems = 4)
+
+    mockMvc
+        .get("/transactions?${request.toQueryString()}") {
+          secure = true
+          header("Authorization", "Bearer $token")
+        }
+        .andExpect {
+          status { isOk() }
+          content { json(objectMapper.writeValueAsString(response)) }
+        }
+  }
+
+  @Test
   fun `search - with no categories`() {
     val request =
         SearchTransactionsRequest(
-            withNoCategory = true,
+            categoryType = TransactionCategoryType.WITHOUT_CATEGORY,
             pageNumber = 0,
             pageSize = 100,
             sortKey = TransactionSortKey.EXPENSE_DATE,
