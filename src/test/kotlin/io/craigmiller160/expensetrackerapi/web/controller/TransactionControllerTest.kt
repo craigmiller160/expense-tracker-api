@@ -126,13 +126,11 @@ class TransactionControllerTest : BaseIntegrationTest() {
 
   @Test
   fun `search - with categories, but with more items than on the first page`() {
-    dataHelper.createTransaction(1L, user1Categories[0].id)
-    dataHelper.createTransaction(1L, user1Categories[0].id)
     val request =
         SearchTransactionsRequest(
             categoryType = TransactionCategoryType.WITH_CATEGORY,
             pageNumber = 0,
-            pageSize = 4,
+            pageSize = 2,
             sortKey = TransactionSortKey.EXPENSE_DATE,
             sortDirection = SortDirection.ASC)
 
@@ -141,11 +139,9 @@ class TransactionControllerTest : BaseIntegrationTest() {
             transactions =
                 listOf(
                     TransactionResponse.from(user1Transactions[0], user1Categories[0]),
-                    TransactionResponse.from(user1Transactions[2], user1Categories[2]),
-                    TransactionResponse.from(user1Transactions[4], user1Categories[1]),
-                    TransactionResponse.from(user1Transactions[6], user1Categories[0])),
+                    TransactionResponse.from(user1Transactions[2], user1Categories[2])),
             pageNumber = 0,
-            totalItems = 6)
+            totalItems = 4)
 
     mockMvc
         .get("/transactions?${request.toQueryString()}") {
@@ -301,7 +297,7 @@ class TransactionControllerTest : BaseIntegrationTest() {
                   TransactionResponse.from(txn, txn.categoryId?.let { user1CategoriesMap[it] })
                 },
             pageNumber = 0,
-            totalItems = expected.size)
+            totalItems = expected.size.toLong())
 
     mockMvc
         .get("/transactions?${request.toQueryString()}") {

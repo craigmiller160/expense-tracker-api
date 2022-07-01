@@ -9,7 +9,7 @@ import org.springframework.data.domain.Page
 data class SearchTransactionsResponse(
     val transactions: List<TransactionResponse>,
     val pageNumber: Int,
-    val totalItems: Int
+    val totalItems: Long
 ) {
   companion object {
     fun from(
@@ -22,7 +22,7 @@ data class SearchTransactionsResponse(
             TransactionResponse.from(txn, category)
           }
       return SearchTransactionsResponse(
-          transactions = transactions, pageNumber = page.number, totalItems = page.numberOfElements)
+          transactions = transactions, pageNumber = page.number, totalItems = page.totalElements)
     }
   }
 }
