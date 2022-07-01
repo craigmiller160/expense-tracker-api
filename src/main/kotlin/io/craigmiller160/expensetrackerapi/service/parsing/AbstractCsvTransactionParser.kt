@@ -1,6 +1,7 @@
 package io.craigmiller160.expensetrackerapi.service.parsing
 
 import arrow.core.Either
+import arrow.core.flatMap
 import arrow.core.sequence
 import com.opencsv.CSVReader
 import io.craigmiller160.expensetrackerapi.common.error.InvalidImportException
@@ -13,6 +14,8 @@ typealias FieldExtractor = (index: Int, name: String) -> TryEither<String>
 
 abstract class AbstractCsvTransactionParser : TransactionParser {
 
+  protected abstract val numberOfColumns: Int
+
   override fun parse(userId: Long, stream: InputStream): TryEither<List<Transaction>> =
       CSVReader(InputStreamReader(stream))
           .readAll()
@@ -20,16 +23,23 @@ abstract class AbstractCsvTransactionParser : TransactionParser {
           .drop(1)
           .map { prepareFieldExtractor(it) }
           .mapIndexed { index, fieldExtractor ->
-            getTransaction(userId, fieldExtractor).mapLeft {
-              InvalidImportException("Error parsing CSV record, row ${index + 2}", it)
+            fieldExtractor.flatMap {
+              getTransaction(userId, it).mapLeft {
+                InvalidImportException("Error parsing CSV record, row ${index + 2}", it)
+              }
             }
           }
-          .filter { either -> either.exists { includeTransaction(it) } }
           .sequence()
+          .map { list -> list.filter { includeTransaction(it) } }
 
-  private fun prepareFieldExtractor(fields: Array<String>): FieldExtractor = { index, name ->
-    Either.catch { fields[index] }
-        .mapLeft { InvalidImportException("Missing field $name at CSV row index $index") }
+  private fun prepareFieldExtractor(fields: Array<String>): TryEither<FieldExtractor> {
+    if (fields.size != numberOfColumns) {
+      return Either.Left(InvalidImportException("Invalid number of columns in CSV: ${fields.size}"))
+    }
+    return Either.Right { index, name ->
+      Either.catch { fields[index] }
+          .mapLeft { InvalidImportException("Missing field $name at CSV row index $index") }
+    }
   }
 
   protected open fun includeTransaction(transaction: Transaction): Boolean = true

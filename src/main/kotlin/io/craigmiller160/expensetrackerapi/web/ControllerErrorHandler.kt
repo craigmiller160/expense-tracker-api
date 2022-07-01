@@ -1,12 +1,14 @@
 package io.craigmiller160.expensetrackerapi.web
 
 import io.craigmiller160.expensetrackerapi.common.error.BadRequestException
+import io.craigmiller160.expensetrackerapi.common.error.InvalidImportException
 import io.craigmiller160.expensetrackerapi.web.types.ErrorResponse
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import org.slf4j.LoggerFactory
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.AccessDeniedException
+import org.springframework.web.HttpMediaTypeNotSupportedException
 import org.springframework.web.bind.annotation.ControllerAdvice
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.context.request.RequestContextHolder
@@ -26,6 +28,18 @@ class ControllerErrorHandler {
   fun badRequestException(ex: BadRequestException): ResponseEntity<ErrorResponse> {
     log.error(ex.message, ex)
     return createErrorResponse(400, ex.message ?: "")
+  }
+
+  @ExceptionHandler(InvalidImportException::class)
+  fun invalidImportException(ex: InvalidImportException): ResponseEntity<ErrorResponse> {
+    log.error(ex.message, ex)
+    return createErrorResponse(400, ex.message ?: "")
+  }
+
+  @ExceptionHandler(HttpMediaTypeNotSupportedException::class)
+  fun mediaTypeNotSupported(ex: HttpMediaTypeNotSupportedException): ResponseEntity<ErrorResponse> {
+    log.error(ex.message, ex)
+    return createErrorResponse(415, ex.message ?: "")
   }
 
   @ExceptionHandler(AccessDeniedException::class)
