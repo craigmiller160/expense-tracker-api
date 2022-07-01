@@ -125,6 +125,11 @@ class TransactionControllerTest : BaseIntegrationTest() {
   }
 
   @Test
+  fun `search - with categories, but with more items than on the first page`() {
+    TODO()
+  }
+
+  @Test
   fun `search - with no categories`() {
     val request =
         SearchTransactionsRequest(
