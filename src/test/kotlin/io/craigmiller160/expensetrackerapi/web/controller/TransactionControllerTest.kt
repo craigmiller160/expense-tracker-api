@@ -12,6 +12,7 @@ import io.craigmiller160.expensetrackerapi.web.types.SearchTransactionsRequest
 import io.craigmiller160.expensetrackerapi.web.types.SearchTransactionsResponse
 import io.craigmiller160.expensetrackerapi.web.types.SortDirection
 import io.craigmiller160.expensetrackerapi.web.types.TransactionAndCategory
+import io.craigmiller160.expensetrackerapi.web.types.TransactionCategoryType
 import io.craigmiller160.expensetrackerapi.web.types.TransactionResponse
 import io.craigmiller160.expensetrackerapi.web.types.TransactionSortKey
 import io.craigmiller160.expensetrackerapi.web.types.UnconfirmedTransactionCountResponse
@@ -64,7 +65,7 @@ class TransactionControllerTest : BaseIntegrationTest() {
   fun `search - with no categories, sort by EXPENSE_DATE DESC`() {
     val request =
         SearchTransactionsRequest(
-            withNoCategory = true,
+            categoryType = TransactionCategoryType.WITHOUT_CATEGORY,
             pageNumber = 0,
             pageSize = 100,
             sortKey = TransactionSortKey.EXPENSE_DATE,
@@ -92,10 +93,15 @@ class TransactionControllerTest : BaseIntegrationTest() {
   }
 
   @Test
+  fun `search - with categories`() {
+    TODO()
+  }
+
+  @Test
   fun `search - with no categories`() {
     val request =
         SearchTransactionsRequest(
-            withNoCategory = true,
+            categoryType = TransactionCategoryType.WITHOUT_CATEGORY,
             pageNumber = 0,
             pageSize = 100,
             sortKey = TransactionSortKey.EXPENSE_DATE,
