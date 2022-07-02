@@ -14,6 +14,7 @@ data class TransactionResponse(
     val description: String,
     val amount: BigDecimal,
     val confirmed: Boolean,
+    val duplicate: Boolean,
     val categoryId: TypedId<CategoryId>?,
     val categoryName: String?
 ) {
@@ -25,6 +26,7 @@ data class TransactionResponse(
             description = transaction.description,
             amount = transaction.amount,
             confirmed = transaction.confirmed,
+            duplicate = false,
             categoryId = category?.id,
             categoryName = category?.name)
   }
