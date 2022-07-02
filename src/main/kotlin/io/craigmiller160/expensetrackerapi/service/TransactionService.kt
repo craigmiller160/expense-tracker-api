@@ -60,8 +60,12 @@ class TransactionService(
   @Transactional
   fun search(request: SearchTransactionsRequest): TryEither<SearchTransactionsResponse> {
     val userId = oAuth2Service.getAuthenticatedUser().userId
+
     val sort =
-        Sort.by(request.sortDirection.toSpringSortDirection(), request.sortKey.toColumnName())
+        Sort.by(
+            Sort.Order(
+                request.sortDirection.toSpringSortDirection(), request.sortKey.toColumnName()),
+            Sort.Order(Sort.Direction.ASC, "description"))
     val pageable = PageRequest.of(request.pageNumber, request.pageSize, sort)
     val categoryMapEither = getCategoryMap(userId)
     return categoryMapEither
