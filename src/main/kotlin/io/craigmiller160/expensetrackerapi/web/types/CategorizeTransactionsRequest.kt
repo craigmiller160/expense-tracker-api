@@ -6,7 +6,7 @@ import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.TransactionId
 
 data class TransactionAndCategory(
     val transactionId: TypedId<TransactionId>,
-    val categoryId: TypedId<CategoryId>
+    val categoryId: TypedId<CategoryId>?
 )
 
 data class CategorizeTransactionsRequest(

@@ -72,8 +72,21 @@ interface TransactionRepository :
       AND t.userId = :userId
   """)
   @Modifying(flushAutomatically = true, clearAutomatically = true)
-  fun removeCategoryFromTransaction(
+  fun removeCategoryFromAllTransactions(
       @Param("userId") userId: Long,
       @Param("categoryId") categoryId: TypedId<CategoryId>
+  )
+
+  @Query(
+      """
+      UPDATE Transaction t
+      SET t.categoryId = null
+      WHERE t.id = :transactionId
+      AND t.userId = :userId
+  """)
+  @Modifying(flushAutomatically = true, clearAutomatically = true)
+  fun removeTransactionCategory(
+      @Param("transactionId") transactionId: TypedId<TransactionId>,
+      @Param("userId") userId: Long
   )
 }

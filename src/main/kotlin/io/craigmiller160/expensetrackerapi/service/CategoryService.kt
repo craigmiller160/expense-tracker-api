@@ -47,7 +47,9 @@ class CategoryService(
   @Transactional
   fun deleteCategory(categoryId: TypedId<CategoryId>): TryEither<Unit> {
     val userId = oAuth2Service.getAuthenticatedUser().userId
-    return Either.catch { transactionRepository.removeCategoryFromTransaction(userId, categoryId) }
+    return Either.catch {
+          transactionRepository.removeCategoryFromAllTransactions(userId, categoryId)
+        }
         .flatMapCatch { categoryRepository.deleteByIdAndUserId(categoryId, userId) }
   }
 }

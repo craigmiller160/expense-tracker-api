@@ -39,8 +39,10 @@ class TransactionService(
     return request.transactionsAndCategories.foldRight<TransactionAndCategory, TryEither<Unit>>(
         Either.Right(Unit)) { txnAndCat, result ->
       result.flatMapCatch {
-        transactionRepository.setTransactionCategory(
-            txnAndCat.transactionId, txnAndCat.categoryId, userId)
+        txnAndCat.categoryId?.let {
+          transactionRepository.setTransactionCategory(txnAndCat.transactionId, it, userId)
+        }
+            ?: transactionRepository.removeTransactionCategory(txnAndCat.transactionId, userId)
       }
     }
   }
