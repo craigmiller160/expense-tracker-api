@@ -125,6 +125,36 @@ class TransactionControllerTest : BaseIntegrationTest() {
   }
 
   @Test
+  fun `search - with categories, but with more items than on the first page`() {
+    val request =
+        SearchTransactionsRequest(
+            categoryType = TransactionCategoryType.WITH_CATEGORY,
+            pageNumber = 0,
+            pageSize = 2,
+            sortKey = TransactionSortKey.EXPENSE_DATE,
+            sortDirection = SortDirection.ASC)
+
+    val response =
+        SearchTransactionsResponse(
+            transactions =
+                listOf(
+                    TransactionResponse.from(user1Transactions[0], user1Categories[0]),
+                    TransactionResponse.from(user1Transactions[2], user1Categories[2])),
+            pageNumber = 0,
+            totalItems = 4)
+
+    mockMvc
+        .get("/transactions?${request.toQueryString()}") {
+          secure = true
+          header("Authorization", "Bearer $token")
+        }
+        .andExpect {
+          status { isOk() }
+          content { json(objectMapper.writeValueAsString(response)) }
+        }
+  }
+
+  @Test
   fun `search - with no categories`() {
     val request =
         SearchTransactionsRequest(
@@ -267,7 +297,7 @@ class TransactionControllerTest : BaseIntegrationTest() {
                   TransactionResponse.from(txn, txn.categoryId?.let { user1CategoriesMap[it] })
                 },
             pageNumber = 0,
-            totalItems = expected.size)
+            totalItems = expected.size.toLong())
 
     mockMvc
         .get("/transactions?${request.toQueryString()}") {
