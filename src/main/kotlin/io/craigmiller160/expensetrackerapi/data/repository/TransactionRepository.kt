@@ -25,7 +25,16 @@ interface TransactionRepository :
     ), 
         t.updated = current_timestamp,
         t.version = t.version + 1,
-        t.confirmed = true
+        t.confirmed =
+            CASE
+                WHEN ((
+                    SELECT COUNT(c)
+                    FROM Category c
+                    WHERE c.id = :categoryId 
+                    AND c.userId = :userId
+                ) > 0) THEN true
+                ELSE false
+            END
     WHERE t.id = :transactionId
     AND t.userId = :userId
   """)
