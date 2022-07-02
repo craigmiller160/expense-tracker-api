@@ -187,6 +187,10 @@ class TransactionControllerTest : BaseIntegrationTest() {
 
   @Test
   fun `search - confirmed transactions only`() {
+    user1Transactions =
+        user1Transactions.map { txn ->
+          transactionRepository.saveAndFlush(txn.copy(confirmed = false))
+        }
     val txn1 = transactionRepository.saveAndFlush(user1Transactions.first().copy(confirmed = true))
     val txn2 = transactionRepository.saveAndFlush(user1Transactions[1].copy(confirmed = true))
     transactionRepository.saveAndFlush(user2Transactions.first().copy(confirmed = true))
@@ -220,6 +224,10 @@ class TransactionControllerTest : BaseIntegrationTest() {
 
   @Test
   fun `get count of unconfirmed transactions`() {
+    user1Transactions =
+        user1Transactions.map { txn ->
+          transactionRepository.saveAndFlush(txn.copy(confirmed = false))
+        }
     transactionRepository.saveAndFlush(user1Transactions.first().copy(confirmed = true))
     transactionRepository.saveAndFlush(user1Transactions[1].copy(confirmed = true))
 
@@ -238,6 +246,10 @@ class TransactionControllerTest : BaseIntegrationTest() {
 
   @Test
   fun `search - unconfirmed transactions only`() {
+    user1Transactions =
+        user1Transactions.map { txn ->
+          transactionRepository.saveAndFlush(txn.copy(confirmed = false))
+        }
     transactionRepository.saveAndFlush(user1Transactions.first().copy(confirmed = true))
     transactionRepository.saveAndFlush(user1Transactions[1].copy(confirmed = true))
     val request =
