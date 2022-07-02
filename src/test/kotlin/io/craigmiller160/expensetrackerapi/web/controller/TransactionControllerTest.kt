@@ -52,7 +52,7 @@ class TransactionControllerTest : BaseIntegrationTest() {
         user1Txns.mapIndexed { index, transaction ->
           if (index % 2 == 0) {
             transactionRepository.saveAndFlush(
-                transaction.copy(categoryId = user1Categories[index % 3].id))
+                transaction.copy(categoryId = user1Categories[index % 3].id, confirmed = true))
           } else {
             transaction
           }
@@ -368,7 +368,28 @@ class TransactionControllerTest : BaseIntegrationTest() {
 
   @Test
   fun categorizeTransactions_removeCategory() {
-    TODO()
+    assertThat(user1Transactions[0].categoryId).isNotNull
+    val request =
+        CategorizeTransactionsRequest(
+            transactionsAndCategories =
+                listOf(TransactionAndCategory(user1Transactions[0].id, null)))
+
+    mockMvc
+        .put("/transactions/categorize") {
+          secure = true
+          header("Authorization", "Bearer $token")
+          contentType = MediaType.APPLICATION_JSON
+          content = objectMapper.writeValueAsString(request)
+        }
+        .andExpect { status { isNoContent() } }
+
+    entityManager.flush()
+
+    assertThat(transactionRepository.findById(user1Transactions[0].id))
+        .isPresent
+        .get()
+        .hasFieldOrPropertyWithValue("categoryId", null)
+        .hasFieldOrPropertyWithValue("confirmed", true)
   }
 
   @Test
