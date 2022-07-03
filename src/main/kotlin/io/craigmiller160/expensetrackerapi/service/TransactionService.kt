@@ -92,7 +92,8 @@ class TransactionService(
     val categoryIdSpec = SpecBuilder.`in`<Transaction>(filteredCategoryIds, "categoryId")
     val categoryTypeSpec =
         when (request.categoryType) {
-          null -> SpecBuilder.emptySpec()
+          null,
+          TransactionCategoryType.ALL -> SpecBuilder.emptySpec()
           TransactionCategoryType.WITH_CATEGORY -> SpecBuilder.isNotNull<Transaction>("categoryId")
           TransactionCategoryType.WITHOUT_CATEGORY -> SpecBuilder.isNull<Transaction>("categoryId")
         }
