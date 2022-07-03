@@ -52,7 +52,7 @@ class TransactionControllerTest : BaseIntegrationTest() {
         user1Txns.mapIndexed { index, transaction ->
           if (index % 2 == 0) {
             transactionRepository.saveAndFlush(
-                transaction.copy(categoryId = user1Categories[index % 3].id))
+                transaction.copy(categoryId = user1Categories[index % 3].id, confirmed = true))
           } else {
             transaction
           }
@@ -187,6 +187,10 @@ class TransactionControllerTest : BaseIntegrationTest() {
 
   @Test
   fun `search - confirmed transactions only`() {
+    user1Transactions =
+        user1Transactions.map { txn ->
+          transactionRepository.saveAndFlush(txn.copy(confirmed = false))
+        }
     val txn1 = transactionRepository.saveAndFlush(user1Transactions.first().copy(confirmed = true))
     val txn2 = transactionRepository.saveAndFlush(user1Transactions[1].copy(confirmed = true))
     transactionRepository.saveAndFlush(user2Transactions.first().copy(confirmed = true))
@@ -220,6 +224,10 @@ class TransactionControllerTest : BaseIntegrationTest() {
 
   @Test
   fun `get count of unconfirmed transactions`() {
+    user1Transactions =
+        user1Transactions.map { txn ->
+          transactionRepository.saveAndFlush(txn.copy(confirmed = false))
+        }
     transactionRepository.saveAndFlush(user1Transactions.first().copy(confirmed = true))
     transactionRepository.saveAndFlush(user1Transactions[1].copy(confirmed = true))
 
@@ -238,6 +246,10 @@ class TransactionControllerTest : BaseIntegrationTest() {
 
   @Test
   fun `search - unconfirmed transactions only`() {
+    user1Transactions =
+        user1Transactions.map { txn ->
+          transactionRepository.saveAndFlush(txn.copy(confirmed = false))
+        }
     transactionRepository.saveAndFlush(user1Transactions.first().copy(confirmed = true))
     transactionRepository.saveAndFlush(user1Transactions[1].copy(confirmed = true))
     val request =
@@ -367,6 +379,32 @@ class TransactionControllerTest : BaseIntegrationTest() {
   }
 
   @Test
+  fun categorizeTransactions_removeCategory() {
+    assertThat(user1Transactions[0].categoryId).isNotNull
+    val request =
+        CategorizeTransactionsRequest(
+            transactionsAndCategories =
+                listOf(TransactionAndCategory(user1Transactions[0].id, null)))
+
+    mockMvc
+        .put("/transactions/categorize") {
+          secure = true
+          header("Authorization", "Bearer $token")
+          contentType = MediaType.APPLICATION_JSON
+          content = objectMapper.writeValueAsString(request)
+        }
+        .andExpect { status { isNoContent() } }
+
+    entityManager.flush()
+
+    assertThat(transactionRepository.findById(user1Transactions[0].id))
+        .isPresent
+        .get()
+        .hasFieldOrPropertyWithValue("categoryId", null)
+        .hasFieldOrPropertyWithValue("confirmed", true)
+  }
+
+  @Test
   fun categorizeTransactions() {
     val user2Category = dataHelper.createCategory(2L, "Other")
     val uncategorizedTransaction = user1Transactions[5]
@@ -400,17 +438,21 @@ class TransactionControllerTest : BaseIntegrationTest() {
         .isPresent
         .get()
         .hasFieldOrPropertyWithValue("categoryId", user1Categories.first().id)
+        .hasFieldOrPropertyWithValue("confirmed", true)
     assertThat(transactionRepository.findById(categorizedTransaction.id))
         .isPresent
         .get()
         .hasFieldOrPropertyWithValue("categoryId", user1Categories.first().id)
+        .hasFieldOrPropertyWithValue("confirmed", true)
     assertThat(transactionRepository.findById(user2Transactions.first().id))
         .isPresent
         .get()
         .hasFieldOrPropertyWithValue("categoryId", null)
+        .hasFieldOrPropertyWithValue("confirmed", false)
     assertThat(transactionRepository.findById(user1Transactions[2].id))
         .isPresent
         .get()
         .hasFieldOrPropertyWithValue("categoryId", null)
+        .hasFieldOrPropertyWithValue("confirmed", false)
   }
 }
