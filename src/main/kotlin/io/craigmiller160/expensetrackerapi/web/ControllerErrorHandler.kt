@@ -8,6 +8,7 @@ import java.time.ZonedDateTime
 import org.slf4j.LoggerFactory
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.AccessDeniedException
+import org.springframework.validation.BindException
 import org.springframework.web.HttpMediaTypeNotSupportedException
 import org.springframework.web.bind.annotation.ControllerAdvice
 import org.springframework.web.bind.annotation.ExceptionHandler
@@ -34,6 +35,12 @@ class ControllerErrorHandler {
   fun invalidImportException(ex: InvalidImportException): ResponseEntity<ErrorResponse> {
     log.error(ex.message, ex)
     return createErrorResponse(400, ex.message ?: "")
+  }
+
+  @ExceptionHandler(BindException::class)
+  fun bindException(ex: BindException): ResponseEntity<ErrorResponse> {
+    val message = ex.bindingResult.allErrors.joinToString("; ") { it.defaultMessage ?: "" }
+    return createErrorResponse(400, message)
   }
 
   @ExceptionHandler(HttpMediaTypeNotSupportedException::class)

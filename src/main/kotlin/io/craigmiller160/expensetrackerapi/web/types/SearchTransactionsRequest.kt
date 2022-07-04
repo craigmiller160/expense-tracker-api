@@ -2,9 +2,9 @@ package io.craigmiller160.expensetrackerapi.web.types
 
 import io.craigmiller160.expensetrackerapi.common.data.typedid.TypedId
 import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.CategoryId
-import io.craigmiller160.expensetrackerapi.common.error.BadRequestException
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
+import javax.validation.constraints.AssertTrue
 import org.springframework.format.annotation.DateTimeFormat
 
 const val DATE_PATTERN = "yyyy-MM-dd"
@@ -24,11 +24,12 @@ data class SearchTransactionsRequest(
     private val DATE_FORMAT = DateTimeFormatter.ofPattern(DATE_PATTERN)
   }
 
-  init {
-    if (categoryType == TransactionCategoryType.WITHOUT_CATEGORY &&
-        categoryIds?.isNotEmpty() == true) {
-      throw BadRequestException("Cannot set WITHOUT_CATEGORY and specify categoryIds")
+  @AssertTrue(message = "Cannot set WITHOUT_CATEGORY and specify categoryIds")
+  private fun isCategoryPropsValid(): Boolean {
+    if (categoryType == TransactionCategoryType.WITHOUT_CATEGORY) {
+      return categoryIds == null || categoryIds.isEmpty()
     }
+    return true
   }
 
   fun toQueryString(): String =
