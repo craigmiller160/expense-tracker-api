@@ -203,7 +203,7 @@ class TransactionControllerTest : BaseIntegrationTest() {
                     TransactionResponse.from(txn1, user1Categories[0]),
                     TransactionResponse.from(txn2, user1Categories[2])),
             pageNumber = 0,
-            totalItems = 4)
+            totalItems = 2)
 
     mockMvc
         .get("/transactions?${request.toQueryString()}") {
@@ -225,7 +225,7 @@ class TransactionControllerTest : BaseIntegrationTest() {
     transactionRepository.saveAndFlush(user1Transactions[6].copy(duplicate = true))
     val request =
         SearchTransactionsRequest(
-            isDuplicate = true,
+            isDuplicate = false,
             pageNumber = 0,
             pageSize = 100,
             sortKey = TransactionSortKey.EXPENSE_DATE,
@@ -238,7 +238,7 @@ class TransactionControllerTest : BaseIntegrationTest() {
                     TransactionResponse.from(user1Transactions[0], user1Categories[0]),
                     TransactionResponse.from(user1Transactions[2], user1Categories[2])),
             pageNumber = 0,
-            totalItems = 4)
+            totalItems = 2)
 
     mockMvc
         .get("/transactions?${request.toQueryString()}") {
