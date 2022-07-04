@@ -18,7 +18,6 @@ import io.craigmiller160.expensetrackerapi.web.types.DeleteTransactionsRequest
 import io.craigmiller160.expensetrackerapi.web.types.SearchTransactionsRequest
 import io.craigmiller160.expensetrackerapi.web.types.SearchTransactionsResponse
 import io.craigmiller160.expensetrackerapi.web.types.TransactionAndCategory
-import io.craigmiller160.expensetrackerapi.web.types.TransactionCategoryType
 import io.craigmiller160.expensetrackerapi.web.types.UnconfirmedTransactionCountResponse
 import io.craigmiller160.oauth2.service.OAuth2Service
 import org.springframework.data.domain.PageRequest
@@ -87,15 +86,15 @@ class TransactionService(
         SpecBuilder.greaterThanOrEqualTo<Transaction>(request.startDate, "expenseDate")
     val endDateSpec = SpecBuilder.lessThanOrEqualTo<Transaction>(request.endDate, "expenseDate")
     val confirmedSpec = SpecBuilder.equals<Transaction>(request.isConfirmed, "confirmed")
+    val duplicateSpec = SpecBuilder.equals<Transaction>(request.isDuplicate, "duplicate")
     val filteredCategoryIds =
         request.categoryIds?.let { ids -> ids.filter { categories.contains(it) } }
     val categoryIdSpec = SpecBuilder.`in`<Transaction>(filteredCategoryIds, "categoryId")
-    val categoryTypeSpec =
-        when (request.categoryType) {
-          null,
-          TransactionCategoryType.ALL -> SpecBuilder.emptySpec()
-          TransactionCategoryType.WITH_CATEGORY -> SpecBuilder.isNotNull<Transaction>("categoryId")
-          TransactionCategoryType.WITHOUT_CATEGORY -> SpecBuilder.isNull<Transaction>("categoryId")
+    val isCategorizedSpec =
+        when (request.isCategorized) {
+          null -> SpecBuilder.emptySpec()
+          true -> SpecBuilder.isNotNull<Transaction>("categoryId")
+          false -> SpecBuilder.isNull<Transaction>("categoryId")
         }
 
     return userIdSpec
@@ -103,7 +102,8 @@ class TransactionService(
         .and(endDateSpec)
         .and(confirmedSpec)
         .and(categoryIdSpec)
-        .and(categoryTypeSpec)
+        .and(isCategorizedSpec)
+        .and(duplicateSpec)
   }
 
   private fun getCategoryMap(userId: Long): TryEither<Map<TypedId<CategoryId>, Category>> =
