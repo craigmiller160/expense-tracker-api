@@ -186,6 +186,16 @@ class TransactionControllerTest : BaseIntegrationTest() {
   }
 
   @Test
+  fun `search - only duplicates`() {
+    TODO()
+  }
+
+  @Test
+  fun `search - only non-duplicates`() {
+    TODO()
+  }
+
+  @Test
   fun `search - confirmed transactions only`() {
     user1Transactions =
         user1Transactions.map { txn ->
