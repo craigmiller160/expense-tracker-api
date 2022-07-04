@@ -1,0 +1,2 @@
+ALTER TABLE transactions
+ADD COLUMN duplicate BOOLEAN NOT NULL DEFAULT false;
