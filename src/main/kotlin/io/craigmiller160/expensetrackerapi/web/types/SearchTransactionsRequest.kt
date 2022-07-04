@@ -16,8 +16,9 @@ data class SearchTransactionsRequest(
     override val sortDirection: SortDirection,
     @field:DateTimeFormat(pattern = DATE_PATTERN) val startDate: LocalDate? = null,
     @field:DateTimeFormat(pattern = DATE_PATTERN) val endDate: LocalDate? = null,
-    val confirmed: Boolean? = null,
-    val categoryType: TransactionCategoryType? = null,
+    val isConfirmed: Boolean? = null,
+    val isCategorized: Boolean? = null,
+    val isDuplicate: Boolean? = null,
     val categoryIds: Set<TypedId<CategoryId>>? = null
 ) : PageableRequest, SortableRequest<TransactionSortKey> {
   companion object {
@@ -26,7 +27,7 @@ data class SearchTransactionsRequest(
 
   @AssertTrue(message = "Cannot set WITHOUT_CATEGORY and specify categoryIds")
   private fun isCategoryPropsValid(): Boolean {
-    if (categoryType == TransactionCategoryType.WITHOUT_CATEGORY) {
+    if (isCategorized == true) {
       return categoryIds == null || categoryIds.isEmpty()
     }
     return true
@@ -40,8 +41,9 @@ data class SearchTransactionsRequest(
               "sortDirection" to sortDirection.name,
               "startDate" to startDate?.let { DATE_FORMAT.format(it) },
               "endDate" to endDate?.let { DATE_FORMAT.format(it) },
-              "confirmed" to confirmed,
-              "categoryType" to categoryType?.name,
+              "isConfirmed" to isConfirmed,
+              "isCategorized" to isCategorized,
+              "isDuplicate" to isDuplicate,
               "categoryIds" to categoryIds?.joinToString(",") { it.toString() })
           .filter { it.second != null }
           .map { "${it.first}=${it.second}" }

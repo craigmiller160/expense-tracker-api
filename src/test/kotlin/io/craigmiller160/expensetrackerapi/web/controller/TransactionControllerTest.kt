@@ -196,7 +196,7 @@ class TransactionControllerTest : BaseIntegrationTest() {
     transactionRepository.saveAndFlush(user2Transactions.first().copy(confirmed = true))
     val request =
         SearchTransactionsRequest(
-            confirmed = true,
+            isConfirmed = true,
             pageNumber = 0,
             pageSize = 100,
             sortKey = TransactionSortKey.EXPENSE_DATE,
@@ -254,7 +254,7 @@ class TransactionControllerTest : BaseIntegrationTest() {
     transactionRepository.saveAndFlush(user1Transactions[1].copy(confirmed = true))
     val request =
         SearchTransactionsRequest(
-            confirmed = false,
+            isConfirmed = false,
             pageNumber = 0,
             pageSize = 100,
             sortKey = TransactionSortKey.EXPENSE_DATE,
