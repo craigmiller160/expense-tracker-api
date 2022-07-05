@@ -217,6 +217,24 @@ class TransactionControllerTest : BaseIntegrationTest() {
   }
 
   @Test
+  fun `search - invalid category options`() {
+    val request =
+        SearchTransactionsRequest(
+            isCategorized = false,
+            pageNumber = 0,
+            pageSize = 100,
+            sortKey = TransactionSortKey.EXPENSE_DATE,
+            sortDirection = SortDirection.ASC)
+
+    mockMvc
+        .get("/transactions?${request.toQueryString()}") {
+          secure = true
+          header("Authorization", "Bearer $token")
+        }
+        .andExpect { status { isBadRequest() } }
+  }
+
+  @Test
   fun `search - only non-duplicates`() {
     transactionRepository.saveAndFlush(user1Transactions[1].copy(duplicate = true))
     transactionRepository.saveAndFlush(user1Transactions[3].copy(duplicate = true))
