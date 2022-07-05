@@ -23,6 +23,7 @@ data class Transaction(
     val description: String,
     val amount: BigDecimal,
     val confirmed: Boolean = false,
+    val duplicate: Boolean = false,
     val categoryId: TypedId<CategoryId>? = null,
     @Id override val id: TypedId<TransactionId> = TypedId(),
     override val created: ZonedDateTime = ZonedDateTime.now(),

@@ -40,7 +40,7 @@ dependencies {
     val kotestArrowVersion = "1.2.5"
     val springArrowKtVersion = "1.0.0-SNAPSHOT"
     val springOAuth2UtilsVersion = "1.10.0-SNAPSHOT"
-    val springWebUtilsVersion = "1.1.3"
+    val springWebUtilsVersion = "1.2.0-SNAPSHOT"
     val mockitoKotlinVersion = "4.0.0"
     val arrowKtVersion = "1.1.2"
     val assertJVersion = "3.23.1"

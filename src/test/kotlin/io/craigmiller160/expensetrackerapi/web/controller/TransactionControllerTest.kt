@@ -12,7 +12,6 @@ import io.craigmiller160.expensetrackerapi.web.types.SearchTransactionsRequest
 import io.craigmiller160.expensetrackerapi.web.types.SearchTransactionsResponse
 import io.craigmiller160.expensetrackerapi.web.types.SortDirection
 import io.craigmiller160.expensetrackerapi.web.types.TransactionAndCategory
-import io.craigmiller160.expensetrackerapi.web.types.TransactionCategoryType
 import io.craigmiller160.expensetrackerapi.web.types.TransactionResponse
 import io.craigmiller160.expensetrackerapi.web.types.TransactionSortKey
 import io.craigmiller160.expensetrackerapi.web.types.UnconfirmedTransactionCountResponse
@@ -65,7 +64,7 @@ class TransactionControllerTest : BaseIntegrationTest() {
   fun `search - with no categories, sort by EXPENSE_DATE DESC`() {
     val request =
         SearchTransactionsRequest(
-            categoryType = TransactionCategoryType.WITHOUT_CATEGORY,
+            isCategorized = false,
             pageNumber = 0,
             pageSize = 100,
             sortKey = TransactionSortKey.EXPENSE_DATE,
@@ -96,7 +95,7 @@ class TransactionControllerTest : BaseIntegrationTest() {
   fun `search - with categories`() {
     val request =
         SearchTransactionsRequest(
-            categoryType = TransactionCategoryType.WITH_CATEGORY,
+            isCategorized = true,
             pageNumber = 0,
             pageSize = 100,
             sortKey = TransactionSortKey.EXPENSE_DATE,
@@ -128,7 +127,7 @@ class TransactionControllerTest : BaseIntegrationTest() {
   fun `search - with categories, but with more items than on the first page`() {
     val request =
         SearchTransactionsRequest(
-            categoryType = TransactionCategoryType.WITH_CATEGORY,
+            isCategorized = true,
             pageNumber = 0,
             pageSize = 2,
             sortKey = TransactionSortKey.EXPENSE_DATE,
@@ -158,7 +157,7 @@ class TransactionControllerTest : BaseIntegrationTest() {
   fun `search - with no categories`() {
     val request =
         SearchTransactionsRequest(
-            categoryType = TransactionCategoryType.WITHOUT_CATEGORY,
+            isCategorized = false,
             pageNumber = 0,
             pageSize = 100,
             sortKey = TransactionSortKey.EXPENSE_DATE,
@@ -186,6 +185,92 @@ class TransactionControllerTest : BaseIntegrationTest() {
   }
 
   @Test
+  fun `search - only duplicates`() {
+    val txn1 = transactionRepository.saveAndFlush(user1Transactions[0].copy(duplicate = true))
+    val txn2 = transactionRepository.saveAndFlush(user1Transactions[2].copy(duplicate = true))
+    val request =
+        SearchTransactionsRequest(
+            isDuplicate = true,
+            pageNumber = 0,
+            pageSize = 100,
+            sortKey = TransactionSortKey.EXPENSE_DATE,
+            sortDirection = SortDirection.ASC)
+
+    val response =
+        SearchTransactionsResponse(
+            transactions =
+                listOf(
+                    TransactionResponse.from(txn1, user1Categories[0]),
+                    TransactionResponse.from(txn2, user1Categories[2])),
+            pageNumber = 0,
+            totalItems = 2)
+
+    mockMvc
+        .get("/transactions?${request.toQueryString()}") {
+          secure = true
+          header("Authorization", "Bearer $token")
+        }
+        .andExpect {
+          status { isOk() }
+          content { json(objectMapper.writeValueAsString(response)) }
+        }
+  }
+
+  @Test
+  fun `search - invalid category options`() {
+    val request =
+        SearchTransactionsRequest(
+            isCategorized = false,
+            categoryIds = setOf(user1Categories[0].id),
+            pageNumber = 0,
+            pageSize = 100,
+            sortKey = TransactionSortKey.EXPENSE_DATE,
+            sortDirection = SortDirection.ASC)
+
+    mockMvc
+        .get("/transactions?${request.toQueryString()}") {
+          secure = true
+          header("Authorization", "Bearer $token")
+        }
+        .andExpect { status { isBadRequest() } }
+  }
+
+  @Test
+  fun `search - only non-duplicates`() {
+    transactionRepository.saveAndFlush(user1Transactions[1].copy(duplicate = true))
+    transactionRepository.saveAndFlush(user1Transactions[3].copy(duplicate = true))
+    transactionRepository.saveAndFlush(user1Transactions[4].copy(duplicate = true))
+    transactionRepository.saveAndFlush(user1Transactions[5].copy(duplicate = true))
+    transactionRepository.saveAndFlush(user1Transactions[6].copy(duplicate = true))
+    val request =
+        SearchTransactionsRequest(
+            isDuplicate = false,
+            pageNumber = 0,
+            pageSize = 100,
+            sortKey = TransactionSortKey.EXPENSE_DATE,
+            sortDirection = SortDirection.ASC)
+
+    val response =
+        SearchTransactionsResponse(
+            transactions =
+                listOf(
+                    TransactionResponse.from(user1Transactions[0], user1Categories[0]),
+                    TransactionResponse.from(user1Transactions[2], user1Categories[2])),
+            pageNumber = 0,
+            totalItems = 2)
+
+    mockMvc
+        .get("/transactions?${request.toQueryString()}") {
+          secure = true
+          header("Authorization", "Bearer $token")
+        }
+        .andExpect {
+          status { isOk() }
+          content { json(objectMapper.writeValueAsString(response)) }
+        }
+  }
+
+  @Test
   fun `search - confirmed transactions only`() {
     user1Transactions =
         user1Transactions.map { txn ->
@@ -196,7 +281,7 @@ class TransactionControllerTest : BaseIntegrationTest() {
     transactionRepository.saveAndFlush(user2Transactions.first().copy(confirmed = true))
     val request =
         SearchTransactionsRequest(
-            confirmed = true,
+            isConfirmed = true,
             pageNumber = 0,
             pageSize = 100,
             sortKey = TransactionSortKey.EXPENSE_DATE,
@@ -254,7 +339,7 @@ class TransactionControllerTest : BaseIntegrationTest() {
     transactionRepository.saveAndFlush(user1Transactions[1].copy(confirmed = true))
     val request =
         SearchTransactionsRequest(
-            confirmed = false,
+            isConfirmed = false,
             pageNumber = 0,
             pageSize = 100,
             sortKey = TransactionSortKey.EXPENSE_DATE,

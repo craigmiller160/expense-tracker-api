@@ -26,7 +26,7 @@ data class TransactionResponse(
             description = transaction.description,
             amount = transaction.amount,
             confirmed = transaction.confirmed,
-            duplicate = false,
+            duplicate = transaction.duplicate,
             categoryId = category?.id,
             categoryName = category?.name)
   }
