@@ -221,6 +221,7 @@ class TransactionControllerTest : BaseIntegrationTest() {
     val request =
         SearchTransactionsRequest(
             isCategorized = false,
+            categoryIds = setOf(user1Categories[0].id),
             pageNumber = 0,
             pageSize = 100,
             sortKey = TransactionSortKey.EXPENSE_DATE,

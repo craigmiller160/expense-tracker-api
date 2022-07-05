@@ -27,7 +27,7 @@ data class SearchTransactionsRequest(
 
   @AssertTrue(message = "Cannot set WITHOUT_CATEGORY and specify categoryIds")
   private fun isCategoryPropsValid(): Boolean {
-    if (isCategorized == true) {
+    if (isCategorized == false) {
       return categoryIds == null || categoryIds.isEmpty()
     }
     return true
