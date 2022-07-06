@@ -309,7 +309,7 @@ class TransactionControllerTest : BaseIntegrationTest() {
   }
 
   @Test
-  fun `get data on what records need attention`() {
+  fun `get data on what records need attention, when all types need attention`() {
     val oldestUnconfirmed =
         transactionRepository.saveAndFlush(user1Transactions[0].copy(confirmed = false))
     val oldestDuplicate =
@@ -319,6 +319,28 @@ class TransactionControllerTest : BaseIntegrationTest() {
             unconfirmed = CountAndOldest(count = 3, oldest = oldestUnconfirmed.expenseDate),
             uncategorized = CountAndOldest(count = 3, oldest = user1Transactions[1].expenseDate),
             duplicate = CountAndOldest(count = 1, oldest = oldestDuplicate.expenseDate))
+    mockMvc
+        .get("/transactions/needs-attention") {
+          secure = true
+          header("Authorization", "Bearer $token")
+        }
+        .andExpect {
+          status { isOk() }
+          content { json(objectMapper.writeValueAsString(response)) }
+        }
+  }
+
+  @Test
+  fun `get data on what records need attention, when no types need attention`() {
+    user1Transactions.forEach { txn ->
+      transactionRepository.saveAndFlush(
+          txn.copy(confirmed = true, categoryId = user1Categories[0].id))
+    }
+    val response =
+        NeedsAttentionResponse(
+            unconfirmed = CountAndOldest(count = 0, oldest = null),
+            uncategorized = CountAndOldest(count = 0, oldest = null),
+            duplicate = CountAndOldest(count = 0, oldest = null))
     mockMvc
         .get("/transactions/needs-attention") {
           secure = true
