@@ -316,7 +316,7 @@ class TransactionControllerTest : BaseIntegrationTest() {
         transactionRepository.saveAndFlush(user1Transactions[2].copy(duplicate = true))
     val response =
         NeedsAttentionResponse(
-            unconfirmed = CountAndOldest(count = 3, oldest = oldestUnconfirmed.expenseDate),
+            unconfirmed = CountAndOldest(count = 4, oldest = oldestUnconfirmed.expenseDate),
             uncategorized = CountAndOldest(count = 3, oldest = user1Transactions[1].expenseDate),
             duplicate = CountAndOldest(count = 1, oldest = oldestDuplicate.expenseDate))
     mockMvc
