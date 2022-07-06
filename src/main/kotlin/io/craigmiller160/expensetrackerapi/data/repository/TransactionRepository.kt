@@ -107,11 +107,39 @@ interface TransactionRepository :
     """)
   fun getOldestUnconfirmedDate(@Param("userId") userId: Long): LocalDate
 
+  @Query(
+      """
+      SELECT COUNT(t)
+      FROM Transaction t
+      WHERE t.userId = :userId
+      AND t.categoryId IS NULL
+  """)
   fun countAllUncategorized(@Param("userId") userId: Long): Long
 
+  @Query(
+      """
+      SELECT MIN(t.expenseDate)
+      FROM Transaction t
+      WHERE t.userId = :userId
+      AND t.categoryId IS NULL
+  """)
   fun getOldestUncategorizedDate(@Param("userId") userId: Long): LocalDate
 
+  @Query(
+      """
+      SELECT COUNT(t)
+      FROM Transaction t
+      WHERE t.userId = :userId
+      AND t.duplicate = true
+  """)
   fun countAllDuplicates(@Param("userId") userId: Long): Long
 
+  @Query(
+      """
+      SELECT MIN(t.expenseDate)
+      FROM Transaction t
+      WHERE t.userId = :userId
+      AND t.duplicate = true
+  """)
   fun getOldestDuplicate(@Param("userId") userId: Long): Long
 }
