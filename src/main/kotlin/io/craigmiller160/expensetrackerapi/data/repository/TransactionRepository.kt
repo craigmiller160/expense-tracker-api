@@ -105,7 +105,7 @@ interface TransactionRepository :
         WHERE t.userId = :userId
         AND t.confirmed = false
     """)
-  fun getOldestUnconfirmedDate(@Param("userId") userId: Long): LocalDate
+  fun getOldestUnconfirmedDate(@Param("userId") userId: Long): LocalDate?
 
   @Query(
       """
@@ -123,7 +123,7 @@ interface TransactionRepository :
       WHERE t.userId = :userId
       AND t.categoryId IS NULL
   """)
-  fun getOldestUncategorizedDate(@Param("userId") userId: Long): LocalDate
+  fun getOldestUncategorizedDate(@Param("userId") userId: Long): LocalDate?
 
   @Query(
       """
@@ -141,5 +141,5 @@ interface TransactionRepository :
       WHERE t.userId = :userId
       AND t.duplicate = true
   """)
-  fun getOldestDuplicate(@Param("userId") userId: Long): Long
+  fun getOldestDuplicate(@Param("userId") userId: Long): LocalDate?
 }

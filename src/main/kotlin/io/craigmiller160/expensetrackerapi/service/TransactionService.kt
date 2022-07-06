@@ -1,6 +1,7 @@
 package io.craigmiller160.expensetrackerapi.service
 
 import arrow.core.Either
+import arrow.core.continuations.either
 import arrow.core.flatMap
 import io.craigmiller160.expensetrackerapi.common.data.typedid.TypedId
 import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.CategoryId
@@ -14,6 +15,7 @@ import io.craigmiller160.expensetrackerapi.data.specification.SpecBuilder
 import io.craigmiller160.expensetrackerapi.function.TryEither
 import io.craigmiller160.expensetrackerapi.function.flatMapCatch
 import io.craigmiller160.expensetrackerapi.web.types.CategorizeTransactionsRequest
+import io.craigmiller160.expensetrackerapi.web.types.CountAndOldest
 import io.craigmiller160.expensetrackerapi.web.types.DeleteTransactionsRequest
 import io.craigmiller160.expensetrackerapi.web.types.NeedsAttentionResponse
 import io.craigmiller160.expensetrackerapi.web.types.SearchTransactionsRequest
@@ -54,7 +56,23 @@ class TransactionService(
 
   @Transactional
   fun getNeedsAttention(): TryEither<NeedsAttentionResponse> {
-    TODO()
+    val userId = oAuth2Service.getAuthenticatedUser().userId
+    return either.eager {
+      val unconfirmedCount =
+          Either.catch { transactionRepository.countAllUnconfirmed(userId) }.bind()
+      val oldestUnconfirmed =
+          Either.catch { transactionRepository.getOldestUnconfirmedDate(userId) }.bind()
+      val uncategorizedCount =
+          Either.catch { transactionRepository.countAllUncategorized(userId) }.bind()
+      val oldestUncategorized =
+          Either.catch { transactionRepository.getOldestUncategorizedDate(userId) }.bind()
+      val duplicateCount = Either.catch { transactionRepository.countAllDuplicates(userId) }.bind()
+      val oldestDuplicate = Either.catch { transactionRepository.getOldestDuplicate(userId) }.bind()
+      NeedsAttentionResponse(
+          unconfirmed = CountAndOldest(count = unconfirmedCount, oldest = oldestUnconfirmed),
+          uncategorized = CountAndOldest(count = uncategorizedCount, oldest = oldestUncategorized),
+          duplicate = CountAndOldest(count = duplicateCount, oldest = oldestDuplicate))
+    }
   }
 
   @Transactional
