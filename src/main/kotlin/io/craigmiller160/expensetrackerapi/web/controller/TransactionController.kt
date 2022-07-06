@@ -4,9 +4,9 @@ import io.craigmiller160.expensetrackerapi.function.TryEither
 import io.craigmiller160.expensetrackerapi.service.TransactionService
 import io.craigmiller160.expensetrackerapi.web.types.CategorizeTransactionsRequest
 import io.craigmiller160.expensetrackerapi.web.types.DeleteTransactionsRequest
+import io.craigmiller160.expensetrackerapi.web.types.NeedsAttentionResponse
 import io.craigmiller160.expensetrackerapi.web.types.SearchTransactionsRequest
 import io.craigmiller160.expensetrackerapi.web.types.SearchTransactionsResponse
-import io.craigmiller160.expensetrackerapi.web.types.UnconfirmedTransactionCountResponse
 import javax.validation.Valid
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.DeleteMapping
@@ -35,7 +35,7 @@ class TransactionController(private val transactionService: TransactionService) 
   ): TryEither<ResponseEntity<Unit>> =
       transactionService.categorizeTransactions(request).map { ResponseEntity.noContent().build() }
 
-  @GetMapping("/unconfirmed-count")
-  fun getUnconfirmedCount(): TryEither<UnconfirmedTransactionCountResponse> =
-      transactionService.getUnconfirmedCount()
+  @GetMapping("/needs-attention")
+  fun getNeedsAttention(): TryEither<NeedsAttentionResponse> =
+      transactionService.getNeedsAttention()
 }
