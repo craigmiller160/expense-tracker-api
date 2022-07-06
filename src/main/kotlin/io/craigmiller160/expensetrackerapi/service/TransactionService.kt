@@ -52,7 +52,10 @@ class TransactionService(
     return Either.catch { transactionRepository.deleteTransactions(request.ids, userId) }
   }
 
-  fun getNeedsAttention(): TryEither<NeedsAttentionResponse> = TODO()
+  @Transactional
+  fun getNeedsAttention(): TryEither<NeedsAttentionResponse> {
+    TODO()
+  }
 
   @Transactional
   fun search(request: SearchTransactionsRequest): TryEither<SearchTransactionsResponse> {
