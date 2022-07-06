@@ -7,14 +7,15 @@ import io.craigmiller160.expensetrackerapi.data.model.Category
 import io.craigmiller160.expensetrackerapi.data.model.Transaction
 import io.craigmiller160.expensetrackerapi.data.repository.TransactionRepository
 import io.craigmiller160.expensetrackerapi.web.types.CategorizeTransactionsRequest
+import io.craigmiller160.expensetrackerapi.web.types.CountAndOldest
 import io.craigmiller160.expensetrackerapi.web.types.DeleteTransactionsRequest
+import io.craigmiller160.expensetrackerapi.web.types.NeedsAttentionResponse
 import io.craigmiller160.expensetrackerapi.web.types.SearchTransactionsRequest
 import io.craigmiller160.expensetrackerapi.web.types.SearchTransactionsResponse
 import io.craigmiller160.expensetrackerapi.web.types.SortDirection
 import io.craigmiller160.expensetrackerapi.web.types.TransactionAndCategory
 import io.craigmiller160.expensetrackerapi.web.types.TransactionResponse
 import io.craigmiller160.expensetrackerapi.web.types.TransactionSortKey
-import io.craigmiller160.expensetrackerapi.web.types.UnconfirmedTransactionCountResponse
 import java.time.LocalDate
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
@@ -308,18 +309,40 @@ class TransactionControllerTest : BaseIntegrationTest() {
   }
 
   @Test
-  fun `get count of unconfirmed transactions`() {
-    user1Transactions =
-        user1Transactions.map { txn ->
-          transactionRepository.saveAndFlush(txn.copy(confirmed = false))
-        }
-    transactionRepository.saveAndFlush(user1Transactions.first().copy(confirmed = true))
-    transactionRepository.saveAndFlush(user1Transactions[1].copy(confirmed = true))
-
-    val response = UnconfirmedTransactionCountResponse(unconfirmedTransactionCount = 5)
-
+  fun `get data on what records need attention, when all types need attention`() {
+    val oldestUnconfirmed =
+        transactionRepository.saveAndFlush(user1Transactions[0].copy(confirmed = false))
+    val oldestDuplicate =
+        transactionRepository.saveAndFlush(user1Transactions[2].copy(duplicate = true))
+    val response =
+        NeedsAttentionResponse(
+            unconfirmed = CountAndOldest(count = 4, oldest = oldestUnconfirmed.expenseDate),
+            uncategorized = CountAndOldest(count = 3, oldest = user1Transactions[1].expenseDate),
+            duplicate = CountAndOldest(count = 1, oldest = oldestDuplicate.expenseDate))
     mockMvc
-        .get("/transactions/unconfirmed-count") {
+        .get("/transactions/needs-attention") {
+          secure = true
+          header("Authorization", "Bearer $token")
+        }
+        .andExpect {
+          status { isOk() }
+          content { json(objectMapper.writeValueAsString(response)) }
+        }
+  }
+
+  @Test
+  fun `get data on what records need attention, when no types need attention`() {
+    user1Transactions.forEach { txn ->
+      transactionRepository.saveAndFlush(
+          txn.copy(confirmed = true, categoryId = user1Categories[0].id))
+    }
+    val response =
+        NeedsAttentionResponse(
+            unconfirmed = CountAndOldest(count = 0, oldest = null),
+            uncategorized = CountAndOldest(count = 0, oldest = null),
+            duplicate = CountAndOldest(count = 0, oldest = null))
+    mockMvc
+        .get("/transactions/needs-attention") {
           secure = true
           header("Authorization", "Bearer $token")
         }

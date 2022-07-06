@@ -4,6 +4,7 @@ import io.craigmiller160.expensetrackerapi.common.data.typedid.TypedId
 import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.CategoryId
 import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.TransactionId
 import io.craigmiller160.expensetrackerapi.data.model.Transaction
+import java.time.LocalDate
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor
 import org.springframework.data.jpa.repository.Modifying
@@ -57,8 +58,6 @@ interface TransactionRepository :
       @Param("userId") userId: Long
   )
 
-  fun countAllByUserIdAndConfirmed(userId: Long, confirmed: Boolean): Long
-
   @Query(
       """
       UPDATE Transaction t
@@ -89,4 +88,58 @@ interface TransactionRepository :
       @Param("transactionId") transactionId: TypedId<TransactionId>,
       @Param("userId") userId: Long
   )
+
+  @Query(
+      """
+      SELECT COUNT(t)
+      FROM Transaction t
+      WHERE t.userId = :userId
+      AND t.confirmed = false
+  """)
+  fun countAllUnconfirmed(@Param("userId") userId: Long): Long
+
+  @Query(
+      """
+        SELECT MIN(t.expenseDate)
+        FROM Transaction t
+        WHERE t.userId = :userId
+        AND t.confirmed = false
+    """)
+  fun getOldestUnconfirmedDate(@Param("userId") userId: Long): LocalDate?
+
+  @Query(
+      """
+      SELECT COUNT(t)
+      FROM Transaction t
+      WHERE t.userId = :userId
+      AND t.categoryId IS NULL
+  """)
+  fun countAllUncategorized(@Param("userId") userId: Long): Long
+
+  @Query(
+      """
+      SELECT MIN(t.expenseDate)
+      FROM Transaction t
+      WHERE t.userId = :userId
+      AND t.categoryId IS NULL
+  """)
+  fun getOldestUncategorizedDate(@Param("userId") userId: Long): LocalDate?
+
+  @Query(
+      """
+      SELECT COUNT(t)
+      FROM Transaction t
+      WHERE t.userId = :userId
+      AND t.duplicate = true
+  """)
+  fun countAllDuplicates(@Param("userId") userId: Long): Long
+
+  @Query(
+      """
+      SELECT MIN(t.expenseDate)
+      FROM Transaction t
+      WHERE t.userId = :userId
+      AND t.duplicate = true
+  """)
+  fun getOldestDuplicate(@Param("userId") userId: Long): LocalDate?
 }

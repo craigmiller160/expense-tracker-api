@@ -1,6 +1,7 @@
 package io.craigmiller160.expensetrackerapi.service
 
 import arrow.core.Either
+import arrow.core.continuations.either
 import arrow.core.flatMap
 import io.craigmiller160.expensetrackerapi.common.data.typedid.TypedId
 import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.CategoryId
@@ -14,11 +15,12 @@ import io.craigmiller160.expensetrackerapi.data.specification.SpecBuilder
 import io.craigmiller160.expensetrackerapi.function.TryEither
 import io.craigmiller160.expensetrackerapi.function.flatMapCatch
 import io.craigmiller160.expensetrackerapi.web.types.CategorizeTransactionsRequest
+import io.craigmiller160.expensetrackerapi.web.types.CountAndOldest
 import io.craigmiller160.expensetrackerapi.web.types.DeleteTransactionsRequest
+import io.craigmiller160.expensetrackerapi.web.types.NeedsAttentionResponse
 import io.craigmiller160.expensetrackerapi.web.types.SearchTransactionsRequest
 import io.craigmiller160.expensetrackerapi.web.types.SearchTransactionsResponse
 import io.craigmiller160.expensetrackerapi.web.types.TransactionAndCategory
-import io.craigmiller160.expensetrackerapi.web.types.UnconfirmedTransactionCountResponse
 import io.craigmiller160.oauth2.service.OAuth2Service
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
@@ -52,10 +54,25 @@ class TransactionService(
     return Either.catch { transactionRepository.deleteTransactions(request.ids, userId) }
   }
 
-  fun getUnconfirmedCount(): TryEither<UnconfirmedTransactionCountResponse> {
+  @Transactional
+  fun getNeedsAttention(): TryEither<NeedsAttentionResponse> {
     val userId = oAuth2Service.getAuthenticatedUser().userId
-    return Either.catch { transactionRepository.countAllByUserIdAndConfirmed(userId, false) }
-        .map { UnconfirmedTransactionCountResponse(it) }
+    return either.eager {
+      val unconfirmedCount =
+          Either.catch { transactionRepository.countAllUnconfirmed(userId) }.bind()
+      val oldestUnconfirmed =
+          Either.catch { transactionRepository.getOldestUnconfirmedDate(userId) }.bind()
+      val uncategorizedCount =
+          Either.catch { transactionRepository.countAllUncategorized(userId) }.bind()
+      val oldestUncategorized =
+          Either.catch { transactionRepository.getOldestUncategorizedDate(userId) }.bind()
+      val duplicateCount = Either.catch { transactionRepository.countAllDuplicates(userId) }.bind()
+      val oldestDuplicate = Either.catch { transactionRepository.getOldestDuplicate(userId) }.bind()
+      NeedsAttentionResponse(
+          unconfirmed = CountAndOldest(count = unconfirmedCount, oldest = oldestUnconfirmed),
+          uncategorized = CountAndOldest(count = uncategorizedCount, oldest = oldestUncategorized),
+          duplicate = CountAndOldest(count = duplicateCount, oldest = oldestDuplicate))
+    }
   }
 
   @Transactional
