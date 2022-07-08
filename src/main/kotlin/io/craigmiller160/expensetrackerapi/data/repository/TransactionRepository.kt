@@ -39,7 +39,8 @@ interface TransactionRepository :
   @Query(
       """
       UPDATE Transaction t
-      SET t.confirmed = true
+      SET t.confirmed = true, 
+        t.version = t.version + 1
       WHERE t.id IN (:transactionIds)
       AND t.userId = :userId
   """)
