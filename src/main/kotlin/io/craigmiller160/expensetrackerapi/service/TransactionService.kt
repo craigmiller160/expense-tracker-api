@@ -38,8 +38,8 @@ class TransactionService(
   @Transactional
   fun categorizeTransactions(request: CategorizeTransactionsRequest): TryEither<Unit> {
     val userId = oAuth2Service.getAuthenticatedUser().userId
-    return request.transactionsAndCategories.foldRight<TransactionAndCategory, TryEither<Unit>>(
-        Either.Right(Unit)) { txnAndCat, result ->
+    return request.transactionsAndCategories.toList().foldRight<
+        TransactionAndCategory, TryEither<Unit>>(Either.Right(Unit)) { txnAndCat, result ->
       result.flatMapCatch {
         txnAndCat.categoryId?.let {
           transactionRepository.setTransactionCategory(txnAndCat.transactionId, it, userId)
