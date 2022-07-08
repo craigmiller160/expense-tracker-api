@@ -49,5 +49,6 @@ class TransactionController(private val transactionService: TransactionService) 
 
   @PutMapping
   @ResponseStatus(HttpStatus.NO_CONTENT)
-  fun updateTransactions(@RequestBody request: UpdateTransactionsRequest): TryEither<Unit> = TODO()
+  fun updateTransactions(@RequestBody request: UpdateTransactionsRequest): TryEither<Unit> =
+      transactionService.updateTransactions(request)
 }

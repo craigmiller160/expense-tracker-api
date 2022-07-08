@@ -21,6 +21,7 @@ import io.craigmiller160.expensetrackerapi.web.types.NeedsAttentionResponse
 import io.craigmiller160.expensetrackerapi.web.types.SearchTransactionsRequest
 import io.craigmiller160.expensetrackerapi.web.types.SearchTransactionsResponse
 import io.craigmiller160.expensetrackerapi.web.types.TransactionAndCategory
+import io.craigmiller160.expensetrackerapi.web.types.UpdateTransactionsRequest
 import io.craigmiller160.oauth2.service.OAuth2Service
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
@@ -100,6 +101,13 @@ class TransactionService(
         .flatMap { page -> categoryMapEither.map { Pair(page, it) } }
         .map { (page, categories) -> SearchTransactionsResponse.from(page, categories) }
   }
+
+  @Transactional
+  fun updateTransactions(request: UpdateTransactionsRequest): TryEither<Unit> =
+      either.eager {
+        categorizeTransactions(request.categorize).bind()
+        confirmTransactions(request.confirm).bind()
+      }
 
   private fun createSearchSpec(
       userId: Long,
