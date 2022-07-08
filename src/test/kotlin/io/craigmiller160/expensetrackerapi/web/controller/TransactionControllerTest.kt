@@ -597,7 +597,7 @@ class TransactionControllerTest : BaseIntegrationTest() {
     val uncategorizedTransaction = user1Transactions[5]
     assertThat(uncategorizedTransaction.categoryId).isNull()
 
-    assertThat(user1Transactions[6]).hasFieldOrPropertyWithValue("confirmed", false)
+    assertThat(user1Transactions[1]).hasFieldOrPropertyWithValue("confirmed", false)
 
     val categorizedTransaction = user1Transactions[4]
 
