@@ -7,6 +7,7 @@ import io.craigmiller160.expensetrackerapi.data.model.Category
 import io.craigmiller160.expensetrackerapi.data.model.Transaction
 import io.craigmiller160.expensetrackerapi.data.repository.TransactionRepository
 import io.craigmiller160.expensetrackerapi.web.types.CategorizeTransactionsRequest
+import io.craigmiller160.expensetrackerapi.web.types.ConfirmTransactionsRequest
 import io.craigmiller160.expensetrackerapi.web.types.CountAndOldest
 import io.craigmiller160.expensetrackerapi.web.types.DeleteTransactionsRequest
 import io.craigmiller160.expensetrackerapi.web.types.NeedsAttentionResponse
@@ -514,7 +515,27 @@ class TransactionControllerTest : BaseIntegrationTest() {
 
   @Test
   fun confirmTransactions() {
-    TODO()
+    val request =
+        ConfirmTransactionsRequest(
+            transactionIds = setOf(user1Transactions[0].id, user2Transactions[0].id))
+
+    mockMvc
+        .put("/transactions/confirm") {
+          secure = true
+          header("Authorization", "Bearer $token")
+          contentType = MediaType.APPLICATION_JSON
+          content = objectMapper.writeValueAsString(request)
+        }
+        .andExpect { status { isNoContent() } }
+
+    assertThat(transactionRepository.findById(user1Transactions[0].id))
+        .isPresent
+        .get()
+        .hasFieldOrPropertyWithValue("confirmed", true)
+    assertThat(transactionRepository.findById(user2Transactions[0].id))
+        .isPresent
+        .get()
+        .hasFieldOrPropertyWithValue("confirmed", false)
   }
 
   @Test
