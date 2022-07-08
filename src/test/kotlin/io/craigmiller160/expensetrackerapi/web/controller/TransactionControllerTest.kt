@@ -493,7 +493,7 @@ class TransactionControllerTest : BaseIntegrationTest() {
     val request =
         CategorizeTransactionsRequest(
             transactionsAndCategories =
-                listOf(TransactionAndCategory(user1Transactions[0].id, null)))
+                setOf(TransactionAndCategory(user1Transactions[0].id, null)))
 
     mockMvc
         .put("/transactions/categorize") {
@@ -550,7 +550,7 @@ class TransactionControllerTest : BaseIntegrationTest() {
     val request =
         CategorizeTransactionsRequest(
             transactionsAndCategories =
-                listOf(
+                setOf(
                     TransactionAndCategory(uncategorizedTransaction.id, user1Categories.first().id),
                     TransactionAndCategory(categorizedTransaction.id, user1Categories.first().id),
                     TransactionAndCategory(
