@@ -513,6 +513,11 @@ class TransactionControllerTest : BaseIntegrationTest() {
   }
 
   @Test
+  fun confirmTransactions() {
+    TODO()
+  }
+
+  @Test
   fun categorizeTransactions() {
     val user2Category = dataHelper.createCategory(2L, "Other")
     val uncategorizedTransaction = user1Transactions[5]
