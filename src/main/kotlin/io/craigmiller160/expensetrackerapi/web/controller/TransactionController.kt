@@ -8,6 +8,7 @@ import io.craigmiller160.expensetrackerapi.web.types.DeleteTransactionsRequest
 import io.craigmiller160.expensetrackerapi.web.types.NeedsAttentionResponse
 import io.craigmiller160.expensetrackerapi.web.types.SearchTransactionsRequest
 import io.craigmiller160.expensetrackerapi.web.types.SearchTransactionsResponse
+import io.craigmiller160.expensetrackerapi.web.types.UpdateTransactionsRequest
 import javax.validation.Valid
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -45,4 +46,8 @@ class TransactionController(private val transactionService: TransactionService) 
   @GetMapping("/needs-attention")
   fun getNeedsAttention(): TryEither<NeedsAttentionResponse> =
       transactionService.getNeedsAttention()
+
+  @PutMapping
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  fun updateTransactions(@RequestBody request: UpdateTransactionsRequest): TryEither<Unit> = TODO()
 }
