@@ -25,17 +25,7 @@ interface TransactionRepository :
         AND c.userId = :userId
     ), 
         t.updated = current_timestamp,
-        t.version = t.version + 1,
-        t.confirmed =
-            CASE
-                WHEN ((
-                    SELECT COUNT(c)
-                    FROM Category c
-                    WHERE c.id = :categoryId 
-                    AND c.userId = :userId
-                ) > 0) THEN true
-                ELSE false
-            END
+        t.version = t.version + 1
     WHERE t.id = :transactionId
     AND t.userId = :userId
   """)
@@ -61,7 +51,8 @@ interface TransactionRepository :
   @Query(
       """
       UPDATE Transaction t
-      SET t.categoryId = null
+      SET t.categoryId = null, 
+        t.version = t.version + 1
       WHERE t.categoryId = (
         SELECT c.id
         FROM Category c
