@@ -15,6 +15,7 @@ import io.craigmiller160.expensetrackerapi.data.specification.SpecBuilder
 import io.craigmiller160.expensetrackerapi.function.TryEither
 import io.craigmiller160.expensetrackerapi.function.flatMapCatch
 import io.craigmiller160.expensetrackerapi.web.types.CategorizeTransactionsRequest
+import io.craigmiller160.expensetrackerapi.web.types.ConfirmTransactionsRequest
 import io.craigmiller160.expensetrackerapi.web.types.CountAndOldest
 import io.craigmiller160.expensetrackerapi.web.types.DeleteTransactionsRequest
 import io.craigmiller160.expensetrackerapi.web.types.NeedsAttentionResponse
@@ -46,6 +47,11 @@ class TransactionService(
             ?: transactionRepository.removeTransactionCategory(txnAndCat.transactionId, userId)
       }
     }
+  }
+
+  @Transactional
+  fun confirmTransactions(request: ConfirmTransactionsRequest): TryEither<Unit> {
+    TODO()
   }
 
   @Transactional
