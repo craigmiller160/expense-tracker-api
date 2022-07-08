@@ -587,6 +587,6 @@ class TransactionControllerTest : BaseIntegrationTest() {
         .isPresent
         .get()
         .hasFieldOrPropertyWithValue("categoryId", null)
-        .hasFieldOrPropertyWithValue("confirmed", false)
+        .hasFieldOrPropertyWithValue("confirmed", true)
   }
 }
