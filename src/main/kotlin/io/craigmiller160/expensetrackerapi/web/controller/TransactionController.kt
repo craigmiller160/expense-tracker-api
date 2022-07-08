@@ -36,12 +36,12 @@ class TransactionController(private val transactionService: TransactionService) 
   @PutMapping("/categorize")
   @ResponseStatus(HttpStatus.NO_CONTENT)
   fun categorizeTransactions(@RequestBody request: CategorizeTransactionsRequest): TryEither<Unit> =
-      transactionService.categorizeTransactions(request)
+      transactionService.categorizeTransactions(request.transactionsAndCategories)
 
   @PutMapping("/confirm")
   @ResponseStatus(HttpStatus.NO_CONTENT)
   fun confirmTransactions(@RequestBody request: ConfirmTransactionsRequest): TryEither<Unit> =
-      transactionService.confirmTransactions(request)
+      transactionService.confirmTransactions(request.transactionIds)
 
   @GetMapping("/needs-attention")
   fun getNeedsAttention(): TryEither<NeedsAttentionResponse> =
