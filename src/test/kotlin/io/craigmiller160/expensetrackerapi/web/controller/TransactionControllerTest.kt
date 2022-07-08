@@ -589,4 +589,9 @@ class TransactionControllerTest : BaseIntegrationTest() {
         .hasFieldOrPropertyWithValue("categoryId", null)
         .hasFieldOrPropertyWithValue("confirmed", true)
   }
+
+  @Test
+  fun updateTransaction() {
+    TODO()
+  }
 }
