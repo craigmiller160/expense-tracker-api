@@ -51,7 +51,10 @@ class TransactionService(
 
   @Transactional
   fun confirmTransactions(request: ConfirmTransactionsRequest): TryEither<Unit> {
-    TODO()
+    val userId = oAuth2Service.getAuthenticatedUser().userId
+    return Either.catch {
+      transactionRepository.confirmTransactions(request.transactionIds, userId)
+    }
   }
 
   @Transactional
