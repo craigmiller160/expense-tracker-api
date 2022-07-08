@@ -38,6 +38,19 @@ interface TransactionRepository :
 
   @Query(
       """
+      UPDATE Transaction t
+      SET t.confirmed = true
+      WHERE t.id IN (:transactionIds)
+      AND t.userId = :userId
+  """)
+  @Modifying(flushAutomatically = true, clearAutomatically = true)
+  fun confirmTransactions(
+      @Param("transactionIds") transactionIds: Set<TypedId<TransactionId>>,
+      @Param("userId") userId: Long
+  )
+
+  @Query(
+      """
       DELETE FROM Transaction t
       WHERE t.id IN (:transactionIds)
       AND t.userId = :userId
