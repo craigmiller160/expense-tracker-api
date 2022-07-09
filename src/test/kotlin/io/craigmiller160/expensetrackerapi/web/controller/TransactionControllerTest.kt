@@ -648,7 +648,7 @@ class TransactionControllerTest : BaseIntegrationTest() {
         .isPresent
         .get()
         .hasFieldOrPropertyWithValue("categoryId", user1Categories.first().id)
-        .hasFieldOrPropertyWithValue("confirmed", true)
+        .hasFieldOrPropertyWithValue("confirmed", false)
     assertThat(transactionRepository.findById(user2Transactions.first().id))
         .isPresent
         .get()
@@ -658,7 +658,7 @@ class TransactionControllerTest : BaseIntegrationTest() {
         .isPresent
         .get()
         .hasFieldOrPropertyWithValue("categoryId", null)
-        .hasFieldOrPropertyWithValue("confirmed", true)
+        .hasFieldOrPropertyWithValue("confirmed", false)
 
     assertThat(transactionRepository.findById(user1Transactions[6].id))
         .isPresent
