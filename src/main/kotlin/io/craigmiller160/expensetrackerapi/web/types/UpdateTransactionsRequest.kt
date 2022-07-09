@@ -5,9 +5,9 @@ import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.CategoryId
 import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.TransactionId
 
 data class TransactionToUpdate(
-    val transactionId: TypedId<TransactionId>,
-    val categoryId: TypedId<CategoryId>?,
-    val confirmed: Boolean
-)
+    override val transactionId: TypedId<TransactionId>,
+    override val categoryId: TypedId<CategoryId>?,
+    override val confirmed: Boolean
+) : TransactionAndCategoryUpdateItem, TransactionAndConfirmUpdateItem
 
 data class UpdateTransactionsRequest(val transactions: Set<TransactionToUpdate>)

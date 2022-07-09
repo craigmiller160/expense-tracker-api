@@ -4,11 +4,14 @@ import io.craigmiller160.expensetrackerapi.common.data.typedid.TypedId
 import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.CategoryId
 import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.TransactionId
 
-data class TransactionAndCategory(
-    override val transactionId: TypedId<TransactionId>,
-    override val categoryId: TypedId<CategoryId>?
-) : TransactionAndCategoryUpdateItem
+interface TransactionUpdateItem {
+  val transactionId: TypedId<TransactionId>
+}
 
-data class CategorizeTransactionsRequest(
-    val transactionsAndCategories: Set<TransactionAndCategory>
-)
+interface TransactionAndCategoryUpdateItem : TransactionUpdateItem {
+  val categoryId: TypedId<CategoryId>?
+}
+
+interface TransactionAndConfirmUpdateItem : TransactionUpdateItem {
+  val confirmed: Boolean
+}
