@@ -17,6 +17,8 @@ import io.craigmiller160.expensetrackerapi.web.types.SortDirection
 import io.craigmiller160.expensetrackerapi.web.types.TransactionAndCategory
 import io.craigmiller160.expensetrackerapi.web.types.TransactionResponse
 import io.craigmiller160.expensetrackerapi.web.types.TransactionSortKey
+import io.craigmiller160.expensetrackerapi.web.types.TransactionToConfirm
+import io.craigmiller160.expensetrackerapi.web.types.TransactionToUpdate
 import io.craigmiller160.expensetrackerapi.web.types.UpdateTransactionsRequest
 import java.time.LocalDate
 import org.assertj.core.api.Assertions.assertThat
@@ -518,7 +520,11 @@ class TransactionControllerTest : BaseIntegrationTest() {
   fun confirmTransactions() {
     val request =
         ConfirmTransactionsRequest(
-            transactionIds = setOf(user1Transactions[0].id, user2Transactions[0].id))
+            transactionsToConfirm =
+                setOf(
+                    TransactionToConfirm(transactionId = user1Transactions[0].id, confirmed = true),
+                    TransactionToConfirm(
+                        transactionId = user2Transactions[0].id, confirmed = true)))
 
     mockMvc
         .put("/transactions/confirm") {
@@ -603,14 +609,26 @@ class TransactionControllerTest : BaseIntegrationTest() {
 
     val request =
         UpdateTransactionsRequest(
-            categorize =
+            transactions =
                 setOf(
-                    TransactionAndCategory(uncategorizedTransaction.id, user1Categories.first().id),
-                    TransactionAndCategory(categorizedTransaction.id, user1Categories.first().id),
-                    TransactionAndCategory(
-                        user2Transactions.first().id, user1Categories.first().id),
-                    TransactionAndCategory(user1Transactions[2].id, user2Category.id)),
-            confirm = setOf(user1Transactions[6].id, user2Transactions[0].id))
+                    TransactionToUpdate(
+                        transactionId = uncategorizedTransaction.id,
+                        categoryId = user1Categories.first().id,
+                        confirmed = false),
+                    TransactionToUpdate(
+                        transactionId = categorizedTransaction.id,
+                        categoryId = user1Categories.first().id,
+                        confirmed = false),
+                    TransactionToUpdate(
+                        transactionId = user2Transactions.first().id,
+                        categoryId = user1Categories.first().id,
+                        confirmed = false),
+                    TransactionToUpdate(
+                        transactionId = user1Transactions[2].id,
+                        categoryId = user2Category.id,
+                        confirmed = false),
+                    TransactionToUpdate(transactionId = user1Transactions[6].id, confirmed = true),
+                    TransactionToUpdate(transactionId = user2Transactions[0].id, confirmed = true)))
 
     mockMvc
         .put("/transactions") {
