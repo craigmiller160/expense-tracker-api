@@ -41,7 +41,7 @@ class TransactionController(private val transactionService: TransactionService) 
   @PutMapping("/confirm")
   @ResponseStatus(HttpStatus.NO_CONTENT)
   fun confirmTransactions(@RequestBody request: ConfirmTransactionsRequest): TryEither<Unit> =
-      transactionService.confirmTransactions(request.transactionIds)
+      transactionService.confirmTransactions(request.transactionsToConfirm)
 
   @GetMapping("/needs-attention")
   fun getNeedsAttention(): TryEither<NeedsAttentionResponse> =

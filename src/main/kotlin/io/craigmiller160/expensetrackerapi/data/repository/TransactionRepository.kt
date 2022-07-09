@@ -39,14 +39,15 @@ interface TransactionRepository :
   @Query(
       """
       UPDATE Transaction t
-      SET t.confirmed = true, 
+      SET t.confirmed = :confirmed, 
         t.version = t.version + 1
-      WHERE t.id IN (:transactionIds)
+      WHERE t.id = :transactionId
       AND t.userId = :userId
   """)
   @Modifying(flushAutomatically = true, clearAutomatically = true)
-  fun confirmTransactions(
-      @Param("transactionIds") transactionIds: Set<TypedId<TransactionId>>,
+  fun confirmTransaction(
+      @Param("transactionId") transactionId: TypedId<TransactionId>,
+      @Param("confirmed") confirmed: Boolean,
       @Param("userId") userId: Long
   )
 

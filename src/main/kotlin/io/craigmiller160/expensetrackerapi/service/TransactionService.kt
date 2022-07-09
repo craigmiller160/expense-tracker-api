@@ -5,7 +5,6 @@ import arrow.core.continuations.either
 import arrow.core.flatMap
 import io.craigmiller160.expensetrackerapi.common.data.typedid.TypedId
 import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.CategoryId
-import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.TransactionId
 import io.craigmiller160.expensetrackerapi.data.model.Category
 import io.craigmiller160.expensetrackerapi.data.model.Transaction
 import io.craigmiller160.expensetrackerapi.data.model.toColumnName
@@ -20,7 +19,8 @@ import io.craigmiller160.expensetrackerapi.web.types.DeleteTransactionsRequest
 import io.craigmiller160.expensetrackerapi.web.types.NeedsAttentionResponse
 import io.craigmiller160.expensetrackerapi.web.types.SearchTransactionsRequest
 import io.craigmiller160.expensetrackerapi.web.types.SearchTransactionsResponse
-import io.craigmiller160.expensetrackerapi.web.types.TransactionAndCategory
+import io.craigmiller160.expensetrackerapi.web.types.TransactionAndCategoryUpdateItem
+import io.craigmiller160.expensetrackerapi.web.types.TransactionAndConfirmUpdateItem
 import io.craigmiller160.expensetrackerapi.web.types.UpdateTransactionsRequest
 import io.craigmiller160.oauth2.service.OAuth2Service
 import org.springframework.data.domain.PageRequest
@@ -37,11 +37,12 @@ class TransactionService(
 ) {
   @Transactional
   fun categorizeTransactions(
-      transactionsAndCategories: Set<TransactionAndCategory>
+      transactionsAndCategories: Set<TransactionAndCategoryUpdateItem>
   ): TryEither<Unit> {
     val userId = oAuth2Service.getAuthenticatedUser().userId
-    return transactionsAndCategories.toList().foldRight<TransactionAndCategory, TryEither<Unit>>(
-        Either.Right(Unit)) { txnAndCat, result ->
+    return transactionsAndCategories.toList().foldRight<
+        TransactionAndCategoryUpdateItem, TryEither<Unit>>(Either.Right(Unit)) { txnAndCat, result
+      ->
       result.flatMapCatch {
         txnAndCat.categoryId?.let {
           transactionRepository.setTransactionCategory(txnAndCat.transactionId, it, userId)
@@ -52,9 +53,16 @@ class TransactionService(
   }
 
   @Transactional
-  fun confirmTransactions(transactionIds: Set<TypedId<TransactionId>>): TryEither<Unit> {
+  fun confirmTransactions(
+      transactionsToConfirm: Set<TransactionAndConfirmUpdateItem>
+  ): TryEither<Unit> {
     val userId = oAuth2Service.getAuthenticatedUser().userId
-    return Either.catch { transactionRepository.confirmTransactions(transactionIds, userId) }
+    return transactionsToConfirm.toList().foldRight<
+        TransactionAndConfirmUpdateItem, TryEither<Unit>>(Either.Right(Unit)) { txn, result ->
+      result.flatMapCatch {
+        transactionRepository.confirmTransaction(txn.transactionId, txn.confirmed, userId)
+      }
+    }
   }
 
   @Transactional
@@ -105,8 +113,8 @@ class TransactionService(
   @Transactional
   fun updateTransactions(request: UpdateTransactionsRequest): TryEither<Unit> =
       either.eager {
-        categorizeTransactions(request.categorize).bind()
-        confirmTransactions(request.confirm).bind()
+        categorizeTransactions(request.transactions).bind()
+        confirmTransactions(request.transactions).bind()
       }
 
   private fun createSearchSpec(
