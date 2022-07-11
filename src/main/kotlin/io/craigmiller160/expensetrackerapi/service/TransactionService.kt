@@ -14,13 +14,14 @@ import io.craigmiller160.expensetrackerapi.data.repository.TransactionRepository
 import io.craigmiller160.expensetrackerapi.data.specification.SpecBuilder
 import io.craigmiller160.expensetrackerapi.function.TryEither
 import io.craigmiller160.expensetrackerapi.function.flatMapCatch
-import io.craigmiller160.expensetrackerapi.web.types.CategorizeTransactionsRequest
 import io.craigmiller160.expensetrackerapi.web.types.CountAndOldest
 import io.craigmiller160.expensetrackerapi.web.types.DeleteTransactionsRequest
 import io.craigmiller160.expensetrackerapi.web.types.NeedsAttentionResponse
 import io.craigmiller160.expensetrackerapi.web.types.SearchTransactionsRequest
 import io.craigmiller160.expensetrackerapi.web.types.SearchTransactionsResponse
-import io.craigmiller160.expensetrackerapi.web.types.TransactionAndCategory
+import io.craigmiller160.expensetrackerapi.web.types.TransactionAndCategoryUpdateItem
+import io.craigmiller160.expensetrackerapi.web.types.TransactionAndConfirmUpdateItem
+import io.craigmiller160.expensetrackerapi.web.types.UpdateTransactionsRequest
 import io.craigmiller160.oauth2.service.OAuth2Service
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
@@ -35,15 +36,31 @@ class TransactionService(
     private val oAuth2Service: OAuth2Service
 ) {
   @Transactional
-  fun categorizeTransactions(request: CategorizeTransactionsRequest): TryEither<Unit> {
+  fun categorizeTransactions(
+      transactionsAndCategories: Set<TransactionAndCategoryUpdateItem>
+  ): TryEither<Unit> {
     val userId = oAuth2Service.getAuthenticatedUser().userId
-    return request.transactionsAndCategories.foldRight<TransactionAndCategory, TryEither<Unit>>(
-        Either.Right(Unit)) { txnAndCat, result ->
+    return transactionsAndCategories.toList().foldRight<
+        TransactionAndCategoryUpdateItem, TryEither<Unit>>(Either.Right(Unit)) { txnAndCat, result
+      ->
       result.flatMapCatch {
         txnAndCat.categoryId?.let {
           transactionRepository.setTransactionCategory(txnAndCat.transactionId, it, userId)
         }
             ?: transactionRepository.removeTransactionCategory(txnAndCat.transactionId, userId)
+      }
+    }
+  }
+
+  @Transactional
+  fun confirmTransactions(
+      transactionsToConfirm: Set<TransactionAndConfirmUpdateItem>
+  ): TryEither<Unit> {
+    val userId = oAuth2Service.getAuthenticatedUser().userId
+    return transactionsToConfirm.toList().foldRight<
+        TransactionAndConfirmUpdateItem, TryEither<Unit>>(Either.Right(Unit)) { txn, result ->
+      result.flatMapCatch {
+        transactionRepository.confirmTransaction(txn.transactionId, txn.confirmed, userId)
       }
     }
   }
@@ -92,6 +109,13 @@ class TransactionService(
         .flatMap { page -> categoryMapEither.map { Pair(page, it) } }
         .map { (page, categories) -> SearchTransactionsResponse.from(page, categories) }
   }
+
+  @Transactional
+  fun updateTransactions(request: UpdateTransactionsRequest): TryEither<Unit> =
+      either.eager {
+        categorizeTransactions(request.transactions).bind()
+        confirmTransactions(request.transactions).bind()
+      }
 
   private fun createSearchSpec(
       userId: Long,

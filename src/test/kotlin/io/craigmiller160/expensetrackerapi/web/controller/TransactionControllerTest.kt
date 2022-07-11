@@ -7,6 +7,7 @@ import io.craigmiller160.expensetrackerapi.data.model.Category
 import io.craigmiller160.expensetrackerapi.data.model.Transaction
 import io.craigmiller160.expensetrackerapi.data.repository.TransactionRepository
 import io.craigmiller160.expensetrackerapi.web.types.CategorizeTransactionsRequest
+import io.craigmiller160.expensetrackerapi.web.types.ConfirmTransactionsRequest
 import io.craigmiller160.expensetrackerapi.web.types.CountAndOldest
 import io.craigmiller160.expensetrackerapi.web.types.DeleteTransactionsRequest
 import io.craigmiller160.expensetrackerapi.web.types.NeedsAttentionResponse
@@ -16,6 +17,9 @@ import io.craigmiller160.expensetrackerapi.web.types.SortDirection
 import io.craigmiller160.expensetrackerapi.web.types.TransactionAndCategory
 import io.craigmiller160.expensetrackerapi.web.types.TransactionResponse
 import io.craigmiller160.expensetrackerapi.web.types.TransactionSortKey
+import io.craigmiller160.expensetrackerapi.web.types.TransactionToConfirm
+import io.craigmiller160.expensetrackerapi.web.types.TransactionToUpdate
+import io.craigmiller160.expensetrackerapi.web.types.UpdateTransactionsRequest
 import java.time.LocalDate
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
@@ -492,7 +496,7 @@ class TransactionControllerTest : BaseIntegrationTest() {
     val request =
         CategorizeTransactionsRequest(
             transactionsAndCategories =
-                listOf(TransactionAndCategory(user1Transactions[0].id, null)))
+                setOf(TransactionAndCategory(user1Transactions[0].id, null)))
 
     mockMvc
         .put("/transactions/categorize") {
@@ -513,6 +517,35 @@ class TransactionControllerTest : BaseIntegrationTest() {
   }
 
   @Test
+  fun confirmTransactions() {
+    val request =
+        ConfirmTransactionsRequest(
+            transactionsToConfirm =
+                setOf(
+                    TransactionToConfirm(transactionId = user1Transactions[0].id, confirmed = true),
+                    TransactionToConfirm(
+                        transactionId = user2Transactions[0].id, confirmed = true)))
+
+    mockMvc
+        .put("/transactions/confirm") {
+          secure = true
+          header("Authorization", "Bearer $token")
+          contentType = MediaType.APPLICATION_JSON
+          content = objectMapper.writeValueAsString(request)
+        }
+        .andExpect { status { isNoContent() } }
+
+    assertThat(transactionRepository.findById(user1Transactions[0].id))
+        .isPresent
+        .get()
+        .hasFieldOrPropertyWithValue("confirmed", true)
+    assertThat(transactionRepository.findById(user2Transactions[0].id))
+        .isPresent
+        .get()
+        .hasFieldOrPropertyWithValue("confirmed", false)
+  }
+
+  @Test
   fun categorizeTransactions() {
     val user2Category = dataHelper.createCategory(2L, "Other")
     val uncategorizedTransaction = user1Transactions[5]
@@ -524,7 +557,7 @@ class TransactionControllerTest : BaseIntegrationTest() {
     val request =
         CategorizeTransactionsRequest(
             transactionsAndCategories =
-                listOf(
+                setOf(
                     TransactionAndCategory(uncategorizedTransaction.id, user1Categories.first().id),
                     TransactionAndCategory(categorizedTransaction.id, user1Categories.first().id),
                     TransactionAndCategory(
@@ -546,7 +579,7 @@ class TransactionControllerTest : BaseIntegrationTest() {
         .isPresent
         .get()
         .hasFieldOrPropertyWithValue("categoryId", user1Categories.first().id)
-        .hasFieldOrPropertyWithValue("confirmed", true)
+        .hasFieldOrPropertyWithValue("confirmed", false)
     assertThat(transactionRepository.findById(categorizedTransaction.id))
         .isPresent
         .get()
@@ -561,6 +594,75 @@ class TransactionControllerTest : BaseIntegrationTest() {
         .isPresent
         .get()
         .hasFieldOrPropertyWithValue("categoryId", null)
+        .hasFieldOrPropertyWithValue("confirmed", true)
+  }
+
+  @Test
+  fun updateTransaction() {
+    val user2Category = dataHelper.createCategory(2L, "Other")
+    val uncategorizedTransaction = user1Transactions[5]
+    assertThat(uncategorizedTransaction.categoryId).isNull()
+
+    assertThat(user1Transactions[1]).hasFieldOrPropertyWithValue("confirmed", false)
+
+    val categorizedTransaction = user1Transactions[4]
+
+    val request =
+        UpdateTransactionsRequest(
+            transactions =
+                setOf(
+                    TransactionToUpdate(
+                        transactionId = uncategorizedTransaction.id,
+                        categoryId = user1Categories.first().id,
+                        confirmed = false),
+                    TransactionToUpdate(
+                        transactionId = categorizedTransaction.id,
+                        categoryId = user1Categories.first().id,
+                        confirmed = false),
+                    TransactionToUpdate(
+                        transactionId = user2Transactions.first().id,
+                        categoryId = user1Categories.first().id,
+                        confirmed = false),
+                    TransactionToUpdate(
+                        transactionId = user1Transactions[2].id,
+                        categoryId = user2Category.id,
+                        confirmed = false),
+                    TransactionToUpdate(transactionId = user1Transactions[6].id, confirmed = true),
+                    TransactionToUpdate(transactionId = user2Transactions[0].id, confirmed = true)))
+
+    mockMvc
+        .put("/transactions") {
+          secure = true
+          header("Authorization", "Bearer $token")
+          contentType = MediaType.APPLICATION_JSON
+          content = objectMapper.writeValueAsString(request)
+        }
+        .andExpect { status { isNoContent() } }
+
+    assertThat(transactionRepository.findById(uncategorizedTransaction.id))
+        .isPresent
+        .get()
+        .hasFieldOrPropertyWithValue("categoryId", user1Categories.first().id)
         .hasFieldOrPropertyWithValue("confirmed", false)
+    assertThat(transactionRepository.findById(categorizedTransaction.id))
+        .isPresent
+        .get()
+        .hasFieldOrPropertyWithValue("categoryId", user1Categories.first().id)
+        .hasFieldOrPropertyWithValue("confirmed", false)
+    assertThat(transactionRepository.findById(user2Transactions.first().id))
+        .isPresent
+        .get()
+        .hasFieldOrPropertyWithValue("categoryId", null)
+        .hasFieldOrPropertyWithValue("confirmed", false)
+    assertThat(transactionRepository.findById(user1Transactions[2].id))
+        .isPresent
+        .get()
+        .hasFieldOrPropertyWithValue("categoryId", null)
+        .hasFieldOrPropertyWithValue("confirmed", false)
+
+    assertThat(transactionRepository.findById(user1Transactions[6].id))
+        .isPresent
+        .get()
+        .hasFieldOrPropertyWithValue("confirmed", true)
   }
 }
