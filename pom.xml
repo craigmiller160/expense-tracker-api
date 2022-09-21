@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>io.craigmiller160</groupId>
+    <artifactId>expense-tracker-api</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>2.7.3</version>
+        <relativePath/> <!-- lookup parent from repository -->
+    </parent>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.jetbrains.kotlin</groupId>
+                <artifactId>kotlin-bom</artifactId>
+                <version>${kotln.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <properties>
+        <kotlin.version>1.7.10</kotlin.version>
+        <arrow.kt.version>1.1.2</arrow.kt.version>
+        <kotest.arrow.version>1.2.5</kotest.arrow.version>
+        <spring.arrow.kt.version>1.0.1</spring.arrow.kt.version>
+        <spring.oauth2.utils.version>1.10.0-SNAPSHOT</spring.oauth2.utils.version>
+        <spring.web.utils.version>1.2.0-SNAPSHOT</spring.web.utils.version>
+        <mockito.kotlin.version>4.0.0</mockito.kotlin.version>
+        <opencsv.version>5.6</opencsv.version>
+        <faker.version>1.0.2</faker.version>
+    </properties>
+
+    <distributionManagement>
+        <repository>
+            <id>nexus</id>
+            <name>Releases</name>
+            <url>https://nexus-craigmiller160.ddns.net/repository/maven-releases</url>
+        </repository>
+        <snapshotRepository>
+            <id>nexus</id>
+            <name>Snapshot</name>
+            <url>https://nexus-craigmiller160.ddns.net/repository/maven-snapshots</url>
+        </snapshotRepository>
+    </distributionManagement>
+
+</project>
