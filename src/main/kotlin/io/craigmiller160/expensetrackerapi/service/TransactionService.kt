@@ -6,12 +6,10 @@ import arrow.core.flatMap
 import io.craigmiller160.expensetrackerapi.common.data.typedid.TypedId
 import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.CategoryId
 import io.craigmiller160.expensetrackerapi.data.model.Category
-import io.craigmiller160.expensetrackerapi.data.model.Transaction
 import io.craigmiller160.expensetrackerapi.data.model.toColumnName
 import io.craigmiller160.expensetrackerapi.data.model.toSpringSortDirection
 import io.craigmiller160.expensetrackerapi.data.repository.CategoryRepository
 import io.craigmiller160.expensetrackerapi.data.repository.TransactionRepository
-import io.craigmiller160.expensetrackerapi.data.specification.SpecBuilder
 import io.craigmiller160.expensetrackerapi.function.TryEither
 import io.craigmiller160.expensetrackerapi.function.flatMapCatch
 import io.craigmiller160.expensetrackerapi.web.types.CountAndOldest
@@ -25,7 +23,6 @@ import io.craigmiller160.expensetrackerapi.web.types.UpdateTransactionsRequest
 import io.craigmiller160.oauth2.service.OAuth2Service
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
-import org.springframework.data.jpa.domain.Specification
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -120,37 +117,6 @@ class TransactionService(
       categorizeTransactions(request.transactions).bind()
       confirmTransactions(request.transactions).bind()
     }
-
-  private fun createSearchSpec(
-    userId: Long,
-    request: SearchTransactionsRequest,
-    categories: Set<TypedId<CategoryId>>
-  ): Specification<Transaction> {
-    val userIdSpec = SpecBuilder.equals<Transaction>(userId, "userId")
-    val startDateSpec =
-      SpecBuilder.greaterThanOrEqualTo<Transaction>(request.startDate, "expenseDate")
-    val endDateSpec = SpecBuilder.lessThanOrEqualTo<Transaction>(request.endDate, "expenseDate")
-    val confirmedSpec = SpecBuilder.equals<Transaction>(request.isConfirmed, "confirmed")
-    val duplicateSpec = SpecBuilder.equals<Transaction>(request.isDuplicate, "duplicate")
-    // TODO need to figure out filtered category IDs
-    val filteredCategoryIds =
-      request.categoryIds?.let { ids -> ids.filter { categories.contains(it) } }
-    val categoryIdSpec = SpecBuilder.`in`<Transaction>(filteredCategoryIds, "categoryId")
-    val isCategorizedSpec =
-      when (request.isCategorized) {
-        null -> SpecBuilder.emptySpec()
-        true -> SpecBuilder.isNotNull<Transaction>("categoryId")
-        false -> SpecBuilder.isNull<Transaction>("categoryId")
-      }
-
-    return userIdSpec
-      .and(startDateSpec)
-      .and(endDateSpec)
-      .and(confirmedSpec)
-      .and(categoryIdSpec)
-      .and(isCategorizedSpec)
-      .and(duplicateSpec)
-  }
 
   private fun getCategoryMap(userId: Long): TryEither<Map<TypedId<CategoryId>, Category>> =
     Either.catch { categoryRepository.findAllByUserIdOrderByName(userId).associateBy { it.id } }
