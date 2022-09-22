@@ -22,89 +22,89 @@ class TransactionImportControllerTest : BaseIntegrationTest() {
   @Test
   fun getImportTypes() {
     val expectedResponse =
-        TransactionImportType.values().map { ImportTypeResponse(it.name, it.displayName) }
+      TransactionImportType.values().map { ImportTypeResponse(it.name, it.displayName) }
     mockMvc
-        .get("/transaction-import/types") {
-          secure = true
-          header("Authorization", "Bearer $token")
-        }
-        .andExpect {
-          status { isOk() }
-          content { json(objectMapper.writeValueAsString(expectedResponse)) }
-        }
+      .get("/transaction-import/types") {
+        secure = true
+        header("Authorization", "Bearer $token")
+      }
+      .andExpect {
+        status { isOk() }
+        content { json(objectMapper.writeValueAsString(expectedResponse)) }
+      }
   }
 
   @Test
   fun `importTransactions - DISCOVER_CSV`() {
     ResourceUtils.getResourceBytes("data/discover1.csv")
-        .flatMap { bytes ->
-          Either.catch {
-            mockMvc
-                .multipart("/transaction-import?type=${TransactionImportType.DISCOVER_CSV.name}") {
-                  secure = true
-                  header("Authorization", "Bearer $token")
-                  header("Content-Type", MediaType.MULTIPART_FORM_DATA_VALUE)
-                  file("file", bytes)
-                }
-                .andExpect {
-                  status { isOk() }
-                  content { json("""{"transactionsImported":57}""") }
-                }
-          }
+      .flatMap { bytes ->
+        Either.catch {
+          mockMvc
+            .multipart("/transaction-import?type=${TransactionImportType.DISCOVER_CSV.name}") {
+              secure = true
+              header("Authorization", "Bearer $token")
+              header("Content-Type", MediaType.MULTIPART_FORM_DATA_VALUE)
+              file("file", bytes)
+            }
+            .andExpect {
+              status { isOk() }
+              content { json("""{"transactionsImported":57}""") }
+            }
         }
-        .shouldBeRight()
+      }
+      .shouldBeRight()
 
     val transactions = transactionRepository.findAllByOrderByExpenseDateAsc()
     assertThat(transactions).hasSize(57)
 
     assertThat(transactions.first())
-        .hasFieldOrPropertyWithValue("userId", 1L)
-        .hasFieldOrPropertyWithValue("expenseDate", LocalDate.of(2022, 4, 18))
-        .hasFieldOrPropertyWithValue("description", "WAWA 5127 TAMPA FL")
-        .hasFieldOrPropertyWithValue("amount", BigDecimal("44.72"))
+      .hasFieldOrPropertyWithValue("userId", 1L)
+      .hasFieldOrPropertyWithValue("expenseDate", LocalDate.of(2022, 4, 18))
+      .hasFieldOrPropertyWithValue("description", "WAWA 5127 TAMPA FL")
+      .hasFieldOrPropertyWithValue("amount", BigDecimal("44.72"))
 
     assertThat(transactions.last())
-        .hasFieldOrPropertyWithValue("userId", 1L)
-        .hasFieldOrPropertyWithValue("expenseDate", LocalDate.of(2022, 5, 18))
-        .hasFieldOrPropertyWithValue("description", "PANDA EXPRESS 1679 RIVERVIEW FL")
-        .hasFieldOrPropertyWithValue("amount", BigDecimal("5.81"))
+      .hasFieldOrPropertyWithValue("userId", 1L)
+      .hasFieldOrPropertyWithValue("expenseDate", LocalDate.of(2022, 5, 18))
+      .hasFieldOrPropertyWithValue("description", "PANDA EXPRESS 1679 RIVERVIEW FL")
+      .hasFieldOrPropertyWithValue("amount", BigDecimal("5.81"))
   }
 
   @Test
   fun `importTransactions - CHASE_CSV`() {
     ResourceUtils.getResourceBytes("data/chase1.csv")
-        .flatMap { bytes ->
-          Either.catch {
-            mockMvc
-                .multipart("/transaction-import?type=${TransactionImportType.CHASE_CSV.name}") {
-                  secure = true
-                  header("Authorization", "Bearer $token")
-                  header("Content-Type", MediaType.MULTIPART_FORM_DATA_VALUE)
-                  file("file", bytes)
-                }
-                .andExpect {
-                  status { isOk() }
-                  content { json("""{"transactionsImported":19}""") }
-                }
-          }
+      .flatMap { bytes ->
+        Either.catch {
+          mockMvc
+            .multipart("/transaction-import?type=${TransactionImportType.CHASE_CSV.name}") {
+              secure = true
+              header("Authorization", "Bearer $token")
+              header("Content-Type", MediaType.MULTIPART_FORM_DATA_VALUE)
+              file("file", bytes)
+            }
+            .andExpect {
+              status { isOk() }
+              content { json("""{"transactionsImported":19}""") }
+            }
         }
-        .shouldBeRight()
+      }
+      .shouldBeRight()
 
     val transactions = transactionRepository.findAllByOrderByExpenseDateAsc()
     assertThat(transactions).hasSize(19)
 
     assertThat(transactions.first())
-        .hasFieldOrPropertyWithValue("userId", 1L)
-        .hasFieldOrPropertyWithValue("expenseDate", LocalDate.of(2022, 5, 23))
-        .hasFieldOrPropertyWithValue(
-            "description", "FID BKG SVC LLC  MONEYLINE                  PPD ID: 1035141383")
-        .hasFieldOrPropertyWithValue("amount", BigDecimal("250.00"))
+      .hasFieldOrPropertyWithValue("userId", 1L)
+      .hasFieldOrPropertyWithValue("expenseDate", LocalDate.of(2022, 5, 23))
+      .hasFieldOrPropertyWithValue(
+        "description", "FID BKG SVC LLC  MONEYLINE                  PPD ID: 1035141383")
+      .hasFieldOrPropertyWithValue("amount", BigDecimal("250.00"))
 
     assertThat(transactions.last())
-        .hasFieldOrPropertyWithValue("userId", 1L)
-        .hasFieldOrPropertyWithValue("expenseDate", LocalDate.of(2022, 6, 15))
-        .hasFieldOrPropertyWithValue(
-            "description", "FRONTIER COMM CORP WE 800-921-8101 CT        06/14")
-        .hasFieldOrPropertyWithValue("amount", BigDecimal("64.99"))
+      .hasFieldOrPropertyWithValue("userId", 1L)
+      .hasFieldOrPropertyWithValue("expenseDate", LocalDate.of(2022, 6, 15))
+      .hasFieldOrPropertyWithValue(
+        "description", "FRONTIER COMM CORP WE 800-921-8101 CT        06/14")
+      .hasFieldOrPropertyWithValue("amount", BigDecimal("64.99"))
   }
 }

@@ -17,20 +17,20 @@ abstract class AbstractCsvTransactionParser : TransactionParser {
   protected abstract val numberOfColumns: Int
 
   override fun parse(userId: Long, stream: InputStream): TryEither<List<Transaction>> =
-      CSVReader(InputStreamReader(stream))
-          .readAll()
-          .asSequence()
-          .drop(1)
-          .map { prepareFieldExtractor(it) }
-          .mapIndexed { index, fieldExtractor ->
-            fieldExtractor.flatMap {
-              getTransaction(userId, it).mapLeft {
-                InvalidImportException("Error parsing CSV record, row ${index + 2}", it)
-              }
-            }
+    CSVReader(InputStreamReader(stream))
+      .readAll()
+      .asSequence()
+      .drop(1)
+      .map { prepareFieldExtractor(it) }
+      .mapIndexed { index, fieldExtractor ->
+        fieldExtractor.flatMap {
+          getTransaction(userId, it).mapLeft {
+            InvalidImportException("Error parsing CSV record, row ${index + 2}", it)
           }
-          .sequence()
-          .map { list -> list.filter { includeTransaction(it) } }
+        }
+      }
+      .sequence()
+      .map { list -> list.filter { includeTransaction(it) } }
 
   private fun prepareFieldExtractor(fields: Array<String>): TryEither<FieldExtractor> {
     if (fields.size != numberOfColumns) {
@@ -38,14 +38,14 @@ abstract class AbstractCsvTransactionParser : TransactionParser {
     }
     return Either.Right { index, name ->
       Either.catch { fields[index] }
-          .mapLeft { InvalidImportException("Missing field $name at CSV row index $index") }
+        .mapLeft { InvalidImportException("Missing field $name at CSV row index $index") }
     }
   }
 
   protected open fun includeTransaction(transaction: Transaction): Boolean = true
 
   protected abstract fun getTransaction(
-      userId: Long,
-      fieldExtractor: FieldExtractor
+    userId: Long,
+    fieldExtractor: FieldExtractor
   ): TryEither<Transaction>
 }

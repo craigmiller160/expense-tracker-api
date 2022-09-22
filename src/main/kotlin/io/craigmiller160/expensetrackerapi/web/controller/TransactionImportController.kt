@@ -19,10 +19,10 @@ import org.springframework.web.multipart.MultipartFile
 class TransactionImportController(private val transactionImportService: TransactionImportService) {
   @PostMapping(consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])
   fun importTransactions(
-      @RequestParam("type") type: TransactionImportType,
-      @RequestPart("file") file: MultipartFile
+    @RequestParam("type") type: TransactionImportType,
+    @RequestPart("file") file: MultipartFile
   ): TryEither<ImportTransactionsResponse> =
-      transactionImportService.importTransactions(type, file.inputStream)
+    transactionImportService.importTransactions(type, file.inputStream)
 
   @GetMapping("/types")
   fun getImportTypes(): List<ImportTypeResponse> = transactionImportService.getImportTypes()

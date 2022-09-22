@@ -1,2 +1,2 @@
-ALTER TABLE transactions
-ADD COLUMN duplicate BOOLEAN NOT NULL DEFAULT false;
+ALTER TABLE
+    transactions ADD COLUMN duplicate BOOLEAN NOT NULL DEFAULT FALSE;

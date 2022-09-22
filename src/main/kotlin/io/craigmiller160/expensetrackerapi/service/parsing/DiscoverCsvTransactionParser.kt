@@ -18,16 +18,16 @@ class DiscoverCsvTransactionParser : AbstractCsvTransactionParser() {
   override val numberOfColumns: Int = 5
 
   override fun getTransaction(
-      userId: Long,
-      fieldExtractor: FieldExtractor
+    userId: Long,
+    fieldExtractor: FieldExtractor
   ): TryEither<Transaction> =
-      either.eager {
-        val transactionDate = fieldExtractor(0, "transactionDate").bind()
-        val expenseDate = Either.catch { LocalDate.parse(transactionDate, DATE_FORMAT) }.bind()
-        val description = fieldExtractor(2, "description").bind()
-        val rawAmount = fieldExtractor(3, "amount").bind()
-        val amount = Either.catch { BigDecimal(rawAmount) }.bind()
-        Transaction(
-            userId = userId, expenseDate = expenseDate, description = description, amount = amount)
-      }
+    either.eager {
+      val transactionDate = fieldExtractor(0, "transactionDate").bind()
+      val expenseDate = Either.catch { LocalDate.parse(transactionDate, DATE_FORMAT) }.bind()
+      val description = fieldExtractor(2, "description").bind()
+      val rawAmount = fieldExtractor(3, "amount").bind()
+      val amount = Either.catch { BigDecimal(rawAmount) }.bind()
+      Transaction(
+        userId = userId, expenseDate = expenseDate, description = description, amount = amount)
+    }
 }

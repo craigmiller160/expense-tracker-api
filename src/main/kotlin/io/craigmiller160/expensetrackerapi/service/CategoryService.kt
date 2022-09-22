@@ -16,9 +16,9 @@ import org.springframework.transaction.annotation.Transactional
 
 @Service
 class CategoryService(
-    private val categoryRepository: CategoryRepository,
-    private val transactionRepository: TransactionRepository,
-    private val oAuth2Service: OAuth2Service
+  private val categoryRepository: CategoryRepository,
+  private val transactionRepository: TransactionRepository,
+  private val oAuth2Service: OAuth2Service
 ) {
   fun getAllCategories(): TryEither<List<CategoryResponse>> {
     val userId = oAuth2Service.getAuthenticatedUser().userId
@@ -30,26 +30,26 @@ class CategoryService(
   fun createCategory(request: CategoryRequest): TryEither<CategoryResponse> {
     val userId = oAuth2Service.getAuthenticatedUser().userId
     return Either.catch { categoryRepository.save(Category(name = request.name, userId = userId)) }
-        .map { CategoryResponse.from(it) }
+      .map { CategoryResponse.from(it) }
   }
 
   @Transactional
   fun updateCategory(categoryId: TypedId<CategoryId>, request: CategoryRequest): TryEither<Unit> {
     val userId = oAuth2Service.getAuthenticatedUser().userId
     return Either.catch { categoryRepository.findByIdAndUserId(categoryId, userId) }
-        .flatMapCatch { nullableCategory ->
-          nullableCategory?.let { category ->
-            categoryRepository.save(category.copy(name = request.name))
-          }
+      .flatMapCatch { nullableCategory ->
+        nullableCategory?.let { category ->
+          categoryRepository.save(category.copy(name = request.name))
         }
+      }
   }
 
   @Transactional
   fun deleteCategory(categoryId: TypedId<CategoryId>): TryEither<Unit> {
     val userId = oAuth2Service.getAuthenticatedUser().userId
     return Either.catch {
-          transactionRepository.removeCategoryFromAllTransactions(userId, categoryId)
-        }
-        .flatMapCatch { categoryRepository.deleteByIdAndUserId(categoryId, userId) }
+        transactionRepository.removeCategoryFromAllTransactions(userId, categoryId)
+      }
+      .flatMapCatch { categoryRepository.deleteByIdAndUserId(categoryId, userId) }
   }
 }

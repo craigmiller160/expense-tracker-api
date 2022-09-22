@@ -31,38 +31,39 @@ import org.springframework.transaction.annotation.Transactional
 
 @Service
 class TransactionService(
-    private val transactionRepository: TransactionRepository,
-    private val categoryRepository: CategoryRepository,
-    private val oAuth2Service: OAuth2Service
+  private val transactionRepository: TransactionRepository,
+  private val categoryRepository: CategoryRepository,
+  private val oAuth2Service: OAuth2Service
 ) {
   @Transactional
   fun categorizeTransactions(
-      transactionsAndCategories: Set<TransactionAndCategoryUpdateItem>
+    transactionsAndCategories: Set<TransactionAndCategoryUpdateItem>
   ): TryEither<Unit> {
     val userId = oAuth2Service.getAuthenticatedUser().userId
     return transactionsAndCategories.toList().foldRight<
-        TransactionAndCategoryUpdateItem, TryEither<Unit>>(Either.Right(Unit)) { txnAndCat, result
-      ->
-      result.flatMapCatch {
-        txnAndCat.categoryId?.let {
-          transactionRepository.setTransactionCategory(txnAndCat.transactionId, it, userId)
-        }
+      TransactionAndCategoryUpdateItem, TryEither<Unit>>(
+      Either.Right(Unit)) { txnAndCat, result ->
+        result.flatMapCatch {
+          txnAndCat.categoryId?.let {
+            transactionRepository.setTransactionCategory(txnAndCat.transactionId, it, userId)
+          }
             ?: transactionRepository.removeTransactionCategory(txnAndCat.transactionId, userId)
+        }
       }
-    }
   }
 
   @Transactional
   fun confirmTransactions(
-      transactionsToConfirm: Set<TransactionAndConfirmUpdateItem>
+    transactionsToConfirm: Set<TransactionAndConfirmUpdateItem>
   ): TryEither<Unit> {
     val userId = oAuth2Service.getAuthenticatedUser().userId
     return transactionsToConfirm.toList().foldRight<
-        TransactionAndConfirmUpdateItem, TryEither<Unit>>(Either.Right(Unit)) { txn, result ->
-      result.flatMapCatch {
-        transactionRepository.confirmTransaction(txn.transactionId, txn.confirmed, userId)
+      TransactionAndConfirmUpdateItem, TryEither<Unit>>(
+      Either.Right(Unit)) { txn, result ->
+        result.flatMapCatch {
+          transactionRepository.confirmTransaction(txn.transactionId, txn.confirmed, userId)
+        }
       }
-    }
   }
 
   @Transactional
@@ -76,19 +77,19 @@ class TransactionService(
     val userId = oAuth2Service.getAuthenticatedUser().userId
     return either.eager {
       val unconfirmedCount =
-          Either.catch { transactionRepository.countAllUnconfirmed(userId) }.bind()
+        Either.catch { transactionRepository.countAllUnconfirmed(userId) }.bind()
       val oldestUnconfirmed =
-          Either.catch { transactionRepository.getOldestUnconfirmedDate(userId) }.bind()
+        Either.catch { transactionRepository.getOldestUnconfirmedDate(userId) }.bind()
       val uncategorizedCount =
-          Either.catch { transactionRepository.countAllUncategorized(userId) }.bind()
+        Either.catch { transactionRepository.countAllUncategorized(userId) }.bind()
       val oldestUncategorized =
-          Either.catch { transactionRepository.getOldestUncategorizedDate(userId) }.bind()
+        Either.catch { transactionRepository.getOldestUncategorizedDate(userId) }.bind()
       val duplicateCount = Either.catch { transactionRepository.countAllDuplicates(userId) }.bind()
       val oldestDuplicate = Either.catch { transactionRepository.getOldestDuplicate(userId) }.bind()
       NeedsAttentionResponse(
-          unconfirmed = CountAndOldest(count = unconfirmedCount, oldest = oldestUnconfirmed),
-          uncategorized = CountAndOldest(count = uncategorizedCount, oldest = oldestUncategorized),
-          duplicate = CountAndOldest(count = duplicateCount, oldest = oldestDuplicate))
+        unconfirmed = CountAndOldest(count = unconfirmedCount, oldest = oldestUnconfirmed),
+        uncategorized = CountAndOldest(count = uncategorizedCount, oldest = oldestUncategorized),
+        duplicate = CountAndOldest(count = duplicateCount, oldest = oldestDuplicate))
     }
   }
 
@@ -97,56 +98,55 @@ class TransactionService(
     val userId = oAuth2Service.getAuthenticatedUser().userId
 
     val sort =
-        Sort.by(
-            Sort.Order(
-                request.sortDirection.toSpringSortDirection(), request.sortKey.toColumnName()),
-            Sort.Order(Sort.Direction.ASC, "description"))
+      Sort.by(
+        Sort.Order(request.sortDirection.toSpringSortDirection(), request.sortKey.toColumnName()),
+        Sort.Order(Sort.Direction.ASC, "description"))
     val pageable = PageRequest.of(request.pageNumber, request.pageSize, sort)
     val categoryMapEither = getCategoryMap(userId)
     return categoryMapEither
-        .map { categories -> createSearchSpec(userId, request, categories.keys) }
-        .flatMapCatch { spec -> transactionRepository.findAll(spec, pageable) }
-        .flatMap { page -> categoryMapEither.map { Pair(page, it) } }
-        .map { (page, categories) -> SearchTransactionsResponse.from(page, categories) }
+      .map { categories -> createSearchSpec(userId, request, categories.keys) }
+      .flatMapCatch { spec -> transactionRepository.findAll(spec, pageable) }
+      .flatMap { page -> categoryMapEither.map { Pair(page, it) } }
+      .map { (page, categories) -> SearchTransactionsResponse.from(page, categories) }
   }
 
   @Transactional
   fun updateTransactions(request: UpdateTransactionsRequest): TryEither<Unit> =
-      either.eager {
-        categorizeTransactions(request.transactions).bind()
-        confirmTransactions(request.transactions).bind()
-      }
+    either.eager {
+      categorizeTransactions(request.transactions).bind()
+      confirmTransactions(request.transactions).bind()
+    }
 
   private fun createSearchSpec(
-      userId: Long,
-      request: SearchTransactionsRequest,
-      categories: Set<TypedId<CategoryId>>
+    userId: Long,
+    request: SearchTransactionsRequest,
+    categories: Set<TypedId<CategoryId>>
   ): Specification<Transaction> {
     val userIdSpec = SpecBuilder.equals<Transaction>(userId, "userId")
     val startDateSpec =
-        SpecBuilder.greaterThanOrEqualTo<Transaction>(request.startDate, "expenseDate")
+      SpecBuilder.greaterThanOrEqualTo<Transaction>(request.startDate, "expenseDate")
     val endDateSpec = SpecBuilder.lessThanOrEqualTo<Transaction>(request.endDate, "expenseDate")
     val confirmedSpec = SpecBuilder.equals<Transaction>(request.isConfirmed, "confirmed")
     val duplicateSpec = SpecBuilder.equals<Transaction>(request.isDuplicate, "duplicate")
     val filteredCategoryIds =
-        request.categoryIds?.let { ids -> ids.filter { categories.contains(it) } }
+      request.categoryIds?.let { ids -> ids.filter { categories.contains(it) } }
     val categoryIdSpec = SpecBuilder.`in`<Transaction>(filteredCategoryIds, "categoryId")
     val isCategorizedSpec =
-        when (request.isCategorized) {
-          null -> SpecBuilder.emptySpec()
-          true -> SpecBuilder.isNotNull<Transaction>("categoryId")
-          false -> SpecBuilder.isNull<Transaction>("categoryId")
-        }
+      when (request.isCategorized) {
+        null -> SpecBuilder.emptySpec()
+        true -> SpecBuilder.isNotNull<Transaction>("categoryId")
+        false -> SpecBuilder.isNull<Transaction>("categoryId")
+      }
 
     return userIdSpec
-        .and(startDateSpec)
-        .and(endDateSpec)
-        .and(confirmedSpec)
-        .and(categoryIdSpec)
-        .and(isCategorizedSpec)
-        .and(duplicateSpec)
+      .and(startDateSpec)
+      .and(endDateSpec)
+      .and(confirmedSpec)
+      .and(categoryIdSpec)
+      .and(isCategorizedSpec)
+      .and(duplicateSpec)
   }
 
   private fun getCategoryMap(userId: Long): TryEither<Map<TypedId<CategoryId>, Category>> =
-      Either.catch { categoryRepository.findAllByUserIdOrderByName(userId).associateBy { it.id } }
+    Either.catch { categoryRepository.findAllByUserIdOrderByName(userId).associateBy { it.id } }
 }

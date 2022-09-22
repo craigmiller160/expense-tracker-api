@@ -25,17 +25,17 @@ class CategoryController(private val categoryService: CategoryService) {
 
   @PostMapping
   fun createCategory(@RequestBody request: CategoryRequest): TryEither<CategoryResponse> =
-      categoryService.createCategory(request)
+    categoryService.createCategory(request)
 
   @PutMapping("/{categoryId}")
   @ResponseStatus(HttpStatus.NO_CONTENT)
   fun updateCategory(
-      @PathVariable("categoryId") categoryId: TypedId<CategoryId>,
-      @RequestBody request: CategoryRequest
+    @PathVariable("categoryId") categoryId: TypedId<CategoryId>,
+    @RequestBody request: CategoryRequest
   ): TryEither<Unit> = categoryService.updateCategory(categoryId, request)
 
   @DeleteMapping("/{categoryId}")
   @ResponseStatus(HttpStatus.NO_CONTENT)
   fun deleteCategory(@PathVariable("categoryId") categoryId: TypedId<CategoryId>): TryEither<Unit> =
-      categoryService.deleteCategory(categoryId)
+    categoryService.deleteCategory(categoryId)
 }

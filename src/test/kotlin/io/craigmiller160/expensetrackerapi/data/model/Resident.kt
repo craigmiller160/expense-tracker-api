@@ -14,9 +14,9 @@ import org.hibernate.annotations.TypeDef
 @Table(name = "residents")
 @TypeDef(defaultForType = TypedId::class, typeClass = TypedIdJpaType::class)
 data class Resident(
-    val name: String,
-    @Id override val id: TypedId<ResidentId> = TypedId(),
-    override val created: ZonedDateTime = ZonedDateTime.now(),
-    override var updated: ZonedDateTime = ZonedDateTime.now(),
-    @Version override val version: Long = 1
+  val name: String,
+  @Id override val id: TypedId<ResidentId> = TypedId(),
+  override val created: ZonedDateTime = ZonedDateTime.now(),
+  override var updated: ZonedDateTime = ZonedDateTime.now(),
+  @Version override val version: Long = 1
 ) : MutableEntity<ResidentId>

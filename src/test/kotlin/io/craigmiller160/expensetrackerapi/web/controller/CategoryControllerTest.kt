@@ -31,14 +31,14 @@ class CategoryControllerTest : BaseIntegrationTest() {
     val expected = listOf(CategoryResponse.from(cat1), CategoryResponse.from(cat2))
 
     mockMvc
-        .get("/categories") {
-          secure = true
-          header("Authorization", "Bearer $token")
-        }
-        .andExpect {
-          status { isOk() }
-          content { json(objectMapper.writeValueAsString(expected)) }
-        }
+      .get("/categories") {
+        secure = true
+        header("Authorization", "Bearer $token")
+      }
+      .andExpect {
+        status { isOk() }
+        content { json(objectMapper.writeValueAsString(expected)) }
+      }
   }
 
   @Test
@@ -46,26 +46,27 @@ class CategoryControllerTest : BaseIntegrationTest() {
     val request = CategoryRequest("The Category")
 
     val responseString =
-        mockMvc
-            .post("/categories") {
-              secure = true
-              header("Authorization", "Bearer $token")
-              contentType = MediaType.APPLICATION_JSON
-              content = objectMapper.writeValueAsString(request)
-            }
-            .andExpect { status { isOk() } }
-            .andReturn()
-            .response.contentAsString
+      mockMvc
+        .post("/categories") {
+          secure = true
+          header("Authorization", "Bearer $token")
+          contentType = MediaType.APPLICATION_JSON
+          content = objectMapper.writeValueAsString(request)
+        }
+        .andExpect { status { isOk() } }
+        .andReturn()
+        .response
+        .contentAsString
     val response = objectMapper.readValue(responseString, CategoryResponse::class.java)
 
     assertThat(response).hasFieldOrPropertyWithValue("name", request.name)
 
     assertThat(categoryRepository.count()).isEqualTo(1)
     assertThat(categoryRepository.findById(response.id))
-        .isPresent
-        .get()
-        .hasFieldOrPropertyWithValue("name", request.name)
-        .hasFieldOrPropertyWithValue("userId", 1L)
+      .isPresent
+      .get()
+      .hasFieldOrPropertyWithValue("name", request.name)
+      .hasFieldOrPropertyWithValue("userId", 1L)
   }
 
   @Test
@@ -76,13 +77,13 @@ class CategoryControllerTest : BaseIntegrationTest() {
     val request = CategoryRequest("Category B")
     val action: (TypedId<CategoryId>) -> Unit = { id ->
       mockMvc
-          .put("/categories/$id") {
-            secure = true
-            header("Authorization", "Bearer $token")
-            contentType = MediaType.APPLICATION_JSON
-            content = objectMapper.writeValueAsString(request)
-          }
-          .andExpect { status { isNoContent() } }
+        .put("/categories/$id") {
+          secure = true
+          header("Authorization", "Bearer $token")
+          contentType = MediaType.APPLICATION_JSON
+          content = objectMapper.writeValueAsString(request)
+        }
+        .andExpect { status { isNoContent() } }
     }
 
     action(cat1.id)
@@ -105,11 +106,11 @@ class CategoryControllerTest : BaseIntegrationTest() {
 
     val action: (TypedId<CategoryId>) -> Unit = { id ->
       mockMvc
-          .delete("/categories/$id") {
-            secure = true
-            header("Authorization", "Bearer $token")
-          }
-          .andExpect { status { isNoContent() } }
+        .delete("/categories/$id") {
+          secure = true
+          header("Authorization", "Bearer $token")
+        }
+        .andExpect { status { isNoContent() } }
     }
 
     action(cat1.id)
@@ -118,12 +119,12 @@ class CategoryControllerTest : BaseIntegrationTest() {
     assertThat(categoryRepository.findById(cat1.id)).isEmpty
     assertThat(categoryRepository.findById(cat2.id)).isPresent
     assertThat(transactionRepository.findById(txn1.id))
-        .isPresent
-        .get()
-        .hasFieldOrPropertyWithValue("categoryId", null)
+      .isPresent
+      .get()
+      .hasFieldOrPropertyWithValue("categoryId", null)
     assertThat(transactionRepository.findById(txn2.id))
-        .isPresent
-        .get()
-        .hasFieldOrPropertyWithValue("categoryId", cat3.id)
+      .isPresent
+      .get()
+      .hasFieldOrPropertyWithValue("categoryId", cat3.id)
   }
 }

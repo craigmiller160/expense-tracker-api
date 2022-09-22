@@ -12,31 +12,31 @@ import org.springframework.security.web.SecurityFilterChain
 @Configuration
 @EnableWebSecurity
 class WebSecurityConfig(
-    private val jwtFilterConfigurer: JwtValidationFilterConfigurer,
-    private val authEntryPoint: AuthEntryPoint
+  private val jwtFilterConfigurer: JwtValidationFilterConfigurer,
+  private val authEntryPoint: AuthEntryPoint
 ) {
   @Bean
   fun securityFilterChain(http: HttpSecurity): SecurityFilterChain =
-      http
-          .csrf()
-          .disable()
-          .authorizeRequests()
-          .antMatchers(*jwtFilterConfigurer.getInsecurePathPatterns())
-          .permitAll()
-          .anyRequest()
-          .fullyAuthenticated()
-          .and()
-          .apply(jwtFilterConfigurer)
-          .and()
-          .exceptionHandling()
-          .authenticationEntryPoint(authEntryPoint)
-          .and()
-          .sessionManagement()
-          .sessionCreationPolicy(SessionCreationPolicy.ALWAYS)
-          .and()
-          .requiresChannel()
-          .anyRequest()
-          .requiresSecure()
-          .and()
-          .build()
+    http
+      .csrf()
+      .disable()
+      .authorizeRequests()
+      .antMatchers(*jwtFilterConfigurer.getInsecurePathPatterns())
+      .permitAll()
+      .anyRequest()
+      .fullyAuthenticated()
+      .and()
+      .apply(jwtFilterConfigurer)
+      .and()
+      .exceptionHandling()
+      .authenticationEntryPoint(authEntryPoint)
+      .and()
+      .sessionManagement()
+      .sessionCreationPolicy(SessionCreationPolicy.ALWAYS)
+      .and()
+      .requiresChannel()
+      .anyRequest()
+      .requiresSecure()
+      .and()
+      .build()
 }
