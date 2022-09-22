@@ -203,6 +203,12 @@
                     <kotlin>
                         <ktfmt />
                     </kotlin>
+                    <sql>
+                        <includes>
+                            <include>src/main/resources/db/migration/*.sql</include>
+                        </includes>
+                        <dbeaver />
+                    </sql>
                 </configuration>
                 <executions>
                     <execution>
