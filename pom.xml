@@ -46,6 +46,7 @@
         <surefire.plugin.version>2.22.2</surefire.plugin.version>
         <spotless.version>2.26.0</spotless.version>
         <maven.git.hooks.version>1.0.0</maven.git.hooks.version>
+        <git.hooks.plugin.version>3.3.0</git.hooks.plugin.version>
     </properties>
 
     <distributionManagement>
@@ -102,10 +103,12 @@
         <dependency>
             <groupId>org.jetbrains.kotlin</groupId>
             <artifactId>kotlin-reflect</artifactId>
+            <version>${kotlin.version}</version>
         </dependency>
         <dependency>
             <groupId>org.jetbrains.kotlin</groupId>
             <artifactId>kotlin-stdlib-jdk8</artifactId>
+            <version>${kotlin.version}</version>
         </dependency>
         <dependency>
             <groupId>org.postgresql</groupId>
