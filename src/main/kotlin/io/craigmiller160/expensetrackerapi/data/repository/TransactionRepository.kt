@@ -49,8 +49,8 @@ interface TransactionRepository :
     AND (:#{#request.isDuplicate} IS NULL OR :#{#request.isDuplicate} = t.duplicate)
     AND (:categories IS NULL OR t.categoryId IN (:categories))
     AND CASE
-        WHEN :#{#request.isCategorized} IS NULL THEN true
-        WHEN :#{#request.isCategorized} = true THEN (t.categoryId IS NOT NULL)
+        WHEN (:#{#request.isCategorized} IS NULL) THEN true
+        WHEN (:#{#request.isCategorized} = true) THEN (t.categoryId IS NOT NULL)
         ELSE (t.categoryId IS NULL)
     END
   """)
