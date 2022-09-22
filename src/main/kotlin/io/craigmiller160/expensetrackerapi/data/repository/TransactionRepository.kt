@@ -4,7 +4,9 @@ import io.craigmiller160.expensetrackerapi.common.data.typedid.TypedId
 import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.CategoryId
 import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.TransactionId
 import io.craigmiller160.expensetrackerapi.data.model.Transaction
+import io.craigmiller160.expensetrackerapi.web.types.SearchTransactionsRequest
 import java.time.LocalDate
+import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor
 import org.springframework.data.jpa.repository.Modifying
@@ -35,6 +37,17 @@ interface TransactionRepository :
     @Param("categoryId") categoryId: TypedId<CategoryId>,
     @Param("userId") userId: Long
   )
+
+  @Query(
+    """
+    SELECT t
+    FROM Transaction t
+    WHERE (:#{#request.startDate} IS NULL OR :#{#request.startDate} >= t.expenseDate)
+    AND (:#{#request.endDate} IS NULL OR :#{#request.endDate} <= t.expenseDate)
+    AND (:#{#request.isConfirmed} IS NULL OR :#{#request.isConfirmed} = t.confirmed)
+    AND (:#{#request.isDuplicate} IS NULL OR :#{#request.isDuplicate} = t.duplicate)
+  """)
+  fun searchForTransaction(@Param("request") request: SearchTransactionsRequest, page: Pageable)
 
   @Query(
     """
