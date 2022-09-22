@@ -104,8 +104,12 @@ class TransactionService(
     val pageable = PageRequest.of(request.pageNumber, request.pageSize, sort)
     val categoryMapEither = getCategoryMap(userId)
     return categoryMapEither
-      .map { categories -> createSearchSpec(userId, request, categories.keys) }
-      .flatMapCatch { spec -> transactionRepository.findAll(spec, pageable) }
+      .map { categories ->
+        request.categoryIds?.let { ids -> ids.filter { categories.contains(it) } }
+      }
+      .map { filteredCategories ->
+        transactionRepository.searchForTransaction(request, filteredCategories, pageable)
+      }
       .flatMap { page -> categoryMapEither.map { Pair(page, it) } }
       .map { (page, categories) -> SearchTransactionsResponse.from(page, categories) }
   }

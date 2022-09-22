@@ -57,7 +57,7 @@ interface TransactionRepository :
     @Param("request") request: SearchTransactionsRequest,
     @Param("categories") categories: List<TypedId<CategoryId>>?,
     page: Pageable
-  )
+  ): Page<Transaction>
 
   @Query(
     """
