@@ -105,9 +105,7 @@ class TransactionService(
         request.categoryIds?.let { ids -> ids.filter { categories.contains(it) } }
       }
       .map { filteredCategories ->
-        // TODO restore this
-        //        transactionRepository.searchForTransaction(request, filteredCategories, pageable)
-        transactionRepository.searchForTransaction(request, pageable)
+        transactionRepository.searchForTransaction(request, filteredCategories, pageable)
       }
       .flatMap { page -> categoryMapEither.map { Pair(page, it) } }
       .map { (page, categories) -> SearchTransactionsResponse.from(page, categories) }
