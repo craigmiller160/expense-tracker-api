@@ -43,7 +43,7 @@ interface TransactionRepository :
     """
     SELECT t
     FROM Transaction t
-    WHERE (:#{#request.startDate} IS NULL OR :#{#request.startDate} >= t.expenseDate)
+    WHERE (CAST(:#{#request.startDate} AS LocalDate) IS NULL OR CAST(:#{#request.startDate} AS LocalDate) >= t.expenseDate)
   """)
   fun searchForTransaction(
     @Param("request") request: SearchTransactionsRequest,
