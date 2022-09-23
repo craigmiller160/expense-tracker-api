@@ -44,19 +44,10 @@ interface TransactionRepository :
     SELECT t
     FROM Transaction t
     WHERE (:#{#request.startDate} IS NULL OR :#{#request.startDate} >= t.expenseDate)
-    AND (:#{#request.endDate} IS NULL OR :#{#request.endDate} <= t.expenseDate)
-    AND (:#{#request.isConfirmed} IS NULL OR :#{#request.isConfirmed} = t.confirmed)
-    AND (:#{#request.isDuplicate} IS NULL OR :#{#request.isDuplicate} = t.duplicate)
-    AND (:categories IS NULL OR t.categoryId IN (:categories))
-    AND CASE
-        WHEN (:#{#request.isCategorized} IS NULL) THEN true
-        WHEN (:#{#request.isCategorized} = true) THEN (t.categoryId IS NOT NULL)
-        ELSE (t.categoryId IS NULL)
-    END
   """)
   fun searchForTransaction(
     @Param("request") request: SearchTransactionsRequest,
-    @Param("categories") categories: List<TypedId<CategoryId>>?,
+    //    @Param("categories") categories: List<TypedId<CategoryId>>?,
     page: Pageable
   ): Page<Transaction>
 
