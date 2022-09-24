@@ -1,6 +1,7 @@
 package io.craigmiller160.expensetrackerapi.data.querydsl
 
 import com.querydsl.core.BooleanBuilder
+import com.querydsl.core.types.dsl.BooleanExpression
 import com.querydsl.core.types.dsl.PathBuilderFactory
 import com.querydsl.jpa.JPQLQuery
 import javax.persistence.EntityManager
@@ -10,7 +11,7 @@ import org.springframework.stereotype.Component
 
 typealias QueryEnhancer<T> = (JPQLQuery<T>) -> JPQLQuery<T>
 
-typealias QueryCondition<T> = (T) -> BooleanBuilder
+typealias QueryCondition<T> = (T) -> BooleanExpression
 
 typealias WhereEnhancer = (BooleanBuilder) -> BooleanBuilder
 
@@ -28,7 +29,7 @@ class QueryDSLSupport(private val entityManager: EntityManager) {
     builder: BooleanBuilder,
     value: T?,
     condition: QueryCondition<T>
-  ): BooleanBuilder = value?.let { condition(it) } ?: builder
+  ): BooleanBuilder = value?.let { builder.and(condition(it)) } ?: builder
 
   fun <T> andIfNotNull(value: T?, condition: QueryCondition<T>): WhereEnhancer = { builder ->
     andIfNotNull(builder, value, condition)

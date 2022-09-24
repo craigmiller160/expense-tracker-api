@@ -74,10 +74,15 @@ class TransactionRepositoryCustomImpl(
   ): Page<Transaction> {
     val whereClause =
       BooleanBuilder()
-        .let { builder ->
-          request.startDate?.let { builder.and(QTransaction.transaction.expenseDate.goe(it)) }
-            ?: builder
-        }
+        .let(
+          queryDslSupport.andIfNotNull(request.startDate) {
+            QTransaction.transaction.expenseDate.goe(it)
+          })
+        //        .let { builder ->
+        //          request.startDate?.let {
+        // builder.and(QTransaction.transaction.expenseDate.goe(it)) }
+        //            ?: builder
+        //        }
         .let { builder ->
           request.endDate?.let { builder.and(QTransaction.transaction.expenseDate.loe(it)) }
             ?: builder
