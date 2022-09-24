@@ -70,23 +70,37 @@ class TransactionRepositoryCustomImpl(
     request: SearchTransactionsRequest,
     page: Pageable
   ): Page<Transaction> {
-    val whereBuilder =
+    val whereClause =
       BooleanBuilder()
-        .apply { request.startDate?.let { this.and(QTransaction.transaction.expenseDate.goe(it)) } }
-        .apply { request.endDate?.let { this.and(QTransaction.transaction.expenseDate.loe(it)) } }
-        .apply { request.isConfirmed?.let { this.and(QTransaction.transaction.confirmed.eq(it)) } }
-        .apply { request.isDuplicate?.let { this.and(QTransaction.transaction.duplicate.eq(it)) } }
-        .apply {
-          request.categoryIds?.let { this.and(QTransaction.transaction.categoryId.`in`(it)) }
+        .let { builder ->
+          request.startDate?.let { builder.and(QTransaction.transaction.expenseDate.goe(it)) }
+            ?: builder
         }
-        .apply {
+        .let { builder ->
+          request.endDate?.let { builder.and(QTransaction.transaction.expenseDate.loe(it)) }
+            ?: builder
+        }
+        .let { builder ->
+          request.isConfirmed?.let { builder.and(QTransaction.transaction.confirmed.eq(it)) }
+            ?: builder
+        }
+        .let { builder ->
+          request.isDuplicate?.let { builder.and(QTransaction.transaction.duplicate.eq(it)) }
+            ?: builder
+        }
+        .let { builder ->
+          request.categoryIds?.let { builder.and(QTransaction.transaction.categoryId.`in`(it)) }
+            ?: builder
+        }
+        .let { builder ->
           request.isCategorized?.let {
             if (it) {
-              this.and(QTransaction.transaction.categoryId.isNotNull)
+              builder.and(QTransaction.transaction.categoryId.isNotNull)
             } else {
-              this.and(QTransaction.transaction.categoryId.isNull)
+              builder.and(QTransaction.transaction.categoryId.isNull)
             }
           }
+            ?: builder
         }
 
     val baseQuery = queryFactory.query().from(QTransaction.transaction)
