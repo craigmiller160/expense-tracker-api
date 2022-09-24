@@ -19,7 +19,7 @@ class TransactionRepositoryCustomImpl(private val entityManager: EntityManager) 
     private const val SEARCH_FOR_TRANSACTIONS =
       """
             SELECT CASE
-                WHEN :isCountQuery THEN COUNT(t)
+                WHEN :isCountQuery = true THEN COUNT(t)
                 ELSE t
             END
             FROM Transaction t
@@ -62,7 +62,7 @@ class TransactionRepositoryCustomImpl(private val entityManager: EntityManager) 
     categories: List<TypedId<CategoryId>>?
   ): Query =
     entityManager
-      .createQuery(SEARCH_FOR_TRANSACTIONS)
+      .createQuery(SEARCH_FOR_TRANSACTIONS, Transaction::class.java)
       .setParameter("startDate", request.startDate)
       .setParameter("endDate", request.endDate)
       .setParameter("isConfirmed", request.isConfirmed)
