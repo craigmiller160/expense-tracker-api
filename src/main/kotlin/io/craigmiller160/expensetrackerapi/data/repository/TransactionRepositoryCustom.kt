@@ -14,4 +14,9 @@ interface TransactionRepositoryCustom {
     categories: List<TypedId<CategoryId>>?,
     page: Pageable
   ): Page<Transaction>
+
+  fun searchForTransactions3(
+    request: SearchTransactionsRequest, // TODO update the categoryIds property in this object
+    page: Pageable
+  ): Page<Transaction>
 }

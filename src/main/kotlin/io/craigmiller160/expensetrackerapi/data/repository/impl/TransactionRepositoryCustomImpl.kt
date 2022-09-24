@@ -61,6 +61,13 @@ class TransactionRepositoryCustomImpl(private val entityManager: EntityManager) 
     return PageImpl(results, page, count)
   }
 
+  override fun searchForTransactions3(
+    request: SearchTransactionsRequest,
+    page: Pageable
+  ): Page<Transaction> {
+    TODO("Not yet implemented")
+  }
+
   private fun createBaseSearchForTransactionsQuery(
     request: SearchTransactionsRequest,
     categories: List<TypedId<CategoryId>>?
