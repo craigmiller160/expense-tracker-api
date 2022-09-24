@@ -4,10 +4,7 @@ import io.craigmiller160.expensetrackerapi.common.data.typedid.TypedId
 import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.CategoryId
 import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.TransactionId
 import io.craigmiller160.expensetrackerapi.data.model.Transaction
-import io.craigmiller160.expensetrackerapi.web.types.SearchTransactionsRequest
 import java.time.LocalDate
-import org.springframework.data.domain.Page
-import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor
 import org.springframework.data.jpa.repository.Modifying
@@ -42,26 +39,26 @@ interface TransactionRepository :
   )
 
   // TODO maybe delete this
-  @Query(
-    """
-    SELECT t
-    FROM Transaction t
-    WHERE (:#{#request.startDate} IS NULL OR :#{#request.startDate} >= t.expenseDate)
-    AND (:#{#request.endDate} IS NULL OR :#{#request.endDate} <= t.expenseDate)
-    AND (:#{#request.isConfirmed} IS NULL OR :#{#request.isConfirmed} = t.confirmed)
-    AND (:#{#request.isDuplicate} IS NULL OR :#{#request.isDuplicate} = t.duplicate)
-    AND (:categories IS NULL OR t.categoryId IN (:categories))
-    AND CASE
-        WHEN (:#{#request.isCategorized} IS NULL) THEN true
-        WHEN (:#{#request.isCategorized} = true) THEN (t.categoryId IS NOT NULL)
-        ELSE (t.categoryId IS NULL)
-    END
-  """)
-  fun searchForTransaction(
-    @Param("request") request: SearchTransactionsRequest,
-    @Param("categories") categories: List<TypedId<CategoryId>>?,
-    page: Pageable
-  ): Page<Transaction>
+  //  @Query(
+  //    """
+  //    SELECT t
+  //    FROM Transaction t
+  //    WHERE (:#{#request.startDate} IS NULL OR :#{#request.startDate} >= t.expenseDate)
+  //    AND (:#{#request.endDate} IS NULL OR :#{#request.endDate} <= t.expenseDate)
+  //    AND (:#{#request.isConfirmed} IS NULL OR :#{#request.isConfirmed} = t.confirmed)
+  //    AND (:#{#request.isDuplicate} IS NULL OR :#{#request.isDuplicate} = t.duplicate)
+  //    AND (:categories IS NULL OR t.categoryId IN (:categories))
+  //    AND CASE
+  //        WHEN (:#{#request.isCategorized} IS NULL) THEN true
+  //        WHEN (:#{#request.isCategorized} = true) THEN (t.categoryId IS NOT NULL)
+  //        ELSE (t.categoryId IS NULL)
+  //    END
+  //  """)
+  //  fun searchForTransaction(
+  //    @Param("request") request: SearchTransactionsRequest,
+  //    @Param("categories") categories: List<TypedId<CategoryId>>?,
+  //    page: Pageable
+  //  ): Page<Transaction>
 
   @Query(
     """
