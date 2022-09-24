@@ -76,27 +76,27 @@ class TransactionRepositoryCustomImpl(
     val whereClause =
       BooleanBuilder(QTransaction.transaction.userId.eq(userId))
         .let(
-          queryDslSupport.andIfNotNull(request.startDate) {
+          QueryDSLSupport.andIfNotNull(request.startDate) {
             QTransaction.transaction.expenseDate.goe(it)
           })
         .let(
-          queryDslSupport.andIfNotNull(request.endDate) {
+          QueryDSLSupport.andIfNotNull(request.endDate) {
             QTransaction.transaction.expenseDate.loe(it)
           })
         .let(
-          queryDslSupport.andIfNotNull(request.isConfirmed) {
+          QueryDSLSupport.andIfNotNull(request.isConfirmed) {
             QTransaction.transaction.confirmed.eq(it)
           })
         .let(
-          queryDslSupport.andIfNotNull(request.isDuplicate) {
+          QueryDSLSupport.andIfNotNull(request.isDuplicate) {
             QTransaction.transaction.duplicate.eq(it)
           })
         .let(
-          queryDslSupport.andIfNotNull(request.categoryIds) {
+          QueryDSLSupport.andIfNotNull(request.categoryIds) {
             QTransaction.transaction.categoryId.`in`(it)
           })
         .let(
-          queryDslSupport.andIfNotNull(request.isCategorized) {
+          QueryDSLSupport.andIfNotNull(request.isCategorized) {
             if (it) {
               QTransaction.transaction.categoryId.isNotNull
             } else {
