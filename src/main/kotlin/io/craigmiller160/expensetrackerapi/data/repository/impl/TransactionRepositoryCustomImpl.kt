@@ -78,37 +78,30 @@ class TransactionRepositoryCustomImpl(
           queryDslSupport.andIfNotNull(request.startDate) {
             QTransaction.transaction.expenseDate.goe(it)
           })
-        //        .let { builder ->
-        //          request.startDate?.let {
-        // builder.and(QTransaction.transaction.expenseDate.goe(it)) }
-        //            ?: builder
-        //        }
-        .let { builder ->
-          request.endDate?.let { builder.and(QTransaction.transaction.expenseDate.loe(it)) }
-            ?: builder
-        }
-        .let { builder ->
-          request.isConfirmed?.let { builder.and(QTransaction.transaction.confirmed.eq(it)) }
-            ?: builder
-        }
-        .let { builder ->
-          request.isDuplicate?.let { builder.and(QTransaction.transaction.duplicate.eq(it)) }
-            ?: builder
-        }
-        .let { builder ->
-          request.categoryIds?.let { builder.and(QTransaction.transaction.categoryId.`in`(it)) }
-            ?: builder
-        }
-        .let { builder ->
-          request.isCategorized?.let {
+        .let(
+          queryDslSupport.andIfNotNull(request.endDate) {
+            QTransaction.transaction.expenseDate.loe(it)
+          })
+        .let(
+          queryDslSupport.andIfNotNull(request.isConfirmed) {
+            QTransaction.transaction.confirmed.eq(it)
+          })
+        .let(
+          queryDslSupport.andIfNotNull(request.isDuplicate) {
+            QTransaction.transaction.duplicate.eq(it)
+          })
+        .let(
+          queryDslSupport.andIfNotNull(request.categoryIds) {
+            QTransaction.transaction.categoryId.`in`(it)
+          })
+        .let(
+          queryDslSupport.andIfNotNull(request.isCategorized) {
             if (it) {
-              builder.and(QTransaction.transaction.categoryId.isNotNull)
+              QTransaction.transaction.categoryId.isNotNull
             } else {
-              builder.and(QTransaction.transaction.categoryId.isNull)
+              QTransaction.transaction.categoryId.isNull
             }
-          }
-            ?: builder
-        }
+          })
 
     val baseQuery = queryFactory.query().from(QTransaction.transaction).where(whereClause)
 
