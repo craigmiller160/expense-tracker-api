@@ -16,7 +16,8 @@ interface TransactionRepositoryCustom {
   ): Page<Transaction>
 
   fun searchForTransactions3(
-    request: SearchTransactionsRequest, // TODO update the categoryIds property in this object
+    request: SearchTransactionsRequest,
+    userId: Long,
     page: Pageable
   ): Page<Transaction>
 }

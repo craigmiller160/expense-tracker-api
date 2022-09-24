@@ -70,10 +70,11 @@ class TransactionRepositoryCustomImpl(
 
   override fun searchForTransactions3(
     request: SearchTransactionsRequest,
+    userId: Long,
     page: Pageable
   ): Page<Transaction> {
     val whereClause =
-      BooleanBuilder()
+      BooleanBuilder(QTransaction.transaction.userId.eq(userId))
         .let(
           queryDslSupport.andIfNotNull(request.startDate) {
             QTransaction.transaction.expenseDate.goe(it)
