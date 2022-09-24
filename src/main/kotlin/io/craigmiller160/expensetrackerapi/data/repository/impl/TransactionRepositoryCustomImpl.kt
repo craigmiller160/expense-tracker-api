@@ -1,7 +1,10 @@
 package io.craigmiller160.expensetrackerapi.data.repository.impl
 
+import com.querydsl.core.BooleanBuilder
+import com.querydsl.jpa.impl.JPAQueryFactory
 import io.craigmiller160.expensetrackerapi.common.data.typedid.TypedId
 import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.CategoryId
+import io.craigmiller160.expensetrackerapi.data.model.QTransaction
 import io.craigmiller160.expensetrackerapi.data.model.Transaction
 import io.craigmiller160.expensetrackerapi.data.repository.TransactionRepositoryCustom
 import io.craigmiller160.expensetrackerapi.web.types.SearchTransactionsRequest
@@ -13,8 +16,10 @@ import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Repository
 
 @Repository
-class TransactionRepositoryCustomImpl(private val entityManager: EntityManager) :
-  TransactionRepositoryCustom {
+class TransactionRepositoryCustomImpl(
+  private val entityManager: EntityManager,
+  private val queryFactory: JPAQueryFactory
+) : TransactionRepositoryCustom {
   companion object {
     private const val TEMP =
       """
@@ -65,6 +70,27 @@ class TransactionRepositoryCustomImpl(private val entityManager: EntityManager) 
     request: SearchTransactionsRequest,
     page: Pageable
   ): Page<Transaction> {
+    val whereBuilder =
+      BooleanBuilder()
+        .apply { request.startDate?.let { this.and(QTransaction.transaction.expenseDate.goe(it)) } }
+        .apply { request.endDate?.let { this.and(QTransaction.transaction.expenseDate.loe(it)) } }
+        .apply { request.isConfirmed?.let { this.and(QTransaction.transaction.confirmed.eq(it)) } }
+        .apply { request.isDuplicate?.let { this.and(QTransaction.transaction.duplicate.eq(it)) } }
+        .apply {
+          request.categoryIds?.let { this.and(QTransaction.transaction.categoryId.`in`(it)) }
+        }
+        .apply {
+          request.isCategorized?.let {
+            if (it) {
+              this.and(QTransaction.transaction.categoryId.isNotNull)
+            } else {
+              this.and(QTransaction.transaction.categoryId.isNull)
+            }
+          }
+        }
+
+    val baseQuery = queryFactory.query().from(QTransaction.transaction)
+
     TODO("Not yet implemented")
   }
 
