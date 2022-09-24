@@ -2,7 +2,7 @@ package io.craigmiller160.expensetrackerapi.testcontainers
 
 import org.testcontainers.containers.PostgreSQLContainer
 
-class PostgresContainer : PostgreSQLContainer<PostgresContainer>("postgres:12.5") {
+class PostgresContainer : PostgreSQLContainer<PostgresContainer>("postgres:14.5") {
   companion object {
     val INSTANCE = PostgresContainer()
   }
