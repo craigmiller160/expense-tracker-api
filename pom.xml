@@ -315,6 +315,7 @@
                     <sql>
                         <includes>
                             <include>src/main/resources/db/migration/*.sql</include>
+                            <include>src/main/resources/db/dev/migration/*.sql</include>
                         </includes>
                         <dbeaver />
                     </sql>
