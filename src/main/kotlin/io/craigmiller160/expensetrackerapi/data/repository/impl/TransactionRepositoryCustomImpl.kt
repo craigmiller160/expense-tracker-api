@@ -109,7 +109,7 @@ class TransactionRepositoryCustomImpl(
     val results =
       baseQuery
         .select(QTransaction.transaction)
-        .let { queryDslSupport.applyPagination(it, page, Transaction::class.java) }
+        .let(queryDslSupport.applyPagination(page, Transaction::class.java))
         .fetch()
 
     return PageImpl(results, page, count)
