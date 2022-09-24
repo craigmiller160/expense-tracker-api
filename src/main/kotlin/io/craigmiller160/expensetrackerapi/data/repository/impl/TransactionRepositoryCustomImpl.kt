@@ -103,9 +103,12 @@ class TransactionRepositoryCustomImpl(
             ?: builder
         }
 
-    val baseQuery = queryFactory.query().from(QTransaction.transaction)
+    val baseQuery = queryFactory.query().from(QTransaction.transaction).where(whereClause)
 
-    TODO("Not yet implemented")
+    val count = baseQuery.select(QTransaction.transaction.count()).fetchFirst()
+    val results = baseQuery.select(QTransaction.transaction).fetch()
+
+    return PageImpl(results, page, count)
   }
 
   private fun createBaseSearchForTransactionsQuery(
