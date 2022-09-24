@@ -28,11 +28,11 @@ class TransactionRepositoryCustomImpl(private val entityManager: EntityManager) 
             AND (:isConfirmed IS NULL OR :isConfirmed = t.confirmed)
             AND (:isDuplicate IS NULL OR :isDuplicate = t.duplicate)
             AND (:categories IS NULL OR t.categoryId IN (:categories))
-            AND CASE
-                WHEN (:isCategorized IS NULL) THEN true
-                WHEN (:isCategorized = true) THEN (t.categoryId IS NOT NULL)
-                ELSE (t.categoryId IS NULL)
-            END
+            AND (
+                :isCategorized IS NULL OR 
+                (:isCategorized = true AND t.categoryId IS NOT NULL) OR
+                (:isCategorized = false AND t.categoryId IS NULL)
+            )
         """
   }
   override fun searchForTransactions2(
