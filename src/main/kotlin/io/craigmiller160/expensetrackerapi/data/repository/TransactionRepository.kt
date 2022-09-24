@@ -15,7 +15,9 @@ import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.query.Param
 
 interface TransactionRepository :
-  JpaRepository<Transaction, TypedId<TransactionId>>, JpaSpecificationExecutor<Transaction> {
+  JpaRepository<Transaction, TypedId<TransactionId>>,
+  JpaSpecificationExecutor<Transaction>,
+  TransactionRepositoryCustom {
   fun findAllByOrderByExpenseDateAsc(): List<Transaction>
 
   @Query(
@@ -39,6 +41,7 @@ interface TransactionRepository :
     @Param("userId") userId: Long
   )
 
+  // TODO maybe delete this
   @Query(
     """
     SELECT t
