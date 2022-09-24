@@ -101,11 +101,10 @@ class TransactionService(
     val pageable = PageRequest.of(request.pageNumber, request.pageSize, sort)
     val categoryMapEither = getCategoryMap(userId)
     return categoryMapEither
-      .map { categories ->
-        request.categoryIds?.let { ids -> ids.filter { categories.contains(it) } }
-      }
+      .map { categories -> request.categoryIds?.filter { categories.contains(it) }?.toSet() }
       .map { filteredCategories ->
-        transactionRepository.searchForTransactions2(request, filteredCategories, pageable)
+        transactionRepository.searchForTransactions3(
+          request.copy(categoryIds = filteredCategories), pageable)
       }
       .flatMap { page -> categoryMapEither.map { Pair(page, it) } }
       .map { (page, categories) -> SearchTransactionsResponse.from(page, categories) }
