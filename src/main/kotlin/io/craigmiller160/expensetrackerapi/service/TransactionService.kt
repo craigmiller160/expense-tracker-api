@@ -103,7 +103,7 @@ class TransactionService(
     return categoryMapEither
       .map { categories -> request.categoryIds?.filter { categories.contains(it) }?.toSet() }
       .map { filteredCategories ->
-        transactionRepository.searchForTransactions3(
+        transactionRepository.searchForTransactions(
           request.copy(categoryIds = filteredCategories), userId, pageable)
       }
       .flatMap { page -> categoryMapEither.map { Pair(page, it) } }
