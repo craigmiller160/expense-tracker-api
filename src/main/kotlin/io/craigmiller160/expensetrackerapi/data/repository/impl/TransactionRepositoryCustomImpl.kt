@@ -1,7 +1,7 @@
 package io.craigmiller160.expensetrackerapi.data.repository.impl
 
 import io.craigmiller160.expensetrackerapi.common.data.typedid.TypedId
-import io.craigmiller160.expensetrackerapi.data.model.Category
+import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.CategoryId
 import io.craigmiller160.expensetrackerapi.data.model.Transaction
 import io.craigmiller160.expensetrackerapi.data.repository.TransactionRepositoryCustom
 import io.craigmiller160.expensetrackerapi.web.types.SearchTransactionsRequest
@@ -37,7 +37,7 @@ class TransactionRepositoryCustomImpl(private val entityManager: EntityManager) 
   }
   override fun searchForTransactions2(
     request: SearchTransactionsRequest,
-    categories: List<TypedId<Category>>,
+    categories: List<TypedId<CategoryId>>?,
     page: Pageable
   ): Page<Transaction> {
     // TODO all of this needs to be re-usable
@@ -58,7 +58,7 @@ class TransactionRepositoryCustomImpl(private val entityManager: EntityManager) 
 
   private fun createBaseSearchForTransactionsQuery(
     request: SearchTransactionsRequest,
-    categories: List<TypedId<Category>>
+    categories: List<TypedId<CategoryId>>?
   ): Query =
     entityManager
       .createQuery(SEARCH_FOR_TRANSACTIONS)
