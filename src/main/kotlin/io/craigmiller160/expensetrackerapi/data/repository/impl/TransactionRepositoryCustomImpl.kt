@@ -62,7 +62,7 @@ class TransactionRepositoryCustomImpl(private val entityManager: EntityManager) 
     categories: List<TypedId<CategoryId>>?
   ): Query =
     entityManager
-      .createQuery(SEARCH_FOR_TRANSACTIONS, Transaction::class.java)
+      .createQuery(SEARCH_FOR_TRANSACTIONS)
       .setParameter("startDate", request.startDate)
       .setParameter("endDate", request.endDate)
       .setParameter("isConfirmed", request.isConfirmed)
