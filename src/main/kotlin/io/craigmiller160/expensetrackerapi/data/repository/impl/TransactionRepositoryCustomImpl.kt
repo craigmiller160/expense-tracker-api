@@ -27,13 +27,13 @@ class TransactionRepositoryCustomImpl(private val entityManager: EntityManager) 
       """
             SELECT t
             FROM Transaction t
-            WHERE (CAST(:startDate AS LocalDate) IS NULL OR :startDate >= t.expenseDate)
-            AND (CAST(:endDate AS LocalDate) IS NULL OR :endDate <= t.expenseDate)
-            AND (:isConfirmed IS NULL OR :isConfirmed = t.confirmed)
-            AND (:isDuplicate IS NULL OR :isDuplicate = t.duplicate)
-            AND (CAST(:categories AS List) IS NULL OR t.categoryId IN (:categories))
+            WHERE (COALESCE(:startDate, null) IS NULL OR :startDate >= t.expenseDate)
+            AND (COALESCE(:endDate, null) IS NULL OR :endDate <= t.expenseDate)
+            AND (COALESCE(:isConfirmed, null) IS NULL OR :isConfirmed = t.confirmed)
+            AND (COALESCE(:isDuplicate, null) IS NULL OR :isDuplicate = t.duplicate)
+            AND (COALESCE(:categories, null) IS NULL OR t.categoryId IN (:categories))
             AND (
-                CAST(:isCategorized AS boolean) IS NULL OR 
+                COALESCE(:isCategorized, null) IS NULL OR 
                 (:isCategorized = true AND t.categoryId IS NOT NULL) OR
                 (:isCategorized = false AND t.categoryId IS NULL)
             )
