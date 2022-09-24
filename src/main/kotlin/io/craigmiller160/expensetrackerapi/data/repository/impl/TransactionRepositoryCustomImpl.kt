@@ -16,12 +16,16 @@ import org.springframework.stereotype.Repository
 class TransactionRepositoryCustomImpl(private val entityManager: EntityManager) :
   TransactionRepositoryCustom {
   companion object {
-    private const val SEARCH_FOR_TRANSACTIONS =
+    private const val TEMP =
       """
-            SELECT CASE
+          SELECT CASE
                 WHEN :isCountQuery = true THEN COUNT(t)
                 ELSE t
             END
+      """
+    private const val SEARCH_FOR_TRANSACTIONS =
+      """
+            SELECT t
             FROM Transaction t
             WHERE (:startDate IS NULL OR :startDate >= t.expenseDate)
             AND (:endDate IS NULL OR :endDate <= t.expenseDate)
@@ -41,13 +45,13 @@ class TransactionRepositoryCustomImpl(private val entityManager: EntityManager) 
     page: Pageable
   ): Page<Transaction> {
     // TODO all of this needs to be re-usable
-    val count =
-      createBaseSearchForTransactionsQuery(request, categories)
-        .setParameter("isCountQuery", true)
-        .singleResult as Long
+    val count = 0L
+    //      createBaseSearchForTransactionsQuery(request, categories)
+    //        .setParameter("isCountQuery", true)
+    //        .singleResult as Long
     val results =
       createBaseSearchForTransactionsQuery(request, categories)
-        .setParameter("isCountQuery", false)
+        //        .setParameter("isCountQuery", false)
         .let {
           it.firstResult = page.pageNumber * page.pageSize
           it.maxResults = page.pageSize
