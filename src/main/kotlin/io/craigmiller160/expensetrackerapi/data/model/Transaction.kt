@@ -18,15 +18,15 @@ import org.hibernate.annotations.TypeDef
 @Table(name = "transactions")
 @TypeDef(defaultForType = TypedId::class, typeClass = TypedIdJpaType::class)
 data class Transaction(
-    val userId: Long,
-    val expenseDate: LocalDate,
-    val description: String,
-    val amount: BigDecimal,
-    val confirmed: Boolean = false,
-    val duplicate: Boolean = false,
-    val categoryId: TypedId<CategoryId>? = null,
-    @Id override val id: TypedId<TransactionId> = TypedId(),
-    override val created: ZonedDateTime = ZonedDateTime.now(),
-    override var updated: ZonedDateTime = ZonedDateTime.now(),
-    @Version override val version: Long = 1
+  val userId: Long,
+  val expenseDate: LocalDate,
+  val description: String,
+  val amount: BigDecimal,
+  val confirmed: Boolean = false,
+  val duplicate: Boolean = false,
+  val categoryId: TypedId<CategoryId>? = null,
+  @Id override val id: TypedId<TransactionId> = TypedId(),
+  override val created: ZonedDateTime = ZonedDateTime.now(),
+  override var updated: ZonedDateTime = ZonedDateTime.now(),
+  @Version override val version: Long = 1
 ) : MutableEntity<TransactionId>

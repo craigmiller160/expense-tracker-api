@@ -8,7 +8,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 
 @Configuration
 @ComponentScan(
-    basePackages = ["io.craigmiller160.webutils.controller", "io.craigmiller160.webutils.security"])
+  basePackages = ["io.craigmiller160.webutils.controller", "io.craigmiller160.webutils.security"])
 class WebUtilsConfig(private val requestLogger: RequestLogger) : WebMvcConfigurer {
   override fun addInterceptors(registry: InterceptorRegistry) {
     registry.addInterceptor(requestLogger).addPathPatterns("/**")

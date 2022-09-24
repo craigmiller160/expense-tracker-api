@@ -12,11 +12,13 @@ import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.query.Param
 
 interface TransactionRepository :
-    JpaRepository<Transaction, TypedId<TransactionId>>, JpaSpecificationExecutor<Transaction> {
+  JpaRepository<Transaction, TypedId<TransactionId>>,
+  JpaSpecificationExecutor<Transaction>,
+  TransactionRepositoryCustom {
   fun findAllByOrderByExpenseDateAsc(): List<Transaction>
 
   @Query(
-      """
+    """
     UPDATE Transaction t
     SET t.categoryId = (
         SELECT c.id
@@ -31,13 +33,13 @@ interface TransactionRepository :
   """)
   @Modifying(flushAutomatically = true, clearAutomatically = true)
   fun setTransactionCategory(
-      @Param("transactionId") transactionId: TypedId<TransactionId>,
-      @Param("categoryId") categoryId: TypedId<CategoryId>,
-      @Param("userId") userId: Long
+    @Param("transactionId") transactionId: TypedId<TransactionId>,
+    @Param("categoryId") categoryId: TypedId<CategoryId>,
+    @Param("userId") userId: Long
   )
 
   @Query(
-      """
+    """
       UPDATE Transaction t
       SET t.confirmed = :confirmed, 
         t.version = t.version + 1
@@ -46,25 +48,25 @@ interface TransactionRepository :
   """)
   @Modifying(flushAutomatically = true, clearAutomatically = true)
   fun confirmTransaction(
-      @Param("transactionId") transactionId: TypedId<TransactionId>,
-      @Param("confirmed") confirmed: Boolean,
-      @Param("userId") userId: Long
+    @Param("transactionId") transactionId: TypedId<TransactionId>,
+    @Param("confirmed") confirmed: Boolean,
+    @Param("userId") userId: Long
   )
 
   @Query(
-      """
+    """
       DELETE FROM Transaction t
       WHERE t.id IN (:transactionIds)
       AND t.userId = :userId
   """)
   @Modifying(flushAutomatically = true, clearAutomatically = true)
   fun deleteTransactions(
-      @Param("transactionIds") transactionIds: Set<TypedId<TransactionId>>,
-      @Param("userId") userId: Long
+    @Param("transactionIds") transactionIds: Set<TypedId<TransactionId>>,
+    @Param("userId") userId: Long
   )
 
   @Query(
-      """
+    """
       UPDATE Transaction t
       SET t.categoryId = null, 
         t.version = t.version + 1
@@ -78,12 +80,12 @@ interface TransactionRepository :
   """)
   @Modifying(flushAutomatically = true, clearAutomatically = true)
   fun removeCategoryFromAllTransactions(
-      @Param("userId") userId: Long,
-      @Param("categoryId") categoryId: TypedId<CategoryId>
+    @Param("userId") userId: Long,
+    @Param("categoryId") categoryId: TypedId<CategoryId>
   )
 
   @Query(
-      """
+    """
       UPDATE Transaction t
       SET t.categoryId = null
       WHERE t.id = :transactionId
@@ -91,12 +93,12 @@ interface TransactionRepository :
   """)
   @Modifying(flushAutomatically = true, clearAutomatically = true)
   fun removeTransactionCategory(
-      @Param("transactionId") transactionId: TypedId<TransactionId>,
-      @Param("userId") userId: Long
+    @Param("transactionId") transactionId: TypedId<TransactionId>,
+    @Param("userId") userId: Long
   )
 
   @Query(
-      """
+    """
       SELECT COUNT(t)
       FROM Transaction t
       WHERE t.userId = :userId
@@ -105,7 +107,7 @@ interface TransactionRepository :
   fun countAllUnconfirmed(@Param("userId") userId: Long): Long
 
   @Query(
-      """
+    """
         SELECT MIN(t.expenseDate)
         FROM Transaction t
         WHERE t.userId = :userId
@@ -114,7 +116,7 @@ interface TransactionRepository :
   fun getOldestUnconfirmedDate(@Param("userId") userId: Long): LocalDate?
 
   @Query(
-      """
+    """
       SELECT COUNT(t)
       FROM Transaction t
       WHERE t.userId = :userId
@@ -123,7 +125,7 @@ interface TransactionRepository :
   fun countAllUncategorized(@Param("userId") userId: Long): Long
 
   @Query(
-      """
+    """
       SELECT MIN(t.expenseDate)
       FROM Transaction t
       WHERE t.userId = :userId
@@ -132,7 +134,7 @@ interface TransactionRepository :
   fun getOldestUncategorizedDate(@Param("userId") userId: Long): LocalDate?
 
   @Query(
-      """
+    """
       SELECT COUNT(t)
       FROM Transaction t
       WHERE t.userId = :userId
@@ -141,7 +143,7 @@ interface TransactionRepository :
   fun countAllDuplicates(@Param("userId") userId: Long): Long
 
   @Query(
-      """
+    """
       SELECT MIN(t.expenseDate)
       FROM Transaction t
       WHERE t.userId = :userId

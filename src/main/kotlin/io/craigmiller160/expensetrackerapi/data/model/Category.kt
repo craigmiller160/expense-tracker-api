@@ -15,10 +15,10 @@ import org.hibernate.annotations.TypeDef
 @Table(name = "categories")
 @TypeDef(defaultForType = TypedId::class, typeClass = TypedIdJpaType::class)
 data class Category(
-    val name: String,
-    val userId: Long,
-    @Id override val id: TypedId<CategoryId> = TypedId(),
-    override val created: ZonedDateTime = ZonedDateTime.now(),
-    override var updated: ZonedDateTime = ZonedDateTime.now(),
-    @Version override val version: Long = 1
+  val name: String,
+  val userId: Long,
+  @Id override val id: TypedId<CategoryId> = TypedId(),
+  override val created: ZonedDateTime = ZonedDateTime.now(),
+  override var updated: ZonedDateTime = ZonedDateTime.now(),
+  @Version override val version: Long = 1
 ) : MutableEntity<CategoryId>

@@ -24,29 +24,29 @@ import org.springframework.web.bind.annotation.RestController
 class TransactionController(private val transactionService: TransactionService) {
   @GetMapping
   fun search(@Valid request: SearchTransactionsRequest): TryEither<SearchTransactionsResponse> =
-      transactionService.search(request)
+    transactionService.search(request)
 
   @DeleteMapping
   @ResponseStatus(HttpStatus.NO_CONTENT)
   fun deleteTransactions(@RequestBody request: DeleteTransactionsRequest): TryEither<Unit> =
-      transactionService.deleteTransactions(request)
+    transactionService.deleteTransactions(request)
 
   @PutMapping("/categorize")
   @ResponseStatus(HttpStatus.NO_CONTENT)
   fun categorizeTransactions(@RequestBody request: CategorizeTransactionsRequest): TryEither<Unit> =
-      transactionService.categorizeTransactions(request.transactionsAndCategories)
+    transactionService.categorizeTransactions(request.transactionsAndCategories)
 
   @PutMapping("/confirm")
   @ResponseStatus(HttpStatus.NO_CONTENT)
   fun confirmTransactions(@RequestBody request: ConfirmTransactionsRequest): TryEither<Unit> =
-      transactionService.confirmTransactions(request.transactionsToConfirm)
+    transactionService.confirmTransactions(request.transactionsToConfirm)
 
   @GetMapping("/needs-attention")
   fun getNeedsAttention(): TryEither<NeedsAttentionResponse> =
-      transactionService.getNeedsAttention()
+    transactionService.getNeedsAttention()
 
   @PutMapping
   @ResponseStatus(HttpStatus.NO_CONTENT)
   fun updateTransactions(@RequestBody request: UpdateTransactionsRequest): TryEither<Unit> =
-      transactionService.updateTransactions(request)
+    transactionService.updateTransactions(request)
 }

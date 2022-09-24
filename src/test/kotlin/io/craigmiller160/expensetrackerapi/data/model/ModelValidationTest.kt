@@ -29,9 +29,9 @@ class ModelValidationTest : BaseIntegrationTest() {
     assertThat(newCountry.id).isEqualTo(country.id)
 
     val ex =
-        assertThrows<InvalidDataAccessApiUsageException> {
-          countryRepository.saveAndFlush(newCountry)
-        }
+      assertThrows<InvalidDataAccessApiUsageException> {
+        countryRepository.saveAndFlush(newCountry)
+      }
     assertThat(ex.cause).isNotNull.isInstanceOf(IllegalStateException::class.java)
   }
 

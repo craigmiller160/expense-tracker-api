@@ -18,20 +18,20 @@ class ChaseCsvTransactionParser : AbstractCsvTransactionParser() {
   override val numberOfColumns: Int = 8
 
   override fun getTransaction(
-      userId: Long,
-      fieldExtractor: FieldExtractor
+    userId: Long,
+    fieldExtractor: FieldExtractor
   ): TryEither<Transaction> =
-      either.eager {
-        val rawDate = fieldExtractor(1, "postingDate").bind()
-        val expenseDate = Either.catch { LocalDate.parse(rawDate, DATE_FORMAT) }.bind()
-        val description = fieldExtractor(2, "description").bind()
-        val rawAmount = fieldExtractor(3, "amount").bind()
-        val amount = Either.catch { BigDecimal(rawAmount).times(BigDecimal("-1")) }.bind()
-        Transaction(
-            userId = userId, expenseDate = expenseDate, description = description, amount = amount)
-      }
+    either.eager {
+      val rawDate = fieldExtractor(1, "postingDate").bind()
+      val expenseDate = Either.catch { LocalDate.parse(rawDate, DATE_FORMAT) }.bind()
+      val description = fieldExtractor(2, "description").bind()
+      val rawAmount = fieldExtractor(3, "amount").bind()
+      val amount = Either.catch { BigDecimal(rawAmount).times(BigDecimal("-1")) }.bind()
+      Transaction(
+        userId = userId, expenseDate = expenseDate, description = description, amount = amount)
+    }
 
   /** Because of parsing logic, negative amounts are deposits, not expenses */
   override fun includeTransaction(transaction: Transaction): Boolean =
-      transaction.amount >= BigDecimal("0")
+    transaction.amount >= BigDecimal("0")
 }

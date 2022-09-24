@@ -1,0 +1,68 @@
+package io.craigmiller160.expensetrackerapi.data.repository.impl
+
+import com.querydsl.core.BooleanBuilder
+import com.querydsl.jpa.impl.JPAQueryFactory
+import io.craigmiller160.expensetrackerapi.data.model.QTransaction
+import io.craigmiller160.expensetrackerapi.data.model.Transaction
+import io.craigmiller160.expensetrackerapi.data.querydsl.QueryDSLSupport
+import io.craigmiller160.expensetrackerapi.data.repository.TransactionRepositoryCustom
+import io.craigmiller160.expensetrackerapi.web.types.SearchTransactionsRequest
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.PageImpl
+import org.springframework.data.domain.Pageable
+import org.springframework.stereotype.Repository
+
+@Repository
+class TransactionRepositoryCustomImpl(
+  private val queryFactory: JPAQueryFactory,
+  private val queryDslSupport: QueryDSLSupport
+) : TransactionRepositoryCustom {
+
+  override fun searchForTransactions(
+    request: SearchTransactionsRequest,
+    userId: Long,
+    page: Pageable
+  ): Page<Transaction> {
+    val whereClause =
+      BooleanBuilder(QTransaction.transaction.userId.eq(userId))
+        .let(
+          QueryDSLSupport.andIfNotNull(request.startDate) {
+            QTransaction.transaction.expenseDate.goe(it)
+          })
+        .let(
+          QueryDSLSupport.andIfNotNull(request.endDate) {
+            QTransaction.transaction.expenseDate.loe(it)
+          })
+        .let(
+          QueryDSLSupport.andIfNotNull(request.isConfirmed) {
+            QTransaction.transaction.confirmed.eq(it)
+          })
+        .let(
+          QueryDSLSupport.andIfNotNull(request.isDuplicate) {
+            QTransaction.transaction.duplicate.eq(it)
+          })
+        .let(
+          QueryDSLSupport.andIfNotNull(request.categoryIds) {
+            QTransaction.transaction.categoryId.`in`(it)
+          })
+        .let(
+          QueryDSLSupport.andIfNotNull(request.isCategorized) {
+            if (it) {
+              QTransaction.transaction.categoryId.isNotNull
+            } else {
+              QTransaction.transaction.categoryId.isNull
+            }
+          })
+
+    val baseQuery = queryFactory.query().from(QTransaction.transaction).where(whereClause)
+
+    val count = baseQuery.select(QTransaction.transaction.count()).fetchFirst()
+    val results =
+      baseQuery
+        .select(QTransaction.transaction)
+        .let(queryDslSupport.applyPagination(page, Transaction::class.java))
+        .fetch()
+
+    return PageImpl(results, page, count)
+  }
+}

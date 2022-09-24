@@ -7,6 +7,6 @@ import io.craigmiller160.expensetrackerapi.data.model.Category
 data class CategoryResponse(val id: TypedId<CategoryId>, val name: String) {
   companion object {
     fun from(category: Category): CategoryResponse =
-        CategoryResponse(id = category.id, name = category.name)
+      CategoryResponse(id = category.id, name = category.name)
   }
 }

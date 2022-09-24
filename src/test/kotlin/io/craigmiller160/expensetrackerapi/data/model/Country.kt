@@ -13,7 +13,7 @@ import org.hibernate.annotations.TypeDef
 @Table(name = "countries")
 @TypeDef(defaultForType = TypedId::class, typeClass = TypedIdJpaType::class)
 data class Country(
-    val name: String,
-    @Id override val id: TypedId<CountryId> = TypedId(),
-    override val created: ZonedDateTime = ZonedDateTime.now()
+  val name: String,
+  @Id override val id: TypedId<CountryId> = TypedId(),
+  override val created: ZonedDateTime = ZonedDateTime.now()
 ) : ImmutableEntity<CountryId>

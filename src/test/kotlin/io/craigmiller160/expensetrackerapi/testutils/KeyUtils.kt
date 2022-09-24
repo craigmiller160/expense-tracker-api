@@ -16,10 +16,10 @@ object KeyUtils {
 
   fun createJwkSet(keyPair: KeyPair): JWKSet {
     val builder =
-        RSAKey.Builder(keyPair.public as RSAPublicKey)
-            .keyUse(KeyUse.SIGNATURE)
-            .algorithm(JWSAlgorithm.RS256)
-            .keyID("oauth-jwt")
+      RSAKey.Builder(keyPair.public as RSAPublicKey)
+        .keyUse(KeyUse.SIGNATURE)
+        .algorithm(JWSAlgorithm.RS256)
+        .keyID("oauth-jwt")
     return JWKSet(builder.build())
   }
 }

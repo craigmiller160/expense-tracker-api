@@ -12,22 +12,22 @@ import org.springframework.stereotype.Service
 
 @Service
 class TransactionImportService(
-    private val transactionRepository: TransactionRepository,
-    private val transactionParserManager: TransactionParserManager,
-    private val oAuth2Service: OAuth2Service
+  private val transactionRepository: TransactionRepository,
+  private val transactionParserManager: TransactionParserManager,
+  private val oAuth2Service: OAuth2Service
 ) {
   fun getImportTypes(): List<ImportTypeResponse> =
-      TransactionImportType.values().map { ImportTypeResponse(it.name, it.displayName) }
+    TransactionImportType.values().map { ImportTypeResponse(it.name, it.displayName) }
 
   fun importTransactions(
-      type: TransactionImportType,
-      stream: InputStream
+    type: TransactionImportType,
+    stream: InputStream
   ): TryEither<ImportTransactionsResponse> {
     val parser = transactionParserManager.getParserForType(type)
     val authUser = oAuth2Service.getAuthenticatedUser()
     return parser
-        .parse(authUser.userId, stream)
-        .flatMapCatch { transactions -> transactionRepository.saveAll(transactions) }
-        .map { transactions -> ImportTransactionsResponse(transactions.size) }
+      .parse(authUser.userId, stream)
+      .flatMapCatch { transactions -> transactionRepository.saveAll(transactions) }
+      .map { transactions -> ImportTransactionsResponse(transactions.size) }
   }
 }
