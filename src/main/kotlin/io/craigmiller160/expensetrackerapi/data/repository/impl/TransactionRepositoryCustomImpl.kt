@@ -6,6 +6,7 @@ import io.craigmiller160.expensetrackerapi.common.data.typedid.TypedId
 import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.CategoryId
 import io.craigmiller160.expensetrackerapi.data.model.QTransaction
 import io.craigmiller160.expensetrackerapi.data.model.Transaction
+import io.craigmiller160.expensetrackerapi.data.querydsl.QueryDSLSupport
 import io.craigmiller160.expensetrackerapi.data.repository.TransactionRepositoryCustom
 import io.craigmiller160.expensetrackerapi.web.types.SearchTransactionsRequest
 import javax.persistence.EntityManager
@@ -18,7 +19,8 @@ import org.springframework.stereotype.Repository
 @Repository
 class TransactionRepositoryCustomImpl(
   private val entityManager: EntityManager,
-  private val queryFactory: JPAQueryFactory
+  private val queryFactory: JPAQueryFactory,
+  private val queryDslSupport: QueryDSLSupport
 ) : TransactionRepositoryCustom {
   companion object {
     private const val TEMP =
@@ -106,7 +108,11 @@ class TransactionRepositoryCustomImpl(
     val baseQuery = queryFactory.query().from(QTransaction.transaction).where(whereClause)
 
     val count = baseQuery.select(QTransaction.transaction.count()).fetchFirst()
-    val results = baseQuery.select(QTransaction.transaction).fetch()
+    val results =
+      baseQuery
+        .select(QTransaction.transaction)
+        .let { queryDslSupport.applyPagination(it, page, Transaction::class.java) }
+        .fetch()
 
     return PageImpl(results, page, count)
   }
