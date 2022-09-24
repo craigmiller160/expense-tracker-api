@@ -47,6 +47,7 @@ class TransactionRepositoryCustomImpl(private val entityManager: EntityManager) 
         .singleResult as Long
     val results =
       createBaseSearchForTransactionsQuery(request, categories)
+        .setParameter("isCountQuery", false)
         .let {
           it.firstResult = page.pageNumber * page.pageSize
           it.maxResults = page.pageSize
