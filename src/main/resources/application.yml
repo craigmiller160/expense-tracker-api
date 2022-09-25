@@ -23,7 +23,7 @@ spring:
       ddl-auto: none
   datasource:
     host: craigmiller160.ddns.net
-    port: "30001"
+    port: "30019"
     db_name: "expense_tracker_dev"
     username: postgres_root
     password: ${POSTGRES_ROOT_PASSWORD}
