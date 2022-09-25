@@ -43,8 +43,8 @@ oauth2:
   cookie-path: "/expense-tracker"
   insecure-paths: "/actuator/health"
   auth-server-host: https://localhost:7003
-  client-key: 33adb74a-1239-4d49-95d2-a2006aa2503f
-  client-secret: 4f97c36c-1323-414a-b16c-310cd69709c6
+  client-key: 3a870448-5add-4471-8f1b-a81526f6c20d
+  client-secret: 91dc7023-b76c-4594-926b-e33136cc8ad8
 
 logging:
   level:
