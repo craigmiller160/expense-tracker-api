@@ -14,39 +14,6 @@ import org.springframework.data.domain.Pageable
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.stereotype.Repository
 
-const val GET_ALL_NEEDS_ATTENTION_SQL =
-  """
-      SELECT 
-        'UNCONFIRMED', 
-        COUNT(t)
-      FROM 
-        transactions t
-      WHERE 
-        t.user_id = :userId
-      AND 
-        t.confirmed = false
-      UNION
-      SELECT 
-        'DUPLICATE', 
-        COUNT(t)
-      FROM 
-        transactions t
-      WHERE 
-        t.user_id = :userId
-      AND 
-        t.duplicate = true
-      UNION
-      SELECT 
-        'UNCATEGORIZED', 
-        COUNT(t)
-      FROM 
-        transactions t
-      WHERE 
-        t.user_id = :userId
-      AND 
-        t.category_id IS NULL
-    """
-
 @Repository
 class TransactionRepositoryCustomImpl(
   private val queryFactory: JPAQueryFactory,
