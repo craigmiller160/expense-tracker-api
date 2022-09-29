@@ -11,15 +11,51 @@ import io.craigmiller160.expensetrackerapi.web.types.SearchTransactionsRequest
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.Pageable
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.stereotype.Repository
+
+const val GET_ALL_NEEDS_ATTENTION_SQL =
+  """
+      SELECT 
+        'UNCONFIRMED', 
+        COUNT(t)
+      FROM 
+        transactions t
+      WHERE 
+        t.user_id = :userId
+      AND 
+        t.confirmed = false
+      UNION
+      SELECT 
+        'DUPLICATE', 
+        COUNT(t)
+      FROM 
+        transactions t
+      WHERE 
+        t.user_id = :userId
+      AND 
+        t.duplicate = true
+      UNION
+      SELECT 
+        'UNCATEGORIZED', 
+        COUNT(t)
+      FROM 
+        transactions t
+      WHERE 
+        t.user_id = :userId
+      AND 
+        t.category_id IS NULL
+    """
 
 @Repository
 class TransactionRepositoryCustomImpl(
   private val queryFactory: JPAQueryFactory,
-  private val queryDslSupport: QueryDSLSupport
+  private val queryDslSupport: QueryDSLSupport,
+  private val jdbcTemplate: NamedParameterJdbcTemplate
 ) : TransactionRepositoryCustom {
 
   override fun getAllNeedsAttentionCounts(userId: Long): List<NeedsAttentionCount> {
+    queryFactory.query()
     TODO("Not yet implemented")
   }
 
