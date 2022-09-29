@@ -91,34 +91,34 @@ class TransactionImportControllerTest : BaseIntegrationTest() {
             }
             .andExpect {
               status { isOk() }
-              content { json("""{"transactionsImported":19}""") }
+              content { json("""{"transactionsImported":23}""") }
             }
         }
       }
       .shouldBeRight()
 
     val transactions = transactionRepository.findAllByOrderByExpenseDateAsc()
-    assertThat(transactions).hasSize(19)
+    assertThat(transactions).hasSize(23)
 
     assertThat(transactions.first())
       .hasFieldOrPropertyWithValue("userId", 1L)
       .hasFieldOrPropertyWithValue("expenseDate", LocalDate.of(2022, 5, 23))
       .hasFieldOrPropertyWithValue(
         "description", "FID BKG SVC LLC  MONEYLINE                  PPD ID: 1035141383")
-      .hasFieldOrPropertyWithValue("amount", BigDecimal("250.00"))
+      .hasFieldOrPropertyWithValue("amount", BigDecimal("-250.00"))
 
     assertThat(transactions[transactions.size - 3])
       .hasFieldOrPropertyWithValue("userId", 1L)
       .hasFieldOrPropertyWithValue("expenseDate", LocalDate.of(2022, 6, 15))
       .hasFieldOrPropertyWithValue(
         "description", "C89303 CLEARSPEN DIR DEP                    PPD ID: 4462283648")
-      .hasFieldOrPropertyWithValue("amount", BigDecimal("-4097.76"))
+      .hasFieldOrPropertyWithValue("amount", BigDecimal("4097.76"))
 
     assertThat(transactions.last())
       .hasFieldOrPropertyWithValue("userId", 1L)
       .hasFieldOrPropertyWithValue("expenseDate", LocalDate.of(2022, 6, 15))
       .hasFieldOrPropertyWithValue(
         "description", "FRONTIER COMM CORP WE 800-921-8101 CT        06/14")
-      .hasFieldOrPropertyWithValue("amount", BigDecimal("64.99"))
+      .hasFieldOrPropertyWithValue("amount", BigDecimal("-64.99"))
   }
 }
