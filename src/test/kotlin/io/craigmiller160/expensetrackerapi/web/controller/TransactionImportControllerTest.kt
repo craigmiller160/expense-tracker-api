@@ -19,7 +19,6 @@ import org.springframework.test.web.servlet.multipart
 
 class TransactionImportControllerTest : BaseIntegrationTest() {
   @Autowired private lateinit var transactionRepository: TransactionRepository
-  // TODO need all expenses to be negative
   @Test
   fun getImportTypes() {
     val expectedResponse =

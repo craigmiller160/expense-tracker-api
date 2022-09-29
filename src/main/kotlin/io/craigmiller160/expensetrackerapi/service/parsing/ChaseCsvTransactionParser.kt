@@ -31,7 +31,7 @@ class ChaseCsvTransactionParser : TransactionParser {
       val expenseDate = LocalDate.parse(rawDate, DATE_FORMAT)
       val description = row[2]
       val rawAmount = row[3]
-      val amount = BigDecimal(rawAmount) // TODO multiple by -1 or no?
+      val amount = BigDecimal(rawAmount)
       Transaction(
         userId = userId, expenseDate = expenseDate, description = description, amount = amount)
     }
