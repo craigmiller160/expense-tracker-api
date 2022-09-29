@@ -64,7 +64,7 @@ class TransactionImportControllerTest : BaseIntegrationTest() {
       .hasFieldOrPropertyWithValue("description", "PARTY CITY 1084 TAMPA FL01837R")
       .hasFieldOrPropertyWithValue("amount", BigDecimal("-36.87"))
 
-    assertThat(transactions[transactions.size - 14])
+    assertThat(transactions[41])
       .hasFieldOrPropertyWithValue("userId", 1L)
       .hasFieldOrPropertyWithValue("expenseDate", LocalDate.of(2022, 5, 9))
       .hasFieldOrPropertyWithValue(
