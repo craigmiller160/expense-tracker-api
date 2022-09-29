@@ -1,4 +1,4 @@
 UPDATE
     transactions t
 SET
-    amount = t.amount * 1;
+    amount = t.amount *- 1;
