@@ -91,7 +91,11 @@ class TransactionService(
         duplicate =
           CountAndOldest(
             count = needsAttentionCounts[NeedsAttentionType.DUPLICATE]!!.count,
-            oldest = needsAttentionOldest[NeedsAttentionType.DUPLICATE]?.date))
+            oldest = needsAttentionOldest[NeedsAttentionType.DUPLICATE]?.date),
+        possibleRefund =
+          CountAndOldest(
+            count = needsAttentionCounts[NeedsAttentionType.POSSIBLE_REFUND]!!.count,
+            oldest = needsAttentionOldest[NeedsAttentionType.POSSIBLE_REFUND]?.date))
     }
   }
 
