@@ -62,20 +62,20 @@ class TransactionImportControllerTest : BaseIntegrationTest() {
       .hasFieldOrPropertyWithValue("userId", 1L)
       .hasFieldOrPropertyWithValue("expenseDate", LocalDate.of(2022, 4, 18))
       .hasFieldOrPropertyWithValue("description", "WAWA 5127 TAMPA FL")
-      .hasFieldOrPropertyWithValue("amount", BigDecimal("44.72"))
+      .hasFieldOrPropertyWithValue("amount", BigDecimal("-44.72"))
 
     assertThat(transactions[transactions.size - 14])
       .hasFieldOrPropertyWithValue("userId", 1L)
       .hasFieldOrPropertyWithValue("expenseDate", LocalDate.of(2022, 9, 5))
       .hasFieldOrPropertyWithValue(
         "description", "DIRECTPAY FULL BALANCESEE DETAILS OF YOUR NEXT DIRECTPAY BELOW")
-      .hasFieldOrPropertyWithValue("amount", BigDecimal("-1928.54"))
+      .hasFieldOrPropertyWithValue("amount", BigDecimal("1928.54"))
 
     assertThat(transactions.last())
       .hasFieldOrPropertyWithValue("userId", 1L)
       .hasFieldOrPropertyWithValue("expenseDate", LocalDate.of(2022, 5, 18))
       .hasFieldOrPropertyWithValue("description", "PANDA EXPRESS 1679 RIVERVIEW FL")
-      .hasFieldOrPropertyWithValue("amount", BigDecimal("5.81"))
+      .hasFieldOrPropertyWithValue("amount", BigDecimal("-5.81"))
   }
 
   @Test
