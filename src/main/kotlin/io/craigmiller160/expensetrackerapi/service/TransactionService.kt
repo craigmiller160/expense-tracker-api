@@ -8,6 +8,7 @@ import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.CategoryId
 import io.craigmiller160.expensetrackerapi.data.model.Category
 import io.craigmiller160.expensetrackerapi.data.model.toColumnName
 import io.craigmiller160.expensetrackerapi.data.model.toSpringSortDirection
+import io.craigmiller160.expensetrackerapi.data.projection.NeedsAttentionType
 import io.craigmiller160.expensetrackerapi.data.repository.CategoryRepository
 import io.craigmiller160.expensetrackerapi.data.repository.TransactionRepository
 import io.craigmiller160.expensetrackerapi.function.TryEither
@@ -73,17 +74,20 @@ class TransactionService(
   fun getNeedsAttention(): TryEither<NeedsAttentionResponse> {
     val userId = oAuth2Service.getAuthenticatedUser().userId
     return Either.catch {
-      transactionRepository.countAllDuplicates(userId)
-      val unconfirmedCount = transactionRepository.countAllUnconfirmed(userId)
-      val oldestUnconfirmed = transactionRepository.getOldestUnconfirmedDate(userId)
-      val duplicateCount = transactionRepository.countAllDuplicates(userId)
-      val oldestDuplicate = transactionRepository.getOldestDuplicate(userId)
-      val uncategorizedCount = transactionRepository.countAllUncategorized(userId)
-      val oldestUncategorized = transactionRepository.getOldestUncategorizedDate(userId)
+      val needsAttentionCounts =
+        transactionRepository.getAllNeedsAttentionCounts(userId).associateBy { it.type }
+      val needsAttentionOldest =
+        transactionRepository.getAllNeedsAttentionOldest(userId).associateBy { it.type }
 
       NeedsAttentionResponse(
-        unconfirmed = CountAndOldest(count = unconfirmedCount, oldest = oldestUnconfirmed),
-        uncategorized = CountAndOldest(count = uncategorizedCount, oldest = oldestUncategorized),
+        unconfirmed =
+          CountAndOldest(
+            count = needsAttentionCounts[NeedsAttentionType.UNCONFIRMED]!!.count,
+            oldest = needsAttentionOldest[NeedsAttentionType.UNCONFIRMED]!!.date),
+        uncategorized =
+          CountAndOldest(
+            count = needsAttentionCounts[NeedsAttentionType.UNCATEGORIZED]!!.count,
+            oldest = needsAttentionOldest[NeedsAttentionType.UNCATEGORIZED]!!.date),
         duplicate = CountAndOldest(count = duplicateCount, oldest = oldestDuplicate))
     }
   }
