@@ -1,22 +1,22 @@
 SELECT
-    'UNCONFIRMED',
-    MIN( t.expense_date )
+    'UNCONFIRMED' AS TYPE,
+    MIN( t.expense_date ) AS oldest
 FROM
     transactions t
 WHERE
     t.user_id =:userId
     AND t.confirmed = FALSE
 UNION SELECT
-    'DUPLICATE',
-    MIN( t.expense_date )
+    'DUPLICATE' AS TYPE,
+    MIN( t.expense_date ) AS oldest
 FROM
     transactions t
 WHERE
     t.user_id =:userId
     AND t.duplicate = TRUE
 UNION SELECT
-    'UNCATEGORIZED',
-    MIN( t.expense_date )
+    'UNCATEGORIZED' AS TYPE,
+    MIN( t.expense_date ) AS oldest
 FROM
     transactions t
 WHERE

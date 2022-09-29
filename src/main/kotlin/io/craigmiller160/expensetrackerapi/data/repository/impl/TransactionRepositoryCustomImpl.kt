@@ -6,6 +6,7 @@ import io.craigmiller160.expensetrackerapi.data.SqlLoader
 import io.craigmiller160.expensetrackerapi.data.model.QTransaction
 import io.craigmiller160.expensetrackerapi.data.model.Transaction
 import io.craigmiller160.expensetrackerapi.data.projection.NeedsAttentionCount
+import io.craigmiller160.expensetrackerapi.data.projection.NeedsAttentionOldest
 import io.craigmiller160.expensetrackerapi.data.projection.NeedsAttentionType
 import io.craigmiller160.expensetrackerapi.data.querydsl.QueryDSLSupport
 import io.craigmiller160.expensetrackerapi.data.repository.TransactionRepositoryCustom
@@ -22,6 +23,12 @@ private val needsAttentionCountRowMapper: RowMapper<NeedsAttentionCount> = RowMa
   NeedsAttentionCount(NeedsAttentionType.valueOf(rs.getString("type")), rs.getLong("count"))
 }
 
+private val needsAttentionOldestRowMapper: RowMapper<NeedsAttentionOldest> =
+  RowMapper { rs, index ->
+    NeedsAttentionOldest(
+      NeedsAttentionType.valueOf(rs.getString("type")), rs.getDate("oldest").toLocalDate())
+  }
+
 @Repository
 class TransactionRepositoryCustomImpl(
   private val queryFactory: JPAQueryFactory,
@@ -31,10 +38,15 @@ class TransactionRepositoryCustomImpl(
 ) : TransactionRepositoryCustom {
 
   override fun getAllNeedsAttentionCounts(userId: Long): List<NeedsAttentionCount> {
-    val sql = sqlLoader.loadSql("get_all_needs_attention_counts.sql")
+    val countSql = sqlLoader.loadSql("get_all_needs_attention_counts.sql")
+    val oldestSql = sqlLoader.loadSql("get_all_needs_attention_oldest.sql")
     val params = MapSqlParameterSource().addValue("userId", userId)
     val needsAttentionCounts =
-      jdbcTemplate.query(sql, params, needsAttentionCountRowMapper).associateBy { it.type }
+      jdbcTemplate.query(countSql, params, needsAttentionCountRowMapper).associateBy { it.type }
+
+    val needsAttentionOldest =
+      jdbcTemplate.query(oldestSql, params, needsAttentionOldestRowMapper).associateBy { it.type }
+
     TODO("Not yet implemented")
   }
 
