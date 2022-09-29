@@ -31,7 +31,7 @@ class DiscoverCsvTransactionParser : TransactionParser {
       val expenseDate = LocalDate.parse(transactionDate, DATE_FORMAT)
       val description = row[2]
       val rawAmount = row[3]
-      val amount = BigDecimal(rawAmount)
+      val amount = BigDecimal(rawAmount).times(BigDecimal("-1"))
       Transaction(
         userId = userId, expenseDate = expenseDate, description = description, amount = amount)
     }
