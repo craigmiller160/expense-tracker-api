@@ -20,6 +20,7 @@ import io.craigmiller160.expensetrackerapi.web.types.TransactionSortKey
 import io.craigmiller160.expensetrackerapi.web.types.TransactionToConfirm
 import io.craigmiller160.expensetrackerapi.web.types.TransactionToUpdate
 import io.craigmiller160.expensetrackerapi.web.types.UpdateTransactionsRequest
+import java.math.BigDecimal
 import java.time.LocalDate
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
@@ -318,11 +319,15 @@ class TransactionControllerTest : BaseIntegrationTest() {
       transactionRepository.saveAndFlush(user1Transactions[0].copy(confirmed = false))
     val oldestDuplicate =
       transactionRepository.saveAndFlush(user1Transactions[2].copy(duplicate = true))
+    val oldestPossibleRefund =
+      transactionRepository.saveAndFlush(
+        user1Transactions[3].copy(amount = user1Transactions[3].amount * BigDecimal("-1")))
     val response =
       NeedsAttentionResponse(
         unconfirmed = CountAndOldest(count = 4, oldest = oldestUnconfirmed.expenseDate),
         uncategorized = CountAndOldest(count = 3, oldest = user1Transactions[1].expenseDate),
-        duplicate = CountAndOldest(count = 1, oldest = oldestDuplicate.expenseDate))
+        duplicate = CountAndOldest(count = 1, oldest = oldestDuplicate.expenseDate),
+        possibleRefund = CountAndOldest(count = 1, oldest = oldestPossibleRefund.expenseDate))
     mockMvc
       .get("/transactions/needs-attention") {
         secure = true
@@ -344,7 +349,8 @@ class TransactionControllerTest : BaseIntegrationTest() {
       NeedsAttentionResponse(
         unconfirmed = CountAndOldest(count = 0, oldest = null),
         uncategorized = CountAndOldest(count = 0, oldest = null),
-        duplicate = CountAndOldest(count = 0, oldest = null))
+        duplicate = CountAndOldest(count = 0, oldest = null),
+        possibleRefund = CountAndOldest(count = 0, oldest = null))
     mockMvc
       .get("/transactions/needs-attention") {
         secure = true

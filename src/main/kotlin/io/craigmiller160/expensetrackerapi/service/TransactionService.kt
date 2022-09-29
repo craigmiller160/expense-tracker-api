@@ -8,6 +8,7 @@ import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.CategoryId
 import io.craigmiller160.expensetrackerapi.data.model.Category
 import io.craigmiller160.expensetrackerapi.data.model.toColumnName
 import io.craigmiller160.expensetrackerapi.data.model.toSpringSortDirection
+import io.craigmiller160.expensetrackerapi.data.projection.NeedsAttentionType
 import io.craigmiller160.expensetrackerapi.data.repository.CategoryRepository
 import io.craigmiller160.expensetrackerapi.data.repository.TransactionRepository
 import io.craigmiller160.expensetrackerapi.function.TryEither
@@ -72,21 +73,29 @@ class TransactionService(
   @Transactional
   fun getNeedsAttention(): TryEither<NeedsAttentionResponse> {
     val userId = oAuth2Service.getAuthenticatedUser().userId
-    return either.eager {
-      val unconfirmedCount =
-        Either.catch { transactionRepository.countAllUnconfirmed(userId) }.bind()
-      val oldestUnconfirmed =
-        Either.catch { transactionRepository.getOldestUnconfirmedDate(userId) }.bind()
-      val uncategorizedCount =
-        Either.catch { transactionRepository.countAllUncategorized(userId) }.bind()
-      val oldestUncategorized =
-        Either.catch { transactionRepository.getOldestUncategorizedDate(userId) }.bind()
-      val duplicateCount = Either.catch { transactionRepository.countAllDuplicates(userId) }.bind()
-      val oldestDuplicate = Either.catch { transactionRepository.getOldestDuplicate(userId) }.bind()
+    return Either.catch {
+      val needsAttentionCounts =
+        transactionRepository.getAllNeedsAttentionCounts(userId).associateBy { it.type }
+      val needsAttentionOldest =
+        transactionRepository.getAllNeedsAttentionOldest(userId).associateBy { it.type }
+
       NeedsAttentionResponse(
-        unconfirmed = CountAndOldest(count = unconfirmedCount, oldest = oldestUnconfirmed),
-        uncategorized = CountAndOldest(count = uncategorizedCount, oldest = oldestUncategorized),
-        duplicate = CountAndOldest(count = duplicateCount, oldest = oldestDuplicate))
+        unconfirmed =
+          CountAndOldest(
+            count = needsAttentionCounts[NeedsAttentionType.UNCONFIRMED]!!.count,
+            oldest = needsAttentionOldest[NeedsAttentionType.UNCONFIRMED]?.date),
+        uncategorized =
+          CountAndOldest(
+            count = needsAttentionCounts[NeedsAttentionType.UNCATEGORIZED]!!.count,
+            oldest = needsAttentionOldest[NeedsAttentionType.UNCATEGORIZED]?.date),
+        duplicate =
+          CountAndOldest(
+            count = needsAttentionCounts[NeedsAttentionType.DUPLICATE]!!.count,
+            oldest = needsAttentionOldest[NeedsAttentionType.DUPLICATE]?.date),
+        possibleRefund =
+          CountAndOldest(
+            count = needsAttentionCounts[NeedsAttentionType.POSSIBLE_REFUND]!!.count,
+            oldest = needsAttentionOldest[NeedsAttentionType.POSSIBLE_REFUND]?.date))
     }
   }
 
