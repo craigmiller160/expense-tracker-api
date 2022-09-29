@@ -72,17 +72,14 @@ class TransactionService(
   @Transactional
   fun getNeedsAttention(): TryEither<NeedsAttentionResponse> {
     val userId = oAuth2Service.getAuthenticatedUser().userId
-    return either.eager {
-      val unconfirmedCount =
-        Either.catch { transactionRepository.countAllUnconfirmed(userId) }.bind()
-      val oldestUnconfirmed =
-        Either.catch { transactionRepository.getOldestUnconfirmedDate(userId) }.bind()
-      val uncategorizedCount =
-        Either.catch { transactionRepository.countAllUncategorized(userId) }.bind()
-      val oldestUncategorized =
-        Either.catch { transactionRepository.getOldestUncategorizedDate(userId) }.bind()
-      val duplicateCount = Either.catch { transactionRepository.countAllDuplicates(userId) }.bind()
-      val oldestDuplicate = Either.catch { transactionRepository.getOldestDuplicate(userId) }.bind()
+    return Either.catch {
+      val unconfirmedCount = transactionRepository.countAllUnconfirmed(userId)
+      val oldestUnconfirmed = transactionRepository.getOldestUnconfirmedDate(userId)
+      val duplicateCount = transactionRepository.countAllDuplicates(userId)
+      val oldestDuplicate = transactionRepository.getOldestDuplicate(userId)
+      val uncategorizedCount = transactionRepository.countAllUncategorized(userId)
+      val oldestUncategorized = transactionRepository.getOldestUncategorizedDate(userId)
+
       NeedsAttentionResponse(
         unconfirmed = CountAndOldest(count = unconfirmedCount, oldest = oldestUnconfirmed),
         uncategorized = CountAndOldest(count = uncategorizedCount, oldest = oldestUncategorized),
