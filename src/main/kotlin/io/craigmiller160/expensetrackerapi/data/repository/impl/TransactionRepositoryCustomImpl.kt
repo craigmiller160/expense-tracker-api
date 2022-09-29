@@ -31,7 +31,7 @@ class TransactionRepositoryCustomImpl(
 ) : TransactionRepositoryCustom {
 
   override fun getAllNeedsAttentionCounts(userId: Long): List<NeedsAttentionCount> {
-    val sql = sqlLoader.loadSql("get_all_needs_attention.sql")
+    val sql = sqlLoader.loadSql("get_all_needs_attention_counts.sql")
     val params = MapSqlParameterSource().addValue("userId", userId)
     val needsAttentionCounts =
       jdbcTemplate.query(sql, params, needsAttentionCountRowMapper).associateBy { it.type }
