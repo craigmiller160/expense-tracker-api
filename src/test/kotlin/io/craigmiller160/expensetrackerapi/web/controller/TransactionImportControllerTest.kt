@@ -100,6 +100,13 @@ class TransactionImportControllerTest : BaseIntegrationTest() {
         "description", "FID BKG SVC LLC  MONEYLINE                  PPD ID: 1035141383")
       .hasFieldOrPropertyWithValue("amount", BigDecimal("250.00"))
 
+    assertThat(transactions[transactions.size - 3])
+      .hasFieldOrPropertyWithValue("userId", 1L)
+      .hasFieldOrPropertyWithValue("expenseDate", LocalDate.of(2022, 6, 15))
+      .hasFieldOrPropertyWithValue(
+        "description", "C89303 CLEARSPEN DIR DEP                    PPD ID: 4462283648")
+      .hasFieldOrPropertyWithValue("amount", BigDecimal("-4097.76"))
+
     assertThat(transactions.last())
       .hasFieldOrPropertyWithValue("userId", 1L)
       .hasFieldOrPropertyWithValue("expenseDate", LocalDate.of(2022, 6, 15))
