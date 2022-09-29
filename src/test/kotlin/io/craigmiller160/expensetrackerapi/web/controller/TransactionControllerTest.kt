@@ -327,7 +327,7 @@ class TransactionControllerTest : BaseIntegrationTest() {
         unconfirmed = CountAndOldest(count = 4, oldest = oldestUnconfirmed.expenseDate),
         uncategorized = CountAndOldest(count = 3, oldest = user1Transactions[1].expenseDate),
         duplicate = CountAndOldest(count = 1, oldest = oldestDuplicate.expenseDate),
-        possibleRefund = CountAndOldest(count = 1, oldest = null))
+        possibleRefund = CountAndOldest(count = 1, oldest = oldestPossibleRefund.expenseDate))
     mockMvc
       .get("/transactions/needs-attention") {
         secure = true
