@@ -73,6 +73,7 @@ class TransactionService(
   fun getNeedsAttention(): TryEither<NeedsAttentionResponse> {
     val userId = oAuth2Service.getAuthenticatedUser().userId
     return Either.catch {
+      transactionRepository.countAllDuplicates(userId)
       val unconfirmedCount = transactionRepository.countAllUnconfirmed(userId)
       val oldestUnconfirmed = transactionRepository.getOldestUnconfirmedDate(userId)
       val duplicateCount = transactionRepository.countAllDuplicates(userId)

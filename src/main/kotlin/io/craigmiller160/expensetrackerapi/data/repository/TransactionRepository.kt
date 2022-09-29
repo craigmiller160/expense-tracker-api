@@ -109,8 +109,8 @@ interface TransactionRepository :
 
   @Query(
     """
-    SELECT io.craigmiller160.expensetrackerapi.data.projection.NeedsAttentionCount(
-        io.craigmiller160.expensetrackerapi.data.projection.NeedsAttentionType.UNCONFIRMED, 
+    SELECT new io.craigmiller160.expensetrackerapi.data.projection.NeedsAttentionCount(
+        'UNCONFIRMED', 
         COUNT(t)
     )
     FROM Transaction t
