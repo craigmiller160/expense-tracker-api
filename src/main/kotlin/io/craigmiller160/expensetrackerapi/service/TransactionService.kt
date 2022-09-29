@@ -83,12 +83,15 @@ class TransactionService(
         unconfirmed =
           CountAndOldest(
             count = needsAttentionCounts[NeedsAttentionType.UNCONFIRMED]!!.count,
-            oldest = needsAttentionOldest[NeedsAttentionType.UNCONFIRMED]!!.date),
+            oldest = needsAttentionOldest[NeedsAttentionType.UNCONFIRMED]?.date),
         uncategorized =
           CountAndOldest(
             count = needsAttentionCounts[NeedsAttentionType.UNCATEGORIZED]!!.count,
-            oldest = needsAttentionOldest[NeedsAttentionType.UNCATEGORIZED]!!.date),
-        duplicate = CountAndOldest(count = duplicateCount, oldest = oldestDuplicate))
+            oldest = needsAttentionOldest[NeedsAttentionType.UNCATEGORIZED]?.date),
+        duplicate =
+          CountAndOldest(
+            count = needsAttentionCounts[NeedsAttentionType.DUPLICATE]!!.count,
+            oldest = needsAttentionOldest[NeedsAttentionType.DUPLICATE]?.date))
     }
   }
 
