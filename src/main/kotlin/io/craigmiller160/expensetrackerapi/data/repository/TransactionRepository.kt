@@ -15,7 +15,7 @@ interface TransactionRepository :
   JpaRepository<Transaction, TypedId<TransactionId>>,
   JpaSpecificationExecutor<Transaction>,
   TransactionRepositoryCustom {
-  fun findAllByOrderByExpenseDateAsc(): List<Transaction>
+  fun findAllByOrderByExpenseDateAscDescriptionAsc(): List<Transaction>
 
   @Query(
     """
