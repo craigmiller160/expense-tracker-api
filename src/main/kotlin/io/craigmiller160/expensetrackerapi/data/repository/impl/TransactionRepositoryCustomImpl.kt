@@ -4,6 +4,7 @@ import com.querydsl.core.BooleanBuilder
 import com.querydsl.jpa.impl.JPAQueryFactory
 import io.craigmiller160.expensetrackerapi.data.model.QTransaction
 import io.craigmiller160.expensetrackerapi.data.model.Transaction
+import io.craigmiller160.expensetrackerapi.data.projection.NeedsAttentionCount
 import io.craigmiller160.expensetrackerapi.data.querydsl.QueryDSLSupport
 import io.craigmiller160.expensetrackerapi.data.repository.TransactionRepositoryCustom
 import io.craigmiller160.expensetrackerapi.web.types.SearchTransactionsRequest
@@ -17,6 +18,10 @@ class TransactionRepositoryCustomImpl(
   private val queryFactory: JPAQueryFactory,
   private val queryDslSupport: QueryDSLSupport
 ) : TransactionRepositoryCustom {
+
+  override fun getAllNeedsAttentionCounts(userId: Long): List<NeedsAttentionCount> {
+    TODO("Not yet implemented")
+  }
 
   override fun searchForTransactions(
     request: SearchTransactionsRequest,
