@@ -54,7 +54,7 @@ class TransactionImportControllerTest : BaseIntegrationTest() {
       }
       .shouldBeRight()
 
-    val transactions = transactionRepository.findAllByOrderByExpenseDateAsc()
+    val transactions = transactionRepository.findAllByOrderByExpenseDateAscDescriptionAsc()
     assertThat(transactions).hasSize(57)
 
     assertThat(transactions.first())
@@ -97,7 +97,7 @@ class TransactionImportControllerTest : BaseIntegrationTest() {
       }
       .shouldBeRight()
 
-    val transactions = transactionRepository.findAllByOrderByExpenseDateAsc()
+    val transactions = transactionRepository.findAllByOrderByExpenseDateAscDescriptionAsc()
     assertThat(transactions).hasSize(23)
 
     assertThat(transactions.first())
@@ -107,14 +107,14 @@ class TransactionImportControllerTest : BaseIntegrationTest() {
         "description", "FID BKG SVC LLC  MONEYLINE                  PPD ID: 1035141383")
       .hasFieldOrPropertyWithValue("amount", BigDecimal("-250.00"))
 
-    assertThat(transactions[transactions.size - 3])
+    assertThat(transactions[20])
       .hasFieldOrPropertyWithValue("userId", 1L)
       .hasFieldOrPropertyWithValue("expenseDate", LocalDate.of(2022, 6, 15))
       .hasFieldOrPropertyWithValue(
         "description", "C89303 CLEARSPEN DIR DEP                    PPD ID: 4462283648")
       .hasFieldOrPropertyWithValue("amount", BigDecimal("4097.76"))
 
-    assertThat(transactions.last())
+    assertThat(transactions[21])
       .hasFieldOrPropertyWithValue("userId", 1L)
       .hasFieldOrPropertyWithValue("expenseDate", LocalDate.of(2022, 6, 15))
       .hasFieldOrPropertyWithValue(
