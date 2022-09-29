@@ -2,27 +2,39 @@ package io.craigmiller160.expensetrackerapi.data.repository.impl
 
 import com.querydsl.core.BooleanBuilder
 import com.querydsl.jpa.impl.JPAQueryFactory
+import io.craigmiller160.expensetrackerapi.data.SqlLoader
 import io.craigmiller160.expensetrackerapi.data.model.QTransaction
 import io.craigmiller160.expensetrackerapi.data.model.Transaction
 import io.craigmiller160.expensetrackerapi.data.projection.NeedsAttentionCount
+import io.craigmiller160.expensetrackerapi.data.projection.NeedsAttentionType
 import io.craigmiller160.expensetrackerapi.data.querydsl.QueryDSLSupport
 import io.craigmiller160.expensetrackerapi.data.repository.TransactionRepositoryCustom
 import io.craigmiller160.expensetrackerapi.web.types.SearchTransactionsRequest
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.Pageable
+import org.springframework.jdbc.core.RowMapper
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.stereotype.Repository
+
+private val needsAttentionCountRowMapper: RowMapper<NeedsAttentionCount> = RowMapper { rs, index ->
+  NeedsAttentionCount(NeedsAttentionType.valueOf(rs.getString("type")), rs.getLong("count"))
+}
 
 @Repository
 class TransactionRepositoryCustomImpl(
   private val queryFactory: JPAQueryFactory,
   private val queryDslSupport: QueryDSLSupport,
-  private val jdbcTemplate: NamedParameterJdbcTemplate
+  private val jdbcTemplate: NamedParameterJdbcTemplate,
+  private val sqlLoader: SqlLoader
 ) : TransactionRepositoryCustom {
 
   override fun getAllNeedsAttentionCounts(userId: Long): List<NeedsAttentionCount> {
-    queryFactory.query()
+    val sql = sqlLoader.loadSql("get_all_needs_attention.sql")
+    val params = MapSqlParameterSource().addValue("userId", userId)
+    val needsAttentionCounts =
+      jdbcTemplate.query(sql, params, needsAttentionCountRowMapper).associateBy { it.type }
     TODO("Not yet implemented")
   }
 

@@ -1,22 +1,22 @@
 SELECT
-    'UNCONFIRMED',
-    COUNT( t )
+    'UNCONFIRMED' AS TYPE,
+    COUNT( t ) AS COUNT
 FROM
     transactions t
 WHERE
     t.user_id =:userId
     AND t.confirmed = FALSE
 UNION SELECT
-    'DUPLICATE',
-    COUNT( t )
+    'DUPLICATE' AS TYPE,
+    COUNT( t ) AS COUNT
 FROM
     transactions t
 WHERE
     t.user_id =:userId
     AND t.duplicate = TRUE
 UNION SELECT
-    'UNCATEGORIZED',
-    COUNT( t )
+    'UNCATEGORIZED' AS TYPE,
+    COUNT( t ) AS COUNT
 FROM
     transactions t
 WHERE
