@@ -6,5 +6,5 @@ import org.springframework.stereotype.Component
 @Component
 class SqlLoader(private val resourceLoader: ResourceLoader) {
   fun loadSql(fileName: String): String =
-    resourceLoader.getResource("sql/$fileName").inputStream.reader().readText()
+    resourceLoader.getResource("classpath:sql/$fileName").inputStream.reader().readText()
 }
