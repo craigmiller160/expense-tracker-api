@@ -36,7 +36,7 @@ abstract class AbstractCsvTransactionParser : TransactionParser {
     if (fields.size != numberOfColumns) {
       return Either.Left(InvalidImportException("Invalid number of columns in CSV: ${fields.size}"))
     }
-    return Either.Right { index, name ->
+    return Either.Right<FieldExtractor> { index, name ->
       Either.catch { fields[index] }
         .mapLeft { InvalidImportException("Missing field $name at CSV row index $index") }
     }

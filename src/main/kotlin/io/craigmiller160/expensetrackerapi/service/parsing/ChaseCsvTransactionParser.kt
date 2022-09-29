@@ -30,8 +30,4 @@ class ChaseCsvTransactionParser : AbstractCsvTransactionParser() {
       Transaction(
         userId = userId, expenseDate = expenseDate, description = description, amount = amount)
     }
-
-  /** Because of parsing logic, negative amounts are deposits, not expenses */
-  override fun includeTransaction(transaction: Transaction): Boolean =
-    transaction.amount >= BigDecimal("0")
 }
