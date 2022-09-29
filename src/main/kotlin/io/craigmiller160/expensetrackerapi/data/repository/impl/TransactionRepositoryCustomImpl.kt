@@ -26,7 +26,7 @@ private val needsAttentionCountRowMapper: RowMapper<NeedsAttentionCount> = RowMa
 private val needsAttentionOldestRowMapper: RowMapper<NeedsAttentionOldest> =
   RowMapper { rs, index ->
     NeedsAttentionOldest(
-      NeedsAttentionType.valueOf(rs.getString("type")), rs.getDate("oldest").toLocalDate())
+      NeedsAttentionType.valueOf(rs.getString("type")), rs.getDate("oldest")?.toLocalDate())
   }
 
 @Repository
