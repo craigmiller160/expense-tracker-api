@@ -595,7 +595,12 @@ class TransactionControllerTest : BaseIntegrationTest() {
   }
 
   @Test
-  fun updateTransaction() {
+  fun updateTransactionDetails() {
+    TODO()
+  }
+
+  @Test
+  fun updateTransactions() {
     val user2Category = dataHelper.createCategory(2L, "Other")
     val uncategorizedTransaction = user1Transactions[5]
     assertThat(uncategorizedTransaction.categoryId).isNull()
