@@ -22,3 +22,11 @@ FROM
 WHERE
     t.user_id =:userId
     AND t.category_id IS NULL
+UNION SELECT
+    'POSSIBLE_REFUND' AS TYPE,
+    COUNT( t ) AS COUNT
+FROM
+    transactions t
+WHERE
+    t.user_id =:userId
+    AND t.amount > 0;
