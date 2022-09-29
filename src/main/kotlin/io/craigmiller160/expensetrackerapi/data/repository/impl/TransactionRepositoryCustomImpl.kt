@@ -39,15 +39,14 @@ class TransactionRepositoryCustomImpl(
 
   override fun getAllNeedsAttentionCounts(userId: Long): List<NeedsAttentionCount> {
     val countSql = sqlLoader.loadSql("get_all_needs_attention_counts.sql")
+    val params = MapSqlParameterSource().addValue("userId", userId)
+    return jdbcTemplate.query(countSql, params, needsAttentionCountRowMapper)
+  }
+
+  override fun getAllNeedsAttentionOldest(userId: Long): List<NeedsAttentionOldest> {
     val oldestSql = sqlLoader.loadSql("get_all_needs_attention_oldest.sql")
     val params = MapSqlParameterSource().addValue("userId", userId)
-    val needsAttentionCounts =
-      jdbcTemplate.query(countSql, params, needsAttentionCountRowMapper).associateBy { it.type }
-
-    val needsAttentionOldest =
-      jdbcTemplate.query(oldestSql, params, needsAttentionOldestRowMapper).associateBy { it.type }
-
-    TODO("Not yet implemented")
+    return jdbcTemplate.query(oldestSql, params, needsAttentionOldestRowMapper)
   }
 
   override fun searchForTransactions(
