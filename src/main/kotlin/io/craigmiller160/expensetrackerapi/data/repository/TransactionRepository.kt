@@ -4,6 +4,7 @@ import io.craigmiller160.expensetrackerapi.common.data.typedid.TypedId
 import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.CategoryId
 import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.TransactionId
 import io.craigmiller160.expensetrackerapi.data.model.Transaction
+import io.craigmiller160.expensetrackerapi.data.projection.NeedsAttentionCount
 import java.time.LocalDate
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor
@@ -105,6 +106,18 @@ interface TransactionRepository :
       AND t.confirmed = false
   """)
   fun countAllUnconfirmed(@Param("userId") userId: Long): Long
+
+  @Query(
+    """
+    SELECT io.craigmiller160.expensetrackerapi.data.projection.NeedsAttentionCount(
+        io.craigmiller160.expensetrackerapi.data.projection.NeedsAttentionType.UNCONFIRMED, 
+        COUNT(t)
+    )
+    FROM Transaction t
+    WHERE t.userId = :userId
+    AND t.confirmed = false
+  """)
+  fun getAllNeedsAttentionCounts(@Param("userId") userId: Long): List<NeedsAttentionCount>
 
   @Query(
     """
