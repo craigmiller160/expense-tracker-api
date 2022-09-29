@@ -66,7 +66,7 @@ class TransactionImportControllerTest : BaseIntegrationTest() {
 
     assertThat(transactions[transactions.size - 14])
       .hasFieldOrPropertyWithValue("userId", 1L)
-      .hasFieldOrPropertyWithValue("expenseDate", LocalDate.of(2022, 9, 5))
+      .hasFieldOrPropertyWithValue("expenseDate", LocalDate.of(2022, 5, 9))
       .hasFieldOrPropertyWithValue(
         "description", "DIRECTPAY FULL BALANCESEE DETAILS OF YOUR NEXT DIRECTPAY BELOW")
       .hasFieldOrPropertyWithValue("amount", BigDecimal("1928.54"))
