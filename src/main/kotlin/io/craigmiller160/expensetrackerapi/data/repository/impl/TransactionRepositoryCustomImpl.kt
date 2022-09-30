@@ -84,6 +84,14 @@ class TransactionRepositoryCustomImpl(
               QTransaction.transaction.categoryId.isNull
             }
           })
+        .let(
+          QueryDSLSupport.andIfNotNull(request.isPossibleRefund) {
+            if (it) {
+              QTransaction.transaction.amount.gt(0)
+            } else {
+              QTransaction.transaction.amount.lt(0)
+            }
+          })
 
     val baseQuery = queryFactory.query().from(QTransaction.transaction).where(whereClause)
 
