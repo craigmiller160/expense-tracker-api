@@ -664,8 +664,8 @@ class TransactionControllerTest : BaseIntegrationTest() {
       .hasFieldOrPropertyWithValue("confirmed", request.confirmed)
       .hasFieldOrPropertyWithValue("expenseDate", request.expenseDate)
       .hasFieldOrPropertyWithValue("description", request.description)
-      .hasFieldOrPropertyWithValue("amount", request.amount)
       .hasFieldOrPropertyWithValue("categoryId", request.categoryId)
+    assertThat(dbTransaction.amount.toDouble()).isEqualTo(request.amount.toDouble())
   }
 
   @Test
