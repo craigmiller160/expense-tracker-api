@@ -25,7 +25,7 @@ class DataHelper(
         userId = userId,
         expenseDate = internalDate,
         description = faker.company().name(),
-        amount = BigDecimal(faker.commerce().price()),
+        amount = BigDecimal(faker.commerce().price()) * BigDecimal("-1"),
         categoryId = categoryId))
   }
 

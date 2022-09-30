@@ -20,6 +20,7 @@ import io.craigmiller160.expensetrackerapi.web.types.TransactionSortKey
 import io.craigmiller160.expensetrackerapi.web.types.TransactionToConfirm
 import io.craigmiller160.expensetrackerapi.web.types.TransactionToUpdate
 import io.craigmiller160.expensetrackerapi.web.types.UpdateTransactionsRequest
+import java.math.BigDecimal
 import java.time.LocalDate
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
@@ -190,6 +191,43 @@ class TransactionControllerTest : BaseIntegrationTest() {
   }
 
   @Test
+  fun `search - possible refunds`() {
+    val txn1 =
+      transactionRepository.saveAndFlush(
+        user1Transactions[0].copy(amount = user1Transactions[0].amount * BigDecimal("-1")))
+    val txn2 =
+      transactionRepository.saveAndFlush(
+        user1Transactions[2].copy(amount = user1Transactions[2].amount * BigDecimal("-1")))
+
+    val request =
+      SearchTransactionsRequest(
+        isPossibleRefund = true,
+        pageNumber = 0,
+        pageSize = 100,
+        sortKey = TransactionSortKey.EXPENSE_DATE,
+        sortDirection = SortDirection.ASC)
+
+    val response =
+      SearchTransactionsResponse(
+        transactions =
+          listOf(
+            TransactionResponse.from(txn1, user1Categories[0]),
+            TransactionResponse.from(txn2, user1Categories[2])),
+        pageNumber = 0,
+        totalItems = 2)
+
+    mockMvc
+      .get("/transactions/?${request.toQueryString()}") {
+        secure = true
+        header("Authorization", "Bearer $token")
+      }
+      .andExpect {
+        status { isOk() }
+        content { json(objectMapper.writeValueAsString(response)) }
+      }
+  }
+
+  @Test
   fun `search - only duplicates`() {
     val txn1 = transactionRepository.saveAndFlush(user1Transactions[0].copy(duplicate = true))
     val txn2 = transactionRepository.saveAndFlush(user1Transactions[2].copy(duplicate = true))
@@ -318,11 +356,15 @@ class TransactionControllerTest : BaseIntegrationTest() {
       transactionRepository.saveAndFlush(user1Transactions[0].copy(confirmed = false))
     val oldestDuplicate =
       transactionRepository.saveAndFlush(user1Transactions[2].copy(duplicate = true))
+    val oldestPossibleRefund =
+      transactionRepository.saveAndFlush(
+        user1Transactions[3].copy(amount = user1Transactions[3].amount * BigDecimal("-1")))
     val response =
       NeedsAttentionResponse(
         unconfirmed = CountAndOldest(count = 4, oldest = oldestUnconfirmed.expenseDate),
         uncategorized = CountAndOldest(count = 3, oldest = user1Transactions[1].expenseDate),
-        duplicate = CountAndOldest(count = 1, oldest = oldestDuplicate.expenseDate))
+        duplicate = CountAndOldest(count = 1, oldest = oldestDuplicate.expenseDate),
+        possibleRefund = CountAndOldest(count = 1, oldest = oldestPossibleRefund.expenseDate))
     mockMvc
       .get("/transactions/needs-attention") {
         secure = true
@@ -344,7 +386,8 @@ class TransactionControllerTest : BaseIntegrationTest() {
       NeedsAttentionResponse(
         unconfirmed = CountAndOldest(count = 0, oldest = null),
         uncategorized = CountAndOldest(count = 0, oldest = null),
-        duplicate = CountAndOldest(count = 0, oldest = null))
+        duplicate = CountAndOldest(count = 0, oldest = null),
+        possibleRefund = CountAndOldest(count = 0, oldest = null))
     mockMvc
       .get("/transactions/needs-attention") {
         secure = true
