@@ -197,7 +197,7 @@ class TransactionControllerTest : BaseIntegrationTest() {
         user1Transactions[0].copy(amount = user1Transactions[0].amount * BigDecimal("-1")))
     val txn2 =
       transactionRepository.saveAndFlush(
-        user1Transactions[2].copy(amount = user1Transactions[0].amount * BigDecimal("-1")))
+        user1Transactions[2].copy(amount = user1Transactions[2].amount * BigDecimal("-1")))
 
     val request =
       SearchTransactionsRequest(
