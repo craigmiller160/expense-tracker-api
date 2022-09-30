@@ -89,7 +89,7 @@ class TransactionRepositoryCustomImpl(
             if (it) {
               QTransaction.transaction.amount.gt(0)
             } else {
-              QTransaction.transaction.amount.lt(0)
+              QTransaction.transaction.amount.loe(0)
             }
           })
 
