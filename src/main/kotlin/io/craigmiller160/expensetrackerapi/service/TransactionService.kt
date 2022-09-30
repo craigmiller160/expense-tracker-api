@@ -3,12 +3,12 @@ package io.craigmiller160.expensetrackerapi.service
 import arrow.core.Either
 import arrow.core.continuations.either
 import arrow.core.flatMap
+import arrow.core.flatten
 import io.craigmiller160.expensetrackerapi.common.data.typedid.TypedId
 import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.CategoryId
 import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.TransactionId
 import io.craigmiller160.expensetrackerapi.common.error.BadRequestException
 import io.craigmiller160.expensetrackerapi.data.model.Category
-import io.craigmiller160.expensetrackerapi.data.model.Transaction
 import io.craigmiller160.expensetrackerapi.data.model.toColumnName
 import io.craigmiller160.expensetrackerapi.data.model.toSpringSortDirection
 import io.craigmiller160.expensetrackerapi.data.projection.NeedsAttentionType
@@ -26,6 +26,7 @@ import io.craigmiller160.expensetrackerapi.web.types.TransactionAndConfirmUpdate
 import io.craigmiller160.expensetrackerapi.web.types.UpdateTransactionDetailsRequest
 import io.craigmiller160.expensetrackerapi.web.types.UpdateTransactionsRequest
 import io.craigmiller160.oauth2.service.OAuth2Service
+import java.math.BigDecimal
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
 import org.springframework.stereotype.Service
@@ -136,16 +137,21 @@ class TransactionService(
   ): TryEither<Unit> {
     val userId = oAuth2Service.getAuthenticatedUser().userId
 
-    transactionRepository
-      .findByIdAndUserId(transactionId, userId)
-      ?.let(doUpdateTransactionDetails(request))
-      ?.let { transactionRepository.save(it) }
-      ?: throw BadRequestException("No transaction with ID: $transactionId")
+    return Either.catch {
+        transactionRepository
+          .findByIdAndUserId(transactionId, userId)
+          ?.copy(
+            confirmed = request.confirmed,
+            expenseDate = request.expenseDate,
+            description = request.description,
+            amount = BigDecimal("${request.amount}"),
+            categoryId = request.categoryId)
+          ?.let { transactionRepository.save(it) }
+          ?.let { Either.Right(Unit) }
+          ?: Either.Left(BadRequestException("No transaction with ID: $transactionId"))
+      }
+      .flatten()
   }
-
-  private fun doUpdateTransactionDetails(
-    request: UpdateTransactionDetailsRequest
-  ): (Transaction) -> Transaction = { existingTransaction -> }
 
   private fun getCategoryMap(userId: Long): TryEither<Map<TypedId<CategoryId>, Category>> =
     Either.catch { categoryRepository.findAllByUserIdOrderByName(userId).associateBy { it.id } }
