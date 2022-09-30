@@ -19,6 +19,7 @@ data class SearchTransactionsRequest(
   val isConfirmed: Boolean? = null,
   val isCategorized: Boolean? = null,
   val isDuplicate: Boolean? = null,
+  val isPossibleRefund: Boolean? = null,
   val categoryIds: Set<TypedId<CategoryId>>? = null
 ) : PageableRequest, SortableRequest<TransactionSortKey> {
   companion object {
