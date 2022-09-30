@@ -16,6 +16,7 @@ import javax.validation.Valid
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
@@ -56,7 +57,7 @@ class TransactionController(private val transactionService: TransactionService) 
   @PutMapping("/{transactionId}/details")
   @ResponseStatus(HttpStatus.NO_CONTENT)
   fun updateTransactionDetails(
-    transactionId: TypedId<TransactionId>,
+    @PathVariable("transactionId") transactionId: TypedId<TransactionId>,
     @RequestBody request: UpdateTransactionDetailsRequest
   ): TryEither<Unit> = transactionService.updateTransactionDetails(transactionId, request)
 }
