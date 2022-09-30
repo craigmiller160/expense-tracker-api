@@ -19,6 +19,7 @@ data class SearchTransactionsRequest(
   val isConfirmed: Boolean? = null,
   val isCategorized: Boolean? = null,
   val isDuplicate: Boolean? = null,
+  val isPossibleRefund: Boolean? = null,
   val categoryIds: Set<TypedId<CategoryId>>? = null
 ) : PageableRequest, SortableRequest<TransactionSortKey> {
   companion object {
@@ -44,6 +45,7 @@ data class SearchTransactionsRequest(
         "isConfirmed" to isConfirmed,
         "isCategorized" to isCategorized,
         "isDuplicate" to isDuplicate,
+        "isPossibleRefund" to isPossibleRefund,
         "categoryIds" to categoryIds?.joinToString(",") { it.toString() })
       .filter { it.second != null }
       .map { "${it.first}=${it.second}" }

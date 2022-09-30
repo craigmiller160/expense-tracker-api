@@ -191,6 +191,43 @@ class TransactionControllerTest : BaseIntegrationTest() {
   }
 
   @Test
+  fun `search - possible refunds`() {
+    val txn1 =
+      transactionRepository.saveAndFlush(
+        user1Transactions[0].copy(amount = user1Transactions[0].amount * BigDecimal("-1")))
+    val txn2 =
+      transactionRepository.saveAndFlush(
+        user1Transactions[2].copy(amount = user1Transactions[2].amount * BigDecimal("-1")))
+
+    val request =
+      SearchTransactionsRequest(
+        isPossibleRefund = true,
+        pageNumber = 0,
+        pageSize = 100,
+        sortKey = TransactionSortKey.EXPENSE_DATE,
+        sortDirection = SortDirection.ASC)
+
+    val response =
+      SearchTransactionsResponse(
+        transactions =
+          listOf(
+            TransactionResponse.from(txn1, user1Categories[0]),
+            TransactionResponse.from(txn2, user1Categories[2])),
+        pageNumber = 0,
+        totalItems = 2)
+
+    mockMvc
+      .get("/transactions/?${request.toQueryString()}") {
+        secure = true
+        header("Authorization", "Bearer $token")
+      }
+      .andExpect {
+        status { isOk() }
+        content { json(objectMapper.writeValueAsString(response)) }
+      }
+  }
+
+  @Test
   fun `search - only duplicates`() {
     val txn1 = transactionRepository.saveAndFlush(user1Transactions[0].copy(duplicate = true))
     val txn2 = transactionRepository.saveAndFlush(user1Transactions[2].copy(duplicate = true))
