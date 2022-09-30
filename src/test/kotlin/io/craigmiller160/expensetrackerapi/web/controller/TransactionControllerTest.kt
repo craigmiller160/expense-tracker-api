@@ -19,6 +19,7 @@ import io.craigmiller160.expensetrackerapi.web.types.TransactionResponse
 import io.craigmiller160.expensetrackerapi.web.types.TransactionSortKey
 import io.craigmiller160.expensetrackerapi.web.types.TransactionToConfirm
 import io.craigmiller160.expensetrackerapi.web.types.TransactionToUpdate
+import io.craigmiller160.expensetrackerapi.web.types.UpdateTransactionDetailsRequest
 import io.craigmiller160.expensetrackerapi.web.types.UpdateTransactionsRequest
 import java.math.BigDecimal
 import java.time.LocalDate
@@ -639,7 +640,31 @@ class TransactionControllerTest : BaseIntegrationTest() {
 
   @Test
   fun updateTransactionDetails() {
-    TODO()
+    val transactionId = user1Transactions[0].id
+    val request =
+      UpdateTransactionDetailsRequest(
+        transactionId = transactionId,
+        confirmed = true,
+        expenseDate = LocalDate.of(1990, 1, 1),
+        description = "New Description",
+        amount = -112.57,
+        categoryId = user1Categories[0].id)
+
+    mockMvc
+      .put("/transactions/$transactionId/details") {
+        content = objectMapper.writeValueAsString(request)
+        contentType = MediaType.APPLICATION_JSON
+        header("Authorization", "Bearer $token")
+      }
+      .andExpect { status { isNoContent() } }
+
+    val dbTransaction = transactionRepository.findById(transactionId).orElseThrow()
+    assertThat(dbTransaction)
+      .hasFieldOrPropertyWithValue("confirmed", request.confirmed)
+      .hasFieldOrPropertyWithValue("expenseDate", request.expenseDate)
+      .hasFieldOrPropertyWithValue("description", request.description)
+      .hasFieldOrPropertyWithValue("amount", request.amount)
+      .hasFieldOrPropertyWithValue("categoryId", request.categoryId)
   }
 
   @Test

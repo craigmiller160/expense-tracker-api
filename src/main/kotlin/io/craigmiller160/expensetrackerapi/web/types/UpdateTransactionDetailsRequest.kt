@@ -10,6 +10,6 @@ data class UpdateTransactionDetailsRequest(
   override val confirmed: Boolean,
   val expenseDate: LocalDate,
   val description: String,
-  val amount: String,
+  val amount: Double,
   override val categoryId: TypedId<CategoryId>?
 ) : TransactionAndCategoryUpdateItem, TransactionAndConfirmUpdateItem
