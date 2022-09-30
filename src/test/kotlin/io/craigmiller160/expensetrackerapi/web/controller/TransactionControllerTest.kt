@@ -652,6 +652,7 @@ class TransactionControllerTest : BaseIntegrationTest() {
 
     mockMvc
       .put("/transactions/$transactionId/details") {
+        secure = true
         content = objectMapper.writeValueAsString(request)
         contentType = MediaType.APPLICATION_JSON
         header("Authorization", "Bearer $token")

@@ -57,6 +57,6 @@ class TransactionController(private val transactionService: TransactionService) 
   @ResponseStatus(HttpStatus.NO_CONTENT)
   fun updateTransactionDetails(
     transactionId: TypedId<TransactionId>,
-    request: UpdateTransactionDetailsRequest
+    @RequestBody request: UpdateTransactionDetailsRequest
   ): TryEither<Unit> = transactionService.updateTransactionDetails(transactionId, request)
 }
