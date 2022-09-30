@@ -45,6 +45,7 @@ data class SearchTransactionsRequest(
         "isConfirmed" to isConfirmed,
         "isCategorized" to isCategorized,
         "isDuplicate" to isDuplicate,
+        "isPossibleRefund" to isPossibleRefund,
         "categoryIds" to categoryIds?.joinToString(",") { it.toString() })
       .filter { it.second != null }
       .map { "${it.first}=${it.second}" }
