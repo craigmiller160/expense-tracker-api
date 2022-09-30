@@ -6,7 +6,9 @@ import arrow.core.flatMap
 import io.craigmiller160.expensetrackerapi.common.data.typedid.TypedId
 import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.CategoryId
 import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.TransactionId
+import io.craigmiller160.expensetrackerapi.common.error.BadRequestException
 import io.craigmiller160.expensetrackerapi.data.model.Category
+import io.craigmiller160.expensetrackerapi.data.model.Transaction
 import io.craigmiller160.expensetrackerapi.data.model.toColumnName
 import io.craigmiller160.expensetrackerapi.data.model.toSpringSortDirection
 import io.craigmiller160.expensetrackerapi.data.projection.NeedsAttentionType
@@ -132,9 +134,18 @@ class TransactionService(
     transactionId: TypedId<TransactionId>,
     request: UpdateTransactionDetailsRequest
   ): TryEither<Unit> {
-    val finalRequest = request.copy(transactionId = transactionId)
-    TODO()
+    val userId = oAuth2Service.getAuthenticatedUser().userId
+
+    transactionRepository
+      .findByIdAndUserId(transactionId, userId)
+      ?.let(doUpdateTransactionDetails(request))
+      ?.let { transactionRepository.save(it) }
+      ?: throw BadRequestException("No transaction with ID: $transactionId")
   }
+
+  private fun doUpdateTransactionDetails(
+    request: UpdateTransactionDetailsRequest
+  ): (Transaction) -> Transaction = { existingTransaction -> }
 
   private fun getCategoryMap(userId: Long): TryEither<Map<TypedId<CategoryId>, Category>> =
     Either.catch { categoryRepository.findAllByUserIdOrderByName(userId).associateBy { it.id } }
