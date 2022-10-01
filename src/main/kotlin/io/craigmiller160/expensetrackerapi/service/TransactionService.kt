@@ -9,6 +9,7 @@ import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.CategoryId
 import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.TransactionId
 import io.craigmiller160.expensetrackerapi.common.error.BadRequestException
 import io.craigmiller160.expensetrackerapi.data.model.Category
+import io.craigmiller160.expensetrackerapi.data.model.Transaction
 import io.craigmiller160.expensetrackerapi.data.model.toColumnName
 import io.craigmiller160.expensetrackerapi.data.model.toSpringSortDirection
 import io.craigmiller160.expensetrackerapi.data.projection.NeedsAttentionType
@@ -126,7 +127,22 @@ class TransactionService(
   }
 
   fun createTransaction(request: CreateTransactionRequest): TryEither<TransactionResponse> {
-    TODO()
+    val userId = oAuth2Service.getAuthenticatedUser().userId
+
+    return Either.catch {
+      val validCategoryId =
+        request.categoryId?.let { categoryRepository.findByIdAndUserId(it, userId) }?.id
+      val transaction =
+        Transaction(
+          userId = userId,
+          expenseDate = request.expenseDate,
+          description = request.description,
+          amount = request.amount,
+          confirmed = true,
+          duplicate = false,
+          categoryId = validCategoryId)
+      transactionRepository.save(transaction).let(TransactionResponse::from)
+    }
   }
 
   @Transactional
