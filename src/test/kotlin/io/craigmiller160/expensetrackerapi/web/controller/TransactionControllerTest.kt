@@ -9,6 +9,7 @@ import io.craigmiller160.expensetrackerapi.data.repository.TransactionRepository
 import io.craigmiller160.expensetrackerapi.web.types.CategorizeTransactionsRequest
 import io.craigmiller160.expensetrackerapi.web.types.ConfirmTransactionsRequest
 import io.craigmiller160.expensetrackerapi.web.types.CountAndOldest
+import io.craigmiller160.expensetrackerapi.web.types.CreateTransactionRequest
 import io.craigmiller160.expensetrackerapi.web.types.DeleteTransactionsRequest
 import io.craigmiller160.expensetrackerapi.web.types.NeedsAttentionResponse
 import io.craigmiller160.expensetrackerapi.web.types.SearchTransactionsRequest
@@ -30,6 +31,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.MediaType
 import org.springframework.test.web.servlet.delete
 import org.springframework.test.web.servlet.get
+import org.springframework.test.web.servlet.post
 import org.springframework.test.web.servlet.put
 
 class TransactionControllerTest : BaseIntegrationTest() {
@@ -639,6 +641,53 @@ class TransactionControllerTest : BaseIntegrationTest() {
   }
 
   @Test
+  fun createTransaction() {
+    val request =
+      CreateTransactionRequest(
+        expenseDate = LocalDate.of(2022, 1, 1),
+        description = "Another Transaction",
+        amount = BigDecimal("-120"),
+        categoryId = user1Categories[0].id)
+
+    val responseString =
+      mockMvc
+        .post("/transactions") {
+          secure = true
+          header("Authorization", "Bearer $token")
+          content = objectMapper.writeValueAsString(request)
+          contentType = MediaType.APPLICATION_JSON
+        }
+        .andExpect { status { isOk() } }
+        .andReturn()
+        .response
+        .contentAsString
+    val response = objectMapper.readValue(responseString, TransactionResponse::class.java)
+
+    assertThat(response)
+      .hasFieldOrPropertyWithValue("expenseDate", request.expenseDate)
+      .hasFieldOrPropertyWithValue("amount", request.amount)
+      .hasFieldOrPropertyWithValue("description", request.description)
+      .hasFieldOrPropertyWithValue("categoryId", request.categoryId)
+      .hasFieldOrPropertyWithValue("categoryName", user1Categories[0].name)
+      .hasFieldOrPropertyWithValue("confirmed", true)
+      .hasFieldOrPropertyWithValue("duplicate", false)
+
+    val dbTransaction = transactionRepository.findById(response.id).orElseThrow()
+    assertThat(dbTransaction)
+      .hasFieldOrPropertyWithValue("expenseDate", request.expenseDate)
+      .hasFieldOrPropertyWithValue("amount", request.amount)
+      .hasFieldOrPropertyWithValue("description", request.description)
+      .hasFieldOrPropertyWithValue("categoryId", request.categoryId)
+      .hasFieldOrPropertyWithValue("confirmed", true)
+      .hasFieldOrPropertyWithValue("duplicate", false)
+  }
+
+  @Test
+  fun createTransaction_invalidCategoryId() {
+    TODO()
+  }
+
+  @Test
   fun updateTransactionDetails() {
     val transactionId = user1Transactions[0].id
     val request =
@@ -666,6 +715,11 @@ class TransactionControllerTest : BaseIntegrationTest() {
       .hasFieldOrPropertyWithValue("description", request.description)
       .hasFieldOrPropertyWithValue("categoryId", request.categoryId)
     assertThat(dbTransaction.amount.toDouble()).isEqualTo(request.amount.toDouble())
+  }
+
+  @Test
+  fun updateTransactionDetails_invalidCategoryId() {
+    TODO()
   }
 
   @Test
