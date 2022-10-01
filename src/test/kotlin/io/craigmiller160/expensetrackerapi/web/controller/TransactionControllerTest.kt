@@ -696,7 +696,7 @@ class TransactionControllerTest : BaseIntegrationTest() {
         confirmed = true,
         expenseDate = LocalDate.of(1990, 1, 1),
         description = "New Description",
-        amount = -112.57,
+        amount = BigDecimal("-112.57"),
         categoryId = user1Categories[0].id)
 
     mockMvc
@@ -719,7 +719,33 @@ class TransactionControllerTest : BaseIntegrationTest() {
 
   @Test
   fun updateTransactionDetails_invalidCategoryId() {
-    TODO()
+    val user2Category = dataHelper.createCategory(2L, "Other")
+    val transactionId = user1Transactions[0].id
+    val request =
+      UpdateTransactionDetailsRequest(
+        transactionId = transactionId,
+        confirmed = true,
+        expenseDate = LocalDate.of(1990, 1, 1),
+        description = "New Description",
+        amount = BigDecimal("-112.57"),
+        categoryId = user2Category.id)
+
+    mockMvc
+      .put("/transactions/$transactionId/details") {
+        secure = true
+        content = objectMapper.writeValueAsString(request)
+        contentType = MediaType.APPLICATION_JSON
+        header("Authorization", "Bearer $token")
+      }
+      .andExpect { status { isNoContent() } }
+
+    val dbTransaction = transactionRepository.findById(transactionId).orElseThrow()
+    assertThat(dbTransaction)
+      .hasFieldOrPropertyWithValue("confirmed", request.confirmed)
+      .hasFieldOrPropertyWithValue("expenseDate", request.expenseDate)
+      .hasFieldOrPropertyWithValue("description", request.description)
+      .hasFieldOrPropertyWithValue("categoryId", null)
+    assertThat(dbTransaction.amount.toDouble()).isEqualTo(request.amount.toDouble())
   }
 
   @Test

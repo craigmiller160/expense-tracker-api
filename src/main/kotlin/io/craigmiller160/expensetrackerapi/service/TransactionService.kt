@@ -28,7 +28,6 @@ import io.craigmiller160.expensetrackerapi.web.types.TransactionResponse
 import io.craigmiller160.expensetrackerapi.web.types.UpdateTransactionDetailsRequest
 import io.craigmiller160.expensetrackerapi.web.types.UpdateTransactionsRequest
 import io.craigmiller160.oauth2.service.OAuth2Service
-import java.math.BigDecimal
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
 import org.springframework.stereotype.Service
@@ -150,7 +149,7 @@ class TransactionService(
             confirmed = request.confirmed,
             expenseDate = request.expenseDate,
             description = request.description,
-            amount = BigDecimal("${request.amount}"),
+            amount = request.amount,
             categoryId = request.categoryId)
           ?.let { transactionRepository.save(it) }
           ?.let { Either.Right(Unit) }
