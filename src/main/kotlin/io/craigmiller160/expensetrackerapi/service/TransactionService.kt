@@ -17,12 +17,14 @@ import io.craigmiller160.expensetrackerapi.data.repository.TransactionRepository
 import io.craigmiller160.expensetrackerapi.function.TryEither
 import io.craigmiller160.expensetrackerapi.function.flatMapCatch
 import io.craigmiller160.expensetrackerapi.web.types.CountAndOldest
+import io.craigmiller160.expensetrackerapi.web.types.CreateTransactionRequest
 import io.craigmiller160.expensetrackerapi.web.types.DeleteTransactionsRequest
 import io.craigmiller160.expensetrackerapi.web.types.NeedsAttentionResponse
 import io.craigmiller160.expensetrackerapi.web.types.SearchTransactionsRequest
 import io.craigmiller160.expensetrackerapi.web.types.SearchTransactionsResponse
 import io.craigmiller160.expensetrackerapi.web.types.TransactionAndCategoryUpdateItem
 import io.craigmiller160.expensetrackerapi.web.types.TransactionAndConfirmUpdateItem
+import io.craigmiller160.expensetrackerapi.web.types.TransactionResponse
 import io.craigmiller160.expensetrackerapi.web.types.UpdateTransactionDetailsRequest
 import io.craigmiller160.expensetrackerapi.web.types.UpdateTransactionsRequest
 import io.craigmiller160.oauth2.service.OAuth2Service
@@ -122,6 +124,10 @@ class TransactionService(
       }
       .flatMap { page -> categoryMapEither.map { Pair(page, it) } }
       .map { (page, categories) -> SearchTransactionsResponse.from(page, categories) }
+  }
+
+  fun createTransaction(request: CreateTransactionRequest): TryEither<TransactionResponse> {
+    TODO()
   }
 
   @Transactional
