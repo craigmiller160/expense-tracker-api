@@ -724,6 +724,7 @@ class TransactionControllerTest : BaseIntegrationTest() {
 
   @Test
   fun updateTransactions() {
+    // This does also validate a category id that's for the wrong user
     val user2Category = dataHelper.createCategory(2L, "Other")
     val uncategorizedTransaction = user1Transactions[5]
     assertThat(uncategorizedTransaction.categoryId).isNull()
