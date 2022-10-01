@@ -684,7 +684,45 @@ class TransactionControllerTest : BaseIntegrationTest() {
 
   @Test
   fun createTransaction_invalidCategoryId() {
-    TODO()
+    val user2Category = dataHelper.createCategory(2L, "Other")
+    val request =
+      CreateTransactionRequest(
+        expenseDate = LocalDate.of(2022, 1, 1),
+        description = "Another Transaction",
+        amount = BigDecimal("-120"),
+        categoryId = user2Category.id)
+
+    val responseString =
+      mockMvc
+        .post("/transactions") {
+          secure = true
+          header("Authorization", "Bearer $token")
+          content = objectMapper.writeValueAsString(request)
+          contentType = MediaType.APPLICATION_JSON
+        }
+        .andExpect { status { isOk() } }
+        .andReturn()
+        .response
+        .contentAsString
+    val response = objectMapper.readValue(responseString, TransactionResponse::class.java)
+
+    assertThat(response)
+      .hasFieldOrPropertyWithValue("expenseDate", request.expenseDate)
+      .hasFieldOrPropertyWithValue("amount", request.amount)
+      .hasFieldOrPropertyWithValue("description", request.description)
+      .hasFieldOrPropertyWithValue("categoryId", null)
+      .hasFieldOrPropertyWithValue("categoryName", null)
+      .hasFieldOrPropertyWithValue("confirmed", true)
+      .hasFieldOrPropertyWithValue("duplicate", false)
+
+    val dbTransaction = transactionRepository.findById(response.id).orElseThrow()
+    assertThat(dbTransaction)
+      .hasFieldOrPropertyWithValue("expenseDate", request.expenseDate)
+      .hasFieldOrPropertyWithValue("amount", request.amount)
+      .hasFieldOrPropertyWithValue("description", request.description)
+      .hasFieldOrPropertyWithValue("categoryId", null)
+      .hasFieldOrPropertyWithValue("confirmed", true)
+      .hasFieldOrPropertyWithValue("duplicate", false)
   }
 
   @Test
