@@ -143,6 +143,8 @@ class TransactionService(
     val userId = oAuth2Service.getAuthenticatedUser().userId
 
     return Either.catch {
+        val validCategoryId =
+          request.categoryId?.let { categoryRepository.findByIdAndUserId(it, userId) }?.id
         transactionRepository
           .findByIdAndUserId(transactionId, userId)
           ?.copy(
@@ -150,7 +152,7 @@ class TransactionService(
             expenseDate = request.expenseDate,
             description = request.description,
             amount = request.amount,
-            categoryId = request.categoryId)
+            categoryId = validCategoryId)
           ?.let { transactionRepository.save(it) }
           ?.let { Either.Right(Unit) }
           ?: Either.Left(BadRequestException("No transaction with ID: $transactionId"))
