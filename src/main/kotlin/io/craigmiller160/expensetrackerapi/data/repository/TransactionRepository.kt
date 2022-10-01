@@ -16,6 +16,8 @@ interface TransactionRepository :
   TransactionRepositoryCustom {
   fun findAllByOrderByExpenseDateAscDescriptionAsc(): List<Transaction>
 
+  fun findByIdAndUserId(id: TypedId<TransactionId>, userId: Long): Transaction?
+
   @Query(
     """
     UPDATE Transaction t

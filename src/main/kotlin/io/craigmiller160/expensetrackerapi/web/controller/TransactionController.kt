@@ -1,5 +1,7 @@
 package io.craigmiller160.expensetrackerapi.web.controller
 
+import io.craigmiller160.expensetrackerapi.common.data.typedid.TypedId
+import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.TransactionId
 import io.craigmiller160.expensetrackerapi.function.TryEither
 import io.craigmiller160.expensetrackerapi.service.TransactionService
 import io.craigmiller160.expensetrackerapi.web.types.CategorizeTransactionsRequest
@@ -8,11 +10,13 @@ import io.craigmiller160.expensetrackerapi.web.types.DeleteTransactionsRequest
 import io.craigmiller160.expensetrackerapi.web.types.NeedsAttentionResponse
 import io.craigmiller160.expensetrackerapi.web.types.SearchTransactionsRequest
 import io.craigmiller160.expensetrackerapi.web.types.SearchTransactionsResponse
+import io.craigmiller160.expensetrackerapi.web.types.UpdateTransactionDetailsRequest
 import io.craigmiller160.expensetrackerapi.web.types.UpdateTransactionsRequest
 import javax.validation.Valid
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
@@ -49,4 +53,11 @@ class TransactionController(private val transactionService: TransactionService) 
   @ResponseStatus(HttpStatus.NO_CONTENT)
   fun updateTransactions(@RequestBody request: UpdateTransactionsRequest): TryEither<Unit> =
     transactionService.updateTransactions(request)
+
+  @PutMapping("/{transactionId}/details")
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  fun updateTransactionDetails(
+    @PathVariable("transactionId") transactionId: TypedId<TransactionId>,
+    @RequestBody request: UpdateTransactionDetailsRequest
+  ): TryEither<Unit> = transactionService.updateTransactionDetails(transactionId, request)
 }
