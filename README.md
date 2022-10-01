@@ -4,4 +4,6 @@ The backend for a program to help me track my expenses.
 
 ## How to Run (Dev)
 
-Use the command `gradle bootRun`.
+Create a Postgres database `expense_tracker_dev`, if it isn't already.
+
+Then use the command `mvnd spring-boot:run`.
