@@ -130,8 +130,8 @@ class TransactionService(
     val userId = oAuth2Service.getAuthenticatedUser().userId
 
     return Either.catch {
-      val validCategoryId =
-        request.categoryId?.let { categoryRepository.findByIdAndUserId(it, userId) }?.id
+      val validCategory =
+        request.categoryId?.let { categoryRepository.findByIdAndUserId(it, userId) }
       val transaction =
         Transaction(
           userId = userId,
@@ -140,8 +140,8 @@ class TransactionService(
           amount = request.amount,
           confirmed = true,
           duplicate = false,
-          categoryId = validCategoryId)
-      transactionRepository.save(transaction).let(TransactionResponse::from)
+          categoryId = validCategory?.id)
+      transactionRepository.save(transaction).let { TransactionResponse.from(it, validCategory) }
     }
   }
 
