@@ -26,7 +26,7 @@ data class TransactionResponse(
         description = transaction.description,
         amount = transaction.amount,
         confirmed = transaction.confirmed,
-        duplicate = transaction.duplicate,
+        duplicate = false, // TODO this should be set based on a query
         categoryId = category?.id,
         categoryName = category?.name)
   }

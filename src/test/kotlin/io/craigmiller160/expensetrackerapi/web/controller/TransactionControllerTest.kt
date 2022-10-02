@@ -230,34 +230,35 @@ class TransactionControllerTest : BaseIntegrationTest() {
 
   @Test
   fun `search - only duplicates`() {
-    val txn1 = transactionRepository.saveAndFlush(user1Transactions[0].copy(duplicate = true))
-    val txn2 = transactionRepository.saveAndFlush(user1Transactions[2].copy(duplicate = true))
-    val request =
-      SearchTransactionsRequest(
-        isDuplicate = true,
-        pageNumber = 0,
-        pageSize = 100,
-        sortKey = TransactionSortKey.EXPENSE_DATE,
-        sortDirection = SortDirection.ASC)
-
-    val response =
-      SearchTransactionsResponse(
-        transactions =
-          listOf(
-            TransactionResponse.from(txn1, user1Categories[0]),
-            TransactionResponse.from(txn2, user1Categories[2])),
-        pageNumber = 0,
-        totalItems = 2)
-
-    mockMvc
-      .get("/transactions?${request.toQueryString()}") {
-        secure = true
-        header("Authorization", "Bearer $token")
-      }
-      .andExpect {
-        status { isOk() }
-        content { json(objectMapper.writeValueAsString(response)) }
-      }
+    //    val txn1 = transactionRepository.saveAndFlush(user1Transactions[0].copy(duplicate = true))
+    //    val txn2 = transactionRepository.saveAndFlush(user1Transactions[2].copy(duplicate = true))
+    //    val request =
+    //      SearchTransactionsRequest(
+    //        isDuplicate = true,
+    //        pageNumber = 0,
+    //        pageSize = 100,
+    //        sortKey = TransactionSortKey.EXPENSE_DATE,
+    //        sortDirection = SortDirection.ASC)
+    //
+    //    val response =
+    //      SearchTransactionsResponse(
+    //        transactions =
+    //          listOf(
+    //            TransactionResponse.from(txn1, user1Categories[0]),
+    //            TransactionResponse.from(txn2, user1Categories[2])),
+    //        pageNumber = 0,
+    //        totalItems = 2)
+    //
+    //    mockMvc
+    //      .get("/transactions?${request.toQueryString()}") {
+    //        secure = true
+    //        header("Authorization", "Bearer $token")
+    //      }
+    //      .andExpect {
+    //        status { isOk() }
+    //        content { json(objectMapper.writeValueAsString(response)) }
+    //      }
+    TODO()
   }
 
   @Test
@@ -281,37 +282,38 @@ class TransactionControllerTest : BaseIntegrationTest() {
 
   @Test
   fun `search - only non-duplicates`() {
-    transactionRepository.saveAndFlush(user1Transactions[1].copy(duplicate = true))
-    transactionRepository.saveAndFlush(user1Transactions[3].copy(duplicate = true))
-    transactionRepository.saveAndFlush(user1Transactions[4].copy(duplicate = true))
-    transactionRepository.saveAndFlush(user1Transactions[5].copy(duplicate = true))
-    transactionRepository.saveAndFlush(user1Transactions[6].copy(duplicate = true))
-    val request =
-      SearchTransactionsRequest(
-        isDuplicate = false,
-        pageNumber = 0,
-        pageSize = 100,
-        sortKey = TransactionSortKey.EXPENSE_DATE,
-        sortDirection = SortDirection.ASC)
-
-    val response =
-      SearchTransactionsResponse(
-        transactions =
-          listOf(
-            TransactionResponse.from(user1Transactions[0], user1Categories[0]),
-            TransactionResponse.from(user1Transactions[2], user1Categories[2])),
-        pageNumber = 0,
-        totalItems = 2)
-
-    mockMvc
-      .get("/transactions?${request.toQueryString()}") {
-        secure = true
-        header("Authorization", "Bearer $token")
-      }
-      .andExpect {
-        status { isOk() }
-        content { json(objectMapper.writeValueAsString(response)) }
-      }
+    //    transactionRepository.saveAndFlush(user1Transactions[1].copy(duplicate = true))
+    //    transactionRepository.saveAndFlush(user1Transactions[3].copy(duplicate = true))
+    //    transactionRepository.saveAndFlush(user1Transactions[4].copy(duplicate = true))
+    //    transactionRepository.saveAndFlush(user1Transactions[5].copy(duplicate = true))
+    //    transactionRepository.saveAndFlush(user1Transactions[6].copy(duplicate = true))
+    //    val request =
+    //      SearchTransactionsRequest(
+    //        isDuplicate = false,
+    //        pageNumber = 0,
+    //        pageSize = 100,
+    //        sortKey = TransactionSortKey.EXPENSE_DATE,
+    //        sortDirection = SortDirection.ASC)
+    //
+    //    val response =
+    //      SearchTransactionsResponse(
+    //        transactions =
+    //          listOf(
+    //            TransactionResponse.from(user1Transactions[0], user1Categories[0]),
+    //            TransactionResponse.from(user1Transactions[2], user1Categories[2])),
+    //        pageNumber = 0,
+    //        totalItems = 2)
+    //
+    //    mockMvc
+    //      .get("/transactions?${request.toQueryString()}") {
+    //        secure = true
+    //        header("Authorization", "Bearer $token")
+    //      }
+    //      .andExpect {
+    //        status { isOk() }
+    //        content { json(objectMapper.writeValueAsString(response)) }
+    //      }
+    TODO()
   }
 
   @Test
@@ -353,28 +355,29 @@ class TransactionControllerTest : BaseIntegrationTest() {
 
   @Test
   fun `get data on what records need attention, when all types need attention`() {
-    val oldestUnconfirmed =
-      transactionRepository.saveAndFlush(user1Transactions[0].copy(confirmed = false))
-    val oldestDuplicate =
-      transactionRepository.saveAndFlush(user1Transactions[2].copy(duplicate = true))
-    val oldestPossibleRefund =
-      transactionRepository.saveAndFlush(
-        user1Transactions[3].copy(amount = user1Transactions[3].amount * BigDecimal("-1")))
-    val response =
-      NeedsAttentionResponse(
-        unconfirmed = CountAndOldest(count = 4, oldest = oldestUnconfirmed.expenseDate),
-        uncategorized = CountAndOldest(count = 3, oldest = user1Transactions[1].expenseDate),
-        duplicate = CountAndOldest(count = 1, oldest = oldestDuplicate.expenseDate),
-        possibleRefund = CountAndOldest(count = 1, oldest = oldestPossibleRefund.expenseDate))
-    mockMvc
-      .get("/transactions/needs-attention") {
-        secure = true
-        header("Authorization", "Bearer $token")
-      }
-      .andExpect {
-        status { isOk() }
-        content { json(objectMapper.writeValueAsString(response)) }
-      }
+    //    val oldestUnconfirmed =
+    //      transactionRepository.saveAndFlush(user1Transactions[0].copy(confirmed = false))
+    //    val oldestDuplicate =
+    //      transactionRepository.saveAndFlush(user1Transactions[2].copy(duplicate = true))
+    //    val oldestPossibleRefund =
+    //      transactionRepository.saveAndFlush(
+    //        user1Transactions[3].copy(amount = user1Transactions[3].amount * BigDecimal("-1")))
+    //    val response =
+    //      NeedsAttentionResponse(
+    //        unconfirmed = CountAndOldest(count = 4, oldest = oldestUnconfirmed.expenseDate),
+    //        uncategorized = CountAndOldest(count = 3, oldest = user1Transactions[1].expenseDate),
+    //        duplicate = CountAndOldest(count = 1, oldest = oldestDuplicate.expenseDate),
+    //        possibleRefund = CountAndOldest(count = 1, oldest = oldestPossibleRefund.expenseDate))
+    //    mockMvc
+    //      .get("/transactions/needs-attention") {
+    //        secure = true
+    //        header("Authorization", "Bearer $token")
+    //      }
+    //      .andExpect {
+    //        status { isOk() }
+    //        content { json(objectMapper.writeValueAsString(response)) }
+    //      }
+    TODO()
   }
 
   @Test
