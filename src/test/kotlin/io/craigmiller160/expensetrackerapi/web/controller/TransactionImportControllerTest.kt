@@ -2,7 +2,9 @@ package io.craigmiller160.expensetrackerapi.web.controller
 
 import arrow.core.Either
 import arrow.core.flatMap
+import arrow.core.getOrHandle
 import io.craigmiller160.expensetrackerapi.BaseIntegrationTest
+import io.craigmiller160.expensetrackerapi.data.repository.TransactionDuplicateRepository
 import io.craigmiller160.expensetrackerapi.data.repository.TransactionRepository
 import io.craigmiller160.expensetrackerapi.service.TransactionImportType
 import io.craigmiller160.expensetrackerapi.testutils.ResourceUtils
@@ -11,6 +13,7 @@ import io.kotest.assertions.arrow.core.shouldBeRight
 import java.math.BigDecimal
 import java.time.LocalDate
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.Assertions.assertArrayEquals
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.MediaType
@@ -19,6 +22,7 @@ import org.springframework.test.web.servlet.multipart
 
 class TransactionImportControllerTest : BaseIntegrationTest() {
   @Autowired private lateinit var transactionRepository: TransactionRepository
+  @Autowired private lateinit var transactionDuplicateRepository: TransactionDuplicateRepository
   @Test
   fun getImportTypes() {
     val expectedResponse =
@@ -35,8 +39,42 @@ class TransactionImportControllerTest : BaseIntegrationTest() {
   }
 
   @Test
-  fun `importTransactions - DISCOVER_CSV with duplicates`() {
+  fun `importTransactions - DISCOVER_CSV with duplicates already in database`() {
     TODO()
+  }
+
+  @Test
+  fun `importTransactions - DISCOVER_CSV with duplicates in import`() {
+    val duplicateLine =
+      """05/18/2022,05/18/2022,"PANDA EXPRESS 1679 RIVERVIEW FL",5.81,"Restaurants""""
+    val csvBytes =
+      ResourceUtils.getResourceBytes("data/discover1.csv")
+        .map { "${String(it)}\n$duplicateLine".toByteArray() }
+        .getOrHandle { throw it }
+
+    mockMvc
+      .multipart("/transaction-import?type=${TransactionImportType.DISCOVER_CSV.name}") {
+        secure = true
+        header("Authorization", "Bearer $token")
+        header("Content-Type", MediaType.MULTIPART_FORM_DATA_VALUE)
+        file("file", csvBytes)
+      }
+      .andExpect {
+        status { isOk() }
+        content { json("""{"transactionsImported":57}""") }
+      }
+
+    val allTransactions = transactionRepository.findAll()
+    val lastTransaction = allTransactions.last()
+    val nextToLastTransaction = allTransactions[allTransactions.size - 2]
+    assertArrayEquals(lastTransaction.contentHash, nextToLastTransaction.contentHash)
+
+    val duplicates =
+      transactionDuplicateRepository.findAllByUserIdAndNewTransactionId(1L, lastTransaction.id)
+    assertThat(duplicates).hasSize(1)
+    assertThat(duplicates.first())
+      .hasFieldOrPropertyWithValue("newTransactionId", lastTransaction.id)
+      .hasFieldOrPropertyWithValue("possibleDuplicateTransactionId", nextToLastTransaction.id)
   }
 
   @Test
