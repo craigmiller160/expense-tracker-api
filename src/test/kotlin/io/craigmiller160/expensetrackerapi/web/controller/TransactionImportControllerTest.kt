@@ -4,8 +4,10 @@ import arrow.core.Either
 import arrow.core.flatMap
 import arrow.core.getOrHandle
 import io.craigmiller160.expensetrackerapi.BaseIntegrationTest
+import io.craigmiller160.expensetrackerapi.data.model.Transaction
 import io.craigmiller160.expensetrackerapi.data.repository.TransactionDuplicateRepository
 import io.craigmiller160.expensetrackerapi.data.repository.TransactionRepository
+import io.craigmiller160.expensetrackerapi.data.utils.TransactionContentHash
 import io.craigmiller160.expensetrackerapi.service.TransactionImportType
 import io.craigmiller160.expensetrackerapi.testutils.ResourceUtils
 import io.craigmiller160.expensetrackerapi.web.types.ImportTypeResponse
@@ -40,7 +42,44 @@ class TransactionImportControllerTest : BaseIntegrationTest() {
 
   @Test
   fun `importTransactions - DISCOVER_CSV with duplicates already in database`() {
-    TODO()
+    val expenseDate = LocalDate.of(2022, 5, 18)
+    val description = "PANDA EXPRESS 1679 RIVERVIEW FL"
+    val amount = BigDecimal("-5.81")
+    val transaction =
+      transactionRepository.save(
+        Transaction(
+          userId = 1L,
+          expenseDate = expenseDate,
+          description = description,
+          amount = amount,
+          confirmed = false,
+          contentHash = TransactionContentHash.hash(expenseDate, amount, description)))
+    val csvBytes = ResourceUtils.getResourceBytes("data/discover1.csv").getOrHandle { throw it }
+
+    mockMvc
+      .multipart("/transaction-import?type=${TransactionImportType.DISCOVER_CSV.name}") {
+        secure = true
+        header("Authorization", "Bearer $token")
+        header("Content-Type", MediaType.MULTIPART_FORM_DATA_VALUE)
+        file("file", csvBytes)
+      }
+      .andExpect {
+        status { isOk() }
+        content { json("""{"transactionsImported":57}""") }
+      }
+
+    val allDuplicateTransactions =
+      transactionRepository.findAllByUserIdAndContentHashOrderByCreated(1L, transaction.contentHash)
+    val lastTransaction = allDuplicateTransactions.last()
+    val nextToLastTransaction = allDuplicateTransactions[allDuplicateTransactions.size - 2]
+    assertArrayEquals(lastTransaction.contentHash, nextToLastTransaction.contentHash)
+
+    val duplicates =
+      transactionDuplicateRepository.findAllByUserIdAndNewTransactionId(1L, lastTransaction.id)
+    assertThat(duplicates).hasSize(1)
+    assertThat(duplicates.first())
+      .hasFieldOrPropertyWithValue("newTransactionId", lastTransaction.id)
+      .hasFieldOrPropertyWithValue("possibleDuplicateTransactionId", nextToLastTransaction.id)
   }
 
   @Test
@@ -64,9 +103,14 @@ class TransactionImportControllerTest : BaseIntegrationTest() {
         content { json("""{"transactionsImported":57}""") }
       }
 
-    val allTransactions = transactionRepository.findAll()
-    val lastTransaction = allTransactions.last()
-    val nextToLastTransaction = allTransactions[allTransactions.size - 2]
+    val contentHash =
+      TransactionContentHash.hash(
+        LocalDate.of(2022, 5, 18), BigDecimal("-5.81"), "PANDA EXPRESS 1679 RIVERVIEW FL")
+
+    val allDuplicateTransactions =
+      transactionRepository.findAllByUserIdAndContentHashOrderByCreated(1L, contentHash)
+    val lastTransaction = allDuplicateTransactions.last()
+    val nextToLastTransaction = allDuplicateTransactions[allDuplicateTransactions.size - 2]
     assertArrayEquals(lastTransaction.contentHash, nextToLastTransaction.contentHash)
 
     val duplicates =

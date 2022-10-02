@@ -16,6 +16,11 @@ interface TransactionRepository :
   TransactionRepositoryCustom {
   fun findAllByOrderByExpenseDateAscDescriptionAsc(): List<Transaction>
 
+  fun findAllByUserIdAndContentHashOrderByCreated(
+    userId: Long,
+    contentHash: ByteArray
+  ): List<Transaction>
+
   fun findByIdAndUserId(id: TypedId<TransactionId>, userId: Long): Transaction?
 
   @Query(
