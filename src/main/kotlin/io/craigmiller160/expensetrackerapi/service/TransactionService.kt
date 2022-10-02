@@ -15,6 +15,7 @@ import io.craigmiller160.expensetrackerapi.data.model.toSpringSortDirection
 import io.craigmiller160.expensetrackerapi.data.projection.NeedsAttentionType
 import io.craigmiller160.expensetrackerapi.data.repository.CategoryRepository
 import io.craigmiller160.expensetrackerapi.data.repository.TransactionRepository
+import io.craigmiller160.expensetrackerapi.data.utils.TransactionContentHash
 import io.craigmiller160.expensetrackerapi.function.TryEither
 import io.craigmiller160.expensetrackerapi.function.flatMapCatch
 import io.craigmiller160.expensetrackerapi.web.types.CountAndOldest
@@ -139,7 +140,9 @@ class TransactionService(
           description = request.description,
           amount = request.amount,
           confirmed = true,
-          categoryId = validCategory?.id)
+          categoryId = validCategory?.id,
+          contentHash =
+            TransactionContentHash.hash(request.expenseDate, request.amount, request.description))
       transactionRepository.save(transaction).let { TransactionResponse.from(it, validCategory) }
     }
   }
