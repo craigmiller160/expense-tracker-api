@@ -2,34 +2,29 @@ package io.craigmiller160.expensetrackerapi.web.types
 
 import io.craigmiller160.expensetrackerapi.common.data.typedid.TypedId
 import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.CategoryId
+import io.craigmiller160.expensetrackerapi.common.utils.DateUtils
 import java.time.LocalDate
-import java.time.format.DateTimeFormatter
 import javax.validation.constraints.AssertTrue
 import org.springframework.format.annotation.DateTimeFormat
-
-const val DATE_PATTERN = "yyyy-MM-dd"
 
 data class SearchTransactionsRequest(
   override val pageNumber: Int,
   override val pageSize: Int,
   override val sortKey: TransactionSortKey,
   override val sortDirection: SortDirection,
-  @field:DateTimeFormat(pattern = DATE_PATTERN) val startDate: LocalDate? = null,
-  @field:DateTimeFormat(pattern = DATE_PATTERN) val endDate: LocalDate? = null,
+  @field:DateTimeFormat(pattern = DateUtils.DATE_PATTERN) val startDate: LocalDate? = null,
+  @field:DateTimeFormat(pattern = DateUtils.DATE_PATTERN) val endDate: LocalDate? = null,
   val isConfirmed: Boolean? = null,
   val isCategorized: Boolean? = null,
   val isDuplicate: Boolean? = null,
   val isPossibleRefund: Boolean? = null,
   val categoryIds: Set<TypedId<CategoryId>>? = null
 ) : PageableRequest, SortableRequest<TransactionSortKey> {
-  companion object {
-    private val DATE_FORMAT = DateTimeFormatter.ofPattern(DATE_PATTERN)
-  }
 
   @AssertTrue(message = "Cannot set WITHOUT_CATEGORY and specify categoryIds")
   private fun isCategoryPropsValid(): Boolean {
     if (isCategorized == false) {
-      return categoryIds == null || categoryIds.isEmpty()
+      return categoryIds.isNullOrEmpty()
     }
     return true
   }
@@ -40,8 +35,8 @@ data class SearchTransactionsRequest(
         "pageSize" to pageSize,
         "sortKey" to sortKey.name,
         "sortDirection" to sortDirection.name,
-        "startDate" to startDate?.let { DATE_FORMAT.format(it) },
-        "endDate" to endDate?.let { DATE_FORMAT.format(it) },
+        "startDate" to startDate?.let { DateUtils.format(it) },
+        "endDate" to endDate?.let { DateUtils.format(it) },
         "isConfirmed" to isConfirmed,
         "isCategorized" to isCategorized,
         "isDuplicate" to isDuplicate,
