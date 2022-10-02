@@ -1,6 +1,5 @@
 package io.craigmiller160.expensetrackerapi.common.utils
 
-import io.craigmiller160.expensetrackerapi.web.types.DATE_PATTERN
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
