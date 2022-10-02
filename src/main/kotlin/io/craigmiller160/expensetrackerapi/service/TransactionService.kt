@@ -154,6 +154,7 @@ class TransactionService(
       confirmTransactions(request.transactions).bind()
     }
 
+  @Transactional
   fun updateTransactionDetails(
     transactionId: TypedId<TransactionId>,
     request: UpdateTransactionDetailsRequest
