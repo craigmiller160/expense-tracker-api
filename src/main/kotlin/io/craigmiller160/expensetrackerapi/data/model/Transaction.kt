@@ -28,4 +28,6 @@ data class Transaction(
   override val created: ZonedDateTime = ZonedDateTime.now(),
   override var updated: ZonedDateTime = ZonedDateTime.now(),
   @Version override val version: Long = 1
-) : MutableEntity<TransactionId>
+) : MutableEntity<TransactionId> {
+  val contentHash: ByteArray = TODO()
+}
