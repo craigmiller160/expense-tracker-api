@@ -33,3 +33,8 @@ ALTER TABLE
     transactions ALTER COLUMN content_hash
 SET
     NOT NULL;
+
+-- TODO this may not be able to be indexed efficiently as bytea
+CREATE
+    INDEX transaction_content_hash_idx ON
+    transactions(content_hash);

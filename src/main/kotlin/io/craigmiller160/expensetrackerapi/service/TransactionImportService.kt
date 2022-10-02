@@ -36,5 +36,9 @@ class TransactionImportService(
   }
 
   private fun checkForDuplicates(transactions: List<Transaction>): TryEither<List<Transaction>> =
-    Either.catch { TODO() }
+    Either.catch {
+      val hashes = transactions.map { it.contentHash }
+
+      TODO()
+    }
 }
