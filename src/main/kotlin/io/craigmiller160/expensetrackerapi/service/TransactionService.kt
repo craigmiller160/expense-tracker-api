@@ -139,7 +139,6 @@ class TransactionService(
           description = request.description,
           amount = request.amount,
           confirmed = true,
-          duplicate = false,
           categoryId = validCategory?.id)
       transactionRepository.save(transaction).let { TransactionResponse.from(it, validCategory) }
     }
