@@ -4,6 +4,7 @@ import arrow.core.Either
 import arrow.core.flatMap
 import arrow.core.sequence
 import io.craigmiller160.expensetrackerapi.data.model.Transaction
+import io.craigmiller160.expensetrackerapi.data.utils.TransactionContentHash
 import io.craigmiller160.expensetrackerapi.function.TryEither
 import java.io.InputStream
 import java.math.BigDecimal
@@ -33,7 +34,11 @@ class DiscoverCsvTransactionParser : TransactionParser {
       val rawAmount = row[3]
       val amount = BigDecimal(rawAmount).times(BigDecimal("-1"))
       Transaction(
-        userId = userId, expenseDate = expenseDate, description = description, amount = amount)
+        userId = userId,
+        expenseDate = expenseDate,
+        description = description,
+        amount = amount,
+        contentHash = TransactionContentHash.hash(expenseDate, amount, description))
     }
   }
 }

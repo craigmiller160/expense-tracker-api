@@ -7,6 +7,7 @@ import io.craigmiller160.expensetrackerapi.data.model.Category
 import io.craigmiller160.expensetrackerapi.data.model.Transaction
 import io.craigmiller160.expensetrackerapi.data.repository.CategoryRepository
 import io.craigmiller160.expensetrackerapi.data.repository.TransactionRepository
+import io.craigmiller160.expensetrackerapi.data.utils.TransactionContentHash
 import java.math.BigDecimal
 import java.time.LocalDate
 import org.springframework.stereotype.Component
@@ -20,13 +21,16 @@ class DataHelper(
   private var internalDate = LocalDate.now().minusDays(100)
   fun createTransaction(userId: Long, categoryId: TypedId<CategoryId>? = null): Transaction {
     internalDate = internalDate.plusDays(1)
+    val description = faker.company().name()
+    val amount = BigDecimal(faker.commerce().price()) * BigDecimal("-1")
     return transactionRepository.saveAndFlush(
       Transaction(
         userId = userId,
         expenseDate = internalDate,
-        description = faker.company().name(),
-        amount = BigDecimal(faker.commerce().price()) * BigDecimal("-1"),
-        categoryId = categoryId))
+        description = description,
+        amount = amount,
+        categoryId = categoryId,
+        contentHash = TransactionContentHash.hash(internalDate, amount, description)))
   }
 
   fun createCategory(userId: Long, name: String): Category =
