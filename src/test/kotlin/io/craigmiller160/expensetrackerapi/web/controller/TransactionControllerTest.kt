@@ -868,4 +868,9 @@ class TransactionControllerTest : BaseIntegrationTest() {
   fun `createTransaction is duplicate`() {
     TODO()
   }
+
+  @Test
+  fun `updateTransactionDetails is duplicate`() {
+    TODO()
+  }
 }
