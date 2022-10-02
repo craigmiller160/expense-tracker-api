@@ -9,6 +9,7 @@ import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.CategoryId
 import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.TransactionId
 import io.craigmiller160.expensetrackerapi.common.error.BadRequestException
 import io.craigmiller160.expensetrackerapi.data.model.Category
+import io.craigmiller160.expensetrackerapi.data.model.Transaction
 import io.craigmiller160.expensetrackerapi.data.model.toColumnName
 import io.craigmiller160.expensetrackerapi.data.model.toSpringSortDirection
 import io.craigmiller160.expensetrackerapi.data.projection.NeedsAttentionType
@@ -17,16 +18,17 @@ import io.craigmiller160.expensetrackerapi.data.repository.TransactionRepository
 import io.craigmiller160.expensetrackerapi.function.TryEither
 import io.craigmiller160.expensetrackerapi.function.flatMapCatch
 import io.craigmiller160.expensetrackerapi.web.types.CountAndOldest
+import io.craigmiller160.expensetrackerapi.web.types.CreateTransactionRequest
 import io.craigmiller160.expensetrackerapi.web.types.DeleteTransactionsRequest
 import io.craigmiller160.expensetrackerapi.web.types.NeedsAttentionResponse
 import io.craigmiller160.expensetrackerapi.web.types.SearchTransactionsRequest
 import io.craigmiller160.expensetrackerapi.web.types.SearchTransactionsResponse
 import io.craigmiller160.expensetrackerapi.web.types.TransactionAndCategoryUpdateItem
 import io.craigmiller160.expensetrackerapi.web.types.TransactionAndConfirmUpdateItem
+import io.craigmiller160.expensetrackerapi.web.types.TransactionResponse
 import io.craigmiller160.expensetrackerapi.web.types.UpdateTransactionDetailsRequest
 import io.craigmiller160.expensetrackerapi.web.types.UpdateTransactionsRequest
 import io.craigmiller160.oauth2.service.OAuth2Service
-import java.math.BigDecimal
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
 import org.springframework.stereotype.Service
@@ -124,6 +126,25 @@ class TransactionService(
       .map { (page, categories) -> SearchTransactionsResponse.from(page, categories) }
   }
 
+  fun createTransaction(request: CreateTransactionRequest): TryEither<TransactionResponse> {
+    val userId = oAuth2Service.getAuthenticatedUser().userId
+
+    return Either.catch {
+      val validCategory =
+        request.categoryId?.let { categoryRepository.findByIdAndUserId(it, userId) }
+      val transaction =
+        Transaction(
+          userId = userId,
+          expenseDate = request.expenseDate,
+          description = request.description,
+          amount = request.amount,
+          confirmed = true,
+          duplicate = false,
+          categoryId = validCategory?.id)
+      transactionRepository.save(transaction).let { TransactionResponse.from(it, validCategory) }
+    }
+  }
+
   @Transactional
   fun updateTransactions(request: UpdateTransactionsRequest): TryEither<Unit> =
     either.eager {
@@ -138,14 +159,16 @@ class TransactionService(
     val userId = oAuth2Service.getAuthenticatedUser().userId
 
     return Either.catch {
+        val validCategoryId =
+          request.categoryId?.let { categoryRepository.findByIdAndUserId(it, userId) }?.id
         transactionRepository
           .findByIdAndUserId(transactionId, userId)
           ?.copy(
             confirmed = request.confirmed,
             expenseDate = request.expenseDate,
             description = request.description,
-            amount = BigDecimal("${request.amount}"),
-            categoryId = request.categoryId)
+            amount = request.amount,
+            categoryId = validCategoryId)
           ?.let { transactionRepository.save(it) }
           ?.let { Either.Right(Unit) }
           ?: Either.Left(BadRequestException("No transaction with ID: $transactionId"))
