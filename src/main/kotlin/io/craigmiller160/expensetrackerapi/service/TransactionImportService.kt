@@ -1,5 +1,8 @@
 package io.craigmiller160.expensetrackerapi.service
 
+import arrow.core.Either
+import arrow.core.flatMap
+import io.craigmiller160.expensetrackerapi.data.model.Transaction
 import io.craigmiller160.expensetrackerapi.data.repository.TransactionRepository
 import io.craigmiller160.expensetrackerapi.function.TryEither
 import io.craigmiller160.expensetrackerapi.function.flatMapCatch
@@ -28,6 +31,10 @@ class TransactionImportService(
     return parser
       .parse(authUser.userId, stream)
       .flatMapCatch { transactions -> transactionRepository.saveAll(transactions) }
+      .flatMap { transactions -> checkForDuplicates(transactions) }
       .map { transactions -> ImportTransactionsResponse(transactions.size) }
   }
+
+  private fun checkForDuplicates(transactions: List<Transaction>): TryEither<List<Transaction>> =
+    Either.catch { TODO() }
 }
