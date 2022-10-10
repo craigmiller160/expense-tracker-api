@@ -98,6 +98,9 @@ class TransactionImportControllerTest : BaseIntegrationTest() {
         content { json("""{"transactionsImported":57}""") }
       }
 
+    entityManager.flush()
+    entityManager.clear()
+
     val contentHash =
       TransactionContentHash.hash(
         1L, LocalDate.of(2022, 5, 18), BigDecimal("-5.81"), "PANDA EXPRESS 1679 RIVERVIEW FL")
@@ -135,6 +138,9 @@ class TransactionImportControllerTest : BaseIntegrationTest() {
         }
       }
       .shouldBeRight()
+
+    entityManager.flush()
+    entityManager.clear()
 
     val transactions = transactionRepository.findAllByOrderByExpenseDateAscDescriptionAsc()
     assertThat(transactions).hasSize(57)
@@ -178,6 +184,9 @@ class TransactionImportControllerTest : BaseIntegrationTest() {
         }
       }
       .shouldBeRight()
+
+    entityManager.flush()
+    entityManager.clear()
 
     val transactions = transactionRepository.findAllByOrderByExpenseDateAscDescriptionAsc()
     assertThat(transactions).hasSize(23)
