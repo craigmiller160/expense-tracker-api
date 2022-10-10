@@ -5,7 +5,6 @@ import arrow.core.flatMap
 import arrow.core.getOrHandle
 import io.craigmiller160.expensetrackerapi.BaseIntegrationTest
 import io.craigmiller160.expensetrackerapi.data.model.Transaction
-import io.craigmiller160.expensetrackerapi.data.repository.TransactionDuplicateRepository
 import io.craigmiller160.expensetrackerapi.data.repository.TransactionRepository
 import io.craigmiller160.expensetrackerapi.data.utils.TransactionContentHash
 import io.craigmiller160.expensetrackerapi.service.TransactionImportType
@@ -23,9 +22,7 @@ import org.springframework.test.web.servlet.get
 import org.springframework.test.web.servlet.multipart
 
 class TransactionImportControllerTest : BaseIntegrationTest() {
-  // TODO make sure content hashes are being set properly
   @Autowired private lateinit var transactionRepository: TransactionRepository
-  @Autowired private lateinit var transactionDuplicateRepository: TransactionDuplicateRepository
   @Test
   fun getImportTypes() {
     val expectedResponse =
@@ -69,19 +66,15 @@ class TransactionImportControllerTest : BaseIntegrationTest() {
         content { json("""{"transactionsImported":57}""") }
       }
 
+    entityManager.flush()
+    entityManager.clear()
+
     val allDuplicateTransactions =
       transactionRepository.findAllByUserIdAndContentHashInOrderByCreated(
         1L, listOf(transaction.contentHash))
     val lastTransaction = allDuplicateTransactions.last()
     val nextToLastTransaction = allDuplicateTransactions[allDuplicateTransactions.size - 2]
     assertEquals(lastTransaction.contentHash, nextToLastTransaction.contentHash)
-
-    val duplicates =
-      transactionDuplicateRepository.findAllByUserIdAndNewTransactionId(1L, lastTransaction.id)
-    assertThat(duplicates).hasSize(1)
-    assertThat(duplicates.first())
-      .hasFieldOrPropertyWithValue("newTransactionId", lastTransaction.id)
-      .hasFieldOrPropertyWithValue("possibleDuplicateTransactionId", nextToLastTransaction.id)
   }
 
   @Test
