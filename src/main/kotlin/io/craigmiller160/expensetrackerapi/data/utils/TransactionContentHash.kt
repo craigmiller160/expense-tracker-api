@@ -6,6 +6,6 @@ import java.math.BigDecimal
 import java.time.LocalDate
 
 object TransactionContentHash {
-  fun hash(expenseDate: LocalDate, amount: BigDecimal, description: String): ByteArray =
-    SHA256.hash("${DateUtils.format(expenseDate)}${amount.toDouble()}$description")
+  fun hash(userId: Long, expenseDate: LocalDate, amount: BigDecimal, description: String): String =
+    SHA256.hash("$userId${DateUtils.format(expenseDate)}${amount.toDouble()}$description")
 }

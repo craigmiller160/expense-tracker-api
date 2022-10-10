@@ -15,7 +15,7 @@ import io.kotest.assertions.arrow.core.shouldBeRight
 import java.math.BigDecimal
 import java.time.LocalDate
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.Assertions.assertArrayEquals
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.MediaType
@@ -54,7 +54,7 @@ class TransactionImportControllerTest : BaseIntegrationTest() {
           description = description,
           amount = amount,
           confirmed = false,
-          contentHash = TransactionContentHash.hash(expenseDate, amount, description)))
+          contentHash = TransactionContentHash.hash(1L, expenseDate, amount, description)))
     val csvBytes = ResourceUtils.getResourceBytes("data/discover1.csv").getOrHandle { throw it }
 
     mockMvc
@@ -70,10 +70,11 @@ class TransactionImportControllerTest : BaseIntegrationTest() {
       }
 
     val allDuplicateTransactions =
-      transactionRepository.findAllByUserIdAndContentHashOrderByCreated(1L, transaction.contentHash)
+      transactionRepository.findAllByUserIdAndContentHashInOrderByCreated(
+        1L, listOf(transaction.contentHash))
     val lastTransaction = allDuplicateTransactions.last()
     val nextToLastTransaction = allDuplicateTransactions[allDuplicateTransactions.size - 2]
-    assertArrayEquals(lastTransaction.contentHash, nextToLastTransaction.contentHash)
+    assertEquals(lastTransaction.contentHash, nextToLastTransaction.contentHash)
 
     val duplicates =
       transactionDuplicateRepository.findAllByUserIdAndNewTransactionId(1L, lastTransaction.id)
@@ -106,13 +107,13 @@ class TransactionImportControllerTest : BaseIntegrationTest() {
 
     val contentHash =
       TransactionContentHash.hash(
-        LocalDate.of(2022, 5, 18), BigDecimal("-5.81"), "PANDA EXPRESS 1679 RIVERVIEW FL")
+        1L, LocalDate.of(2022, 5, 18), BigDecimal("-5.81"), "PANDA EXPRESS 1679 RIVERVIEW FL")
 
     val allDuplicateTransactions =
-      transactionRepository.findAllByUserIdAndContentHashOrderByCreated(1L, contentHash)
+      transactionRepository.findAllByUserIdAndContentHashInOrderByCreated(1L, listOf(contentHash))
     val lastTransaction = allDuplicateTransactions.last()
     val nextToLastTransaction = allDuplicateTransactions[allDuplicateTransactions.size - 2]
-    assertArrayEquals(lastTransaction.contentHash, nextToLastTransaction.contentHash)
+    assertEquals(lastTransaction.contentHash, nextToLastTransaction.contentHash)
 
     val duplicates =
       transactionDuplicateRepository.findAllByUserIdAndNewTransactionId(1L, lastTransaction.id)
