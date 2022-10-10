@@ -36,6 +36,8 @@ class TransactionRepositoryCustomImpl(
   private val jdbcTemplate: NamedParameterJdbcTemplate,
   private val sqlLoader: SqlLoader
 ) : TransactionRepositoryCustom {
+  // TODO need more indexes for all search-able fields
+  // TODO also every user id should be indexed
 
   override fun getAllNeedsAttentionCounts(userId: Long): List<NeedsAttentionCount> {
     val countSql = sqlLoader.loadSql("get_all_needs_attention_counts.sql")
