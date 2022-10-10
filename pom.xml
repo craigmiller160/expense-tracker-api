@@ -312,14 +312,6 @@
                     <kotlin>
                         <ktfmt />
                     </kotlin>
-                    <sql>
-                        <includes>
-                            <include>src/main/resources/db/migration/*.sql</include>
-                            <include>src/main/resources/db/dev/migration/*.sql</include>
-                            <include>src/main/resources/sql/*.sql</include>
-                        </includes>
-                        <dbeaver />
-                    </sql>
                 </configuration>
                 <executions>
                     <execution>
