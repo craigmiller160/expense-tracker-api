@@ -27,18 +27,22 @@ class TransactionImportService(
     stream: InputStream
   ): TryEither<ImportTransactionsResponse> {
     val parser = transactionParserManager.getParserForType(type)
-    val authUser = oAuth2Service.getAuthenticatedUser()
+    val userId = oAuth2Service.getAuthenticatedUser().userId
     return parser
-      .parse(authUser.userId, stream)
+      .parse(userId, stream)
       .flatMapCatch { transactions -> transactionRepository.saveAll(transactions) }
-      .flatMap { transactions -> checkForDuplicates(transactions) }
+      .flatMap { transactions -> checkForDuplicates(userId, transactions) }
       .map { transactions -> ImportTransactionsResponse(transactions.size) }
   }
 
-  private fun checkForDuplicates(transactions: List<Transaction>): TryEither<List<Transaction>> =
+  private fun checkForDuplicates(
+    userId: Long,
+    transactions: List<Transaction>
+  ): TryEither<List<Transaction>> =
     Either.catch {
       val hashes = transactions.map { it.contentHash }
-      val dbDuplicates
+      val dbDuplicates =
+        transactionRepository.findAllByUserIdAndContentHashInOrderByCreated(userId, hashes)
 
       TODO()
     }

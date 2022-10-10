@@ -16,9 +16,9 @@ interface TransactionRepository :
   TransactionRepositoryCustom {
   fun findAllByOrderByExpenseDateAscDescriptionAsc(): List<Transaction>
 
-  fun findAllByUserIdAndContentHashOrderByCreated(
+  fun findAllByUserIdAndContentHashInOrderByCreated(
     userId: Long,
-    contentHash: ByteArray
+    contentHash: List<String>
   ): List<Transaction>
 
   fun findByIdAndUserId(id: TypedId<TransactionId>, userId: Long): Transaction?
