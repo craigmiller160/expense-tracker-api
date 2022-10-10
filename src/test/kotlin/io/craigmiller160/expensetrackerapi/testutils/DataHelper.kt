@@ -7,7 +7,6 @@ import io.craigmiller160.expensetrackerapi.data.model.Category
 import io.craigmiller160.expensetrackerapi.data.model.Transaction
 import io.craigmiller160.expensetrackerapi.data.repository.CategoryRepository
 import io.craigmiller160.expensetrackerapi.data.repository.TransactionRepository
-import io.craigmiller160.expensetrackerapi.data.utils.TransactionContentHash
 import java.math.BigDecimal
 import java.time.LocalDate
 import org.springframework.stereotype.Component
@@ -29,8 +28,7 @@ class DataHelper(
         expenseDate = internalDate,
         description = description,
         amount = amount,
-        categoryId = categoryId,
-        contentHash = TransactionContentHash.hash(internalDate, amount, description)))
+        categoryId = categoryId))
   }
 
   fun createCategory(userId: Long, name: String): Category =

@@ -1,3 +1,4 @@
+-- TODO maybe delete this, the entity, all of it
 CREATE TABLE transaction_duplicates(
     id UUID NOT NULL,
     user_id BIGINT NOT NULL,

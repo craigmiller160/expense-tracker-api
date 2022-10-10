@@ -2,7 +2,7 @@ CREATE FUNCTION txn_content_hash (user_id BIGINT, expense_date DATE, amount NUME
 RETURNS VARCHAR AS
 $$
     BEGIN
-        RETURN ENCODE(SHA256(CONCAT(user_id, expense_date, amount, description)), 'hex');
+        RETURN ENCODE(DIGEST(CONCAT(user_id, expense_date, amount, description), 'sha256'), 'hex');
     END;
 $$ LANGUAGE plpgsql;
 
