@@ -682,7 +682,6 @@ class TransactionControllerTest : BaseIntegrationTest() {
       .hasFieldOrPropertyWithValue("description", request.description)
       .hasFieldOrPropertyWithValue("categoryId", request.categoryId)
       .hasFieldOrPropertyWithValue("confirmed", true)
-      .hasFieldOrPropertyWithValue("duplicate", false)
   }
 
   @Test
@@ -725,7 +724,6 @@ class TransactionControllerTest : BaseIntegrationTest() {
       .hasFieldOrPropertyWithValue("description", request.description)
       .hasFieldOrPropertyWithValue("categoryId", null)
       .hasFieldOrPropertyWithValue("confirmed", true)
-      .hasFieldOrPropertyWithValue("duplicate", false)
   }
 
   @Test
