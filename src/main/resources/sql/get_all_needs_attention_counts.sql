@@ -4,7 +4,7 @@ WHERE t.user_id = :userId
 AND t.confirmed = FALSE
 UNION
 SELECT 'DUPLICATE' AS TYPE, COUNT(t) AS COUNT
-FROM transactions t
+FROM transactions_view t
 WHERE t.user_id = :userId
 AND t.duplicate = TRUE
 UNION
