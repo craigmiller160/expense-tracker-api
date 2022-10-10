@@ -1,0 +1,19 @@
+select t1.*
+from transactions t1
+where t1.content_hash in (
+    select t2.content_hash
+    from transactions t2
+    where t2.id != t1.id
+);
+
+select t1.*, exists(
+    select t2.*
+    from transactions t2
+    where t2.id != t1.id
+    and t2.content_hash = t1.content_hash
+) as duplicate
+from transactions t1;
+
+
+There is no need for a duplicate tracking table. Instead, the above queries use the existing data to derive duplication
+This needs to be integrated into the app properly.

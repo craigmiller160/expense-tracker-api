@@ -26,6 +26,7 @@ RETURNS TRIGGER AS
 $$
     BEGIN
         new.content_hash := txn_content_hash(new.user_id, new.expense_date, new.amount, new.description);
+        RETURN new;
     END;
 $$ LANGUAGE plpgsql;
 
