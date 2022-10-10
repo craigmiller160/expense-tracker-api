@@ -23,6 +23,7 @@ import org.springframework.test.web.servlet.get
 import org.springframework.test.web.servlet.multipart
 
 class TransactionImportControllerTest : BaseIntegrationTest() {
+  // TODO make sure content hashes are being set properly
   @Autowired private lateinit var transactionRepository: TransactionRepository
   @Autowired private lateinit var transactionDuplicateRepository: TransactionDuplicateRepository
   @Test

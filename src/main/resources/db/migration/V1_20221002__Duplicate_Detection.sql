@@ -25,9 +25,9 @@ CREATE FUNCTION set_content_hash_on_change()
 RETURNS TRIGGER AS
 $$
     BEGIN
-        new.content_hash := txn_content_hash(new.user_id, new.expense_date, new.amount, new.description);)
+        new.content_hash := txn_content_hash(new.user_id, new.expense_date, new.amount, new.description);
     END;
-$$;
+$$ LANGUAGE plpgsql;
 
 CREATE TRIGGER set_content_hash_on_change
 BEFORE INSERT OR UPDATE ON transactions
