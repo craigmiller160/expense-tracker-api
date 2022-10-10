@@ -110,13 +110,6 @@ class TransactionImportControllerTest : BaseIntegrationTest() {
     val lastTransaction = allDuplicateTransactions.last()
     val nextToLastTransaction = allDuplicateTransactions[allDuplicateTransactions.size - 2]
     assertEquals(lastTransaction.contentHash, nextToLastTransaction.contentHash)
-
-    val duplicates =
-      transactionDuplicateRepository.findAllByUserIdAndNewTransactionId(1L, lastTransaction.id)
-    assertThat(duplicates).hasSize(1)
-    assertThat(duplicates.first())
-      .hasFieldOrPropertyWithValue("newTransactionId", lastTransaction.id)
-      .hasFieldOrPropertyWithValue("possibleDuplicateTransactionId", nextToLastTransaction.id)
   }
 
   @Test
