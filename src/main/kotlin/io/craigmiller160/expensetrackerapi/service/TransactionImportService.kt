@@ -1,8 +1,5 @@
 package io.craigmiller160.expensetrackerapi.service
 
-import arrow.core.Either
-import arrow.core.flatMap
-import io.craigmiller160.expensetrackerapi.data.model.Transaction
 import io.craigmiller160.expensetrackerapi.data.repository.TransactionRepository
 import io.craigmiller160.expensetrackerapi.function.TryEither
 import io.craigmiller160.expensetrackerapi.function.flatMapCatch
@@ -31,25 +28,6 @@ class TransactionImportService(
     return parser
       .parse(userId, stream)
       .flatMapCatch { transactions -> transactionRepository.saveAll(transactions) }
-      .flatMap { transactions -> checkForDuplicates(userId, transactions) }
       .map { transactions -> ImportTransactionsResponse(transactions.size) }
   }
-
-  private fun checkForDuplicates(
-    userId: Long,
-    transactions: List<Transaction>
-  ): TryEither<List<Transaction>> =
-    Either.catch {
-      val newTransactionsByHash = transactions.groupBy { it.contentHash }
-      val dbDuplicatesByHash =
-        transactionRepository
-          .findAllByUserIdAndContentHashInOrderByCreated(userId, newTransactionsByHash.keys)
-          .groupBy { it.contentHash }
-      // TODO any new transaction with a value list greater than 1 has duplicates
-      // TODO need to do an O(n)^2 iteration for the db duplicates
-      // TODO probably want the duplicate linkage to be bi-directional for maximum impact, but think
-      // about this
-
-      TODO()
-    }
 }
