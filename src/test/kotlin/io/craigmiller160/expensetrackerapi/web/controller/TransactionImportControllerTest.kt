@@ -83,7 +83,7 @@ class TransactionImportControllerTest : BaseIntegrationTest() {
       """05/18/2022,05/18/2022,"PANDA EXPRESS 1679 RIVERVIEW FL",5.81,"Restaurants""""
     val csvBytes =
       ResourceUtils.getResourceBytes("data/discover1.csv")
-        .map { "${String(it)}\n$duplicateLine".toByteArray() }
+        .map { "${String(it).trim()}\n$duplicateLine".toByteArray() }
         .getOrHandle { throw it }
 
     mockMvc
@@ -95,7 +95,7 @@ class TransactionImportControllerTest : BaseIntegrationTest() {
       }
       .andExpect {
         status { isOk() }
-        content { json("""{"transactionsImported":57}""") }
+        content { json("""{"transactionsImported":58}""") }
       }
 
     entityManager.flush()
