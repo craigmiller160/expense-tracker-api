@@ -40,9 +40,15 @@ class TransactionImportService(
     transactions: List<Transaction>
   ): TryEither<List<Transaction>> =
     Either.catch {
-      val hashes = transactions.map { it.contentHash }
-      val dbDuplicates =
-        transactionRepository.findAllByUserIdAndContentHashInOrderByCreated(userId, hashes)
+      val newTransactionsByHash = transactions.groupBy { it.contentHash }
+      val dbDuplicatesByHash =
+        transactionRepository
+          .findAllByUserIdAndContentHashInOrderByCreated(userId, newTransactionsByHash.keys)
+          .groupBy { it.contentHash }
+      // TODO any new transaction with a value list greater than 1 has duplicates
+      // TODO need to do an O(n)^2 iteration for the db duplicates
+      // TODO probably want the duplicate linkage to be bi-directional for maximum impact, but think
+      // about this
 
       TODO()
     }

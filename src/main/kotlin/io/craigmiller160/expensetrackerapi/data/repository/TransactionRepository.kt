@@ -18,7 +18,7 @@ interface TransactionRepository :
 
   fun findAllByUserIdAndContentHashInOrderByCreated(
     userId: Long,
-    contentHash: List<String>
+    contentHash: Collection<String>
   ): List<Transaction>
 
   fun findByIdAndUserId(id: TypedId<TransactionId>, userId: Long): Transaction?
