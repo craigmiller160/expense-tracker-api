@@ -54,6 +54,7 @@ class TransactionRepositoryCustomImpl(
     userId: Long,
     page: Pageable
   ): Page<Transaction> {
+    // TODO need new duplicate filter
     val whereClause =
       BooleanBuilder(QTransaction.transaction.userId.eq(userId))
         .let(
@@ -68,10 +69,10 @@ class TransactionRepositoryCustomImpl(
           QueryDSLSupport.andIfNotNull(request.isConfirmed) {
             QTransaction.transaction.confirmed.eq(it)
           })
-        .let(
-          QueryDSLSupport.andIfNotNull(request.isDuplicate) {
-            QTransaction.transaction.duplicate.eq(it)
-          })
+        //        .let(
+        //          QueryDSLSupport.andIfNotNull(request.isDuplicate) {
+        //            QTransaction.transaction.duplicate.eq(it)
+        //          })
         .let(
           QueryDSLSupport.andIfNotNull(request.categoryIds) {
             QTransaction.transaction.categoryId.`in`(it)
