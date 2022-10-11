@@ -3,8 +3,8 @@ package io.craigmiller160.expensetrackerapi.data.repository.impl
 import com.querydsl.core.BooleanBuilder
 import com.querydsl.jpa.impl.JPAQueryFactory
 import io.craigmiller160.expensetrackerapi.data.SqlLoader
-import io.craigmiller160.expensetrackerapi.data.model.QTransaction
-import io.craigmiller160.expensetrackerapi.data.model.Transaction
+import io.craigmiller160.expensetrackerapi.data.model.QTransactionView
+import io.craigmiller160.expensetrackerapi.data.model.TransactionView
 import io.craigmiller160.expensetrackerapi.data.projection.NeedsAttentionCount
 import io.craigmiller160.expensetrackerapi.data.projection.NeedsAttentionOldest
 import io.craigmiller160.expensetrackerapi.data.projection.NeedsAttentionType
@@ -53,54 +53,53 @@ class TransactionRepositoryCustomImpl(
     request: SearchTransactionsRequest,
     userId: Long,
     page: Pageable
-  ): Page<Transaction> {
-    // TODO need new duplicate filter
+  ): Page<TransactionView> {
     val whereClause =
-      BooleanBuilder(QTransaction.transaction.userId.eq(userId))
+      BooleanBuilder(QTransactionView.transactionView.userId.eq(userId))
         .let(
           QueryDSLSupport.andIfNotNull(request.startDate) {
-            QTransaction.transaction.expenseDate.goe(it)
+            QTransactionView.transactionView.expenseDate.goe(it)
           })
         .let(
           QueryDSLSupport.andIfNotNull(request.endDate) {
-            QTransaction.transaction.expenseDate.loe(it)
+            QTransactionView.transactionView.expenseDate.loe(it)
           })
         .let(
           QueryDSLSupport.andIfNotNull(request.isConfirmed) {
-            QTransaction.transaction.confirmed.eq(it)
+            QTransactionView.transactionView.confirmed.eq(it)
           })
-        //        .let(
-        //          QueryDSLSupport.andIfNotNull(request.isDuplicate) {
-        //            QTransaction.transaction.duplicate.eq(it)
-        //          })
+        .let(
+          QueryDSLSupport.andIfNotNull(request.isDuplicate) {
+            QTransactionView.transactionView.duplicate.eq(it)
+          })
         .let(
           QueryDSLSupport.andIfNotNull(request.categoryIds) {
-            QTransaction.transaction.categoryId.`in`(it)
+            QTransactionView.transactionView.categoryId.`in`(it)
           })
         .let(
           QueryDSLSupport.andIfNotNull(request.isCategorized) {
             if (it) {
-              QTransaction.transaction.categoryId.isNotNull
+              QTransactionView.transactionView.categoryId.isNotNull
             } else {
-              QTransaction.transaction.categoryId.isNull
+              QTransactionView.transactionView.categoryId.isNull
             }
           })
         .let(
           QueryDSLSupport.andIfNotNull(request.isPossibleRefund) {
             if (it) {
-              QTransaction.transaction.amount.gt(0)
+              QTransactionView.transactionView.amount.gt(0)
             } else {
-              QTransaction.transaction.amount.loe(0)
+              QTransactionView.transactionView.amount.loe(0)
             }
           })
 
-    val baseQuery = queryFactory.query().from(QTransaction.transaction).where(whereClause)
+    val baseQuery = queryFactory.query().from(QTransactionView.transactionView).where(whereClause)
 
-    val count = baseQuery.select(QTransaction.transaction.count()).fetchFirst()
+    val count = baseQuery.select(QTransactionView.transactionView.count()).fetchFirst()
     val results =
       baseQuery
-        .select(QTransaction.transaction)
-        .let(queryDslSupport.applyPagination(page, Transaction::class.java))
+        .select(QTransactionView.transactionView)
+        .let(queryDslSupport.applyPagination(page, TransactionView::class.java))
         .fetch()
 
     return PageImpl(results, page, count)
