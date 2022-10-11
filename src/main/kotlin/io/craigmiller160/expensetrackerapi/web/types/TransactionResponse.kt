@@ -5,6 +5,7 @@ import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.CategoryId
 import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.TransactionId
 import io.craigmiller160.expensetrackerapi.data.model.Category
 import io.craigmiller160.expensetrackerapi.data.model.Transaction
+import io.craigmiller160.expensetrackerapi.data.model.TransactionView
 import java.math.BigDecimal
 import java.time.LocalDate
 
@@ -26,8 +27,19 @@ data class TransactionResponse(
         description = transaction.description,
         amount = transaction.amount,
         confirmed = transaction.confirmed,
-        duplicate = false, // TODO this should be set based on a query
+        duplicate = false,
         categoryId = category?.id,
         categoryName = category?.name)
   }
+
+  fun from(transaction: TransactionView): TransactionResponse =
+    TransactionResponse(
+      id = transaction.id,
+      expenseDate = transaction.expenseDate,
+      description = transaction.description,
+      amount = transaction.amount,
+      confirmed = transaction.confirmed,
+      duplicate = transaction.duplicate,
+      categoryId = transaction.categoryId,
+      categoryName = transaction.categoryName)
 }
