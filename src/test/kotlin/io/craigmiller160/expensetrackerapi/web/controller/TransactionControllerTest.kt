@@ -300,8 +300,8 @@ class TransactionControllerTest : BaseIntegrationTest() {
       SearchTransactionsResponse(
         transactions =
           listOf(
-            TransactionResponse.from(user1Transactions[0], user1Categories[0]),
-            TransactionResponse.from(user1Transactions[2], user1Categories[2])),
+            TransactionResponse.from(txn1, user1Categories[0]).copy(duplicate = true),
+            TransactionResponse.from(txn2, user1Categories[0]).copy(duplicate = true)),
         pageNumber = 0,
         totalItems = 2)
 
