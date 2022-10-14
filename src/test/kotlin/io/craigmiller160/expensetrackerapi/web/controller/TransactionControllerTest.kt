@@ -858,7 +858,31 @@ class TransactionControllerTest : BaseIntegrationTest() {
 
   @Test
   fun `createTransaction is duplicate`() {
-    TODO()
+    val request =
+      CreateTransactionRequest(
+        expenseDate = user1Transactions[0].expenseDate,
+        description = user1Transactions[0].description,
+        amount = user1Transactions[0].amount,
+        categoryId = user1Transactions[0].categoryId)
+
+    val responseString =
+      mockMvc
+        .post("/transactions") {
+          secure = true
+          header("Authorization", "Bearer $token")
+          content = objectMapper.writeValueAsString(request)
+        }
+        .andExpect { status { isOk() } }
+        .andReturn()
+        .response
+        .contentAsString
+    val response = objectMapper.readValue(responseString, TransactionResponse::class.java)
+    assertThat(response)
+      .hasFieldOrPropertyWithValue("expenseDate", request.expenseDate)
+      .hasFieldOrPropertyWithValue("description", request.description)
+      .hasFieldOrPropertyWithValue("amount", request.amount)
+      .hasFieldOrPropertyWithValue("categoryId", request.categoryId)
+      .hasFieldOrPropertyWithValue("duplicate", true)
   }
 
   @Test
