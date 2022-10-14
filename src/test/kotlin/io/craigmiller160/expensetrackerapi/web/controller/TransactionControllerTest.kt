@@ -920,14 +920,39 @@ class TransactionControllerTest : BaseIntegrationTest() {
     entityManager.flush()
     entityManager.clear()
 
-    mockMvc.get("/transactions/${txn1.id}/duplicates") {
-      secure = true
-      header("Authorization", "Bearer $token")
-    }
+    val expectedTransactions =
+      transactionViewRepository.findAllByIdIn(listOf(txn1.id, txn2.id)).map {
+        TransactionResponse.from(it)
+      }
+
+    val response =
+      TransactionsPageResponse(
+        transactions = expectedTransactions,
+        totalItems = expectedTransactions.size.toLong(),
+        pageNumber = 0)
+
+    mockMvc
+      .get("/transactions/${txn1.id}/duplicates?pageNumber=0&pageSize=25") {
+        secure = true
+        header("Authorization", "Bearer $token")
+      }
+      .andExpect {
+        status { isOk() }
+        content { objectMapper.writeValueAsString(response) }
+      }
   }
 
   @Test
   fun `getPossibleDuplicates - no duplicates`() {
-    TODO()
+    val response = TransactionsPageResponse(transactions = listOf(), pageNumber = 0, totalItems = 0)
+    mockMvc
+      .get("/transactions/${user1Transactions[0].id}/duplicates?pageNumber=0&pageSize=25") {
+        secure = true
+        header("Authorization", "Bearer $token")
+      }
+      .andExpect {
+        status { isOk() }
+        content { objectMapper.writeValueAsString(response) }
+      }
   }
 }
