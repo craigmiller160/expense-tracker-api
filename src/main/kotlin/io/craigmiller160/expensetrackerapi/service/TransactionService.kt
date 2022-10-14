@@ -193,6 +193,10 @@ class TransactionService(
       TransactionsPageResponse.from(result)
     }
 
+  @Transactional
+  fun markNotDuplicate(transactionId: TypedId<TransactionId>): TryEither<Unit> =
+    Either.catch { transactionRepository.markNotDuplicate(System.nanoTime(), transactionId) }
+
   private fun getCategoryMap(userId: Long): TryEither<Map<TypedId<CategoryId>, Category>> =
     Either.catch { categoryRepository.findAllByUserIdOrderByName(userId).associateBy { it.id } }
 }

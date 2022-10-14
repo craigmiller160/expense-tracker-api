@@ -102,4 +102,16 @@ interface TransactionRepository :
     @Param("transactionId") transactionId: TypedId<TransactionId>,
     @Param("userId") userId: Long
   )
+
+  @Query(
+    """
+    UPDATE Transaction t
+    SET t.markNotDuplicateNano = :nano
+    WHERE t.id = :transactionId
+  """)
+  @Modifying(flushAutomatically = true, clearAutomatically = true)
+  fun markNotDuplicate(
+    @Param("nano") nano: Long,
+    @Param("transactionId") transactionId: TypedId<TransactionId>
+  )
 }
