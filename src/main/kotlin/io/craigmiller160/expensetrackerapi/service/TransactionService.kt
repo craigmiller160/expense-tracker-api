@@ -14,6 +14,7 @@ import io.craigmiller160.expensetrackerapi.data.model.toSpringSortDirection
 import io.craigmiller160.expensetrackerapi.data.projection.NeedsAttentionType
 import io.craigmiller160.expensetrackerapi.data.repository.CategoryRepository
 import io.craigmiller160.expensetrackerapi.data.repository.TransactionRepository
+import io.craigmiller160.expensetrackerapi.data.repository.TransactionViewRepository
 import io.craigmiller160.expensetrackerapi.function.TryEither
 import io.craigmiller160.expensetrackerapi.function.flatMapCatch
 import io.craigmiller160.expensetrackerapi.web.types.CountAndOldest
@@ -36,6 +37,7 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 class TransactionService(
   private val transactionRepository: TransactionRepository,
+  private val transactionViewRepository: TransactionViewRepository,
   private val categoryRepository: CategoryRepository,
   private val oAuth2Service: OAuth2Service
 ) {
@@ -137,7 +139,13 @@ class TransactionService(
           amount = request.amount,
           confirmed = true,
           categoryId = validCategory?.id)
-      transactionRepository.save(transaction).let { TransactionResponse.from(it, validCategory) }
+      val dbTransaction = transactionRepository.saveAndFlush(transaction)
+      transactionViewRepository
+        .findById(dbTransaction.id)
+        .map { TransactionResponse.from(it) }
+        .orElseThrow {
+          IllegalStateException("Cannot find created transaction in database: ${dbTransaction.id}")
+        }
     }
   }
 
