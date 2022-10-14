@@ -9,4 +9,4 @@ EXISTS(
     AND t1.content_hash = t2.content_hash
 ) AS duplicate
 FROM transactions t1
-JOIN categories c ON t1.category_id = c.id
+LEFT JOIN categories c ON t1.category_id = c.id;
