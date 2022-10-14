@@ -917,11 +917,12 @@ class TransactionControllerTest : BaseIntegrationTest() {
   fun `getPossibleDuplicates - has duplicates`() {
     val txn1 = user1Transactions[0]
     val txn2 = transactionRepository.saveAndFlush(txn1.copy(id = TypedId()))
+    val txn3 = transactionRepository.saveAndFlush(txn1.copy(id = TypedId()))
     entityManager.flush()
     entityManager.clear()
 
     val expectedTransactions =
-      transactionViewRepository.findAllByIdIn(listOf(txn1.id, txn2.id)).map {
+      transactionViewRepository.findAllByIdIn(listOf(txn3.id, txn2.id)).map {
         TransactionResponse.from(it)
       }
 
