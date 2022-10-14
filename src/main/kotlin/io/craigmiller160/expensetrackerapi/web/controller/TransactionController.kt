@@ -8,6 +8,7 @@ import io.craigmiller160.expensetrackerapi.web.types.CategorizeTransactionsReque
 import io.craigmiller160.expensetrackerapi.web.types.ConfirmTransactionsRequest
 import io.craigmiller160.expensetrackerapi.web.types.CreateTransactionRequest
 import io.craigmiller160.expensetrackerapi.web.types.DeleteTransactionsRequest
+import io.craigmiller160.expensetrackerapi.web.types.GetPossibleDuplicatesRequest
 import io.craigmiller160.expensetrackerapi.web.types.NeedsAttentionResponse
 import io.craigmiller160.expensetrackerapi.web.types.SearchTransactionsRequest
 import io.craigmiller160.expensetrackerapi.web.types.SearchTransactionsResponse
@@ -68,4 +69,10 @@ class TransactionController(private val transactionService: TransactionService) 
   fun createTransaction(
     @RequestBody request: CreateTransactionRequest
   ): TryEither<TransactionResponse> = transactionService.createTransaction(request)
+
+  @GetMapping("/{transactionId}")
+  fun getPossibleDuplicates(
+    @PathVariable("transactionId") transactionId: TypedId<TransactionId>,
+    request: GetPossibleDuplicatesRequest
+  ): TryEither<List<TransactionResponse>> = TODO()
 }

@@ -20,6 +20,7 @@ import io.craigmiller160.expensetrackerapi.function.flatMapCatch
 import io.craigmiller160.expensetrackerapi.web.types.CountAndOldest
 import io.craigmiller160.expensetrackerapi.web.types.CreateTransactionRequest
 import io.craigmiller160.expensetrackerapi.web.types.DeleteTransactionsRequest
+import io.craigmiller160.expensetrackerapi.web.types.GetPossibleDuplicatesRequest
 import io.craigmiller160.expensetrackerapi.web.types.NeedsAttentionResponse
 import io.craigmiller160.expensetrackerapi.web.types.SearchTransactionsRequest
 import io.craigmiller160.expensetrackerapi.web.types.SearchTransactionsResponse
@@ -180,6 +181,11 @@ class TransactionService(
       }
       .flatten()
   }
+
+  fun getPossibleDuplicates(
+    transactionId: TypedId<TransactionId>,
+    request: GetPossibleDuplicatesRequest
+  ) = TODO()
 
   private fun getCategoryMap(userId: Long): TryEither<Map<TypedId<CategoryId>, Category>> =
     Either.catch { categoryRepository.findAllByUserIdOrderByName(userId).associateBy { it.id } }
