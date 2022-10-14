@@ -11,8 +11,8 @@ import io.craigmiller160.expensetrackerapi.web.types.DeleteTransactionsRequest
 import io.craigmiller160.expensetrackerapi.web.types.GetPossibleDuplicatesRequest
 import io.craigmiller160.expensetrackerapi.web.types.NeedsAttentionResponse
 import io.craigmiller160.expensetrackerapi.web.types.SearchTransactionsRequest
-import io.craigmiller160.expensetrackerapi.web.types.SearchTransactionsResponse
 import io.craigmiller160.expensetrackerapi.web.types.TransactionResponse
+import io.craigmiller160.expensetrackerapi.web.types.TransactionsPageResponse
 import io.craigmiller160.expensetrackerapi.web.types.UpdateTransactionDetailsRequest
 import io.craigmiller160.expensetrackerapi.web.types.UpdateTransactionsRequest
 import javax.validation.Valid
@@ -31,7 +31,7 @@ import org.springframework.web.bind.annotation.RestController
 @RequestMapping("/transactions")
 class TransactionController(private val transactionService: TransactionService) {
   @GetMapping
-  fun search(@Valid request: SearchTransactionsRequest): TryEither<SearchTransactionsResponse> =
+  fun search(@Valid request: SearchTransactionsRequest): TryEither<TransactionsPageResponse> =
     transactionService.search(request)
 
   @DeleteMapping
@@ -74,5 +74,6 @@ class TransactionController(private val transactionService: TransactionService) 
   fun getPossibleDuplicates(
     @PathVariable("transactionId") transactionId: TypedId<TransactionId>,
     request: GetPossibleDuplicatesRequest
-  ): TryEither<List<TransactionResponse>> = TODO()
+  ): TryEither<TransactionsPageResponse> =
+    transactionService.getPossibleDuplicates(transactionId, request)
 }

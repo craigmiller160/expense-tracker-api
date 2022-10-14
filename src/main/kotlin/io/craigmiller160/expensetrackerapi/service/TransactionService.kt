@@ -23,10 +23,10 @@ import io.craigmiller160.expensetrackerapi.web.types.DeleteTransactionsRequest
 import io.craigmiller160.expensetrackerapi.web.types.GetPossibleDuplicatesRequest
 import io.craigmiller160.expensetrackerapi.web.types.NeedsAttentionResponse
 import io.craigmiller160.expensetrackerapi.web.types.SearchTransactionsRequest
-import io.craigmiller160.expensetrackerapi.web.types.SearchTransactionsResponse
 import io.craigmiller160.expensetrackerapi.web.types.TransactionAndCategoryUpdateItem
 import io.craigmiller160.expensetrackerapi.web.types.TransactionAndConfirmUpdateItem
 import io.craigmiller160.expensetrackerapi.web.types.TransactionResponse
+import io.craigmiller160.expensetrackerapi.web.types.TransactionsPageResponse
 import io.craigmiller160.expensetrackerapi.web.types.UpdateTransactionDetailsRequest
 import io.craigmiller160.expensetrackerapi.web.types.UpdateTransactionsRequest
 import io.craigmiller160.oauth2.service.OAuth2Service
@@ -109,7 +109,7 @@ class TransactionService(
   }
 
   @Transactional
-  fun search(request: SearchTransactionsRequest): TryEither<SearchTransactionsResponse> {
+  fun search(request: SearchTransactionsRequest): TryEither<TransactionsPageResponse> {
     val userId = oAuth2Service.getAuthenticatedUser().userId
 
     val sort =
@@ -123,7 +123,7 @@ class TransactionService(
         transactionRepository.searchForTransactions(
           request.copy(categoryIds = filteredCategories), userId, pageable)
       }
-      .map { page -> SearchTransactionsResponse.from(page) }
+      .map { page -> TransactionsPageResponse.from(page) }
   }
 
   fun createTransaction(request: CreateTransactionRequest): TryEither<TransactionResponse> {
@@ -185,7 +185,7 @@ class TransactionService(
   fun getPossibleDuplicates(
     transactionId: TypedId<TransactionId>,
     request: GetPossibleDuplicatesRequest
-  ) = TODO()
+  ): TryEither<TransactionsPageResponse> = TODO()
 
   private fun getCategoryMap(userId: Long): TryEither<Map<TypedId<CategoryId>, Category>> =
     Either.catch { categoryRepository.findAllByUserIdOrderByName(userId).associateBy { it.id } }
