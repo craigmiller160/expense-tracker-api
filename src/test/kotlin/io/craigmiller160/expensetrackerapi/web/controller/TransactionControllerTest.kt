@@ -912,4 +912,22 @@ class TransactionControllerTest : BaseIntegrationTest() {
     val transaction = transactionViewRepository.findById(request.transactionId).orElseThrow()
     assertThat(transaction).hasFieldOrPropertyWithValue("duplicate", true)
   }
+
+  @Test
+  fun `getPossibleDuplicates - has duplicates`() {
+    val txn1 = user1Transactions[0]
+    val txn2 = transactionRepository.saveAndFlush(txn1.copy(id = TypedId()))
+    entityManager.flush()
+    entityManager.clear()
+
+    mockMvc.get("/transactions/${txn1.id}/duplicates") {
+      secure = true
+      header("Authorization", "Bearer $token")
+    }
+  }
+
+  @Test
+  fun `getPossibleDuplicates - no duplicates`() {
+    TODO()
+  }
 }

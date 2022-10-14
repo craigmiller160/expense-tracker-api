@@ -70,7 +70,7 @@ class TransactionController(private val transactionService: TransactionService) 
     @RequestBody request: CreateTransactionRequest
   ): TryEither<TransactionResponse> = transactionService.createTransaction(request)
 
-  @GetMapping("/{transactionId}")
+  @GetMapping("/{transactionId}/duplicates")
   fun getPossibleDuplicates(
     @PathVariable("transactionId") transactionId: TypedId<TransactionId>,
     request: GetPossibleDuplicatesRequest
