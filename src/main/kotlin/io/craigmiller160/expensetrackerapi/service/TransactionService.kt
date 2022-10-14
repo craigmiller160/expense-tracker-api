@@ -2,7 +2,6 @@ package io.craigmiller160.expensetrackerapi.service
 
 import arrow.core.Either
 import arrow.core.continuations.either
-import arrow.core.flatMap
 import arrow.core.flatten
 import io.craigmiller160.expensetrackerapi.common.data.typedid.TypedId
 import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.CategoryId
@@ -115,15 +114,13 @@ class TransactionService(
         Sort.Order(request.sortDirection.toSpringSortDirection(), request.sortKey.toColumnName()),
         Sort.Order(Sort.Direction.ASC, "description"))
     val pageable = PageRequest.of(request.pageNumber, request.pageSize, sort)
-    val categoryMapEither = getCategoryMap(userId)
-    return categoryMapEither
+    return getCategoryMap(userId)
       .map { categories -> request.categoryIds?.filter { categories.contains(it) }?.toSet() }
       .map { filteredCategories ->
         transactionRepository.searchForTransactions(
           request.copy(categoryIds = filteredCategories), userId, pageable)
       }
-      .flatMap { page -> categoryMapEither.map { Pair(page, it) } }
-      .map { (page, categories) -> SearchTransactionsResponse.from(page, categories) }
+      .map { page -> SearchTransactionsResponse.from(page) }
   }
 
   fun createTransaction(request: CreateTransactionRequest): TryEither<TransactionResponse> {

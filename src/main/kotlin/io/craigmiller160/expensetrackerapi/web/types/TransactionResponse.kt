@@ -30,16 +30,16 @@ data class TransactionResponse(
         duplicate = false,
         categoryId = category?.id,
         categoryName = category?.name)
-  }
 
-  fun from(transaction: TransactionView): TransactionResponse =
-    TransactionResponse(
-      id = transaction.id,
-      expenseDate = transaction.expenseDate,
-      description = transaction.description,
-      amount = transaction.amount,
-      confirmed = transaction.confirmed,
-      duplicate = transaction.duplicate,
-      categoryId = transaction.categoryId,
-      categoryName = transaction.categoryName)
+    fun from(transaction: TransactionView): TransactionResponse =
+      TransactionResponse(
+        id = transaction.id,
+        expenseDate = transaction.expenseDate,
+        description = transaction.description,
+        amount = transaction.amount,
+        confirmed = transaction.confirmed,
+        duplicate = transaction.duplicate,
+        categoryId = transaction.categoryId,
+        categoryName = transaction.categoryName)
+  }
 }
