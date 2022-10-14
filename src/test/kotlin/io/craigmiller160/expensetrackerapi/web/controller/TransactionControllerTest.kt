@@ -973,6 +973,9 @@ class TransactionControllerTest : BaseIntegrationTest() {
       }
       .andExpect { status { isNoContent() } }
 
+    entityManager.flush()
+    entityManager.clear()
+
     val txn1Duplicates = transactionViewRepository.findAllDuplicates(txn1.id, PageRequest.of(0, 25))
     assertThat(txn1Duplicates).isEmpty()
     val txn2Duplicates = transactionViewRepository.findAllDuplicates(txn2.id, PageRequest.of(0, 25))
