@@ -24,9 +24,9 @@ class TransactionImportService(
     stream: InputStream
   ): TryEither<ImportTransactionsResponse> {
     val parser = transactionParserManager.getParserForType(type)
-    val authUser = oAuth2Service.getAuthenticatedUser()
+    val userId = oAuth2Service.getAuthenticatedUser().userId
     return parser
-      .parse(authUser.userId, stream)
+      .parse(userId, stream)
       .flatMapCatch { transactions -> transactionRepository.saveAll(transactions) }
       .map { transactions -> ImportTransactionsResponse(transactions.size) }
   }

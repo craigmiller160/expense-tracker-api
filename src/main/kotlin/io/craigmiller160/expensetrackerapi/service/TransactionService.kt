@@ -2,7 +2,6 @@ package io.craigmiller160.expensetrackerapi.service
 
 import arrow.core.Either
 import arrow.core.continuations.either
-import arrow.core.flatMap
 import arrow.core.flatten
 import io.craigmiller160.expensetrackerapi.common.data.typedid.TypedId
 import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.CategoryId
@@ -15,6 +14,7 @@ import io.craigmiller160.expensetrackerapi.data.model.toSpringSortDirection
 import io.craigmiller160.expensetrackerapi.data.projection.NeedsAttentionType
 import io.craigmiller160.expensetrackerapi.data.repository.CategoryRepository
 import io.craigmiller160.expensetrackerapi.data.repository.TransactionRepository
+import io.craigmiller160.expensetrackerapi.data.repository.TransactionViewRepository
 import io.craigmiller160.expensetrackerapi.function.TryEither
 import io.craigmiller160.expensetrackerapi.function.flatMapCatch
 import io.craigmiller160.expensetrackerapi.web.types.CountAndOldest
@@ -37,6 +37,7 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 class TransactionService(
   private val transactionRepository: TransactionRepository,
+  private val transactionViewRepository: TransactionViewRepository,
   private val categoryRepository: CategoryRepository,
   private val oAuth2Service: OAuth2Service
 ) {
@@ -115,15 +116,13 @@ class TransactionService(
         Sort.Order(request.sortDirection.toSpringSortDirection(), request.sortKey.toColumnName()),
         Sort.Order(Sort.Direction.ASC, "description"))
     val pageable = PageRequest.of(request.pageNumber, request.pageSize, sort)
-    val categoryMapEither = getCategoryMap(userId)
-    return categoryMapEither
+    return getCategoryMap(userId)
       .map { categories -> request.categoryIds?.filter { categories.contains(it) }?.toSet() }
       .map { filteredCategories ->
         transactionRepository.searchForTransactions(
           request.copy(categoryIds = filteredCategories), userId, pageable)
       }
-      .flatMap { page -> categoryMapEither.map { Pair(page, it) } }
-      .map { (page, categories) -> SearchTransactionsResponse.from(page, categories) }
+      .map { page -> SearchTransactionsResponse.from(page) }
   }
 
   fun createTransaction(request: CreateTransactionRequest): TryEither<TransactionResponse> {
@@ -139,9 +138,14 @@ class TransactionService(
           description = request.description,
           amount = request.amount,
           confirmed = true,
-          duplicate = false,
           categoryId = validCategory?.id)
-      transactionRepository.save(transaction).let { TransactionResponse.from(it, validCategory) }
+      val dbTransaction = transactionRepository.saveAndFlush(transaction)
+      transactionViewRepository
+        .findById(dbTransaction.id)
+        .map { TransactionResponse.from(it) }
+        .orElseThrow {
+          IllegalStateException("Cannot find created transaction in database: ${dbTransaction.id}")
+        }
     }
   }
 
@@ -152,6 +156,7 @@ class TransactionService(
       confirmTransactions(request.transactions).bind()
     }
 
+  @Transactional
   fun updateTransactionDetails(
     transactionId: TypedId<TransactionId>,
     request: UpdateTransactionDetailsRequest

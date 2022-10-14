@@ -2,8 +2,11 @@ package io.craigmiller160.expensetrackerapi.web.controller
 
 import arrow.core.Either
 import arrow.core.flatMap
+import arrow.core.getOrHandle
 import io.craigmiller160.expensetrackerapi.BaseIntegrationTest
+import io.craigmiller160.expensetrackerapi.data.model.Transaction
 import io.craigmiller160.expensetrackerapi.data.repository.TransactionRepository
+import io.craigmiller160.expensetrackerapi.data.utils.TransactionContentHash
 import io.craigmiller160.expensetrackerapi.service.TransactionImportType
 import io.craigmiller160.expensetrackerapi.testutils.ResourceUtils
 import io.craigmiller160.expensetrackerapi.web.types.ImportTypeResponse
@@ -11,6 +14,7 @@ import io.kotest.assertions.arrow.core.shouldBeRight
 import java.math.BigDecimal
 import java.time.LocalDate
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.MediaType
@@ -35,6 +39,80 @@ class TransactionImportControllerTest : BaseIntegrationTest() {
   }
 
   @Test
+  fun `importTransactions - DISCOVER_CSV with duplicates already in database`() {
+    val expenseDate = LocalDate.of(2022, 5, 18)
+    val description = "PANDA EXPRESS 1679 RIVERVIEW FL"
+    val amount = BigDecimal("-5.81")
+    val transaction =
+      transactionRepository.save(
+        Transaction(
+          userId = 1L,
+          expenseDate = expenseDate,
+          description = description,
+          amount = amount,
+          confirmed = false,
+          contentHash = TransactionContentHash.hash(1L, expenseDate, amount, description)))
+    val csvBytes = ResourceUtils.getResourceBytes("data/discover1.csv").getOrHandle { throw it }
+
+    mockMvc
+      .multipart("/transaction-import?type=${TransactionImportType.DISCOVER_CSV.name}") {
+        secure = true
+        header("Authorization", "Bearer $token")
+        header("Content-Type", MediaType.MULTIPART_FORM_DATA_VALUE)
+        file("file", csvBytes)
+      }
+      .andExpect {
+        status { isOk() }
+        content { json("""{"transactionsImported":57}""") }
+      }
+
+    entityManager.flush()
+    entityManager.clear()
+
+    val allDuplicateTransactions =
+      transactionRepository.findAllByUserIdAndContentHashInOrderByCreated(
+        1L, listOf(transaction.contentHash))
+    val lastTransaction = allDuplicateTransactions.last()
+    val nextToLastTransaction = allDuplicateTransactions[allDuplicateTransactions.size - 2]
+    assertEquals(lastTransaction.contentHash, nextToLastTransaction.contentHash)
+  }
+
+  @Test
+  fun `importTransactions - DISCOVER_CSV with duplicates in import`() {
+    val duplicateLine =
+      """05/18/2022,05/18/2022,"PANDA EXPRESS 1679 RIVERVIEW FL",5.81,"Restaurants""""
+    val csvBytes =
+      ResourceUtils.getResourceBytes("data/discover1.csv")
+        .map { "${String(it).trim()}\n$duplicateLine".toByteArray() }
+        .getOrHandle { throw it }
+
+    mockMvc
+      .multipart("/transaction-import?type=${TransactionImportType.DISCOVER_CSV.name}") {
+        secure = true
+        header("Authorization", "Bearer $token")
+        header("Content-Type", MediaType.MULTIPART_FORM_DATA_VALUE)
+        file("file", csvBytes)
+      }
+      .andExpect {
+        status { isOk() }
+        content { json("""{"transactionsImported":58}""") }
+      }
+
+    entityManager.flush()
+    entityManager.clear()
+
+    val contentHash =
+      TransactionContentHash.hash(
+        1L, LocalDate.of(2022, 5, 18), BigDecimal("-5.81"), "PANDA EXPRESS 1679 RIVERVIEW FL")
+
+    val allDuplicateTransactions =
+      transactionRepository.findAllByUserIdAndContentHashInOrderByCreated(1L, listOf(contentHash))
+    val lastTransaction = allDuplicateTransactions.last()
+    val nextToLastTransaction = allDuplicateTransactions[allDuplicateTransactions.size - 2]
+    assertEquals(lastTransaction.contentHash, nextToLastTransaction.contentHash)
+  }
+
+  @Test
   fun `importTransactions - DISCOVER_CSV`() {
     ResourceUtils.getResourceBytes("data/discover1.csv")
       .flatMap { bytes ->
@@ -53,6 +131,9 @@ class TransactionImportControllerTest : BaseIntegrationTest() {
         }
       }
       .shouldBeRight()
+
+    entityManager.flush()
+    entityManager.clear()
 
     val transactions = transactionRepository.findAllByOrderByExpenseDateAscDescriptionAsc()
     assertThat(transactions).hasSize(57)
@@ -96,6 +177,9 @@ class TransactionImportControllerTest : BaseIntegrationTest() {
         }
       }
       .shouldBeRight()
+
+    entityManager.flush()
+    entityManager.clear()
 
     val transactions = transactionRepository.findAllByOrderByExpenseDateAscDescriptionAsc()
     assertThat(transactions).hasSize(23)

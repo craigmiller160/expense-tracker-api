@@ -20,12 +20,14 @@ class DataHelper(
   private var internalDate = LocalDate.now().minusDays(100)
   fun createTransaction(userId: Long, categoryId: TypedId<CategoryId>? = null): Transaction {
     internalDate = internalDate.plusDays(1)
+    val description = faker.company().name()
+    val amount = BigDecimal(faker.commerce().price()) * BigDecimal("-1")
     return transactionRepository.saveAndFlush(
       Transaction(
         userId = userId,
         expenseDate = internalDate,
-        description = faker.company().name(),
-        amount = BigDecimal(faker.commerce().price()) * BigDecimal("-1"),
+        description = description,
+        amount = amount,
         categoryId = categoryId))
   }
 

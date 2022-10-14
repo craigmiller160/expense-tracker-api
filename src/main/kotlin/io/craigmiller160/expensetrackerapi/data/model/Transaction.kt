@@ -8,6 +8,7 @@ import io.craigmiller160.expensetrackerapi.data.model.core.MutableEntity
 import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.ZonedDateTime
+import javax.persistence.Column
 import javax.persistence.Entity
 import javax.persistence.Id
 import javax.persistence.Table
@@ -22,8 +23,9 @@ data class Transaction(
   val expenseDate: LocalDate,
   val description: String,
   val amount: BigDecimal,
+  @Column(name = "content_hash", insertable = false, updatable = false)
+  val contentHash: String = "",
   val confirmed: Boolean = false,
-  val duplicate: Boolean = false,
   val categoryId: TypedId<CategoryId>? = null,
   @Id override val id: TypedId<TransactionId> = TypedId(),
   override val created: ZonedDateTime = ZonedDateTime.now(),

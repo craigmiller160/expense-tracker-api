@@ -6,6 +6,7 @@ import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.CategoryId
 import io.craigmiller160.expensetrackerapi.data.model.Category
 import io.craigmiller160.expensetrackerapi.data.model.Transaction
 import io.craigmiller160.expensetrackerapi.data.repository.TransactionRepository
+import io.craigmiller160.expensetrackerapi.data.repository.TransactionViewRepository
 import io.craigmiller160.expensetrackerapi.web.types.CategorizeTransactionsRequest
 import io.craigmiller160.expensetrackerapi.web.types.ConfirmTransactionsRequest
 import io.craigmiller160.expensetrackerapi.web.types.CountAndOldest
@@ -41,6 +42,7 @@ class TransactionControllerTest : BaseIntegrationTest() {
   private lateinit var user1CategoriesMap: Map<TypedId<CategoryId>, Category>
   private lateinit var user1Transactions: List<Transaction>
   private lateinit var user2Transactions: List<Transaction>
+  @Autowired private lateinit var transactionViewRepository: TransactionViewRepository
 
   @BeforeEach
   fun setup() {
@@ -232,8 +234,11 @@ class TransactionControllerTest : BaseIntegrationTest() {
 
   @Test
   fun `search - only duplicates`() {
-    val txn1 = transactionRepository.saveAndFlush(user1Transactions[0].copy(duplicate = true))
-    val txn2 = transactionRepository.saveAndFlush(user1Transactions[2].copy(duplicate = true))
+    val txn1 = user1Transactions[0]
+    val txn2 = transactionRepository.saveAndFlush(txn1.copy(id = TypedId()))
+    entityManager.flush()
+    entityManager.clear()
+
     val request =
       SearchTransactionsRequest(
         isDuplicate = true,
@@ -246,8 +251,8 @@ class TransactionControllerTest : BaseIntegrationTest() {
       SearchTransactionsResponse(
         transactions =
           listOf(
-            TransactionResponse.from(txn1, user1Categories[0]),
-            TransactionResponse.from(txn2, user1Categories[2])),
+            TransactionResponse.from(txn1, user1Categories[0]).copy(duplicate = true),
+            TransactionResponse.from(txn2, user1Categories[0]).copy(duplicate = true)),
         pageNumber = 0,
         totalItems = 2)
 
@@ -283,11 +288,8 @@ class TransactionControllerTest : BaseIntegrationTest() {
 
   @Test
   fun `search - only non-duplicates`() {
-    transactionRepository.saveAndFlush(user1Transactions[1].copy(duplicate = true))
-    transactionRepository.saveAndFlush(user1Transactions[3].copy(duplicate = true))
-    transactionRepository.saveAndFlush(user1Transactions[4].copy(duplicate = true))
-    transactionRepository.saveAndFlush(user1Transactions[5].copy(duplicate = true))
-    transactionRepository.saveAndFlush(user1Transactions[6].copy(duplicate = true))
+    val txn1 = user1Transactions[0]
+    val txn2 = transactionRepository.saveAndFlush(txn1.copy(id = TypedId()))
     val request =
       SearchTransactionsRequest(
         isDuplicate = false,
@@ -296,14 +298,14 @@ class TransactionControllerTest : BaseIntegrationTest() {
         sortKey = TransactionSortKey.EXPENSE_DATE,
         sortDirection = SortDirection.ASC)
 
+    val nonDuplicateIds = user1Transactions.subList(1, user1Transactions.size).map { it.id }
+    val nonDuplicateTransactions = transactionViewRepository.findAllByIdIn(nonDuplicateIds)
+
     val response =
       SearchTransactionsResponse(
-        transactions =
-          listOf(
-            TransactionResponse.from(user1Transactions[0], user1Categories[0]),
-            TransactionResponse.from(user1Transactions[2], user1Categories[2])),
+        transactions = nonDuplicateTransactions.map { TransactionResponse.from(it) },
         pageNumber = 0,
-        totalItems = 2)
+        totalItems = nonDuplicateTransactions.size.toLong())
 
     mockMvc
       .get("/transactions?${request.toQueryString()}") {
@@ -358,7 +360,7 @@ class TransactionControllerTest : BaseIntegrationTest() {
     val oldestUnconfirmed =
       transactionRepository.saveAndFlush(user1Transactions[0].copy(confirmed = false))
     val oldestDuplicate =
-      transactionRepository.saveAndFlush(user1Transactions[2].copy(duplicate = true))
+      transactionRepository.saveAndFlush(user1Transactions[2].copy(id = TypedId()))
     val oldestPossibleRefund =
       transactionRepository.saveAndFlush(
         user1Transactions[3].copy(amount = user1Transactions[3].amount * BigDecimal("-1")))
@@ -366,7 +368,7 @@ class TransactionControllerTest : BaseIntegrationTest() {
       NeedsAttentionResponse(
         unconfirmed = CountAndOldest(count = 4, oldest = oldestUnconfirmed.expenseDate),
         uncategorized = CountAndOldest(count = 3, oldest = user1Transactions[1].expenseDate),
-        duplicate = CountAndOldest(count = 1, oldest = oldestDuplicate.expenseDate),
+        duplicate = CountAndOldest(count = 2, oldest = oldestDuplicate.expenseDate),
         possibleRefund = CountAndOldest(count = 1, oldest = oldestPossibleRefund.expenseDate))
     mockMvc
       .get("/transactions/needs-attention") {
@@ -679,7 +681,6 @@ class TransactionControllerTest : BaseIntegrationTest() {
       .hasFieldOrPropertyWithValue("description", request.description)
       .hasFieldOrPropertyWithValue("categoryId", request.categoryId)
       .hasFieldOrPropertyWithValue("confirmed", true)
-      .hasFieldOrPropertyWithValue("duplicate", false)
   }
 
   @Test
@@ -722,7 +723,6 @@ class TransactionControllerTest : BaseIntegrationTest() {
       .hasFieldOrPropertyWithValue("description", request.description)
       .hasFieldOrPropertyWithValue("categoryId", null)
       .hasFieldOrPropertyWithValue("confirmed", true)
-      .hasFieldOrPropertyWithValue("duplicate", false)
   }
 
   @Test
@@ -854,5 +854,62 @@ class TransactionControllerTest : BaseIntegrationTest() {
       .isPresent
       .get()
       .hasFieldOrPropertyWithValue("confirmed", true)
+  }
+
+  @Test
+  fun `createTransaction is duplicate`() {
+    val request =
+      CreateTransactionRequest(
+        expenseDate = user1Transactions[0].expenseDate,
+        description = user1Transactions[0].description,
+        amount = user1Transactions[0].amount,
+        categoryId = user1Transactions[0].categoryId)
+
+    val responseString =
+      mockMvc
+        .post("/transactions") {
+          secure = true
+          header("Authorization", "Bearer $token")
+          content = objectMapper.writeValueAsString(request)
+          contentType = MediaType.APPLICATION_JSON
+        }
+        .andExpect { status { isOk() } }
+        .andReturn()
+        .response
+        .contentAsString
+    val response = objectMapper.readValue(responseString, TransactionResponse::class.java)
+    assertThat(response)
+      .hasFieldOrPropertyWithValue("expenseDate", request.expenseDate)
+      .hasFieldOrPropertyWithValue("description", request.description)
+      .hasFieldOrPropertyWithValue("amount", request.amount)
+      .hasFieldOrPropertyWithValue("categoryId", request.categoryId)
+      .hasFieldOrPropertyWithValue("duplicate", true)
+  }
+
+  @Test
+  fun `updateTransactionDetails is duplicate`() {
+    val request =
+      UpdateTransactionDetailsRequest(
+        transactionId = user1Transactions[1].id,
+        confirmed = user1Transactions[0].confirmed,
+        expenseDate = user1Transactions[0].expenseDate,
+        description = user1Transactions[0].description,
+        amount = user1Transactions[0].amount,
+        categoryId = user1Transactions[0].categoryId)
+
+    mockMvc
+      .put("/transactions/${request.transactionId}/details") {
+        secure = true
+        header("Authorization", "Bearer $token")
+        content = objectMapper.writeValueAsString(request)
+        contentType = MediaType.APPLICATION_JSON
+      }
+      .andExpect { status { isNoContent() } }
+
+    entityManager.flush()
+    entityManager.clear()
+
+    val transaction = transactionViewRepository.findById(request.transactionId).orElseThrow()
+    assertThat(transaction).hasFieldOrPropertyWithValue("duplicate", true)
   }
 }

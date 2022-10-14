@@ -4,6 +4,7 @@ import io.craigmiller160.expensetrackerapi.common.data.typedid.TypedId
 import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.CategoryId
 import io.craigmiller160.expensetrackerapi.data.model.Category
 import io.craigmiller160.expensetrackerapi.data.model.Transaction
+import io.craigmiller160.expensetrackerapi.data.model.TransactionView
 import org.springframework.data.domain.Page
 
 data class SearchTransactionsResponse(
@@ -24,5 +25,11 @@ data class SearchTransactionsResponse(
       return SearchTransactionsResponse(
         transactions = transactions, pageNumber = page.number, totalItems = page.totalElements)
     }
+
+    fun from(page: Page<TransactionView>): SearchTransactionsResponse =
+      SearchTransactionsResponse(
+        transactions = page.content.map { TransactionResponse.from(it) },
+        pageNumber = page.number,
+        totalItems = page.totalElements)
   }
 }

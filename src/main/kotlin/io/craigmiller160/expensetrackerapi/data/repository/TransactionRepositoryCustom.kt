@@ -1,6 +1,6 @@
 package io.craigmiller160.expensetrackerapi.data.repository
 
-import io.craigmiller160.expensetrackerapi.data.model.Transaction
+import io.craigmiller160.expensetrackerapi.data.model.TransactionView
 import io.craigmiller160.expensetrackerapi.data.projection.NeedsAttentionCount
 import io.craigmiller160.expensetrackerapi.data.projection.NeedsAttentionOldest
 import io.craigmiller160.expensetrackerapi.web.types.SearchTransactionsRequest
@@ -13,7 +13,7 @@ interface TransactionRepositoryCustom {
     request: SearchTransactionsRequest,
     userId: Long,
     page: Pageable
-  ): Page<Transaction>
+  ): Page<TransactionView>
 
   fun getAllNeedsAttentionCounts(userId: Long): List<NeedsAttentionCount>
 
