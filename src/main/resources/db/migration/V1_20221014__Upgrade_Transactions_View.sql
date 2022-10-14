@@ -1,7 +1,10 @@
-CREATE OR REPLACE VIEW transactions_view AS
+DROP VIEW transactions_view;
+
+CREATE VIEW transactions_view AS
 SELECT t1.id, t1.user_id, t1.expense_date,
 t1.description, t1.amount, t1.category_id,
-t1.confirmed, t1.content_hash, c.name AS category_name,
+t1.confirmed, c.name AS category_name,
+t1.content_hash,
 EXISTS(
     SELECT t2.*
     FROM transactions t2
