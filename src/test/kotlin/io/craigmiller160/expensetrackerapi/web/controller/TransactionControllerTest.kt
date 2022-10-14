@@ -29,6 +29,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.data.domain.PageRequest
 import org.springframework.http.MediaType
 import org.springframework.test.web.servlet.delete
 import org.springframework.test.web.servlet.get
@@ -955,5 +956,26 @@ class TransactionControllerTest : BaseIntegrationTest() {
         status { isOk() }
         content { objectMapper.writeValueAsString(response) }
       }
+  }
+
+  @Test
+  fun `markNotDuplicate`() {
+    val txn1 = user1Transactions[0]
+    val txn2 = transactionRepository.saveAndFlush(txn1.copy(id = TypedId()))
+    val txn3 = transactionRepository.saveAndFlush(txn1.copy(id = TypedId()))
+    entityManager.flush()
+    entityManager.clear()
+
+    mockMvc
+      .put("/transactions/${user1Transactions[0].id}/notDuplicate") {
+        secure = true
+        header("Authorization", "Bearer $token")
+      }
+      .andExpect { status { isNoContent() } }
+
+    val txn1Duplicates = transactionViewRepository.findAllDuplicates(txn1.id, PageRequest.of(0, 25))
+    assertThat(txn1Duplicates).isEmpty()
+    val txn2Duplicates = transactionViewRepository.findAllDuplicates(txn2.id, PageRequest.of(0, 25))
+    assertThat(txn2Duplicates).hasSize(1).extracting("id").contains(txn3.id)
   }
 }
