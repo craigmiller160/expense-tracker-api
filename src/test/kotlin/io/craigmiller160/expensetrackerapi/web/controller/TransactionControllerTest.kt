@@ -14,13 +14,13 @@ import io.craigmiller160.expensetrackerapi.web.types.CreateTransactionRequest
 import io.craigmiller160.expensetrackerapi.web.types.DeleteTransactionsRequest
 import io.craigmiller160.expensetrackerapi.web.types.NeedsAttentionResponse
 import io.craigmiller160.expensetrackerapi.web.types.SearchTransactionsRequest
-import io.craigmiller160.expensetrackerapi.web.types.SearchTransactionsResponse
 import io.craigmiller160.expensetrackerapi.web.types.SortDirection
 import io.craigmiller160.expensetrackerapi.web.types.TransactionAndCategory
 import io.craigmiller160.expensetrackerapi.web.types.TransactionResponse
 import io.craigmiller160.expensetrackerapi.web.types.TransactionSortKey
 import io.craigmiller160.expensetrackerapi.web.types.TransactionToConfirm
 import io.craigmiller160.expensetrackerapi.web.types.TransactionToUpdate
+import io.craigmiller160.expensetrackerapi.web.types.TransactionsPageResponse
 import io.craigmiller160.expensetrackerapi.web.types.UpdateTransactionDetailsRequest
 import io.craigmiller160.expensetrackerapi.web.types.UpdateTransactionsRequest
 import java.math.BigDecimal
@@ -82,7 +82,7 @@ class TransactionControllerTest : BaseIntegrationTest() {
         sortDirection = SortDirection.DESC)
 
     val response =
-      SearchTransactionsResponse(
+      TransactionsPageResponse(
         transactions =
           listOf(
             TransactionResponse.from(user1Transactions[5]),
@@ -113,7 +113,7 @@ class TransactionControllerTest : BaseIntegrationTest() {
         sortDirection = SortDirection.ASC)
 
     val response =
-      SearchTransactionsResponse(
+      TransactionsPageResponse(
         transactions =
           listOf(
             TransactionResponse.from(user1Transactions[0], user1Categories[0]),
@@ -145,7 +145,7 @@ class TransactionControllerTest : BaseIntegrationTest() {
         sortDirection = SortDirection.ASC)
 
     val response =
-      SearchTransactionsResponse(
+      TransactionsPageResponse(
         transactions =
           listOf(
             TransactionResponse.from(user1Transactions[0], user1Categories[0]),
@@ -175,7 +175,7 @@ class TransactionControllerTest : BaseIntegrationTest() {
         sortDirection = SortDirection.ASC)
 
     val response =
-      SearchTransactionsResponse(
+      TransactionsPageResponse(
         transactions =
           listOf(
             TransactionResponse.from(user1Transactions[1]),
@@ -213,7 +213,7 @@ class TransactionControllerTest : BaseIntegrationTest() {
         sortDirection = SortDirection.ASC)
 
     val response =
-      SearchTransactionsResponse(
+      TransactionsPageResponse(
         transactions =
           listOf(
             TransactionResponse.from(txn1, user1Categories[0]),
@@ -248,7 +248,7 @@ class TransactionControllerTest : BaseIntegrationTest() {
         sortDirection = SortDirection.ASC)
 
     val response =
-      SearchTransactionsResponse(
+      TransactionsPageResponse(
         transactions =
           listOf(
             TransactionResponse.from(txn1, user1Categories[0]).copy(duplicate = true),
@@ -302,7 +302,7 @@ class TransactionControllerTest : BaseIntegrationTest() {
     val nonDuplicateTransactions = transactionViewRepository.findAllByIdIn(nonDuplicateIds)
 
     val response =
-      SearchTransactionsResponse(
+      TransactionsPageResponse(
         transactions = nonDuplicateTransactions.map { TransactionResponse.from(it) },
         pageNumber = 0,
         totalItems = nonDuplicateTransactions.size.toLong())
@@ -336,7 +336,7 @@ class TransactionControllerTest : BaseIntegrationTest() {
         sortDirection = SortDirection.ASC)
 
     val response =
-      SearchTransactionsResponse(
+      TransactionsPageResponse(
         transactions =
           listOf(
             TransactionResponse.from(txn1, user1Categories.first()),
@@ -421,7 +421,7 @@ class TransactionControllerTest : BaseIntegrationTest() {
         sortDirection = SortDirection.ASC)
 
     val response =
-      SearchTransactionsResponse(
+      TransactionsPageResponse(
         transactions =
           listOf(
             TransactionResponse.from(user1Transactions[2], user1Categories[2]),
@@ -463,7 +463,7 @@ class TransactionControllerTest : BaseIntegrationTest() {
         sortDirection = SortDirection.ASC)
 
     val response =
-      SearchTransactionsResponse(
+      TransactionsPageResponse(
         transactions =
           expected.map { txn ->
             TransactionResponse.from(txn, txn.categoryId?.let { user1CategoriesMap[it] })
@@ -490,7 +490,7 @@ class TransactionControllerTest : BaseIntegrationTest() {
     val categories = setOf(user1Categories.first().id, user2Cat.id)
 
     val response =
-      SearchTransactionsResponse(
+      TransactionsPageResponse(
         transactions =
           listOf(
             TransactionResponse.from(user1Transactions.first(), user1Categories.first()),
@@ -911,5 +911,49 @@ class TransactionControllerTest : BaseIntegrationTest() {
 
     val transaction = transactionViewRepository.findById(request.transactionId).orElseThrow()
     assertThat(transaction).hasFieldOrPropertyWithValue("duplicate", true)
+  }
+
+  @Test
+  fun `getPossibleDuplicates - has duplicates`() {
+    val txn1 = user1Transactions[0]
+    val txn2 = transactionRepository.saveAndFlush(txn1.copy(id = TypedId()))
+    val txn3 = transactionRepository.saveAndFlush(txn1.copy(id = TypedId()))
+    entityManager.flush()
+    entityManager.clear()
+
+    val expectedTransactions =
+      transactionViewRepository.findAllByIdIn(listOf(txn3.id, txn2.id)).map {
+        TransactionResponse.from(it)
+      }
+
+    val response =
+      TransactionsPageResponse(
+        transactions = expectedTransactions,
+        totalItems = expectedTransactions.size.toLong(),
+        pageNumber = 0)
+
+    mockMvc
+      .get("/transactions/${txn1.id}/duplicates?pageNumber=0&pageSize=25") {
+        secure = true
+        header("Authorization", "Bearer $token")
+      }
+      .andExpect {
+        status { isOk() }
+        content { objectMapper.writeValueAsString(response) }
+      }
+  }
+
+  @Test
+  fun `getPossibleDuplicates - no duplicates`() {
+    val response = TransactionsPageResponse(transactions = listOf(), pageNumber = 0, totalItems = 0)
+    mockMvc
+      .get("/transactions/${user1Transactions[0].id}/duplicates?pageNumber=0&pageSize=25") {
+        secure = true
+        header("Authorization", "Bearer $token")
+      }
+      .andExpect {
+        status { isOk() }
+        content { objectMapper.writeValueAsString(response) }
+      }
   }
 }

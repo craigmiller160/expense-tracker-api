@@ -17,6 +17,7 @@ data class TransactionView(
   val expenseDate: LocalDate,
   val description: String,
   val amount: BigDecimal,
+  val contentHash: String,
   val categoryId: TypedId<CategoryId>?,
   val categoryName: String?,
   val confirmed: Boolean,
