@@ -185,7 +185,7 @@ class TransactionService(
   fun getPossibleDuplicates(
     transactionId: TypedId<TransactionId>,
     request: GetPossibleDuplicatesRequest
-  ): TryEither<TransactionsPageResponse> = TODO()
+  ): TryEither<TransactionsPageResponse> = Either.catch { TODO() }
 
   private fun getCategoryMap(userId: Long): TryEither<Map<TypedId<CategoryId>, Category>> =
     Either.catch { categoryRepository.findAllByUserIdOrderByName(userId).associateBy { it.id } }
