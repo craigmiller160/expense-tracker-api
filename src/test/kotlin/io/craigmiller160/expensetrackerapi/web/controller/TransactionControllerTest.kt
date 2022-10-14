@@ -888,6 +888,28 @@ class TransactionControllerTest : BaseIntegrationTest() {
 
   @Test
   fun `updateTransactionDetails is duplicate`() {
-    TODO()
+    val request =
+      UpdateTransactionDetailsRequest(
+        transactionId = user1Transactions[1].id,
+        confirmed = user1Transactions[0].confirmed,
+        expenseDate = user1Transactions[0].expenseDate,
+        description = user1Transactions[0].description,
+        amount = user1Transactions[0].amount,
+        categoryId = user1Transactions[0].categoryId)
+
+    mockMvc
+      .put("/transactions/${request.transactionId}/details") {
+        secure = true
+        header("Authorization", "Bearer $token")
+        content = objectMapper.writeValueAsString(request)
+        contentType = MediaType.APPLICATION_JSON
+      }
+      .andExpect { status { isNoContent() } }
+
+    entityManager.flush()
+    entityManager.clear()
+
+    val transaction = transactionViewRepository.findById(request.transactionId).orElseThrow()
+    assertThat(transaction).hasFieldOrPropertyWithValue("duplicate", true)
   }
 }
