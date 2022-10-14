@@ -6,6 +6,7 @@ import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.CategoryId
 import io.craigmiller160.expensetrackerapi.data.model.Category
 import io.craigmiller160.expensetrackerapi.data.model.Transaction
 import io.craigmiller160.expensetrackerapi.data.repository.TransactionRepository
+import io.craigmiller160.expensetrackerapi.data.repository.TransactionViewRepository
 import io.craigmiller160.expensetrackerapi.web.types.CategorizeTransactionsRequest
 import io.craigmiller160.expensetrackerapi.web.types.ConfirmTransactionsRequest
 import io.craigmiller160.expensetrackerapi.web.types.CountAndOldest
@@ -41,6 +42,7 @@ class TransactionControllerTest : BaseIntegrationTest() {
   private lateinit var user1CategoriesMap: Map<TypedId<CategoryId>, Category>
   private lateinit var user1Transactions: List<Transaction>
   private lateinit var user2Transactions: List<Transaction>
+  @Autowired private lateinit var transactionViewRepository: TransactionViewRepository
 
   @BeforeEach
   fun setup() {
@@ -296,14 +298,14 @@ class TransactionControllerTest : BaseIntegrationTest() {
         sortKey = TransactionSortKey.EXPENSE_DATE,
         sortDirection = SortDirection.ASC)
 
+    val nonDuplicateIds = user1Transactions.subList(1, user1Transactions.size).map { it.id }
+    val nonDuplicateTransactions = transactionViewRepository.findAllByIdIn(nonDuplicateIds)
+
     val response =
       SearchTransactionsResponse(
-        transactions =
-          listOf(
-            TransactionResponse.from(txn1, user1Categories[0]).copy(duplicate = true),
-            TransactionResponse.from(txn2, user1Categories[0]).copy(duplicate = true)),
+        transactions = nonDuplicateTransactions.map { TransactionResponse.from(it) },
         pageNumber = 0,
-        totalItems = 2)
+        totalItems = nonDuplicateTransactions.size.toLong())
 
     mockMvc
       .get("/transactions?${request.toQueryString()}") {
