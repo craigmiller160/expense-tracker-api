@@ -871,6 +871,7 @@ class TransactionControllerTest : BaseIntegrationTest() {
           secure = true
           header("Authorization", "Bearer $token")
           content = objectMapper.writeValueAsString(request)
+          contentType = MediaType.APPLICATION_JSON
         }
         .andExpect { status { isOk() } }
         .andReturn()
