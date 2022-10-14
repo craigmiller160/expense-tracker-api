@@ -25,6 +25,7 @@ data class Transaction(
   val amount: BigDecimal,
   @Column(name = "content_hash", insertable = false, updatable = false)
   val contentHash: String = "",
+  val markNotDuplicateNano: Long? = null,
   val confirmed: Boolean = false,
   val categoryId: TypedId<CategoryId>? = null,
   @Id override val id: TypedId<TransactionId> = TypedId(),
