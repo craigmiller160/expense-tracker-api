@@ -78,6 +78,7 @@ class TransactionController(private val transactionService: TransactionService) 
     transactionService.getPossibleDuplicates(transactionId, request)
 
   @PutMapping("/{transactionId}/notDuplicate")
+  @ResponseStatus(HttpStatus.NO_CONTENT)
   fun markNotDuplicate(@PathVariable transactionId: TypedId<TransactionId>): TryEither<Unit> =
     transactionService.markNotDuplicate(transactionId)
 }
