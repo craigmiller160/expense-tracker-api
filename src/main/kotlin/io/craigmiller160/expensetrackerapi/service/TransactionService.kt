@@ -32,6 +32,7 @@ import io.craigmiller160.expensetrackerapi.web.types.UpdateTransactionsRequest
 import io.craigmiller160.oauth2.service.OAuth2Service
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
+import org.springframework.data.domain.Sort.Direction
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -185,7 +186,12 @@ class TransactionService(
   fun getPossibleDuplicates(
     transactionId: TypedId<TransactionId>,
     request: GetPossibleDuplicatesRequest
-  ): TryEither<TransactionsPageResponse> = Either.catch { TODO() }
+  ): TryEither<TransactionsPageResponse> =
+    Either.catch {
+      val pageable = PageRequest.of(request.pageNumber, request.pageSize)
+      val result = transactionViewRepository.findAllDuplicates(transactionId, pageable)
+      TransactionsPageResponse.from(result)
+    }
 
   private fun getCategoryMap(userId: Long): TryEither<Map<TypedId<CategoryId>, Category>> =
     Either.catch { categoryRepository.findAllByUserIdOrderByName(userId).associateBy { it.id } }
