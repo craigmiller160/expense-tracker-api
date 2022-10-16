@@ -11,6 +11,7 @@ import io.craigmiller160.expensetrackerapi.web.types.DeleteTransactionsRequest
 import io.craigmiller160.expensetrackerapi.web.types.GetPossibleDuplicatesRequest
 import io.craigmiller160.expensetrackerapi.web.types.NeedsAttentionResponse
 import io.craigmiller160.expensetrackerapi.web.types.SearchTransactionsRequest
+import io.craigmiller160.expensetrackerapi.web.types.TransactionDuplicatePageResponse
 import io.craigmiller160.expensetrackerapi.web.types.TransactionResponse
 import io.craigmiller160.expensetrackerapi.web.types.TransactionsPageResponse
 import io.craigmiller160.expensetrackerapi.web.types.UpdateTransactionDetailsRequest
@@ -74,7 +75,7 @@ class TransactionController(private val transactionService: TransactionService) 
   fun getPossibleDuplicates(
     @PathVariable transactionId: TypedId<TransactionId>,
     request: GetPossibleDuplicatesRequest
-  ): TryEither<TransactionsPageResponse> =
+  ): TryEither<TransactionDuplicatePageResponse> =
     transactionService.getPossibleDuplicates(transactionId, request)
 
   @PutMapping("/{transactionId}/notDuplicate")

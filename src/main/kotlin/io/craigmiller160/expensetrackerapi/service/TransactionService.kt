@@ -25,6 +25,7 @@ import io.craigmiller160.expensetrackerapi.web.types.NeedsAttentionResponse
 import io.craigmiller160.expensetrackerapi.web.types.SearchTransactionsRequest
 import io.craigmiller160.expensetrackerapi.web.types.TransactionAndCategoryUpdateItem
 import io.craigmiller160.expensetrackerapi.web.types.TransactionAndConfirmUpdateItem
+import io.craigmiller160.expensetrackerapi.web.types.TransactionDuplicatePageResponse
 import io.craigmiller160.expensetrackerapi.web.types.TransactionResponse
 import io.craigmiller160.expensetrackerapi.web.types.TransactionsPageResponse
 import io.craigmiller160.expensetrackerapi.web.types.UpdateTransactionDetailsRequest
@@ -185,11 +186,11 @@ class TransactionService(
   fun getPossibleDuplicates(
     transactionId: TypedId<TransactionId>,
     request: GetPossibleDuplicatesRequest
-  ): TryEither<TransactionsPageResponse> =
+  ): TryEither<TransactionDuplicatePageResponse> =
     Either.catch {
       val pageable = PageRequest.of(request.pageNumber, request.pageSize)
       val pageResult = transactionViewRepository.findAllDuplicates(transactionId, pageable)
-      TransactionsPageResponse.from(pageResult)
+      TransactionDuplicatePageResponse.from(pageResult)
     }
 
   @Transactional
