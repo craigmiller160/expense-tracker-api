@@ -938,9 +938,10 @@ class TransactionControllerTest : BaseIntegrationTest() {
         secure = true
         header("Authorization", "Bearer $token")
       }
+      .andDo { print() }
       .andExpect {
         status { isOk() }
-        content { objectMapper.writeValueAsString(response) }
+        content { json(objectMapper.writeValueAsString(response)) }
       }
   }
 
