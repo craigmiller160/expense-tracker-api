@@ -948,7 +948,8 @@ class TransactionControllerTest : BaseIntegrationTest() {
 
   @Test
   fun `getPossibleDuplicates - no duplicates`() {
-    val response = TransactionsPageResponse(transactions = listOf(), pageNumber = 0, totalItems = 0)
+    val response =
+      TransactionDuplicatePageResponse(transactions = listOf(), pageNumber = 0, totalItems = 0)
     mockMvc
       .get("/transactions/${user1Transactions[0].id}/duplicates?pageNumber=0&pageSize=25") {
         secure = true
@@ -956,7 +957,7 @@ class TransactionControllerTest : BaseIntegrationTest() {
       }
       .andExpect {
         status { isOk() }
-        content { objectMapper.writeValueAsString(response) }
+        content { json(objectMapper.writeValueAsString(response)) }
       }
   }
 
