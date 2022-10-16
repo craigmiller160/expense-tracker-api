@@ -25,6 +25,7 @@ import io.craigmiller160.expensetrackerapi.web.types.NeedsAttentionResponse
 import io.craigmiller160.expensetrackerapi.web.types.SearchTransactionsRequest
 import io.craigmiller160.expensetrackerapi.web.types.TransactionAndCategoryUpdateItem
 import io.craigmiller160.expensetrackerapi.web.types.TransactionAndConfirmUpdateItem
+import io.craigmiller160.expensetrackerapi.web.types.TransactionDuplicatePageResponse
 import io.craigmiller160.expensetrackerapi.web.types.TransactionResponse
 import io.craigmiller160.expensetrackerapi.web.types.TransactionsPageResponse
 import io.craigmiller160.expensetrackerapi.web.types.UpdateTransactionDetailsRequest
@@ -32,7 +33,6 @@ import io.craigmiller160.expensetrackerapi.web.types.UpdateTransactionsRequest
 import io.craigmiller160.oauth2.service.OAuth2Service
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
-import org.springframework.data.domain.Sort.Direction
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -186,11 +186,11 @@ class TransactionService(
   fun getPossibleDuplicates(
     transactionId: TypedId<TransactionId>,
     request: GetPossibleDuplicatesRequest
-  ): TryEither<TransactionsPageResponse> =
+  ): TryEither<TransactionDuplicatePageResponse> =
     Either.catch {
       val pageable = PageRequest.of(request.pageNumber, request.pageSize)
-      val result = transactionViewRepository.findAllDuplicates(transactionId, pageable)
-      TransactionsPageResponse.from(result)
+      val pageResult = transactionViewRepository.findAllDuplicates(transactionId, pageable)
+      TransactionDuplicatePageResponse.from(pageResult)
     }
 
   @Transactional
