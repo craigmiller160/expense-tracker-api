@@ -16,6 +16,8 @@ import io.craigmiller160.expensetrackerapi.web.types.NeedsAttentionResponse
 import io.craigmiller160.expensetrackerapi.web.types.SearchTransactionsRequest
 import io.craigmiller160.expensetrackerapi.web.types.SortDirection
 import io.craigmiller160.expensetrackerapi.web.types.TransactionAndCategory
+import io.craigmiller160.expensetrackerapi.web.types.TransactionDuplicatePageResponse
+import io.craigmiller160.expensetrackerapi.web.types.TransactionDuplicateResponse
 import io.craigmiller160.expensetrackerapi.web.types.TransactionResponse
 import io.craigmiller160.expensetrackerapi.web.types.TransactionSortKey
 import io.craigmiller160.expensetrackerapi.web.types.TransactionToConfirm
@@ -924,11 +926,11 @@ class TransactionControllerTest : BaseIntegrationTest() {
 
     val expectedTransactions =
       transactionViewRepository.findAllByIdIn(listOf(txn3.id, txn2.id)).map {
-        TransactionResponse.from(it)
+        TransactionDuplicateResponse.from(it)
       }
 
     val response =
-      TransactionsPageResponse(
+      TransactionDuplicatePageResponse(
         transactions = expectedTransactions,
         totalItems = expectedTransactions.size.toLong(),
         pageNumber = 0)
@@ -938,7 +940,6 @@ class TransactionControllerTest : BaseIntegrationTest() {
         secure = true
         header("Authorization", "Bearer $token")
       }
-      .andDo { print() }
       .andExpect {
         status { isOk() }
         content { json(objectMapper.writeValueAsString(response)) }
