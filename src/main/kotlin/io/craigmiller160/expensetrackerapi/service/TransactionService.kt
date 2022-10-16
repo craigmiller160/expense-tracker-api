@@ -32,7 +32,6 @@ import io.craigmiller160.expensetrackerapi.web.types.UpdateTransactionsRequest
 import io.craigmiller160.oauth2.service.OAuth2Service
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
-import org.springframework.data.domain.Sort.Direction
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -189,8 +188,8 @@ class TransactionService(
   ): TryEither<TransactionsPageResponse> =
     Either.catch {
       val pageable = PageRequest.of(request.pageNumber, request.pageSize)
-      val result = transactionViewRepository.findAllDuplicates(transactionId, pageable)
-      TransactionsPageResponse.from(result)
+      val pageResult = transactionViewRepository.findAllDuplicates(transactionId, pageable)
+      TransactionsPageResponse.from(pageResult)
     }
 
   @Transactional
