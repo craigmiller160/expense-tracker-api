@@ -48,12 +48,11 @@ class ExpenseTrackerOpenApiCustomizer(
             response.content["*/*"]?.schema = newSchema.schema
           }
         }
-
-    TODO("Not yet implemented")
   }
 
   private fun getMethod(info: RequestMappingInfo): RequestMethod =
     info.methodsCondition.methods.first()
+  // TODO better null handling below
   private fun getPath(info: RequestMappingInfo): String =
-    info.pathPatternsCondition.patterns.first().patternString
+    info.pathPatternsCondition!!.patterns.first().patternString
 }
