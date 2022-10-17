@@ -16,6 +16,9 @@ import io.craigmiller160.expensetrackerapi.web.types.TransactionResponse
 import io.craigmiller160.expensetrackerapi.web.types.TransactionsPageResponse
 import io.craigmiller160.expensetrackerapi.web.types.UpdateTransactionDetailsRequest
 import io.craigmiller160.expensetrackerapi.web.types.UpdateTransactionsRequest
+import io.swagger.v3.oas.annotations.media.Content
+import io.swagger.v3.oas.annotations.media.Schema
+import io.swagger.v3.oas.annotations.responses.ApiResponse
 import javax.validation.Valid
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.DeleteMapping
@@ -31,6 +34,13 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 @RequestMapping("/transactions")
 class TransactionController(private val transactionService: TransactionService) {
+  // TODO need better solution than this
+  @ApiResponse(
+    content =
+      [
+        Content(
+          mediaType = "application/json",
+          schema = Schema(implementation = TransactionsPageResponse::class))])
   @GetMapping
   fun search(@Valid request: SearchTransactionsRequest): TryEither<TransactionsPageResponse> =
     transactionService.search(request)
