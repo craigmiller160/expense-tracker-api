@@ -41,7 +41,7 @@ oauth2:
   cookie-name: expense-tracker-token
   cookie-max-age-secs: 86400
   cookie-path: "/expense-tracker"
-  insecure-paths: "/actuator/health"
+  insecure-paths: "/actuator/health,/v3/api-docs,/v3/api-docs/*,/swagger-ui/*"
   auth-server-host: https://apps-craigmiller160.ddns.net/oauth2
   client-key: 7116aab5-504d-467a-a14c-a4264eecfb72
   client-secret: 5d6a543e-7145-469f-b406-78b83fa7bd88
