@@ -16,6 +16,9 @@ import io.craigmiller160.expensetrackerapi.web.types.TransactionResponse
 import io.craigmiller160.expensetrackerapi.web.types.TransactionsPageResponse
 import io.craigmiller160.expensetrackerapi.web.types.UpdateTransactionDetailsRequest
 import io.craigmiller160.expensetrackerapi.web.types.UpdateTransactionsRequest
+import io.swagger.v3.oas.annotations.media.Content
+import io.swagger.v3.oas.annotations.media.Schema
+import io.swagger.v3.oas.annotations.responses.ApiResponse
 import javax.validation.Valid
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.DeleteMapping
@@ -32,16 +35,30 @@ import org.springframework.web.bind.annotation.RestController
 @RequestMapping("/transactions")
 class TransactionController(private val transactionService: TransactionService) {
   // TODO need better solution than this
-  //  @ApiResponse(
-  //    content =
-  //      [
-  //        Content(
-  //          mediaType = "application/json",
-  //          schema = Schema(implementation = TransactionsPageResponse::class))])
+  @ApiResponse(
+    content =
+      [
+        Content(
+          mediaType = "application/json",
+          schema = Schema(implementation = TransactionsPageResponse::class))])
   @GetMapping
   fun search(@Valid request: SearchTransactionsRequest): TryEither<TransactionsPageResponse> =
     transactionService.search(request)
 
+  @ApiResponse(
+    content =
+      [
+        Content(
+          mediaType = "application/json",
+          schema = Schema(implementation = TransactionResponse::class))])
+  @PostMapping
+  fun createTransaction(
+    @RequestBody request: CreateTransactionRequest
+  ): TryEither<TransactionResponse> = transactionService.createTransaction(request)
+
+  @ApiResponse(
+    content =
+      [Content(mediaType = "application/json", schema = Schema(implementation = Unit::class))])
   @DeleteMapping
   @ResponseStatus(HttpStatus.NO_CONTENT)
   fun deleteTransactions(@RequestBody request: DeleteTransactionsRequest): TryEither<Unit> =
@@ -72,11 +89,6 @@ class TransactionController(private val transactionService: TransactionService) 
     @PathVariable("transactionId") transactionId: TypedId<TransactionId>,
     @RequestBody request: UpdateTransactionDetailsRequest
   ): TryEither<Unit> = transactionService.updateTransactionDetails(transactionId, request)
-
-  @PostMapping
-  fun createTransaction(
-    @RequestBody request: CreateTransactionRequest
-  ): TryEither<TransactionResponse> = transactionService.createTransaction(request)
 
   @GetMapping("/{transactionId}/duplicates")
   fun getPossibleDuplicates(
