@@ -1,12 +1,15 @@
 package io.craigmiller160.expensetrackerapi.web.controller
 
-import io.craigmiller160.expensetrackerapi.BaseIntegrationTest
+import com.fasterxml.jackson.databind.ObjectMapper
 import io.craigmiller160.expensetrackerapi.common.data.typedid.TypedId
 import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.CategoryId
 import io.craigmiller160.expensetrackerapi.data.model.Category
 import io.craigmiller160.expensetrackerapi.data.model.Transaction
 import io.craigmiller160.expensetrackerapi.data.repository.TransactionRepository
 import io.craigmiller160.expensetrackerapi.data.repository.TransactionViewRepository
+import io.craigmiller160.expensetrackerapi.testcore.ExpenseTrackerIntegrationTest
+import io.craigmiller160.expensetrackerapi.testcore.OAuth2Extension
+import io.craigmiller160.expensetrackerapi.testutils.DataHelper
 import io.craigmiller160.expensetrackerapi.web.types.CategorizeTransactionsRequest
 import io.craigmiller160.expensetrackerapi.web.types.ConfirmTransactionsRequest
 import io.craigmiller160.expensetrackerapi.web.types.CountAndOldest
@@ -27,28 +30,40 @@ import io.craigmiller160.expensetrackerapi.web.types.UpdateTransactionDetailsReq
 import io.craigmiller160.expensetrackerapi.web.types.UpdateTransactionsRequest
 import java.math.BigDecimal
 import java.time.LocalDate
+import javax.persistence.EntityManager
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.PageRequest
 import org.springframework.http.MediaType
+import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.delete
 import org.springframework.test.web.servlet.get
 import org.springframework.test.web.servlet.post
 import org.springframework.test.web.servlet.put
 
-class TransactionControllerTest : BaseIntegrationTest() {
-  @Autowired private lateinit var transactionRepository: TransactionRepository
+@ExpenseTrackerIntegrationTest
+class TransactionControllerTest
+@Autowired
+constructor(
+  private val transactionRepository: TransactionRepository,
+  private val transactionViewRepository: TransactionViewRepository,
+  private val dataHelper: DataHelper,
+  private val mockMvc: MockMvc,
+  private val objectMapper: ObjectMapper,
+  private val entityManager: EntityManager
+) {
+  private lateinit var token: String
 
   private lateinit var user1Categories: List<Category>
   private lateinit var user1CategoriesMap: Map<TypedId<CategoryId>, Category>
   private lateinit var user1Transactions: List<Transaction>
   private lateinit var user2Transactions: List<Transaction>
-  @Autowired private lateinit var transactionViewRepository: TransactionViewRepository
 
   @BeforeEach
   fun setup() {
+    token = OAuth2Extension.createJwt()
     user1Categories = dataHelper.createDefaultCategories(1L)
 
     val (user1Txns, user2Txns) =
