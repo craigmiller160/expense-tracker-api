@@ -37,7 +37,7 @@
         <kotlin.version>1.7.10</kotlin.version>
         <arrow.kt.version>1.1.2</arrow.kt.version>
         <kotest.arrow.version>1.2.5</kotest.arrow.version>
-        <spring.arrow.kt.version>1.0.1</spring.arrow.kt.version>
+        <spring.arrow.kt.version>1.0.3</spring.arrow.kt.version>
         <spring.oauth2.utils.version>1.10.0-SNAPSHOT</spring.oauth2.utils.version>
         <spring.web.utils.version>1.2.0-SNAPSHOT</spring.web.utils.version>
         <mockito.kotlin.version>4.0.0</mockito.kotlin.version>
@@ -45,7 +45,7 @@
         <faker.version>1.0.2</faker.version>
         <surefire.plugin.version>2.22.2</surefire.plugin.version>
         <spotless.version>2.26.0</spotless.version>
-        <maven.git.hooks.version>1.0.0</maven.git.hooks.version>
+        <maven.git.hooks.version>1.0.1</maven.git.hooks.version>
         <git.hooks.plugin.version>3.3.0</git.hooks.plugin.version>
         <querydsl.version>5.0.0</querydsl.version>
         <maven.compiler.plugin.version>3.10.1</maven.compiler.plugin.version>
