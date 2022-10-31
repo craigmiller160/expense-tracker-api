@@ -15,7 +15,6 @@ class OAuth2Extension : BeforeEachCallback {
     private val keyPair: KeyPair = KeyUtils.createKeyPair()
     private val jwkSet: JWKSet = KeyUtils.createJwkSet(keyPair)
 
-    // TODO don't like that this is here, consider a new location
     fun createJwt(configure: JwtUtils.JwtConfig.() -> Unit = {}): String =
       JwtUtils.createJwt(keyPair, configure)
   }
