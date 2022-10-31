@@ -4,6 +4,7 @@ import javax.transaction.Transactional
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit.jupiter.SpringExtension
 
 @Retention(AnnotationRetention.RUNTIME)
@@ -12,4 +13,5 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 @ExtendWith(value = [TestContainerExtension::class, SpringExtension::class, MockExtension::class])
 @Transactional
 @AutoConfigureMockMvc
+@ActiveProfiles("test")
 annotation class ExpenseTrackerIntegrationTest()
