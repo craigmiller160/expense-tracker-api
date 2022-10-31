@@ -9,7 +9,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 @Retention(AnnotationRetention.RUNTIME)
 @Target(AnnotationTarget.CLASS)
 @SpringBootTest
-@ExtendWith(value = [SpringExtension::class])
+@ExtendWith(value = [SpringExtension::class, MockExtension::class])
 @Transactional
 @AutoConfigureMockMvc
 annotation class ExpenseTrackerIntegrationTest()
