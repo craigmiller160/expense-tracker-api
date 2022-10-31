@@ -1,24 +1,44 @@
 package io.craigmiller160.expensetrackerapi.web.controller
 
-import io.craigmiller160.expensetrackerapi.BaseIntegrationTest
+import com.fasterxml.jackson.databind.ObjectMapper
 import io.craigmiller160.expensetrackerapi.common.data.typedid.TypedId
 import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.CategoryId
 import io.craigmiller160.expensetrackerapi.data.repository.CategoryRepository
 import io.craigmiller160.expensetrackerapi.data.repository.TransactionRepository
+import io.craigmiller160.expensetrackerapi.testcore.ExpenseTrackerIntegrationTest
+import io.craigmiller160.expensetrackerapi.testcore.OAuth2Extension
+import io.craigmiller160.expensetrackerapi.testutils.DataHelper
 import io.craigmiller160.expensetrackerapi.web.types.CategoryRequest
 import io.craigmiller160.expensetrackerapi.web.types.CategoryResponse
+import javax.persistence.EntityManager
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.MediaType
+import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.delete
 import org.springframework.test.web.servlet.get
 import org.springframework.test.web.servlet.post
 import org.springframework.test.web.servlet.put
 
-class CategoryControllerTest : BaseIntegrationTest() {
-  @Autowired private lateinit var categoryRepository: CategoryRepository
-  @Autowired private lateinit var transactionRepository: TransactionRepository
+@ExpenseTrackerIntegrationTest
+class CategoryControllerTest
+@Autowired
+constructor(
+  private val categoryRepository: CategoryRepository,
+  private val transactionRepository: TransactionRepository,
+  private val entityManager: EntityManager,
+  private val dataHelper: DataHelper,
+  private val mockMvc: MockMvc,
+  private val objectMapper: ObjectMapper
+) {
+  private lateinit var token: String
+
+  @BeforeEach
+  fun setup() {
+    token = OAuth2Extension.createJwt()
+  }
 
   @Test
   fun getAllCategories() {
