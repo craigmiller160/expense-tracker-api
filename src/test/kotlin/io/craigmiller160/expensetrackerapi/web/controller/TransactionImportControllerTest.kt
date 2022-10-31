@@ -3,26 +3,41 @@ package io.craigmiller160.expensetrackerapi.web.controller
 import arrow.core.Either
 import arrow.core.flatMap
 import arrow.core.getOrHandle
-import io.craigmiller160.expensetrackerapi.BaseIntegrationTest
+import com.fasterxml.jackson.databind.ObjectMapper
 import io.craigmiller160.expensetrackerapi.data.model.Transaction
 import io.craigmiller160.expensetrackerapi.data.repository.TransactionRepository
 import io.craigmiller160.expensetrackerapi.data.utils.TransactionContentHash
 import io.craigmiller160.expensetrackerapi.service.TransactionImportType
+import io.craigmiller160.expensetrackerapi.testcore.ExpenseTrackerIntegrationTest
+import io.craigmiller160.expensetrackerapi.testcore.OAuth2Extension
 import io.craigmiller160.expensetrackerapi.testutils.ResourceUtils
 import io.craigmiller160.expensetrackerapi.web.types.ImportTypeResponse
 import io.kotest.assertions.arrow.core.shouldBeRight
 import java.math.BigDecimal
 import java.time.LocalDate
+import javax.persistence.EntityManager
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.MediaType
+import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.get
 import org.springframework.test.web.servlet.multipart
 
-class TransactionImportControllerTest : BaseIntegrationTest() {
-  @Autowired private lateinit var transactionRepository: TransactionRepository
+@ExpenseTrackerIntegrationTest
+class TransactionImportControllerTest(
+  private val transactionRepository: TransactionRepository,
+  private val mockMvc: MockMvc,
+  private val objectMapper: ObjectMapper,
+  private val entityManager: EntityManager
+) {
+  private lateinit var token: String
+
+  @BeforeEach
+  fun setup() {
+    token = OAuth2Extension.createJwt()
+  }
   @Test
   fun getImportTypes() {
     val expectedResponse =
