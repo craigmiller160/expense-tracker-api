@@ -10,7 +10,13 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 @Retention(AnnotationRetention.RUNTIME)
 @Target(AnnotationTarget.CLASS)
 @SpringBootTest
-@ExtendWith(value = [TestContainerExtension::class, SpringExtension::class, MockExtension::class])
+@ExtendWith(
+  value =
+    [
+      TestContainerExtension::class,
+      SpringExtension::class,
+      MockExtension::class,
+      OAuth2Extension::class])
 @Transactional
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
