@@ -1,6 +1,5 @@
 package io.craigmiller160.expensetrackerapi.data.model
 
-import io.craigmiller160.expensetrackerapi.BaseIntegrationTest
 import java.time.ZonedDateTime
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
