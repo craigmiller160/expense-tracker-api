@@ -20,13 +20,16 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.MediaType
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.get
 import org.springframework.test.web.servlet.multipart
 
 @ExpenseTrackerIntegrationTest
-class TransactionImportControllerTest(
+class TransactionImportControllerTest
+@Autowired
+constructor(
   private val transactionRepository: TransactionRepository,
   private val mockMvc: MockMvc,
   private val objectMapper: ObjectMapper,
