@@ -43,8 +43,8 @@ oauth2:
   cookie-path: "/expense-tracker"
   insecure-paths: "/actuator/health,/v3/api-docs,/v3/api-docs/*,/swagger-ui/*"
   auth-server-host: https://apps-craigmiller160.ddns.net/oauth2
-  client-key: 7116aab5-504d-467a-a14c-a4264eecfb72
-  client-secret: 5d6a543e-7145-469f-b406-78b83fa7bd88
+  client-key: e878451c-3ce5-490d-addc-193b8eaff035
+  client-secret: 8ac56e43-f736-4ba7-8712-1639f845554b
 
 logging:
   level:
