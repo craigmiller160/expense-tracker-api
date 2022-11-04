@@ -37,7 +37,7 @@ oauth2:
   auth-login-base-uri: "/expense-tracker/oauth2"
   auth-code-redirect-uri: "/expense-tracker/api/oauth/authcode/code"
   post-auth-redirect: "/expense-tracker"
-  client-name: "(DEV) expense-tracker-api"
+  client-name: "(Dev) expense-tracker-api"
   cookie-name: expense-tracker-token
   cookie-max-age-secs: 86400
   cookie-path: "/expense-tracker"
