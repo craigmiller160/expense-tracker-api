@@ -126,5 +126,5 @@ class TransactionController(private val transactionService: TransactionService) 
   @GetMapping("/{transactionId}/details")
   fun getTransactionDetails(
     @PathVariable transactionId: TypedId<TransactionId>
-  ): TryEither<TransactionDetailsResponse> = TODO()
+  ): TryEither<TransactionDetailsResponse> = transactionService.getTransactionDetails(transactionId)
 }
