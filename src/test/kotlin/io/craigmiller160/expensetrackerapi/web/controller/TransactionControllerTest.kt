@@ -999,4 +999,8 @@ constructor(
     val txn2Duplicates = transactionViewRepository.findAllDuplicates(txn2.id, PageRequest.of(0, 25))
     assertThat(txn2Duplicates).hasSize(1).extracting("id").contains(txn3.id)
   }
+
+  @Test fun getTransactionDetails() = TODO()
+
+  @Test fun `getTransactionDetails - does not exist`() = TODO()
 }
