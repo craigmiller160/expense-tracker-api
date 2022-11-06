@@ -10,28 +10,12 @@ import io.craigmiller160.expensetrackerapi.data.repository.TransactionViewReposi
 import io.craigmiller160.expensetrackerapi.testcore.ExpenseTrackerIntegrationTest
 import io.craigmiller160.expensetrackerapi.testcore.OAuth2Extension
 import io.craigmiller160.expensetrackerapi.testutils.DataHelper
-import io.craigmiller160.expensetrackerapi.web.types.CategorizeTransactionsRequest
-import io.craigmiller160.expensetrackerapi.web.types.ConfirmTransactionsRequest
-import io.craigmiller160.expensetrackerapi.web.types.CountAndOldest
-import io.craigmiller160.expensetrackerapi.web.types.CreateTransactionRequest
-import io.craigmiller160.expensetrackerapi.web.types.DeleteTransactionsRequest
-import io.craigmiller160.expensetrackerapi.web.types.NeedsAttentionResponse
-import io.craigmiller160.expensetrackerapi.web.types.SearchTransactionsRequest
-import io.craigmiller160.expensetrackerapi.web.types.SortDirection
-import io.craigmiller160.expensetrackerapi.web.types.TransactionAndCategory
-import io.craigmiller160.expensetrackerapi.web.types.TransactionDuplicatePageResponse
-import io.craigmiller160.expensetrackerapi.web.types.TransactionDuplicateResponse
-import io.craigmiller160.expensetrackerapi.web.types.TransactionResponse
-import io.craigmiller160.expensetrackerapi.web.types.TransactionSortKey
-import io.craigmiller160.expensetrackerapi.web.types.TransactionToConfirm
-import io.craigmiller160.expensetrackerapi.web.types.TransactionToUpdate
-import io.craigmiller160.expensetrackerapi.web.types.TransactionsPageResponse
-import io.craigmiller160.expensetrackerapi.web.types.UpdateTransactionDetailsRequest
-import io.craigmiller160.expensetrackerapi.web.types.UpdateTransactionsRequest
+import io.craigmiller160.expensetrackerapi.web.types.*
 import java.math.BigDecimal
 import java.time.LocalDate
 import javax.persistence.EntityManager
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -1000,7 +984,45 @@ constructor(
     assertThat(txn2Duplicates).hasSize(1).extracting("id").contains(txn3.id)
   }
 
-  @Test fun getTransactionDetails() = TODO()
+  @Test
+  fun getTransactionDetails() {
+    val txn = user1Transactions[0]
+    val responseString =
+      mockMvc
+        .get("/transactions/${txn.id}/details") {
+          secure = true
+          header("Authorization", "Bearer $token")
+        }
+        .andExpect { status { isOk() } }
+        .andReturn()
+        .response
+        .contentAsString
+    val response = objectMapper.readValue(responseString, TransactionDetailsResponse::class.java)
+    val expected =
+      transactionViewRepository.findById(txn.id).orElseThrow().let {
+        TransactionDetailsResponse.from(it)
+      }
+    assertEquals(expected, response)
+  }
 
-  @Test fun `getTransactionDetails - does not exist`() = TODO()
+  @Test
+  fun `getTransactionDetails - user does not have access`() {
+    val txn = user2Transactions[0]
+    mockMvc
+      .get("/transactions/${txn.id}/details") {
+        secure = true
+        header("Authorization", "Bearer $token")
+      }
+      .andExpect { status { isBadRequest() } }
+  }
+
+  @Test
+  fun `getTransactionDetails - does not exist`() {
+    mockMvc
+      .get("/transactions/ABCDEFG/details") {
+        secure = true
+        header("Authorization", "Bearer $token")
+      }
+      .andExpect { status { isBadRequest() } }
+  }
 }
