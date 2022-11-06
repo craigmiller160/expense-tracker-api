@@ -993,7 +993,7 @@ constructor(
     entityManager.clear()
 
     mockMvc
-      .put("/transactions/${user1Transactions[0].id}/notDuplicate") {
+      .put("/transactions/${txn1.id}/notDuplicate") {
         secure = true
         header("Authorization", "Bearer $token")
       }
@@ -1010,7 +1010,24 @@ constructor(
 
   @Test
   fun `markNotDuplicate - different user id`() {
-    TODO()
+    val txn1 = user2Transactions[0]
+    val txn2 = transactionRepository.saveAndFlush(txn1.copy(id = TypedId()))
+    val txn3 = transactionRepository.saveAndFlush(txn1.copy(id = TypedId()))
+    entityManager.flush()
+    entityManager.clear()
+
+    mockMvc
+      .put("/transactions/${txn1.id}/notDuplicate") {
+        secure = true
+        header("Authorization", "Bearer $token")
+      }
+      .andExpect { status { isNoContent() } }
+
+    entityManager.flush()
+    entityManager.clear()
+
+    val txn1Duplicates = transactionViewRepository.findAllDuplicates(txn1.id, PageRequest.of(0, 25))
+    assertThat(txn1Duplicates).hasSize(2)
   }
 
   @Test
