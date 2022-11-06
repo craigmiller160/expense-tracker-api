@@ -13,6 +13,7 @@ import io.craigmiller160.expensetrackerapi.testutils.DataHelper
 import io.craigmiller160.expensetrackerapi.web.types.*
 import java.math.BigDecimal
 import java.time.LocalDate
+import java.util.UUID
 import javax.persistence.EntityManager
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -1019,7 +1020,7 @@ constructor(
   @Test
   fun `getTransactionDetails - does not exist`() {
     mockMvc
-      .get("/transactions/ABCDEFG/details") {
+      .get("/transactions/${UUID.randomUUID()}/details") {
         secure = true
         header("Authorization", "Bearer $token")
       }
