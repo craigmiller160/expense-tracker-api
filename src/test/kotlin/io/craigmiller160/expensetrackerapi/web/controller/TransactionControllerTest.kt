@@ -10,28 +10,13 @@ import io.craigmiller160.expensetrackerapi.data.repository.TransactionViewReposi
 import io.craigmiller160.expensetrackerapi.testcore.ExpenseTrackerIntegrationTest
 import io.craigmiller160.expensetrackerapi.testcore.OAuth2Extension
 import io.craigmiller160.expensetrackerapi.testutils.DataHelper
-import io.craigmiller160.expensetrackerapi.web.types.CategorizeTransactionsRequest
-import io.craigmiller160.expensetrackerapi.web.types.ConfirmTransactionsRequest
-import io.craigmiller160.expensetrackerapi.web.types.CountAndOldest
-import io.craigmiller160.expensetrackerapi.web.types.CreateTransactionRequest
-import io.craigmiller160.expensetrackerapi.web.types.DeleteTransactionsRequest
-import io.craigmiller160.expensetrackerapi.web.types.NeedsAttentionResponse
-import io.craigmiller160.expensetrackerapi.web.types.SearchTransactionsRequest
-import io.craigmiller160.expensetrackerapi.web.types.SortDirection
-import io.craigmiller160.expensetrackerapi.web.types.TransactionAndCategory
-import io.craigmiller160.expensetrackerapi.web.types.TransactionDuplicatePageResponse
-import io.craigmiller160.expensetrackerapi.web.types.TransactionDuplicateResponse
-import io.craigmiller160.expensetrackerapi.web.types.TransactionResponse
-import io.craigmiller160.expensetrackerapi.web.types.TransactionSortKey
-import io.craigmiller160.expensetrackerapi.web.types.TransactionToConfirm
-import io.craigmiller160.expensetrackerapi.web.types.TransactionToUpdate
-import io.craigmiller160.expensetrackerapi.web.types.TransactionsPageResponse
-import io.craigmiller160.expensetrackerapi.web.types.UpdateTransactionDetailsRequest
-import io.craigmiller160.expensetrackerapi.web.types.UpdateTransactionsRequest
+import io.craigmiller160.expensetrackerapi.web.types.*
 import java.math.BigDecimal
 import java.time.LocalDate
+import java.util.UUID
 import javax.persistence.EntityManager
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -317,7 +302,8 @@ constructor(
         sortDirection = SortDirection.ASC)
 
     val nonDuplicateIds = user1Transactions.subList(1, user1Transactions.size).map { it.id }
-    val nonDuplicateTransactions = transactionViewRepository.findAllByIdIn(nonDuplicateIds)
+    val nonDuplicateTransactions =
+      transactionViewRepository.findAllByIdInAndUserId(nonDuplicateIds, 1L)
 
     val response =
       TransactionsPageResponse(
@@ -932,6 +918,28 @@ constructor(
   }
 
   @Test
+  fun `getPossibleDuplicates - wrong user id`() {
+    val txn1 = user2Transactions[0]
+    val txn2 = transactionRepository.saveAndFlush(txn1.copy(id = TypedId()))
+    val txn3 = transactionRepository.saveAndFlush(txn1.copy(id = TypedId()))
+    entityManager.flush()
+    entityManager.clear()
+
+    val response =
+      TransactionDuplicatePageResponse(transactions = listOf(), totalItems = 0, pageNumber = 0)
+
+    mockMvc
+      .get("/transactions/${txn1.id}/duplicates?pageNumber=0&pageSize=25") {
+        secure = true
+        header("Authorization", "Bearer $token")
+      }
+      .andExpect {
+        status { isOk() }
+        content { json(objectMapper.writeValueAsString(response)) }
+      }
+  }
+
+  @Test
   fun `getPossibleDuplicates - has duplicates`() {
     val txn1 = user1Transactions[0]
     val txn2 = transactionRepository.saveAndFlush(txn1.copy(id = TypedId()))
@@ -940,7 +948,7 @@ constructor(
     entityManager.clear()
 
     val expectedTransactions =
-      transactionViewRepository.findAllByIdIn(listOf(txn3.id, txn2.id)).map {
+      transactionViewRepository.findAllByIdInAndUserId(listOf(txn3.id, txn2.id), 1L).map {
         TransactionDuplicateResponse.from(it)
       }
 
@@ -977,7 +985,7 @@ constructor(
   }
 
   @Test
-  fun `markNotDuplicate`() {
+  fun markNotDuplicate() {
     val txn1 = user1Transactions[0]
     val txn2 = transactionRepository.saveAndFlush(txn1.copy(id = TypedId()))
     val txn3 = transactionRepository.saveAndFlush(txn1.copy(id = TypedId()))
@@ -985,7 +993,7 @@ constructor(
     entityManager.clear()
 
     mockMvc
-      .put("/transactions/${user1Transactions[0].id}/notDuplicate") {
+      .put("/transactions/${txn1.id}/notDuplicate") {
         secure = true
         header("Authorization", "Bearer $token")
       }
@@ -994,9 +1002,76 @@ constructor(
     entityManager.flush()
     entityManager.clear()
 
-    val txn1Duplicates = transactionViewRepository.findAllDuplicates(txn1.id, PageRequest.of(0, 25))
+    val txn1Duplicates =
+      transactionViewRepository.findAllDuplicates(txn1.id, 1L, PageRequest.of(0, 25))
     assertThat(txn1Duplicates).isEmpty()
-    val txn2Duplicates = transactionViewRepository.findAllDuplicates(txn2.id, PageRequest.of(0, 25))
+    val txn2Duplicates =
+      transactionViewRepository.findAllDuplicates(txn2.id, 1L, PageRequest.of(0, 25))
     assertThat(txn2Duplicates).hasSize(1).extracting("id").contains(txn3.id)
+  }
+
+  @Test
+  fun `markNotDuplicate - different user id`() {
+    val txn1 = user2Transactions[0]
+    val txn2 = transactionRepository.saveAndFlush(txn1.copy(id = TypedId()))
+    val txn3 = transactionRepository.saveAndFlush(txn1.copy(id = TypedId()))
+    entityManager.flush()
+    entityManager.clear()
+
+    mockMvc
+      .put("/transactions/${txn1.id}/notDuplicate") {
+        secure = true
+        header("Authorization", "Bearer $token")
+      }
+      .andExpect { status { isNoContent() } }
+
+    entityManager.flush()
+    entityManager.clear()
+
+    val txn1Duplicates =
+      transactionViewRepository.findAllDuplicates(txn1.id, 2L, PageRequest.of(0, 25))
+    assertThat(txn1Duplicates).hasSize(2)
+  }
+
+  @Test
+  fun getTransactionDetails() {
+    val txn = user1Transactions[0]
+    val responseString =
+      mockMvc
+        .get("/transactions/${txn.id}/details") {
+          secure = true
+          header("Authorization", "Bearer $token")
+        }
+        .andExpect { status { isOk() } }
+        .andReturn()
+        .response
+        .contentAsString
+    val response = objectMapper.readValue(responseString, TransactionDetailsResponse::class.java)
+    val expected =
+      transactionViewRepository.findById(txn.id).orElseThrow().let {
+        TransactionDetailsResponse.from(it)
+      }
+    assertEquals(expected, response)
+  }
+
+  @Test
+  fun `getTransactionDetails - user does not have access`() {
+    val txn = user2Transactions[0]
+    mockMvc
+      .get("/transactions/${txn.id}/details") {
+        secure = true
+        header("Authorization", "Bearer $token")
+      }
+      .andExpect { status { isBadRequest() } }
+  }
+
+  @Test
+  fun `getTransactionDetails - does not exist`() {
+    mockMvc
+      .get("/transactions/${UUID.randomUUID()}/details") {
+        secure = true
+        header("Authorization", "Bearer $token")
+      }
+      .andExpect { status { isBadRequest() } }
   }
 }

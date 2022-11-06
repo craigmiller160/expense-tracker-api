@@ -4,18 +4,7 @@ import io.craigmiller160.expensetrackerapi.common.data.typedid.TypedId
 import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.TransactionId
 import io.craigmiller160.expensetrackerapi.function.TryEither
 import io.craigmiller160.expensetrackerapi.service.TransactionService
-import io.craigmiller160.expensetrackerapi.web.types.CategorizeTransactionsRequest
-import io.craigmiller160.expensetrackerapi.web.types.ConfirmTransactionsRequest
-import io.craigmiller160.expensetrackerapi.web.types.CreateTransactionRequest
-import io.craigmiller160.expensetrackerapi.web.types.DeleteTransactionsRequest
-import io.craigmiller160.expensetrackerapi.web.types.GetPossibleDuplicatesRequest
-import io.craigmiller160.expensetrackerapi.web.types.NeedsAttentionResponse
-import io.craigmiller160.expensetrackerapi.web.types.SearchTransactionsRequest
-import io.craigmiller160.expensetrackerapi.web.types.TransactionDuplicatePageResponse
-import io.craigmiller160.expensetrackerapi.web.types.TransactionResponse
-import io.craigmiller160.expensetrackerapi.web.types.TransactionsPageResponse
-import io.craigmiller160.expensetrackerapi.web.types.UpdateTransactionDetailsRequest
-import io.craigmiller160.expensetrackerapi.web.types.UpdateTransactionsRequest
+import io.craigmiller160.expensetrackerapi.web.types.*
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
@@ -127,4 +116,15 @@ class TransactionController(private val transactionService: TransactionService) 
   @ResponseStatus(HttpStatus.NO_CONTENT)
   fun markNotDuplicate(@PathVariable transactionId: TypedId<TransactionId>): TryEither<Unit> =
     transactionService.markNotDuplicate(transactionId)
+
+  @ApiResponse(
+    content =
+      [
+        Content(
+          mediaType = "application/json",
+          schema = Schema(implementation = TransactionDetailsResponse::class))])
+  @GetMapping("/{transactionId}/details")
+  fun getTransactionDetails(
+    @PathVariable transactionId: TypedId<TransactionId>
+  ): TryEither<TransactionDetailsResponse> = transactionService.getTransactionDetails(transactionId)
 }

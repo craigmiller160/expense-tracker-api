@@ -12,7 +12,12 @@ import org.springframework.stereotype.Repository
 
 @Repository
 interface TransactionViewRepository : JpaRepository<TransactionView, TypedId<TransactionId>> {
-  fun findAllByIdIn(transactionIds: List<TypedId<TransactionId>>): List<TransactionView>
+  fun findByIdAndUserId(id: TypedId<TransactionId>, userId: Long): TransactionView?
+
+  fun findAllByIdInAndUserId(
+    transactionIds: List<TypedId<TransactionId>>,
+    userId: Long
+  ): List<TransactionView>
 
   @Query(
     """
@@ -22,11 +27,14 @@ interface TransactionViewRepository : JpaRepository<TransactionView, TypedId<Tra
         SELECT t2.contentHash
         FROM TransactionView t2
         WHERE t2.id = :transactionId
+        AND t2.userId = :userId
     )
     AND t1.id <> :transactionId
+    AND t1.userId = :userId
   """)
   fun findAllDuplicates(
     @Param("transactionId") transactionId: TypedId<TransactionId>,
+    @Param("userId") userId: Long,
     page: Pageable
   ): Page<TransactionView>
 }

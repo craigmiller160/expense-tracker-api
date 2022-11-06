@@ -14,7 +14,7 @@ interface TransactionRepository :
   JpaRepository<Transaction, TypedId<TransactionId>>,
   JpaSpecificationExecutor<Transaction>,
   TransactionRepositoryCustom {
-  fun findAllByOrderByExpenseDateAscDescriptionAsc(): List<Transaction>
+  fun findAllByUserIdOrderByExpenseDateAscDescriptionAsc(userId: Long): List<Transaction>
 
   fun findAllByUserIdAndContentHashInOrderByCreated(
     userId: Long,
@@ -108,10 +108,12 @@ interface TransactionRepository :
     UPDATE Transaction t
     SET t.markNotDuplicateNano = :nano
     WHERE t.id = :transactionId
+    AND t.userId = :userId
   """)
   @Modifying(flushAutomatically = true, clearAutomatically = true)
   fun markNotDuplicate(
     @Param("nano") nano: Long,
-    @Param("transactionId") transactionId: TypedId<TransactionId>
+    @Param("transactionId") transactionId: TypedId<TransactionId>,
+    @Param("userId") userId: Long,
   )
 }

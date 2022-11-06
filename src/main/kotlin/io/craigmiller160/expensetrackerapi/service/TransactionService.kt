@@ -2,6 +2,7 @@ package io.craigmiller160.expensetrackerapi.service
 
 import arrow.core.Either
 import arrow.core.continuations.either
+import arrow.core.flatMap
 import arrow.core.flatten
 import io.craigmiller160.expensetrackerapi.common.data.typedid.TypedId
 import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.CategoryId
@@ -17,19 +18,7 @@ import io.craigmiller160.expensetrackerapi.data.repository.TransactionRepository
 import io.craigmiller160.expensetrackerapi.data.repository.TransactionViewRepository
 import io.craigmiller160.expensetrackerapi.function.TryEither
 import io.craigmiller160.expensetrackerapi.function.flatMapCatch
-import io.craigmiller160.expensetrackerapi.web.types.CountAndOldest
-import io.craigmiller160.expensetrackerapi.web.types.CreateTransactionRequest
-import io.craigmiller160.expensetrackerapi.web.types.DeleteTransactionsRequest
-import io.craigmiller160.expensetrackerapi.web.types.GetPossibleDuplicatesRequest
-import io.craigmiller160.expensetrackerapi.web.types.NeedsAttentionResponse
-import io.craigmiller160.expensetrackerapi.web.types.SearchTransactionsRequest
-import io.craigmiller160.expensetrackerapi.web.types.TransactionAndCategoryUpdateItem
-import io.craigmiller160.expensetrackerapi.web.types.TransactionAndConfirmUpdateItem
-import io.craigmiller160.expensetrackerapi.web.types.TransactionDuplicatePageResponse
-import io.craigmiller160.expensetrackerapi.web.types.TransactionResponse
-import io.craigmiller160.expensetrackerapi.web.types.TransactionsPageResponse
-import io.craigmiller160.expensetrackerapi.web.types.UpdateTransactionDetailsRequest
-import io.craigmiller160.expensetrackerapi.web.types.UpdateTransactionsRequest
+import io.craigmiller160.expensetrackerapi.web.types.*
 import io.craigmiller160.oauth2.service.OAuth2Service
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
@@ -186,17 +175,35 @@ class TransactionService(
   fun getPossibleDuplicates(
     transactionId: TypedId<TransactionId>,
     request: GetPossibleDuplicatesRequest
-  ): TryEither<TransactionDuplicatePageResponse> =
-    Either.catch {
-      val pageable = PageRequest.of(request.pageNumber, request.pageSize)
-      val pageResult = transactionViewRepository.findAllDuplicates(transactionId, pageable)
+  ): TryEither<TransactionDuplicatePageResponse> {
+    val userId = oAuth2Service.getAuthenticatedUser().userId
+    val pageable = PageRequest.of(request.pageNumber, request.pageSize)
+    return Either.catch {
+      val pageResult = transactionViewRepository.findAllDuplicates(transactionId, userId, pageable)
       TransactionDuplicatePageResponse.from(pageResult)
     }
+  }
 
   @Transactional
-  fun markNotDuplicate(transactionId: TypedId<TransactionId>): TryEither<Unit> =
-    Either.catch { transactionRepository.markNotDuplicate(System.nanoTime(), transactionId) }
+  fun markNotDuplicate(transactionId: TypedId<TransactionId>): TryEither<Unit> {
+    val userId = oAuth2Service.getAuthenticatedUser().userId
+    return Either.catch {
+      transactionRepository.markNotDuplicate(System.nanoTime(), transactionId, userId)
+    }
+  }
 
   private fun getCategoryMap(userId: Long): TryEither<Map<TypedId<CategoryId>, Category>> =
     Either.catch { categoryRepository.findAllByUserIdOrderByName(userId).associateBy { it.id } }
+
+  fun getTransactionDetails(
+    transactionId: TypedId<TransactionId>
+  ): TryEither<TransactionDetailsResponse> {
+    val userId = oAuth2Service.getAuthenticatedUser().userId
+    return Either.catch { transactionViewRepository.findByIdAndUserId(transactionId, userId) }
+      .flatMap { txn ->
+        txn?.let { Either.Right(it) }
+          ?: Either.Left(BadRequestException("No transaction for ID: $transactionId"))
+      }
+      .map { TransactionDetailsResponse.from(it) }
+  }
 }
