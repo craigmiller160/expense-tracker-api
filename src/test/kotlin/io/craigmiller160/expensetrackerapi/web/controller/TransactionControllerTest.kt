@@ -1002,9 +1002,11 @@ constructor(
     entityManager.flush()
     entityManager.clear()
 
-    val txn1Duplicates = transactionViewRepository.findAllDuplicates(txn1.id, PageRequest.of(0, 25))
+    val txn1Duplicates =
+      transactionViewRepository.findAllDuplicates(txn1.id, 1L, PageRequest.of(0, 25))
     assertThat(txn1Duplicates).isEmpty()
-    val txn2Duplicates = transactionViewRepository.findAllDuplicates(txn2.id, PageRequest.of(0, 25))
+    val txn2Duplicates =
+      transactionViewRepository.findAllDuplicates(txn2.id, 1L, PageRequest.of(0, 25))
     assertThat(txn2Duplicates).hasSize(1).extracting("id").contains(txn3.id)
   }
 
@@ -1026,7 +1028,8 @@ constructor(
     entityManager.flush()
     entityManager.clear()
 
-    val txn1Duplicates = transactionViewRepository.findAllDuplicates(txn1.id, PageRequest.of(0, 25))
+    val txn1Duplicates =
+      transactionViewRepository.findAllDuplicates(txn1.id, 2L, PageRequest.of(0, 25))
     assertThat(txn1Duplicates).hasSize(2)
   }
 
