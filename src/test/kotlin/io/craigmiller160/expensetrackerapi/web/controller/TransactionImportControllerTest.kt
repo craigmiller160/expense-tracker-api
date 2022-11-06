@@ -153,7 +153,7 @@ constructor(
     entityManager.flush()
     entityManager.clear()
 
-    val transactions = transactionRepository.findAllByOrderByExpenseDateAscDescriptionAsc()
+    val transactions = transactionRepository.findAllByUserIdOrderByExpenseDateAscDescriptionAsc(1L)
     assertThat(transactions).hasSize(57)
 
     assertThat(transactions.first())
@@ -199,7 +199,7 @@ constructor(
     entityManager.flush()
     entityManager.clear()
 
-    val transactions = transactionRepository.findAllByOrderByExpenseDateAscDescriptionAsc()
+    val transactions = transactionRepository.findAllByUserIdOrderByExpenseDateAscDescriptionAsc(1L)
     assertThat(transactions).hasSize(23)
 
     assertThat(transactions.first())

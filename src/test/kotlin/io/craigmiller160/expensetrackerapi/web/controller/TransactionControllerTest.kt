@@ -962,7 +962,7 @@ constructor(
   }
 
   @Test
-  fun `markNotDuplicate`() {
+  fun markNotDuplicate() {
     val txn1 = user1Transactions[0]
     val txn2 = transactionRepository.saveAndFlush(txn1.copy(id = TypedId()))
     val txn3 = transactionRepository.saveAndFlush(txn1.copy(id = TypedId()))
@@ -983,6 +983,11 @@ constructor(
     assertThat(txn1Duplicates).isEmpty()
     val txn2Duplicates = transactionViewRepository.findAllDuplicates(txn2.id, PageRequest.of(0, 25))
     assertThat(txn2Duplicates).hasSize(1).extracting("id").contains(txn3.id)
+  }
+
+  @Test
+  fun `markNotDuplicate - different user id`() {
+    TODO()
   }
 
   @Test
