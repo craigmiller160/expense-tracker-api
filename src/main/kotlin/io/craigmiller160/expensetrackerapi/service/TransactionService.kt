@@ -185,8 +185,12 @@ class TransactionService(
   }
 
   @Transactional
-  fun markNotDuplicate(transactionId: TypedId<TransactionId>): TryEither<Unit> =
-    Either.catch { transactionRepository.markNotDuplicate(System.nanoTime(), transactionId) }
+  fun markNotDuplicate(transactionId: TypedId<TransactionId>): TryEither<Unit> {
+    val userId = oAuth2Service.getAuthenticatedUser().userId
+    return Either.catch {
+      transactionRepository.markNotDuplicate(System.nanoTime(), transactionId, userId)
+    }
+  }
 
   private fun getCategoryMap(userId: Long): TryEither<Map<TypedId<CategoryId>, Category>> =
     Either.catch { categoryRepository.findAllByUserIdOrderByName(userId).associateBy { it.id } }
