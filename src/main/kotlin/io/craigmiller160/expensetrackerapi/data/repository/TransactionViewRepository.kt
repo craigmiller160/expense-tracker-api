@@ -12,8 +12,12 @@ import org.springframework.stereotype.Repository
 
 @Repository
 interface TransactionViewRepository : JpaRepository<TransactionView, TypedId<TransactionId>> {
+  fun findByIdAndUserId(id: TypedId<TransactionId>, userId: Long): TransactionView?
+
+  // TODO need to filter by user id
   fun findAllByIdIn(transactionIds: List<TypedId<TransactionId>>): List<TransactionView>
 
+  // TODO need to filter by user id
   @Query(
     """
     SELECT t1

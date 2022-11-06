@@ -14,6 +14,7 @@ interface TransactionRepository :
   JpaRepository<Transaction, TypedId<TransactionId>>,
   JpaSpecificationExecutor<Transaction>,
   TransactionRepositoryCustom {
+  // TODO filter by user id
   fun findAllByOrderByExpenseDateAscDescriptionAsc(): List<Transaction>
 
   fun findAllByUserIdAndContentHashInOrderByCreated(
@@ -103,6 +104,7 @@ interface TransactionRepository :
     @Param("userId") userId: Long
   )
 
+  // TODO filter by user id
   @Query(
     """
     UPDATE Transaction t
