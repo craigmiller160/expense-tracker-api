@@ -14,10 +14,11 @@ import org.springframework.stereotype.Repository
 interface TransactionViewRepository : JpaRepository<TransactionView, TypedId<TransactionId>> {
   fun findByIdAndUserId(id: TypedId<TransactionId>, userId: Long): TransactionView?
 
-  // TODO need to filter by user id
-  fun findAllByIdIn(transactionIds: List<TypedId<TransactionId>>): List<TransactionView>
+  fun findAllByIdInAndUserId(
+    transactionIds: List<TypedId<TransactionId>>,
+    userId: Long
+  ): List<TransactionView>
 
-  // TODO need to filter by user id
   @Query(
     """
     SELECT t1

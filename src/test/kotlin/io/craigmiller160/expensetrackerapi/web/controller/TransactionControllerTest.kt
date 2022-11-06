@@ -302,7 +302,8 @@ constructor(
         sortDirection = SortDirection.ASC)
 
     val nonDuplicateIds = user1Transactions.subList(1, user1Transactions.size).map { it.id }
-    val nonDuplicateTransactions = transactionViewRepository.findAllByIdIn(nonDuplicateIds)
+    val nonDuplicateTransactions =
+      transactionViewRepository.findAllByIdInAndUserId(nonDuplicateIds, 1L)
 
     val response =
       TransactionsPageResponse(
@@ -917,6 +918,11 @@ constructor(
   }
 
   @Test
+  fun `getPossibleDuplicates - wrong user id`() {
+    TODO()
+  }
+
+  @Test
   fun `getPossibleDuplicates - has duplicates`() {
     val txn1 = user1Transactions[0]
     val txn2 = transactionRepository.saveAndFlush(txn1.copy(id = TypedId()))
@@ -925,7 +931,7 @@ constructor(
     entityManager.clear()
 
     val expectedTransactions =
-      transactionViewRepository.findAllByIdIn(listOf(txn3.id, txn2.id)).map {
+      transactionViewRepository.findAllByIdInAndUserId(listOf(txn3.id, txn2.id), 1L).map {
         TransactionDuplicateResponse.from(it)
       }
 
