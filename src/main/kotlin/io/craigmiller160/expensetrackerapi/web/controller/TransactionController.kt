@@ -34,7 +34,6 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 @RequestMapping("/transactions")
 class TransactionController(private val transactionService: TransactionService) {
-  // TODO need better solution than this
   @ApiResponse(
     content =
       [
