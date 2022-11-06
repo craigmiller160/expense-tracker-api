@@ -175,12 +175,14 @@ class TransactionService(
   fun getPossibleDuplicates(
     transactionId: TypedId<TransactionId>,
     request: GetPossibleDuplicatesRequest
-  ): TryEither<TransactionDuplicatePageResponse> =
-    Either.catch {
-      val pageable = PageRequest.of(request.pageNumber, request.pageSize)
-      val pageResult = transactionViewRepository.findAllDuplicates(transactionId, pageable)
+  ): TryEither<TransactionDuplicatePageResponse> {
+    val userId = oAuth2Service.getAuthenticatedUser().userId
+    val pageable = PageRequest.of(request.pageNumber, request.pageSize)
+    return Either.catch {
+      val pageResult = transactionViewRepository.findAllDuplicates(transactionId, userId, pageable)
       TransactionDuplicatePageResponse.from(pageResult)
     }
+  }
 
   @Transactional
   fun markNotDuplicate(transactionId: TypedId<TransactionId>): TryEither<Unit> =
