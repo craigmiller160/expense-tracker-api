@@ -919,7 +919,24 @@ constructor(
 
   @Test
   fun `getPossibleDuplicates - wrong user id`() {
-    TODO()
+    val txn1 = user2Transactions[0]
+    val txn2 = transactionRepository.saveAndFlush(txn1.copy(id = TypedId()))
+    val txn3 = transactionRepository.saveAndFlush(txn1.copy(id = TypedId()))
+    entityManager.flush()
+    entityManager.clear()
+
+    val response =
+      TransactionDuplicatePageResponse(transactions = listOf(), totalItems = 0, pageNumber = 0)
+
+    mockMvc
+      .get("/transactions/${txn1.id}/duplicates?pageNumber=0&pageSize=25") {
+        secure = true
+        header("Authorization", "Bearer $token")
+      }
+      .andExpect {
+        status { isOk() }
+        content { json(objectMapper.writeValueAsString(response)) }
+      }
   }
 
   @Test
