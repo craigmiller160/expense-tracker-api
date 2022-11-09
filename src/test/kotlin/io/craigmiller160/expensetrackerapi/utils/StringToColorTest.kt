@@ -7,6 +7,6 @@ class StringToColorTest {
   @Test
   fun `converts a string to a random hex code color`() {
     val result = StringToColor.get("Hello World")
-    assertEquals("", result)
+    assertEquals("#969a84", result)
   }
 }
