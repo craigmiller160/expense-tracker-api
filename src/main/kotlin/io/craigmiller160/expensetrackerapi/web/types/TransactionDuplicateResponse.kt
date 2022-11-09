@@ -7,6 +7,7 @@ import java.time.ZonedDateTime
 
 data class TransactionDuplicateResponse(
   val id: TypedId<TransactionId>,
+  val confirmed: Boolean,
   val created: ZonedDateTime,
   val updated: ZonedDateTime,
   val categoryName: String?
@@ -15,6 +16,7 @@ data class TransactionDuplicateResponse(
     fun from(transaction: TransactionView): TransactionDuplicateResponse =
       TransactionDuplicateResponse(
         id = transaction.id,
+        confirmed = transaction.confirmed,
         created = transaction.created,
         updated = transaction.updated,
         categoryName = transaction.categoryName)
