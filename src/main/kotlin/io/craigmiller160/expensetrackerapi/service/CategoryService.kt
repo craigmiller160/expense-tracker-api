@@ -8,6 +8,7 @@ import io.craigmiller160.expensetrackerapi.data.repository.CategoryRepository
 import io.craigmiller160.expensetrackerapi.data.repository.TransactionRepository
 import io.craigmiller160.expensetrackerapi.function.TryEither
 import io.craigmiller160.expensetrackerapi.function.flatMapCatch
+import io.craigmiller160.expensetrackerapi.utils.StringToColor
 import io.craigmiller160.expensetrackerapi.web.types.CategoryRequest
 import io.craigmiller160.expensetrackerapi.web.types.CategoryResponse
 import io.craigmiller160.oauth2.service.OAuth2Service
@@ -29,7 +30,10 @@ class CategoryService(
 
   fun createCategory(request: CategoryRequest): TryEither<CategoryResponse> {
     val userId = oAuth2Service.getAuthenticatedUser().userId
-    return Either.catch { categoryRepository.save(Category(name = request.name, userId = userId)) }
+    return Either.catch {
+        categoryRepository.save(
+          Category(name = request.name, userId = userId, color = StringToColor.get(request.name)))
+      }
       .map { CategoryResponse.from(it) }
   }
 
@@ -39,7 +43,8 @@ class CategoryService(
     return Either.catch { categoryRepository.findByIdAndUserId(categoryId, userId) }
       .flatMapCatch { nullableCategory ->
         nullableCategory?.let { category ->
-          categoryRepository.save(category.copy(name = request.name))
+          categoryRepository.save(
+            category.copy(name = request.name, color = StringToColor.get(request.name)))
         }
       }
   }
