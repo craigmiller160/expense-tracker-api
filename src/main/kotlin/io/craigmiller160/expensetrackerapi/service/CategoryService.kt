@@ -28,6 +28,7 @@ class CategoryService(
     }
   }
 
+  @Transactional
   fun createCategory(request: CategoryRequest): TryEither<CategoryResponse> {
     val userId = oAuth2Service.getAuthenticatedUser().userId
     return Either.catch {
