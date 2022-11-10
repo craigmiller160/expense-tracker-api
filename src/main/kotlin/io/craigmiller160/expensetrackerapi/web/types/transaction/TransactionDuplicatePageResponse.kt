@@ -1,6 +1,7 @@
-package io.craigmiller160.expensetrackerapi.web.types
+package io.craigmiller160.expensetrackerapi.web.types.transaction
 
 import io.craigmiller160.expensetrackerapi.data.model.TransactionView
+import io.craigmiller160.expensetrackerapi.web.types.PageableResponse
 import org.springframework.data.domain.Page
 
 data class TransactionDuplicatePageResponse(

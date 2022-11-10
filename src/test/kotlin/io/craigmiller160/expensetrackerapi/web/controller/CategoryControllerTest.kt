@@ -9,8 +9,8 @@ import io.craigmiller160.expensetrackerapi.testcore.ExpenseTrackerIntegrationTes
 import io.craigmiller160.expensetrackerapi.testcore.OAuth2Extension
 import io.craigmiller160.expensetrackerapi.testutils.DataHelper
 import io.craigmiller160.expensetrackerapi.utils.StringToColor
-import io.craigmiller160.expensetrackerapi.web.types.CategoryRequest
-import io.craigmiller160.expensetrackerapi.web.types.CategoryResponse
+import io.craigmiller160.expensetrackerapi.web.types.category.CategoryRequest
+import io.craigmiller160.expensetrackerapi.web.types.category.CategoryResponse
 import javax.persistence.EntityManager
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach

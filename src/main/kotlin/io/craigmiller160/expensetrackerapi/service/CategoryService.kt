@@ -9,8 +9,8 @@ import io.craigmiller160.expensetrackerapi.data.repository.TransactionRepository
 import io.craigmiller160.expensetrackerapi.function.TryEither
 import io.craigmiller160.expensetrackerapi.function.flatMapCatch
 import io.craigmiller160.expensetrackerapi.utils.StringToColor
-import io.craigmiller160.expensetrackerapi.web.types.CategoryRequest
-import io.craigmiller160.expensetrackerapi.web.types.CategoryResponse
+import io.craigmiller160.expensetrackerapi.web.types.category.CategoryRequest
+import io.craigmiller160.expensetrackerapi.web.types.category.CategoryResponse
 import io.craigmiller160.oauth2.service.OAuth2Service
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional

@@ -4,8 +4,8 @@ import io.craigmiller160.expensetrackerapi.common.data.typedid.TypedId
 import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.CategoryId
 import io.craigmiller160.expensetrackerapi.function.TryEither
 import io.craigmiller160.expensetrackerapi.service.CategoryService
-import io.craigmiller160.expensetrackerapi.web.types.CategoryRequest
-import io.craigmiller160.expensetrackerapi.web.types.CategoryResponse
+import io.craigmiller160.expensetrackerapi.web.types.category.CategoryRequest
+import io.craigmiller160.expensetrackerapi.web.types.category.CategoryResponse
 import io.swagger.v3.oas.annotations.media.ArraySchema
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.Schema
