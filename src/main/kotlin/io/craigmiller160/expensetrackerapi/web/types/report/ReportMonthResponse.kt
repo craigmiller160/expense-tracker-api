@@ -5,5 +5,6 @@ import java.time.LocalDate
 
 data class ReportMonthResponse(
   val date: LocalDate, // TODO can I make this a month instead?
-  val total: BigDecimal
+  val total: BigDecimal,
+  val categories: List<ReportCategoryResponse>
 )
