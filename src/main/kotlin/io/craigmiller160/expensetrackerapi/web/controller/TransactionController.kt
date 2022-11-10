@@ -5,8 +5,7 @@ import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.TransactionId
 import io.craigmiller160.expensetrackerapi.function.TryEither
 import io.craigmiller160.expensetrackerapi.service.TransactionService
 import io.craigmiller160.expensetrackerapi.web.types.*
-import io.craigmiller160.expensetrackerapi.web.types.transaction.CreateTransactionRequest
-import io.craigmiller160.expensetrackerapi.web.types.transaction.DeleteTransactionsRequest
+import io.craigmiller160.expensetrackerapi.web.types.transaction.*
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse

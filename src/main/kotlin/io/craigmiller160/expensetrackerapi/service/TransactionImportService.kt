@@ -4,8 +4,8 @@ import io.craigmiller160.expensetrackerapi.data.repository.TransactionRepository
 import io.craigmiller160.expensetrackerapi.function.TryEither
 import io.craigmiller160.expensetrackerapi.function.flatMapCatch
 import io.craigmiller160.expensetrackerapi.service.parsing.TransactionParserManager
-import io.craigmiller160.expensetrackerapi.web.types.ImportTransactionsResponse
-import io.craigmiller160.expensetrackerapi.web.types.ImportTypeResponse
+import io.craigmiller160.expensetrackerapi.web.types.importing.ImportTransactionsResponse
+import io.craigmiller160.expensetrackerapi.web.types.importing.ImportTypeResponse
 import io.craigmiller160.oauth2.service.OAuth2Service
 import java.io.InputStream
 import org.springframework.stereotype.Service

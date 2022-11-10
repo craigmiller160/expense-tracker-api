@@ -3,8 +3,8 @@ package io.craigmiller160.expensetrackerapi.web.controller
 import io.craigmiller160.expensetrackerapi.function.TryEither
 import io.craigmiller160.expensetrackerapi.service.TransactionImportService
 import io.craigmiller160.expensetrackerapi.service.TransactionImportType
-import io.craigmiller160.expensetrackerapi.web.types.ImportTransactionsResponse
-import io.craigmiller160.expensetrackerapi.web.types.ImportTypeResponse
+import io.craigmiller160.expensetrackerapi.web.types.importing.ImportTransactionsResponse
+import io.craigmiller160.expensetrackerapi.web.types.importing.ImportTypeResponse
 import io.swagger.v3.oas.annotations.media.ArraySchema
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.Schema

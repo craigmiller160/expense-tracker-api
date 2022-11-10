@@ -11,7 +11,7 @@ import io.craigmiller160.expensetrackerapi.service.TransactionImportType
 import io.craigmiller160.expensetrackerapi.testcore.ExpenseTrackerIntegrationTest
 import io.craigmiller160.expensetrackerapi.testcore.OAuth2Extension
 import io.craigmiller160.expensetrackerapi.testutils.ResourceUtils
-import io.craigmiller160.expensetrackerapi.web.types.ImportTypeResponse
+import io.craigmiller160.expensetrackerapi.web.types.importing.ImportTypeResponse
 import io.kotest.assertions.arrow.core.shouldBeRight
 import java.math.BigDecimal
 import java.time.LocalDate

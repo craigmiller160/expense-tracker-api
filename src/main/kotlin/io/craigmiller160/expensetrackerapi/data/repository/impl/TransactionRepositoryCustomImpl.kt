@@ -10,7 +10,7 @@ import io.craigmiller160.expensetrackerapi.data.projection.NeedsAttentionOldest
 import io.craigmiller160.expensetrackerapi.data.projection.NeedsAttentionType
 import io.craigmiller160.expensetrackerapi.data.querydsl.QueryDSLSupport
 import io.craigmiller160.expensetrackerapi.data.repository.TransactionRepositoryCustom
-import io.craigmiller160.expensetrackerapi.web.types.SearchTransactionsRequest
+import io.craigmiller160.expensetrackerapi.web.types.transaction.SearchTransactionsRequest
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.Pageable

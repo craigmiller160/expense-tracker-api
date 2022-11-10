@@ -11,8 +11,7 @@ import io.craigmiller160.expensetrackerapi.testcore.ExpenseTrackerIntegrationTes
 import io.craigmiller160.expensetrackerapi.testcore.OAuth2Extension
 import io.craigmiller160.expensetrackerapi.testutils.DataHelper
 import io.craigmiller160.expensetrackerapi.web.types.*
-import io.craigmiller160.expensetrackerapi.web.types.transaction.CreateTransactionRequest
-import io.craigmiller160.expensetrackerapi.web.types.transaction.DeleteTransactionsRequest
+import io.craigmiller160.expensetrackerapi.web.types.transaction.*
 import java.math.BigDecimal
 import java.time.LocalDate
 import java.util.UUID
