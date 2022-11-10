@@ -1,8 +1,11 @@
-package io.craigmiller160.expensetrackerapi.web.types
+package io.craigmiller160.expensetrackerapi.web.types.transaction
 
 import io.craigmiller160.expensetrackerapi.common.data.typedid.TypedId
 import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.CategoryId
 import io.craigmiller160.expensetrackerapi.common.utils.DateUtils
+import io.craigmiller160.expensetrackerapi.web.types.PageableRequest
+import io.craigmiller160.expensetrackerapi.web.types.SortDirection
+import io.craigmiller160.expensetrackerapi.web.types.SortableRequest
 import java.time.LocalDate
 import javax.validation.constraints.AssertTrue
 import org.springframework.format.annotation.DateTimeFormat

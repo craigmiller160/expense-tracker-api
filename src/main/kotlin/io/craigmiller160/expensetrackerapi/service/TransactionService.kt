@@ -19,6 +19,7 @@ import io.craigmiller160.expensetrackerapi.data.repository.TransactionViewReposi
 import io.craigmiller160.expensetrackerapi.function.TryEither
 import io.craigmiller160.expensetrackerapi.function.flatMapCatch
 import io.craigmiller160.expensetrackerapi.web.types.*
+import io.craigmiller160.expensetrackerapi.web.types.transaction.*
 import io.craigmiller160.oauth2.service.OAuth2Service
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
