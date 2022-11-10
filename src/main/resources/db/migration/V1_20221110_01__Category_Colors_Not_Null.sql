@@ -1,2 +1,0 @@
-ALTER TABLE categories
-ALTER COLUMN colors SET NOT NULL;

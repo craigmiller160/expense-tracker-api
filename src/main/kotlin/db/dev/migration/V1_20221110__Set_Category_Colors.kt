@@ -25,20 +25,19 @@ class V1_20221110__Set_Category_Colors : BaseJavaMigration() {
   }
 
   override fun migrate(context: Context) {
-    context.connection.use { conn ->
-      val jdbcTemplate = NamedParameterJdbcTemplate(SingleConnectionDataSource(conn, false))
-      jdbcTemplate
-        .query(GET_CATEGORY_IDS, MapSqlParameterSource()) { rs, i ->
-          CategoryRecord(id = UUID.fromString(rs.getString("id")), name = rs.getString("name"))
-        }
-        .forEach { category ->
-          val params =
-            MapSqlParameterSource()
-              .addValue("id", category.id)
-              .addValue("color", StringToColor.get(category.name))
-          jdbcTemplate.update(UPDATE_COLORS, params)
-        }
-    }
+    val jdbcTemplate =
+      NamedParameterJdbcTemplate(SingleConnectionDataSource(context.connection, true))
+    jdbcTemplate
+      .query(GET_CATEGORY_IDS, MapSqlParameterSource()) { rs, i ->
+        CategoryRecord(id = UUID.fromString(rs.getString("id")), name = rs.getString("name"))
+      }
+      .forEach { category ->
+        val params =
+          MapSqlParameterSource()
+            .addValue("id", category.id)
+            .addValue("color", StringToColor.get(category.name))
+        jdbcTemplate.update(UPDATE_COLORS, params)
+      }
   }
 
   private data class CategoryRecord(val id: UUID, val name: String)
