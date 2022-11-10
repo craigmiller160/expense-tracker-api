@@ -17,6 +17,7 @@ import org.hibernate.annotations.TypeDef
 data class Category(
   val name: String,
   val userId: Long,
+  val color: String,
   @Id override val id: TypedId<CategoryId> = TypedId(),
   override val created: ZonedDateTime = ZonedDateTime.now(),
   override var updated: ZonedDateTime = ZonedDateTime.now(),

@@ -7,6 +7,7 @@ import io.craigmiller160.expensetrackerapi.data.model.Category
 import io.craigmiller160.expensetrackerapi.data.model.Transaction
 import io.craigmiller160.expensetrackerapi.data.repository.CategoryRepository
 import io.craigmiller160.expensetrackerapi.data.repository.TransactionRepository
+import io.craigmiller160.expensetrackerapi.utils.StringToColor
 import java.math.BigDecimal
 import java.time.LocalDate
 import org.springframework.stereotype.Component
@@ -32,7 +33,8 @@ class DataHelper(
   }
 
   fun createCategory(userId: Long, name: String): Category =
-    categoryRepository.saveAndFlush(Category(userId = userId, name = name))
+    categoryRepository.saveAndFlush(
+      Category(userId = userId, name = name, color = StringToColor.get(name)))
 
   fun createDefaultCategories(userId: Long): List<Category> =
     listOf(

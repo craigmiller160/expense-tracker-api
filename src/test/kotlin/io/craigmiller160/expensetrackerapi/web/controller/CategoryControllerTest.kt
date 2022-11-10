@@ -8,6 +8,7 @@ import io.craigmiller160.expensetrackerapi.data.repository.TransactionRepository
 import io.craigmiller160.expensetrackerapi.testcore.ExpenseTrackerIntegrationTest
 import io.craigmiller160.expensetrackerapi.testcore.OAuth2Extension
 import io.craigmiller160.expensetrackerapi.testutils.DataHelper
+import io.craigmiller160.expensetrackerapi.utils.StringToColor
 import io.craigmiller160.expensetrackerapi.web.types.CategoryRequest
 import io.craigmiller160.expensetrackerapi.web.types.CategoryResponse
 import javax.persistence.EntityManager
@@ -87,6 +88,7 @@ constructor(
       .get()
       .hasFieldOrPropertyWithValue("name", request.name)
       .hasFieldOrPropertyWithValue("userId", 1L)
+      .hasFieldOrPropertyWithValue("color", StringToColor.get(request.name))
   }
 
   @Test
@@ -110,10 +112,14 @@ constructor(
     action(cat2.id)
 
     val dbCat1 = categoryRepository.findById(cat1.id).orElseThrow()
-    assertThat(dbCat1).hasFieldOrPropertyWithValue("name", "Category B")
+    assertThat(dbCat1)
+      .hasFieldOrPropertyWithValue("name", "Category B")
+      .hasFieldOrPropertyWithValue("color", StringToColor.get(request.name))
 
     val dbCat2 = categoryRepository.findById(cat2.id).orElseThrow()
-    assertThat(dbCat2).hasFieldOrPropertyWithValue("name", "Category 2")
+    assertThat(dbCat2)
+      .hasFieldOrPropertyWithValue("name", "Category 2")
+      .hasFieldOrPropertyWithValue("color", StringToColor.get(cat2.name))
   }
 
   @Test
