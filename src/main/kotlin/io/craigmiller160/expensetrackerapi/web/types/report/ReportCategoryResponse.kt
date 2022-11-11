@@ -12,8 +12,11 @@ data class ReportCategoryResponse(
   val percent: BigDecimal
 ) {
   companion object {
-    fun from(month: SpendingByCategory): ReportCategoryResponse =
+    fun from(category: SpendingByCategory, monthTotal: BigDecimal): ReportCategoryResponse =
       ReportCategoryResponse(
-        id = TODO(), name = month.categoryName, amount = month.total, percent = TODO())
+        id = TODO(),
+        name = category.categoryName,
+        amount = category.total,
+        percent = category.total / monthTotal)
   }
 }
