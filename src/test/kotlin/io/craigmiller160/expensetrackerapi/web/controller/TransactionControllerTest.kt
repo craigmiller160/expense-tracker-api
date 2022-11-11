@@ -102,7 +102,7 @@ constructor(
       }
       .andExpect {
         status { isOk() }
-        content { json(objectMapper.writeValueAsString(response)) }
+        content { json(objectMapper.writeValueAsString(response), true) }
       }
   }
 
@@ -134,7 +134,7 @@ constructor(
       }
       .andExpect {
         status { isOk() }
-        content { json(objectMapper.writeValueAsString(response)) }
+        content { json(objectMapper.writeValueAsString(response), true) }
       }
   }
 
@@ -164,7 +164,7 @@ constructor(
       }
       .andExpect {
         status { isOk() }
-        content { json(objectMapper.writeValueAsString(response)) }
+        content { json(objectMapper.writeValueAsString(response), true) }
       }
   }
 
@@ -195,7 +195,7 @@ constructor(
       }
       .andExpect {
         status { isOk() }
-        content { json(objectMapper.writeValueAsString(response)) }
+        content { json(objectMapper.writeValueAsString(response), true) }
       }
   }
 
@@ -232,7 +232,7 @@ constructor(
       }
       .andExpect {
         status { isOk() }
-        content { json(objectMapper.writeValueAsString(response)) }
+        content { json(objectMapper.writeValueAsString(response), true) }
       }
   }
 
@@ -267,7 +267,7 @@ constructor(
       }
       .andExpect {
         status { isOk() }
-        content { json(objectMapper.writeValueAsString(response)) }
+        content { json(objectMapper.writeValueAsString(response), true) }
       }
   }
 
@@ -319,7 +319,7 @@ constructor(
       }
       .andExpect {
         status { isOk() }
-        content { json(objectMapper.writeValueAsString(response)) }
+        content { json(objectMapper.writeValueAsString(response), true) }
       }
   }
 
@@ -356,7 +356,7 @@ constructor(
       }
       .andExpect {
         status { isOk() }
-        content { json(objectMapper.writeValueAsString(response)) }
+        content { json(objectMapper.writeValueAsString(response), true) }
       }
   }
 
@@ -382,7 +382,7 @@ constructor(
       }
       .andExpect {
         status { isOk() }
-        content { json(objectMapper.writeValueAsString(response)) }
+        content { json(objectMapper.writeValueAsString(response), true) }
       }
   }
 
@@ -405,7 +405,7 @@ constructor(
       }
       .andExpect {
         status { isOk() }
-        content { json(objectMapper.writeValueAsString(response)) }
+        content { json(objectMapper.writeValueAsString(response), true) }
       }
   }
 
@@ -444,7 +444,7 @@ constructor(
       }
       .andExpect {
         status { isOk() }
-        content { json(objectMapper.writeValueAsString(response)) }
+        content { json(objectMapper.writeValueAsString(response), true) }
       }
   }
 
@@ -483,7 +483,7 @@ constructor(
       }
       .andExpect {
         status { isOk() }
-        content { json(objectMapper.writeValueAsString(response)) }
+        content { json(objectMapper.writeValueAsString(response), true) }
       }
   }
 
@@ -518,7 +518,7 @@ constructor(
       }
       .andExpect {
         status { isOk() }
-        content { json(objectMapper.writeValueAsString(response)) }
+        content { json(objectMapper.writeValueAsString(response), true) }
       }
   }
 
@@ -936,7 +936,7 @@ constructor(
       }
       .andExpect {
         status { isOk() }
-        content { json(objectMapper.writeValueAsString(response)) }
+        content { json(objectMapper.writeValueAsString(response), true) }
       }
   }
 
@@ -966,7 +966,7 @@ constructor(
       }
       .andExpect {
         status { isOk() }
-        content { json(objectMapper.writeValueAsString(response)) }
+        content { json(objectMapper.writeValueAsString(response), true) }
       }
   }
 
