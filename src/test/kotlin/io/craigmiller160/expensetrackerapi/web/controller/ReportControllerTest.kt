@@ -103,7 +103,7 @@ constructor(
 
   @Test
   fun getReports_oneMonth() {
-    val filteredResponse = expectedResponse.copy(reports = listOf(expectedResponse.reports[1]))
+    val filteredResponse = expectedResponse.copy(reports = listOf(expectedResponse.reports[0]))
     mockMvc
       .get("/reports?pageNumber=0&pageSize=1") {
         secure = true
