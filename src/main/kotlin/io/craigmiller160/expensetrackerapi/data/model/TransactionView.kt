@@ -13,16 +13,16 @@ import javax.persistence.Table
 @Entity
 @Table(name = "transactions_view")
 data class TransactionView(
-  @Id val id: TypedId<TransactionId>,
-  val userId: Long,
-  val expenseDate: LocalDate,
-  val description: String,
-  val amount: BigDecimal,
+  @Id override val id: TypedId<TransactionId>,
+  override val userId: Long,
+  override val expenseDate: LocalDate,
+  override val description: String,
+  override val amount: BigDecimal,
   val contentHash: String,
-  val categoryId: TypedId<CategoryId>?,
+  override val categoryId: TypedId<CategoryId>?,
   val categoryName: String?,
-  val confirmed: Boolean,
+  override val confirmed: Boolean,
   val duplicate: Boolean,
   val created: ZonedDateTime,
   val updated: ZonedDateTime
-)
+) : TransactionCommon

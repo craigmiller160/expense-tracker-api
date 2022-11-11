@@ -19,17 +19,17 @@ import org.hibernate.annotations.TypeDef
 @Table(name = "transactions")
 @TypeDef(defaultForType = TypedId::class, typeClass = TypedIdJpaType::class)
 data class Transaction(
-  val userId: Long,
-  val expenseDate: LocalDate,
-  val description: String,
-  val amount: BigDecimal,
+  override val userId: Long,
+  override val expenseDate: LocalDate,
+  override val description: String,
+  override val amount: BigDecimal,
   @Column(name = "content_hash", insertable = false, updatable = false)
   val contentHash: String = "",
   val markNotDuplicateNano: Long? = null,
-  val confirmed: Boolean = false,
-  val categoryId: TypedId<CategoryId>? = null,
+  override val confirmed: Boolean = false,
+  override val categoryId: TypedId<CategoryId>? = null,
   @Id override val id: TypedId<TransactionId> = TypedId(),
   override val created: ZonedDateTime = ZonedDateTime.now(),
   override var updated: ZonedDateTime = ZonedDateTime.now(),
   @Version override val version: Long = 1
-) : MutableEntity<TransactionId>
+) : MutableEntity<TransactionId>, TransactionCommon
