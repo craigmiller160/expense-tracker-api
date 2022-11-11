@@ -1,6 +1,7 @@
 package io.craigmiller160.expensetrackerapi.web.controller
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import io.craigmiller160.expensetrackerapi.data.repository.ReportRepository
 import io.craigmiller160.expensetrackerapi.data.repository.TransactionRepository
 import io.craigmiller160.expensetrackerapi.testcore.ExpenseTrackerIntegrationTest
 import io.craigmiller160.expensetrackerapi.testcore.OAuth2Extension
@@ -81,20 +82,35 @@ constructor(
               categories =
                 listOf(
                   ReportCategoryResponse(
-                    name = cat1.name, amount = txn3.amount, percent = txn3.amount / month2Total),
+                    name = cat1.name,
+                    color = cat1.color,
+                    amount = txn3.amount,
+                    percent = txn3.amount / month2Total),
                   ReportCategoryResponse(
-                    name = cat2.name, amount = txn4.amount, percent = txn4.amount / month2Total))),
+                    name = cat2.name,
+                    color = cat2.color,
+                    amount = txn4.amount,
+                    percent = txn4.amount / month2Total))),
             ReportMonthResponse(
               date = month1,
               total = month1Total,
               categories =
                 listOf(
                   ReportCategoryResponse(
-                    name = cat1.name, amount = txn1.amount, percent = txn1.amount / month1Total),
+                    name = cat1.name,
+                    color = cat1.color,
+                    amount = txn1.amount,
+                    percent = txn1.amount / month1Total),
                   ReportCategoryResponse(
-                    name = cat2.name, amount = txn2.amount, percent = txn2.amount / month1Total),
+                    name = cat2.name,
+                    color = cat2.color,
+                    amount = txn2.amount,
+                    percent = txn2.amount / month1Total),
                   ReportCategoryResponse(
-                    name = "Unknown", amount = txn6.amount, percent = txn6.amount / month1Total)))))
+                    name = ReportRepository.UNKNOWN_CATEGORY_NAME,
+                    color = ReportRepository.UNKNOWN_CATEGORY_COLOR,
+                    amount = txn6.amount,
+                    percent = txn6.amount / month1Total)))))
   }
 
   @Test
