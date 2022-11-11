@@ -1,5 +1,5 @@
--- TODO This would need to be repeated for each month, it's not efficient
-SELECT category_name, SUM(amount)
+-- The efficient way to use this SQL is to repeat it for each month that needs to be retrieved, and then concatenate a UNION between each one
+SELECT :theDate AS month, category_name, SUM(amount)
 FROM transactions_view
 WHERE expense_date >= DATE_TRUNC('month', :theDate::date)
 AND expense_date <= (DATE_TRUNC('month', :theDate::date) + interval '1 month - 1 day')
