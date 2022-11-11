@@ -96,13 +96,14 @@ constructor(
       }
       .andExpect {
         status { isOk() }
+        // TODO I'm concerned the order is wrong here
         content { json(objectMapper.writeValueAsString(expectedResponse)) }
       }
   }
 
   @Test
   fun getReports_oneMonth() {
-    val filteredResponse = expectedResponse.copy(reports = listOf(expectedResponse.reports[0]))
+    val filteredResponse = expectedResponse.copy(reports = listOf(expectedResponse.reports[1]))
     mockMvc
       .get("/reports?pageNumber=0&pageSize=1") {
         secure = true
