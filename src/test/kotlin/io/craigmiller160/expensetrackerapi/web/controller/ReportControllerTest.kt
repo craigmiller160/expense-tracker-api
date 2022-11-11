@@ -3,6 +3,7 @@ package io.craigmiller160.expensetrackerapi.web.controller
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.craigmiller160.expensetrackerapi.data.repository.TransactionRepository
 import io.craigmiller160.expensetrackerapi.testcore.ExpenseTrackerIntegrationTest
+import io.craigmiller160.expensetrackerapi.testcore.OAuth2Extension
 import io.craigmiller160.expensetrackerapi.testutils.DataHelper
 import io.craigmiller160.expensetrackerapi.web.types.report.ReportCategoryResponse
 import io.craigmiller160.expensetrackerapi.web.types.report.ReportMonthResponse
@@ -12,6 +13,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.test.web.servlet.MockMvc
+import org.springframework.test.web.servlet.get
 
 @ExpenseTrackerIntegrationTest
 class ReportControllerTest
@@ -20,13 +22,15 @@ constructor(
   private val mockMvc: MockMvc,
   private val objectMapper: ObjectMapper,
   private val dataHelper: DataHelper,
-  private val transactionRepository: TransactionRepository
+  private val transactionRepository: TransactionRepository,
 ) {
+  private lateinit var token: String
 
   private lateinit var expectedResponse: ReportPageResponse
 
   @BeforeEach
   fun setup() {
+    token = OAuth2Extension.createJwt()
     val cat1 = dataHelper.createCategory(1L, "Entertainment")
     val cat2 = dataHelper.createCategory(1L, "Groceries")
     val cat3 = dataHelper.createCategory(2L, "Food")
@@ -97,6 +101,14 @@ constructor(
 
   @Test
   fun getReports() {
-    TODO()
+    mockMvc
+      .get("/reports?pageNumber=0&pageSize=10") {
+        secure = true
+        header("Authorization", "Bearer $token")
+      }
+      .andExpect {
+        status { isOk() }
+        content { json(objectMapper.writeValueAsString(expectedResponse)) }
+      }
   }
 }
