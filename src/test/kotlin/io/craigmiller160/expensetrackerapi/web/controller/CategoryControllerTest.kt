@@ -58,7 +58,7 @@ constructor(
       }
       .andExpect {
         status { isOk() }
-        content { json(objectMapper.writeValueAsString(expected)) }
+        content { json(objectMapper.writeValueAsString(expected), true) }
       }
   }
 

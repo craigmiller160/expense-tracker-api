@@ -52,7 +52,7 @@ constructor(
       }
       .andExpect {
         status { isOk() }
-        content { json(objectMapper.writeValueAsString(expectedResponse)) }
+        content { json(objectMapper.writeValueAsString(expectedResponse), true) }
       }
   }
 
@@ -81,7 +81,7 @@ constructor(
       }
       .andExpect {
         status { isOk() }
-        content { json("""{"transactionsImported":57}""") }
+        content { json("""{"transactionsImported":57}""", true) }
       }
 
     entityManager.flush()
@@ -113,7 +113,7 @@ constructor(
       }
       .andExpect {
         status { isOk() }
-        content { json("""{"transactionsImported":58}""") }
+        content { json("""{"transactionsImported":58}""", true) }
       }
 
     entityManager.flush()
@@ -144,7 +144,7 @@ constructor(
             }
             .andExpect {
               status { isOk() }
-              content { json("""{"transactionsImported":57}""") }
+              content { json("""{"transactionsImported":57}""", true) }
             }
         }
       }
@@ -190,7 +190,7 @@ constructor(
             }
             .andExpect {
               status { isOk() }
-              content { json("""{"transactionsImported":23}""") }
+              content { json("""{"transactionsImported":23}""", true) }
             }
         }
       }
