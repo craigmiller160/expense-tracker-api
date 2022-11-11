@@ -8,6 +8,8 @@ import io.craigmiller160.expensetrackerapi.web.types.report.ReportRequest
 import java.time.LocalDate
 import javax.transaction.Transactional
 import org.springframework.data.domain.Page
+import org.springframework.data.domain.PageImpl
+import org.springframework.data.domain.PageRequest
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.stereotype.Repository
@@ -23,18 +25,21 @@ class ReportRepositoryImpl(
     request: ReportRequest
   ): Page<SpendingByMonth> {
     val spendingByMonth = getSpendingByMonth(userId, request)
+    val spendingByMonthCount = getSpendingByMonthCount(userId)
     val months = spendingByMonth.map { it.month }
     val spendingByCategory = getSpendingByCategoryForMonths(userId, months)
     val fullResults =
       spendingByMonth.map { monthRecord ->
         monthRecord.copy(
           categories =
+            // The records should already be in the correct order
             spendingByCategory.filter { categoryRecord ->
               categoryRecord.month == monthRecord.month
             })
       }
 
-    TODO("How to efficiently, functionally merge everything together without mutation?")
+    return PageImpl(
+      fullResults, PageRequest.of(request.pageNumber, request.pageSize), spendingByMonthCount)
   }
 
   private fun getSpendingByCategoryForMonths(
@@ -62,6 +67,13 @@ class ReportRepositoryImpl(
         categoryName = rs.getString("category_name"),
         amount = rs.getBigDecimal("amount"))
     }
+  }
+
+  private fun getSpendingByMonthCount(userId: Long): Long {
+    val getSpendingByMonthCountSql =
+      sqlLoader.loadSql("reports/get_total_spending_by_month_count.sql")
+    val params = MapSqlParameterSource().addValue("userId", userId)
+    return jdbcTemplate.queryForObject(getSpendingByMonthCountSql, params, Long::class.java)!!
   }
 
   private data class SpendingByCategoryQueryWrapper(val params: Map<String, Any>, val sql: String)
