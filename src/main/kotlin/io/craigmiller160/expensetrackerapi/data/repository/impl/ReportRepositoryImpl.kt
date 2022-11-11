@@ -1,0 +1,18 @@
+package io.craigmiller160.expensetrackerapi.data.repository.impl
+
+import io.craigmiller160.expensetrackerapi.data.projection.SpendingByMonth
+import io.craigmiller160.expensetrackerapi.data.repository.ReportRepository
+import io.craigmiller160.expensetrackerapi.web.types.report.ReportRequest
+import javax.transaction.Transactional
+import org.springframework.stereotype.Repository
+
+@Repository
+class ReportRepositoryImpl : ReportRepository {
+  @Transactional
+  override fun getSpendingByMonthAndCategory(
+    userId: Long,
+    request: ReportRequest
+  ): List<SpendingByMonth> {
+    TODO("Not yet implemented")
+  }
+}
