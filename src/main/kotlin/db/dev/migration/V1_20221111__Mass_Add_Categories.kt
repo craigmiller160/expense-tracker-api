@@ -54,9 +54,10 @@ class V1_20221111__Mass_Add_Categories : BaseJavaMigration() {
     val batchParams =
       transactionIds
         .mapIndexed { index, transactionId ->
+          val categoryIndex = if (index == 0) 0 else categoryIds.size % index
           MapSqlParameterSource()
             .addValue("transactionId", transactionId)
-            .addValue("categoryId", categoryIds[categoryIds.size % index])
+            .addValue("categoryId", categoryIds[categoryIndex])
         }
         .toTypedArray()
     jdbcTemplate.batchUpdate(SET_CATEGORY_ON_TRANSACTIONS, batchParams)
