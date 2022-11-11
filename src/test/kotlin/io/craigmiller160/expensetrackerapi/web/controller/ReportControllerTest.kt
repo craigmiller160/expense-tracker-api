@@ -9,6 +9,7 @@ import io.craigmiller160.expensetrackerapi.web.types.report.ReportCategoryRespon
 import io.craigmiller160.expensetrackerapi.web.types.report.ReportMonthResponse
 import io.craigmiller160.expensetrackerapi.web.types.report.ReportPageResponse
 import java.time.LocalDate
+import javax.persistence.EntityManager
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -23,6 +24,7 @@ constructor(
   private val objectMapper: ObjectMapper,
   private val dataHelper: DataHelper,
   private val transactionRepository: TransactionRepository,
+  private val entityManager: EntityManager
 ) {
   private lateinit var token: String
 
@@ -62,6 +64,8 @@ constructor(
       dataHelper.createTransaction(1L).let {
         transactionRepository.save(it.copy(expenseDate = month1))
       }
+
+    entityManager.flush()
 
     val month1Total = txn1.amount + txn2.amount + txn6.amount
     val month2Total = txn3.amount + txn4.amount
