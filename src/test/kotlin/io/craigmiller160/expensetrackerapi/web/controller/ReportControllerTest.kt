@@ -58,8 +58,12 @@ constructor(
       dataHelper.createTransaction(2L, cat3.id).let {
         transactionRepository.save(it.copy(expenseDate = month1))
       }
+    val txn6 =
+      dataHelper.createTransaction(1L).let {
+        transactionRepository.save(it.copy(expenseDate = month1))
+      }
 
-    val month1Total = txn1.amount + txn2.amount
+    val month1Total = txn1.amount + txn2.amount + txn6.amount
     val month2Total = txn3.amount + txn4.amount
     expectedResponse =
       ReportPageResponse(
@@ -84,7 +88,9 @@ constructor(
                   ReportCategoryResponse(
                     name = cat1.name, amount = txn1.amount, percent = txn1.amount / month1Total),
                   ReportCategoryResponse(
-                    name = cat2.name, amount = txn2.amount, percent = txn2.amount / month1Total)))))
+                    name = cat2.name, amount = txn2.amount, percent = txn2.amount / month1Total),
+                  ReportCategoryResponse(
+                    name = "Unknown", amount = txn6.amount, percent = txn6.amount / month1Total)))))
   }
 
   @Test
