@@ -3,4 +3,5 @@ SELECT :theDate AS month, category_name, SUM(amount) AS total
 FROM transactions_view
 WHERE expense_date >= DATE_TRUNC('month', :theDate::date)
 AND expense_date <= (DATE_TRUNC('month', :theDate::date) + interval '1 month - 1 day')
-GROUP BY category_name;
+GROUP BY category_name
+ORDER BY category_name ASC;
