@@ -9,6 +9,7 @@ import io.craigmiller160.expensetrackerapi.web.types.report.ReportCategoryRespon
 import io.craigmiller160.expensetrackerapi.web.types.report.ReportMonthResponse
 import io.craigmiller160.expensetrackerapi.web.types.report.ReportPageResponse
 import java.time.LocalDate
+import javax.persistence.EntityManager
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -23,6 +24,7 @@ constructor(
   private val objectMapper: ObjectMapper,
   private val dataHelper: DataHelper,
   private val transactionRepository: TransactionRepository,
+  private val entityManager: EntityManager
 ) {
   private lateinit var token: String
 
@@ -58,8 +60,14 @@ constructor(
       dataHelper.createTransaction(2L, cat3.id).let {
         transactionRepository.save(it.copy(expenseDate = month1))
       }
+    val txn6 =
+      dataHelper.createTransaction(1L).let {
+        transactionRepository.save(it.copy(expenseDate = month1))
+      }
 
-    val month1Total = txn1.amount + txn2.amount
+    entityManager.flush()
+
+    val month1Total = txn1.amount + txn2.amount + txn6.amount
     val month2Total = txn3.amount + txn4.amount
     expectedResponse =
       ReportPageResponse(
@@ -84,7 +92,9 @@ constructor(
                   ReportCategoryResponse(
                     name = cat1.name, amount = txn1.amount, percent = txn1.amount / month1Total),
                   ReportCategoryResponse(
-                    name = cat2.name, amount = txn2.amount, percent = txn2.amount / month1Total)))))
+                    name = cat2.name, amount = txn2.amount, percent = txn2.amount / month1Total),
+                  ReportCategoryResponse(
+                    name = "Unknown", amount = txn6.amount, percent = txn6.amount / month1Total)))))
   }
 
   @Test

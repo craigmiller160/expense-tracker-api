@@ -65,7 +65,7 @@ class ReportRepositoryImpl(
     return jdbcTemplate.query(finalWrapper.sql, params) { rs, _ ->
       SpendingByCategory(
         month = rs.getDate("month").toLocalDate(),
-        categoryName = rs.getString("category_name"),
+        categoryName = rs.getString("category_name") ?: "Unknown",
         amount = rs.getBigDecimal("amount"))
     }
   }
