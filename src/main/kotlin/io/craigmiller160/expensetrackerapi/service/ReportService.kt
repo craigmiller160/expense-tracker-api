@@ -1,5 +1,6 @@
 package io.craigmiller160.expensetrackerapi.service
 
+import arrow.core.Either
 import io.craigmiller160.expensetrackerapi.data.repository.ReportRepository
 import io.craigmiller160.expensetrackerapi.function.TryEither
 import io.craigmiller160.expensetrackerapi.web.types.report.ReportPageResponse
@@ -16,6 +17,7 @@ class ReportService(
   @Transactional
   fun getSpendingByMonthAndCategory(request: ReportRequest): TryEither<ReportPageResponse> {
     val userId = oAuth2Service.getAuthenticatedUser().userId
-    TODO()
+    return Either.catch { reportRepository.getSpendingByMonthAndCategory(userId, request) }
+      .map { ReportPageResponse.from(it) }
   }
 }
