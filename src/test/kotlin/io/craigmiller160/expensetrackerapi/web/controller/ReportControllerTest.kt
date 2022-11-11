@@ -94,10 +94,10 @@ constructor(
         secure = true
         header("Authorization", "Bearer $token")
       }
+      .andDo { print() }
       .andExpect {
         status { isOk() }
-        // TODO I'm concerned the order is wrong here
-        content { json(objectMapper.writeValueAsString(expectedResponse)) }
+        content { json(objectMapper.writeValueAsString(expectedResponse), true) }
       }
   }
 
@@ -111,7 +111,7 @@ constructor(
       }
       .andExpect {
         status { isOk() }
-        content { json(objectMapper.writeValueAsString(filteredResponse)) }
+        content { json(objectMapper.writeValueAsString(filteredResponse, true)) }
       }
   }
 }
