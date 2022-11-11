@@ -5,6 +5,7 @@ import io.craigmiller160.expensetrackerapi.common.data.typedid.TypedId
 import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.CategoryId
 import io.craigmiller160.expensetrackerapi.data.model.Category
 import io.craigmiller160.expensetrackerapi.data.model.Transaction
+import io.craigmiller160.expensetrackerapi.data.model.TransactionCommon
 import io.craigmiller160.expensetrackerapi.data.repository.TransactionRepository
 import io.craigmiller160.expensetrackerapi.data.repository.TransactionViewRepository
 import io.craigmiller160.expensetrackerapi.testcore.ExpenseTrackerIntegrationTest
@@ -14,6 +15,7 @@ import io.craigmiller160.expensetrackerapi.web.types.*
 import io.craigmiller160.expensetrackerapi.web.types.transaction.*
 import java.math.BigDecimal
 import java.time.LocalDate
+import java.util.Comparator
 import java.util.UUID
 import javax.persistence.EntityManager
 import org.assertj.core.api.Assertions.assertThat
@@ -40,6 +42,15 @@ constructor(
   private val objectMapper: ObjectMapper,
   private val entityManager: EntityManager
 ) {
+  private val transactionComparator: Comparator<TransactionCommon> = Comparator { txn1, txn2 ->
+    val expenseDateCompare = txn1.expenseDate.compareTo(txn2.expenseDate)
+    if (expenseDateCompare == 0) {
+      txn1.description.compareTo(txn2.description)
+    } else {
+      expenseDateCompare
+    }
+  }
+
   private lateinit var token: String
 
   private lateinit var user1Categories: List<Category>
@@ -102,7 +113,7 @@ constructor(
       }
       .andExpect {
         status { isOk() }
-        content { json(objectMapper.writeValueAsString(response)) }
+        content { json(objectMapper.writeValueAsString(response), true) }
       }
   }
 
@@ -134,7 +145,7 @@ constructor(
       }
       .andExpect {
         status { isOk() }
-        content { json(objectMapper.writeValueAsString(response)) }
+        content { json(objectMapper.writeValueAsString(response), true) }
       }
   }
 
@@ -164,7 +175,7 @@ constructor(
       }
       .andExpect {
         status { isOk() }
-        content { json(objectMapper.writeValueAsString(response)) }
+        content { json(objectMapper.writeValueAsString(response), true) }
       }
   }
 
@@ -195,7 +206,7 @@ constructor(
       }
       .andExpect {
         status { isOk() }
-        content { json(objectMapper.writeValueAsString(response)) }
+        content { json(objectMapper.writeValueAsString(response), true) }
       }
   }
 
@@ -232,7 +243,7 @@ constructor(
       }
       .andExpect {
         status { isOk() }
-        content { json(objectMapper.writeValueAsString(response)) }
+        content { json(objectMapper.writeValueAsString(response), true) }
       }
   }
 
@@ -267,7 +278,7 @@ constructor(
       }
       .andExpect {
         status { isOk() }
-        content { json(objectMapper.writeValueAsString(response)) }
+        content { json(objectMapper.writeValueAsString(response), true) }
       }
   }
 
@@ -304,7 +315,9 @@ constructor(
 
     val nonDuplicateIds = user1Transactions.subList(1, user1Transactions.size).map { it.id }
     val nonDuplicateTransactions =
-      transactionViewRepository.findAllByIdInAndUserId(nonDuplicateIds, 1L)
+      transactionViewRepository
+        .findAllByIdInAndUserId(nonDuplicateIds, 1L)
+        .sortedWith(transactionComparator)
 
     val response =
       TransactionsPageResponse(
@@ -319,7 +332,7 @@ constructor(
       }
       .andExpect {
         status { isOk() }
-        content { json(objectMapper.writeValueAsString(response)) }
+        content { json(objectMapper.writeValueAsString(response), true) }
       }
   }
 
@@ -356,7 +369,7 @@ constructor(
       }
       .andExpect {
         status { isOk() }
-        content { json(objectMapper.writeValueAsString(response)) }
+        content { json(objectMapper.writeValueAsString(response), true) }
       }
   }
 
@@ -382,7 +395,7 @@ constructor(
       }
       .andExpect {
         status { isOk() }
-        content { json(objectMapper.writeValueAsString(response)) }
+        content { json(objectMapper.writeValueAsString(response), true) }
       }
   }
 
@@ -405,7 +418,7 @@ constructor(
       }
       .andExpect {
         status { isOk() }
-        content { json(objectMapper.writeValueAsString(response)) }
+        content { json(objectMapper.writeValueAsString(response), true) }
       }
   }
 
@@ -444,7 +457,7 @@ constructor(
       }
       .andExpect {
         status { isOk() }
-        content { json(objectMapper.writeValueAsString(response)) }
+        content { json(objectMapper.writeValueAsString(response), true) }
       }
   }
 
@@ -457,6 +470,7 @@ constructor(
             txn.copy(expenseDate = LocalDate.now().minusDays(index.toLong())))
         }
         .filter { it.expenseDate.isAfter(LocalDate.now().minusDays(3)) }
+        .sortedWith(transactionComparator)
 
     val request =
       SearchTransactionsRequest(
@@ -483,7 +497,7 @@ constructor(
       }
       .andExpect {
         status { isOk() }
-        content { json(objectMapper.writeValueAsString(response)) }
+        content { json(objectMapper.writeValueAsString(response), true) }
       }
   }
 
@@ -518,7 +532,7 @@ constructor(
       }
       .andExpect {
         status { isOk() }
-        content { json(objectMapper.writeValueAsString(response)) }
+        content { json(objectMapper.writeValueAsString(response), true) }
       }
   }
 
@@ -936,7 +950,7 @@ constructor(
       }
       .andExpect {
         status { isOk() }
-        content { json(objectMapper.writeValueAsString(response)) }
+        content { json(objectMapper.writeValueAsString(response), true) }
       }
   }
 
@@ -966,7 +980,7 @@ constructor(
       }
       .andExpect {
         status { isOk() }
-        content { json(objectMapper.writeValueAsString(response)) }
+        content { json(objectMapper.writeValueAsString(response), true) }
       }
   }
 

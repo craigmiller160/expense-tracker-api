@@ -38,13 +38,13 @@ class TransactionRepositoryCustomImpl(
 ) : TransactionRepositoryCustom {
 
   override fun getAllNeedsAttentionCounts(userId: Long): List<NeedsAttentionCount> {
-    val countSql = sqlLoader.loadSql("get_all_needs_attention_counts.sql")
+    val countSql = sqlLoader.loadSql("needsAttention/get_all_needs_attention_counts.sql")
     val params = MapSqlParameterSource().addValue("userId", userId)
     return jdbcTemplate.query(countSql, params, needsAttentionCountRowMapper)
   }
 
   override fun getAllNeedsAttentionOldest(userId: Long): List<NeedsAttentionOldest> {
-    val oldestSql = sqlLoader.loadSql("get_all_needs_attention_oldest.sql")
+    val oldestSql = sqlLoader.loadSql("needsAttention/get_all_needs_attention_oldest.sql")
     val params = MapSqlParameterSource().addValue("userId", userId)
     return jdbcTemplate.query(oldestSql, params, needsAttentionOldestRowMapper)
   }
