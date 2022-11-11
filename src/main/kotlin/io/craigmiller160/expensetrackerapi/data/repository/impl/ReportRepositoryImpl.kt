@@ -65,8 +65,9 @@ class ReportRepositoryImpl(
     return jdbcTemplate.query(finalWrapper.sql, params) { rs, _ ->
       SpendingByCategory(
         month = rs.getDate("month").toLocalDate(),
-        categoryName = rs.getString("category_name") ?: "Unknown",
-        amount = rs.getBigDecimal("amount"))
+        categoryName = rs.getString("category_name") ?: ReportRepository.UNKNOWN_CATEGORY_NAME,
+        amount = rs.getBigDecimal("amount"),
+        color = rs.getString("color") ?: ReportRepository.UNKNOWN_CATEGORY_COLOR)
     }
   }
 

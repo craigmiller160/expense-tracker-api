@@ -5,6 +5,7 @@ import java.math.BigDecimal
 
 data class ReportCategoryResponse(
   val name: String,
+  val color: String,
   val amount: BigDecimal,
   val percent: BigDecimal
 ) {
@@ -12,6 +13,7 @@ data class ReportCategoryResponse(
     fun from(category: SpendingByCategory, monthTotal: BigDecimal): ReportCategoryResponse =
       ReportCategoryResponse(
         name = category.categoryName,
+        color = category.color,
         amount = category.amount,
         percent = category.amount / monthTotal)
   }
