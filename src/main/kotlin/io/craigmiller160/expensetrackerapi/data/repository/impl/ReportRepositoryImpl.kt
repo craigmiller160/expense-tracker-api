@@ -51,8 +51,9 @@ class ReportRepositoryImpl(
     val finalWrapper =
       months
         .mapIndexed { index, month ->
-          val sql = getSpendingByCategoryForMonthSql.replace(":theDate", ":theDate$index")
-          val params = mapOf(":theDate$index" to month)
+          val sql =
+            getSpendingByCategoryForMonthSql.replace(":theDate", ":theDate$index").replace(";", "")
+          val params = mapOf("theDate$index" to month)
           SpendingByCategoryQueryWrapper(params = params, sql = sql)
         }
         .reduce { acc, record ->
