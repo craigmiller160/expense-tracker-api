@@ -52,16 +52,13 @@ class ReportRepositoryImpl(
       months
         .mapIndexed { index, month ->
           val sql =
-            getSpendingByCategoryForMonthSql
-              .replace(":theDate", ":theDate$index")
-              .replace(";", "")
-              .let { "($it)" }
+            getSpendingByCategoryForMonthSql.replace(":theDate", ":theDate$index").replace(";", "")
           val params = mapOf("theDate$index" to month)
           SpendingByCategoryQueryWrapper(params = params, sql = sql)
         }
         .reduce { acc, record ->
           SpendingByCategoryQueryWrapper(
-            params = acc.params + record.params, sql = "${acc.sql}\nUNION\n${record.sql}")
+            params = acc.params + record.params, sql = "(${acc.sql})\nUNION\n(${record.sql})")
         }
 
     val params = MapSqlParameterSource().addValues(finalWrapper.params).addValue("userId", userId)
