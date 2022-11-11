@@ -12,7 +12,7 @@ data class ReportCategoryResponse(
     fun from(category: SpendingByCategory, monthTotal: BigDecimal): ReportCategoryResponse =
       ReportCategoryResponse(
         name = category.categoryName,
-        amount = category.total,
-        percent = category.total / monthTotal)
+        amount = category.amount,
+        percent = category.amount / monthTotal)
   }
 }

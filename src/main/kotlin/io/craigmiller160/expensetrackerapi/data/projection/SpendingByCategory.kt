@@ -6,5 +6,5 @@ import java.time.LocalDate
 data class SpendingByCategory(
   val month: LocalDate,
   val categoryName: String,
-  val total: BigDecimal
+  val amount: BigDecimal
 )

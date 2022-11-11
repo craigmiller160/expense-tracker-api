@@ -14,6 +14,6 @@ data class ReportMonthResponse(
       ReportMonthResponse(
         date = month.month,
         total = month.total,
-        categories = month.categories.map { ReportCategoryResponse.from(it) })
+        categories = month.categories.map { ReportCategoryResponse.from(it, month.total) })
   }
 }
