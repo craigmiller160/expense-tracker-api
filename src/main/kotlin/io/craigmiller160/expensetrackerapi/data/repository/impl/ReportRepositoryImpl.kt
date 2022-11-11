@@ -25,6 +25,14 @@ class ReportRepositoryImpl(
     val spendingByMonth = getSpendingByMonth(userId, request)
     val months = spendingByMonth.map { it.month }
     val spendingByCategory = getSpendingByCategoryForMonths(userId, months)
+    val fullResults =
+      spendingByMonth.map { monthRecord ->
+        monthRecord.copy(
+          categories =
+            spendingByCategory.filter { categoryRecord ->
+              categoryRecord.month == monthRecord.month
+            })
+      }
 
     TODO("How to efficiently, functionally merge everything together without mutation?")
   }
@@ -48,7 +56,7 @@ class ReportRepositoryImpl(
         }
 
     val params = MapSqlParameterSource().addValues(finalWrapper.params).addValue("userId", userId)
-    return jdbcTemplate.query(finalWrapper.sql, params) { rs, i ->
+    return jdbcTemplate.query(finalWrapper.sql, params) { rs, _ ->
       SpendingByCategory(
         month = rs.getDate("month").toLocalDate(),
         categoryName = rs.getString("category_name"),
@@ -65,7 +73,7 @@ class ReportRepositoryImpl(
         .addValue("userId", userId)
         .addValue("offset", request.pageNumber * request.pageSize)
         .addValue("limit", request.pageSize)
-    return jdbcTemplate.query(getTotalSpendingByMonthSql, totalSpendingByMonthParams) { rs, i ->
+    return jdbcTemplate.query(getTotalSpendingByMonthSql, totalSpendingByMonthParams) { rs, _ ->
       SpendingByMonth(
         month = rs.getDate("month").toLocalDate(),
         total = rs.getBigDecimal("total"),
