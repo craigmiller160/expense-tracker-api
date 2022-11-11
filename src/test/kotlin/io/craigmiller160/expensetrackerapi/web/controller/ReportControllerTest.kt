@@ -4,6 +4,9 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import io.craigmiller160.expensetrackerapi.data.repository.TransactionRepository
 import io.craigmiller160.expensetrackerapi.testcore.ExpenseTrackerIntegrationTest
 import io.craigmiller160.expensetrackerapi.testutils.DataHelper
+import io.craigmiller160.expensetrackerapi.web.types.report.ReportCategoryResponse
+import io.craigmiller160.expensetrackerapi.web.types.report.ReportMonthResponse
+import io.craigmiller160.expensetrackerapi.web.types.report.ReportPageResponse
 import java.time.LocalDate
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -19,6 +22,9 @@ constructor(
   private val dataHelper: DataHelper,
   private val transactionRepository: TransactionRepository
 ) {
+
+  private lateinit var expectedResponse: ReportPageResponse
+
   @BeforeEach
   fun setup() {
     val cat1 = dataHelper.createCategory(1L, "Entertainment")
@@ -48,7 +54,47 @@ constructor(
       dataHelper.createTransaction(2L, cat3.id).let {
         transactionRepository.save(it.copy(expenseDate = month1))
       }
+
+    val month1Total = txn1.amount + txn2.amount
+    val month2Total = txn3.amount + txn4.amount
+    expectedResponse =
+      ReportPageResponse(
+        pageNumber = 0,
+        totalItems = 2,
+        reports =
+          listOf(
+            ReportMonthResponse(
+              date = month1,
+              total = month1Total,
+              categories =
+                listOf(
+                  ReportCategoryResponse(
+                    id = cat1.id,
+                    name = cat1.name,
+                    amount = txn1.amount,
+                    percent = txn1.amount / month1Total),
+                  ReportCategoryResponse(
+                    id = cat2.id,
+                    name = cat2.name,
+                    amount = txn2.amount,
+                    percent = txn2.amount / month1Total))),
+            ReportMonthResponse(
+              date = month2,
+              total = month2Total,
+              categories =
+                listOf(
+                  ReportCategoryResponse(
+                    id = cat1.id,
+                    name = cat1.name,
+                    amount = txn3.amount,
+                    percent = txn3.amount / month2Total),
+                  ReportCategoryResponse(
+                    id = cat2.id,
+                    name = cat2.name,
+                    amount = txn4.amount,
+                    percent = txn4.amount / month2Total)))))
   }
+
   @Test
   fun getReports() {
     TODO()
