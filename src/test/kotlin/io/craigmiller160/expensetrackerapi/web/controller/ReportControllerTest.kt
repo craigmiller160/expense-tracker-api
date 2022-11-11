@@ -68,15 +68,6 @@ constructor(
         reports =
           listOf(
             ReportMonthResponse(
-              date = month1,
-              total = month1Total,
-              categories =
-                listOf(
-                  ReportCategoryResponse(
-                    name = cat1.name, amount = txn1.amount, percent = txn1.amount / month1Total),
-                  ReportCategoryResponse(
-                    name = cat2.name, amount = txn2.amount, percent = txn2.amount / month1Total))),
-            ReportMonthResponse(
               date = month2,
               total = month2Total,
               categories =
@@ -84,7 +75,16 @@ constructor(
                   ReportCategoryResponse(
                     name = cat1.name, amount = txn3.amount, percent = txn3.amount / month2Total),
                   ReportCategoryResponse(
-                    name = cat2.name, amount = txn4.amount, percent = txn4.amount / month2Total)))))
+                    name = cat2.name, amount = txn4.amount, percent = txn4.amount / month2Total))),
+            ReportMonthResponse(
+              date = month1,
+              total = month1Total,
+              categories =
+                listOf(
+                  ReportCategoryResponse(
+                    name = cat1.name, amount = txn1.amount, percent = txn1.amount / month1Total),
+                  ReportCategoryResponse(
+                    name = cat2.name, amount = txn2.amount, percent = txn2.amount / month1Total)))))
   }
 
   @Test
@@ -111,7 +111,7 @@ constructor(
       }
       .andExpect {
         status { isOk() }
-        content { json(objectMapper.writeValueAsString(filteredResponse, true)) }
+        content { json(objectMapper.writeValueAsString(filteredResponse), true) }
       }
   }
 }
