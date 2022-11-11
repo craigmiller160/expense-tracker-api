@@ -73,30 +73,18 @@ constructor(
               categories =
                 listOf(
                   ReportCategoryResponse(
-                    id = cat1.id,
-                    name = cat1.name,
-                    amount = txn1.amount,
-                    percent = txn1.amount / month1Total),
+                    name = cat1.name, amount = txn1.amount, percent = txn1.amount / month1Total),
                   ReportCategoryResponse(
-                    id = cat2.id,
-                    name = cat2.name,
-                    amount = txn2.amount,
-                    percent = txn2.amount / month1Total))),
+                    name = cat2.name, amount = txn2.amount, percent = txn2.amount / month1Total))),
             ReportMonthResponse(
               date = month2,
               total = month2Total,
               categories =
                 listOf(
                   ReportCategoryResponse(
-                    id = cat1.id,
-                    name = cat1.name,
-                    amount = txn3.amount,
-                    percent = txn3.amount / month2Total),
+                    name = cat1.name, amount = txn3.amount, percent = txn3.amount / month2Total),
                   ReportCategoryResponse(
-                    id = cat2.id,
-                    name = cat2.name,
-                    amount = txn4.amount,
-                    percent = txn4.amount / month2Total)))))
+                    name = cat2.name, amount = txn4.amount, percent = txn4.amount / month2Total)))))
   }
 
   @Test
@@ -110,5 +98,10 @@ constructor(
         status { isOk() }
         content { json(objectMapper.writeValueAsString(expectedResponse)) }
       }
+  }
+
+  @Test
+  fun getReports_onMonth() {
+    TODO()
   }
 }

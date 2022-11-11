@@ -46,9 +46,14 @@ class ReportRepositoryImpl(
           SpendingByCategoryQueryWrapper(
             params = acc.params + record.params, sql = "${acc.sql}\nUNION\n${record.sql}")
         }
-    println(finalWrapper)
 
-    TODO()
+    val params = MapSqlParameterSource().addValues(finalWrapper.params).addValue("userId", userId)
+    return jdbcTemplate.query(finalWrapper.sql, params) { rs, i ->
+      SpendingByCategory(
+        month = rs.getDate("month").toLocalDate(),
+        categoryName = rs.getString("category_name"),
+        amount = rs.getBigDecimal("amount"))
+    }
   }
 
   private data class SpendingByCategoryQueryWrapper(val params: Map<String, Any>, val sql: String)
