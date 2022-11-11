@@ -19,6 +19,7 @@ class V1_20221111__Mass_Add_Categories : BaseJavaMigration() {
       """
             SELECT id
             FROM transactions
+            ORDER BY description ASC
             LIMIT (
                 SELECT COUNT(*) / 2
                 FROM transactions
