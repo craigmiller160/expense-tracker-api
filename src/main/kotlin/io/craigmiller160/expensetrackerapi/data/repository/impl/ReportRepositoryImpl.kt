@@ -24,6 +24,7 @@ class ReportRepositoryImpl(
   ): Page<SpendingByMonth> {
     val spendingByMonth = getSpendingByMonth(userId, request)
     val months = spendingByMonth.map { it.month }
+    val spendingByCategory = getSpendingByCategoryForMonths(userId, months)
 
     TODO("How to efficiently, functionally merge everything together without mutation?")
   }
@@ -34,8 +35,23 @@ class ReportRepositoryImpl(
   ): List<SpendingByCategory> {
     val getSpendingByCategoryForMonthSql =
       sqlLoader.loadSql("reports/get_spending_by_category_for_month.sql")
+    val finalWrapper =
+      months
+        .mapIndexed { index, month ->
+          val sql = getSpendingByCategoryForMonthSql.replace(":theDate", ":theDate$index")
+          val params = mapOf(":theDate$index" to month)
+          SpendingByCategoryQueryWrapper(params = params, sql = sql)
+        }
+        .reduce { acc, record ->
+          SpendingByCategoryQueryWrapper(
+            params = acc.params + record.params, sql = "${acc.sql}\nUNION\n${record.sql}")
+        }
+    println(finalWrapper)
+
     TODO()
   }
+
+  private data class SpendingByCategoryQueryWrapper(val params: Map<String, Any>, val sql: String)
 
   private fun getSpendingByMonth(userId: Long, request: ReportRequest): List<SpendingByMonth> {
     val getTotalSpendingByMonthSql = sqlLoader.loadSql("reports/get_total_spending_by_month.sql")
