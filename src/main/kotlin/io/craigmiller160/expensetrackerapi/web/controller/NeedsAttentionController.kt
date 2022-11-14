@@ -19,7 +19,7 @@ class NeedsAttentionController(private val needsAttentionService: NeedsAttention
         Content(
           mediaType = "application/json",
           schema = Schema(implementation = NeedsAttentionResponse::class))])
-  @GetMapping("/needs-attention")
+  @GetMapping
   fun getNeedsAttention(): TryEither<NeedsAttentionResponse> =
     needsAttentionService.getNeedsAttention()
 }
