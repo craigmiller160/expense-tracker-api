@@ -37,38 +37,48 @@ constructor(
     val cat1 = dataHelper.createCategory(1L, "Entertainment")
     val cat2 = dataHelper.createCategory(1L, "Groceries")
     val cat3 = dataHelper.createCategory(2L, "Food")
+    val cat4 = dataHelper.createCategory(1L, "Restaurants")
+    val cat5 = dataHelper.createCategory(1L, "Travel")
 
     val month1 = LocalDate.of(2022, 1, 1)
     val month2 = LocalDate.of(2022, 2, 1)
 
     val txn1 =
       dataHelper.createTransaction(1L, cat1.id).let {
-        transactionRepository.save(it.copy(expenseDate = month1))
+        transactionRepository.save(it.copy(expenseDate = month1.plusDays(1)))
       }
     val txn2 =
       dataHelper.createTransaction(1L, cat2.id).let {
-        transactionRepository.save(it.copy(expenseDate = month1))
+        transactionRepository.save(it.copy(expenseDate = month1.plusDays(2)))
       }
     val txn3 =
       dataHelper.createTransaction(1L, cat1.id).let {
-        transactionRepository.save(it.copy(expenseDate = month2))
+        transactionRepository.save(it.copy(expenseDate = month2.plusDays(3)))
       }
     val txn4 =
       dataHelper.createTransaction(1L, cat2.id).let {
-        transactionRepository.save(it.copy(expenseDate = month2))
+        transactionRepository.save(it.copy(expenseDate = month2.plusDays(4)))
       }
     val txn5 =
       dataHelper.createTransaction(2L, cat3.id).let {
-        transactionRepository.save(it.copy(expenseDate = month1))
+        transactionRepository.save(it.copy(expenseDate = month1.plusDays(5)))
       }
     val txn6 =
       dataHelper.createTransaction(1L).let {
-        transactionRepository.save(it.copy(expenseDate = month1))
+        transactionRepository.save(it.copy(expenseDate = month1.plusDays(6)))
+      }
+    val txn7 =
+      dataHelper.createTransaction(1L, cat5.id).let {
+        transactionRepository.save(it.copy(expenseDate = month1.plusDays(7)))
+      }
+    val txn8 =
+      dataHelper.createTransaction(1L, cat4.id).let {
+        transactionRepository.save(it.copy(expenseDate = month1.plusDays(8)))
       }
 
     entityManager.flush()
 
-    val month1Total = txn1.amount + txn2.amount + txn6.amount
+    val month1Total = txn1.amount + txn2.amount + txn6.amount + txn7.amount + txn8.amount
     val month2Total = txn3.amount + txn4.amount
     expectedResponse =
       ReportPageResponse(
@@ -106,6 +116,16 @@ constructor(
                     color = cat2.color,
                     amount = txn2.amount,
                     percent = txn2.amount / month1Total),
+                  ReportCategoryResponse(
+                    name = cat4.name,
+                    color = cat4.color,
+                    amount = txn8.amount,
+                    percent = txn8.amount / month1Total),
+                  ReportCategoryResponse(
+                    name = cat5.name,
+                    color = cat5.color,
+                    amount = txn7.amount,
+                    percent = txn7.amount / month1Total),
                   ReportCategoryResponse(
                     name = ReportRepository.UNKNOWN_CATEGORY_NAME,
                     color = ReportRepository.UNKNOWN_CATEGORY_COLOR,

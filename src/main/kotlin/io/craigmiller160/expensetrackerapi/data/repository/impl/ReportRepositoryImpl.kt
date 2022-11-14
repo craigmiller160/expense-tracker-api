@@ -60,6 +60,9 @@ class ReportRepositoryImpl(
           SpendingByCategoryQueryWrapper(
             params = acc.params + record.params, sql = "(${acc.sql})\nUNION\n(${record.sql})")
         }
+        // Order By at the end is necessary because the union breaks the ordering for each
+        // individual query
+        .let { wrapper -> wrapper.copy(sql = "${wrapper.sql} ORDER BY category_name ASC") }
 
     val params = MapSqlParameterSource().addValues(finalWrapper.params).addValue("userId", userId)
     return jdbcTemplate.query(finalWrapper.sql, params) { rs, _ ->
