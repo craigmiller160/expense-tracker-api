@@ -82,7 +82,7 @@ constructor(
         duplicate = CountAndOldest(count = 2, oldest = oldestDuplicate.expenseDate),
         possibleRefund = CountAndOldest(count = 1, oldest = oldestPossibleRefund.expenseDate))
     mockMvc
-      .get("/transactions/needs-attention") {
+      .get("/needs-attention") {
         secure = true
         header("Authorization", "Bearer $token")
       }
@@ -105,7 +105,7 @@ constructor(
         duplicate = CountAndOldest(count = 0, oldest = null),
         possibleRefund = CountAndOldest(count = 0, oldest = null))
     mockMvc
-      .get("/transactions/needs-attention") {
+      .get("/needs-attention") {
         secure = true
         header("Authorization", "Bearer $token")
       }
