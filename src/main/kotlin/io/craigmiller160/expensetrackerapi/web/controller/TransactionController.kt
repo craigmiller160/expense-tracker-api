@@ -71,16 +71,6 @@ class TransactionController(private val transactionService: TransactionService) 
 
   @ApiResponse(
     content =
-      [
-        Content(
-          mediaType = "application/json",
-          schema = Schema(implementation = NeedsAttentionResponse::class))])
-  @GetMapping("/needs-attention")
-  fun getNeedsAttention(): TryEither<NeedsAttentionResponse> =
-    transactionService.getNeedsAttention()
-
-  @ApiResponse(
-    content =
       [Content(mediaType = "application/json", schema = Schema(implementation = Unit::class))])
   @PutMapping
   @ResponseStatus(HttpStatus.NO_CONTENT)
