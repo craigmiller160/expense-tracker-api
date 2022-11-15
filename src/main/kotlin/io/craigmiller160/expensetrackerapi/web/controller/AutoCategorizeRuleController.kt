@@ -42,7 +42,7 @@ class AutoCategorizeRuleController(
   @PostMapping
   fun createRule(
     @RequestBody request: AutoCategorizeRuleRequest
-  ): TryEither<AutoCategorizeRuleResponse> = TODO()
+  ): TryEither<AutoCategorizeRuleResponse> = autoCategorizeRuleService.createRule(request)
 
   @ApiResponse(
     content =
@@ -55,7 +55,7 @@ class AutoCategorizeRuleController(
   fun updateRule(
     @PathVariable ruleId: TypedId<AutoCategorizeRuleId>,
     @RequestBody request: AutoCategorizeRuleRequest
-  ): TryEither<AutoCategorizeRuleResponse> = TODO()
+  ): TryEither<AutoCategorizeRuleResponse> = autoCategorizeRuleService.updateRule(ruleId, request)
 
   @ApiResponse(
     content =
@@ -67,7 +67,7 @@ class AutoCategorizeRuleController(
   @GetMapping("/{ruleId}")
   fun getRule(
     @PathVariable ruleId: TypedId<AutoCategorizeRuleId>
-  ): TryEither<AutoCategorizeRuleResponse> = TODO()
+  ): TryEither<AutoCategorizeRuleResponse> = autoCategorizeRuleService.getRule(ruleId)
 
   @ApiResponse(
     content =
@@ -78,7 +78,8 @@ class AutoCategorizeRuleController(
   @DeleteMapping("/{ruleId}")
   @ResponseStatus(HttpStatus.NO_CONTENT)
   // TODO must fix all ordinals
-  fun deleteRule(@PathVariable ruleId: TypedId<AutoCategorizeRuleId>): TryEither<Unit> = TODO()
+  fun deleteRule(@PathVariable ruleId: TypedId<AutoCategorizeRuleId>): TryEither<Unit> =
+    autoCategorizeRuleService.deleteRule(ruleId)
 
   @ApiResponse(
     content =
@@ -92,5 +93,5 @@ class AutoCategorizeRuleController(
   fun reOrderRule(
     @PathVariable ruleId: TypedId<AutoCategorizeRuleId>,
     @PathVariable ordinal: Int
-  ): TryEither<Unit> = TODO()
+  ): TryEither<Unit> = autoCategorizeRuleService.reOrderRule(ruleId, ordinal)
 }
