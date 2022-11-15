@@ -3,8 +3,10 @@ package io.craigmiller160.expensetrackerapi.service
 import arrow.core.Either
 import io.craigmiller160.expensetrackerapi.common.data.typedid.TypedId
 import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.AutoCategorizeRuleId
+import io.craigmiller160.expensetrackerapi.common.error.BadRequestException
 import io.craigmiller160.expensetrackerapi.data.model.AutoCategorizeRule
 import io.craigmiller160.expensetrackerapi.data.repository.AutoCategorizeRuleRepository
+import io.craigmiller160.expensetrackerapi.data.repository.CategoryRepository
 import io.craigmiller160.expensetrackerapi.function.TryEither
 import io.craigmiller160.expensetrackerapi.web.types.rules.AutoCategorizeRulePageRequest
 import io.craigmiller160.expensetrackerapi.web.types.rules.AutoCategorizeRulePageResponse
@@ -17,6 +19,7 @@ import org.springframework.stereotype.Service
 @Service
 class AutoCategorizeRuleService(
   private val autoCategorizeRuleRepository: AutoCategorizeRuleRepository,
+  private val categoryRepository: CategoryRepository,
   private val oAuth2Service: OAuth2Service
 ) {
   fun getAllRules(
@@ -26,6 +29,10 @@ class AutoCategorizeRuleService(
   @Transactional
   fun createRule(request: AutoCategorizeRuleRequest): TryEither<AutoCategorizeRuleResponse> {
     val userId = oAuth2Service.getAuthenticatedUser().userId
+    if (!categoryRepository.existsByIdAndUserId(request.categoryId, userId)) {
+      return Either.Left(BadRequestException("Invalid Category: ${request.categoryId}"))
+    }
+
     val count = autoCategorizeRuleRepository.countAllByUserId(userId)
     val rule =
       AutoCategorizeRule(
