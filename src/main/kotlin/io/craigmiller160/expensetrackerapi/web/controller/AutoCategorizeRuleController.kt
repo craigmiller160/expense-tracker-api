@@ -12,6 +12,7 @@ import io.swagger.v3.oas.annotations.media.ArraySchema
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
+import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
 
 @RestController
@@ -75,6 +76,7 @@ class AutoCategorizeRuleController(
           mediaType = "application/json",
           array = ArraySchema(schema = Schema(implementation = Unit::class)))])
   @DeleteMapping("/{ruleId}")
+  @ResponseStatus(HttpStatus.NO_CONTENT)
   // TODO must fix all ordinals
   fun deleteRule(@PathVariable ruleId: TypedId<AutoCategorizeRuleId>): TryEither<Unit> = TODO()
 
@@ -85,6 +87,8 @@ class AutoCategorizeRuleController(
           mediaType = "application/json",
           array = ArraySchema(schema = Schema(implementation = Unit::class)))])
   @PutMapping("/{ruleId}/reOrder/{ordinal}")
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  // TODO must change other record ordering too
   fun reOrderRule(
     @PathVariable ruleId: TypedId<AutoCategorizeRuleId>,
     @PathVariable ordinal: Int

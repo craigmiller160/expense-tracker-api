@@ -27,4 +27,11 @@ class AutoCategorizeRuleService(
     ruleId: TypedId<AutoCategorizeRuleId>,
     request: AutoCategorizeRuleRequest
   ): TryEither<AutoCategorizeRuleResponse> = TODO()
+
+  fun getRule(ruleId: TypedId<AutoCategorizeRuleId>): TryEither<AutoCategorizeRuleResponse> = TODO()
+
+  @Transactional fun deleteRule(ruleId: TypedId<AutoCategorizeRuleId>): TryEither<Unit> = TODO()
+
+  @Transactional
+  fun reOrderRule(ruleId: TypedId<AutoCategorizeRuleId>, ordinal: Int): TryEither<Unit> = TODO()
 }
