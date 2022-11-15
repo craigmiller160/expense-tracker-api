@@ -7,14 +7,19 @@ CREATE TABLE auto_categorize_rules (
     end_date DATE,
     min_amount NUMERIC,
     max_amount NUMERIC,
+    created TIMESTAMP NOT NULL,
+    updated TIMESTAMP NOT NULL,
+    version NUMERIC NOT NULL DEFAULT 1,
     PRIMARY KEY (id),
     FOREIGN KEY (category_id) REFERENCES categories (id)
 );
 
 CREATE TABLE unconfirmed_transaction_last_applied_rule (
+    id UUID NOT NULL,
     rule_id UUID NOT NULL,
     transaction_id UUID NOT NULL,
-    PRIMARY KEY (rule_id, transaction_id),
+    created TIMESTAMP NOT NULL,
+    PRIMARY KEY (id),
     FOREIGN KEY (rule_id) REFERENCES auto_categorize_rules (id),
     FOREIGN KEY (transaction_id) REFERENCES transactions (id)
 );
