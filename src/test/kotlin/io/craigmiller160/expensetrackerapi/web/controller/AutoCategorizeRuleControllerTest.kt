@@ -29,4 +29,9 @@ class AutoCategorizeRuleControllerTest {
   fun deleteRule() {
     TODO()
   }
+
+  @Test
+  fun reOrderRule() {
+    TODO()
+  }
 }
