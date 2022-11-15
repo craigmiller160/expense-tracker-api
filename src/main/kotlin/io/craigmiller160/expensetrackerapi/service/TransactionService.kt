@@ -87,6 +87,7 @@ class TransactionService(
       .map { page -> TransactionsPageResponse.from(page) }
   }
 
+  @Transactional
   fun createTransaction(request: CreateTransactionRequest): TryEither<TransactionResponse> {
     val userId = oAuth2Service.getAuthenticatedUser().userId
 
