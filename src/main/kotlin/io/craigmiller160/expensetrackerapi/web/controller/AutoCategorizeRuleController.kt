@@ -58,6 +58,18 @@ class AutoCategorizeRuleController {
       [
         Content(
           mediaType = "application/json",
+          array =
+            ArraySchema(schema = Schema(implementation = AutoCategorizeRuleResponse::class)))])
+  @GetMapping("/{ruleId}")
+  fun getRule(
+    @PathVariable ruleId: TypedId<AutoCategorizeRuleId>
+  ): TryEither<AutoCategorizeRuleResponse> = TODO()
+
+  @ApiResponse(
+    content =
+      [
+        Content(
+          mediaType = "application/json",
           array = ArraySchema(schema = Schema(implementation = Unit::class)))])
   @DeleteMapping("/{ruleId}")
   fun deleteRule(@PathVariable ruleId: TypedId<AutoCategorizeRuleId>): TryEither<Unit> = TODO()
