@@ -1,0 +1,25 @@
+app-deployment:
+  appName: expense-tracker-api
+  image: nexus-docker-craigmiller160.ddns.net/expense-tracker-api:latest
+  configMaps:
+    - expense-tracker-api-config
+  ports:
+    - containerPort: 8080
+  secrets:
+    - envVariable: spring.datasource.username
+      secretName: postgres-root-account
+      secretKey: username
+    - envVariable: spring.datasource.password
+      secretName: postgres-root-account
+      secretKey: password
+    - envVariable: oauth2.client-key
+      secretName: expense-tracker-api-oauth2-keys
+      secretKey: clientKey
+    - envVariable: oauth2.client-secret
+      secretName: expense-tracker-api-oauth2-keys
+      secretKey: clientSecret
+  livenessProbe:
+    httpGet:
+      path: /actuator/health
+      port: 8080
+      scheme: HTTPS
