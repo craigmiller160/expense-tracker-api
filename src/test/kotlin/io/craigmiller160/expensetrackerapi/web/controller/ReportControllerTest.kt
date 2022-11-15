@@ -160,4 +160,22 @@ constructor(
         content { json(objectMapper.writeValueAsString(filteredResponse), true) }
       }
   }
+
+  @Test
+  fun getReports_noTransactions() {
+    transactionRepository.deleteAll()
+    entityManager.flush()
+
+    val response = ReportPageResponse(reports = listOf(), pageNumber = 0, totalItems = 0)
+
+    mockMvc
+      .get("/reports?pageNumber=0&pageSize=1") {
+        secure = true
+        header("Authorization", "Bearer $token")
+      }
+      .andExpect {
+        status { isOk() }
+        content { json(objectMapper.writeValueAsString(response), true) }
+      }
+  }
 }
