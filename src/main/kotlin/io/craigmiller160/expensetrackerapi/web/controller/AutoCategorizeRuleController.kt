@@ -52,4 +52,13 @@ class AutoCategorizeRuleController {
     @PathVariable ruleId: TypedId<AutoCategorizeRuleId>,
     @RequestBody request: AutoCategorizeRuleRequest
   ): TryEither<AutoCategorizeRuleResponse> = TODO()
+
+  @ApiResponse(
+    content =
+      [
+        Content(
+          mediaType = "application/json",
+          array = ArraySchema(schema = Schema(implementation = Unit::class)))])
+  @DeleteMapping("/{ruleId}")
+  fun deleteRule(@PathVariable ruleId: TypedId<AutoCategorizeRuleId>): TryEither<Unit> = TODO()
 }
