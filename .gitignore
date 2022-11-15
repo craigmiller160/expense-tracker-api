@@ -37,3 +37,5 @@ out/
 ### VS Code ###
 .vscode/
 target
+deploy/build
+deploy/chart/charts
