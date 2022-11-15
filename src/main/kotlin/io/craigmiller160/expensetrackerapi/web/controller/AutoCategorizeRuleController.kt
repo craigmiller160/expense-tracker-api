@@ -72,5 +72,6 @@ class AutoCategorizeRuleController {
           mediaType = "application/json",
           array = ArraySchema(schema = Schema(implementation = Unit::class)))])
   @DeleteMapping("/{ruleId}")
+  // TODO must fix all ordinals
   fun deleteRule(@PathVariable ruleId: TypedId<AutoCategorizeRuleId>): TryEither<Unit> = TODO()
 }
