@@ -30,7 +30,7 @@ class AutoCategorizeRuleController(
   @GetMapping
   fun getAllRules(
     request: AutoCategorizeRulePageRequest
-  ): TryEither<AutoCategorizeRulePageResponse> = autoCategorizeRuleService.getAllRules()
+  ): TryEither<AutoCategorizeRulePageResponse> = autoCategorizeRuleService.getAllRules(request)
 
   @ApiResponse(
     content =
