@@ -124,6 +124,11 @@ constructor(
   }
 
   @Test
+  fun updateRule_invalidCategory() {
+    TODO()
+  }
+
+  @Test
   fun getRule() {
     TODO()
   }
