@@ -3,6 +3,7 @@ package io.craigmiller160.expensetrackerapi.web.controller
 import io.craigmiller160.expensetrackerapi.common.data.typedid.TypedId
 import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.AutoCategorizeRuleId
 import io.craigmiller160.expensetrackerapi.function.TryEither
+import io.craigmiller160.expensetrackerapi.service.AutoCategorizeRuleService
 import io.craigmiller160.expensetrackerapi.web.types.rules.AutoCategorizeRulePageRequest
 import io.craigmiller160.expensetrackerapi.web.types.rules.AutoCategorizeRulePageResponse
 import io.craigmiller160.expensetrackerapi.web.types.rules.AutoCategorizeRuleRequest
@@ -15,7 +16,9 @@ import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("/categories/rules")
-class AutoCategorizeRuleController {
+class AutoCategorizeRuleController(
+  private val autoCategorizeRuleService: AutoCategorizeRuleService
+) {
   @ApiResponse(
     content =
       [
@@ -26,7 +29,7 @@ class AutoCategorizeRuleController {
   @GetMapping
   fun getAllRules(
     request: AutoCategorizeRulePageRequest
-  ): TryEither<AutoCategorizeRulePageResponse> = TODO()
+  ): TryEither<AutoCategorizeRulePageResponse> = autoCategorizeRuleService.getAllRules()
 
   @ApiResponse(
     content =
