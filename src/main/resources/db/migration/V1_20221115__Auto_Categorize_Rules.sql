@@ -11,12 +11,10 @@ CREATE TABLE auto_categorize_rules (
     FOREIGN KEY (category_id) REFERENCES categories (id)
 );
 
--- TODO consider the name here
 CREATE TABLE unconfirmed_transaction_last_applied_rule (
-    id UUID NOT NULL,
     rule_id UUID NOT NULL,
     transaction_id UUID NOT NULL,
-    PRIMARY KEY (id),
+    PRIMARY KEY (rule_id, transaction_id),
     FOREIGN KEY (rule_id) REFERENCES auto_categorize_rules (id),
     FOREIGN KEY (transaction_id) REFERENCES transactions (id)
 );
