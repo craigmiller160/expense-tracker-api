@@ -27,15 +27,20 @@ class ReportRepositoryImpl(
     val spendingByMonth = getSpendingByMonth(userId, request)
     val spendingByMonthCount = getSpendingByMonthCount(userId)
     val months = spendingByMonth.map { it.month }
-    val spendingByCategory = getSpendingByCategoryForMonths(userId, months)
+
     val fullResults =
-      spendingByMonth.map { monthRecord ->
-        monthRecord.copy(
-          categories =
-            // The records should already be in the correct order
-            spendingByCategory.filter { categoryRecord ->
-              categoryRecord.month == monthRecord.month
-            })
+      if (months.isNotEmpty()) {
+        val spendingByCategory = getSpendingByCategoryForMonths(userId, months)
+        spendingByMonth.map { monthRecord ->
+          monthRecord.copy(
+            categories =
+              // The records should already be in the correct order
+              spendingByCategory.filter { categoryRecord ->
+                categoryRecord.month == monthRecord.month
+              })
+        }
+      } else {
+        listOf()
       }
 
     return PageImpl(
