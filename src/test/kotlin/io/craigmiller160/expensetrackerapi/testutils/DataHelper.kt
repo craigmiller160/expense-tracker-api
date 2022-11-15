@@ -35,7 +35,7 @@ class DataHelper(
         categoryId = categoryId))
   }
 
-  fun createRule(userId: Long, categoryId: TypedId<CategoryId> = null): AutoCategorizeRule {
+  fun createRule(userId: Long, categoryId: TypedId<CategoryId>): AutoCategorizeRule {
     val count = autoCategorizeRuleRepository.countAllByUserId(userId)
     val rule =
       AutoCategorizeRule(
