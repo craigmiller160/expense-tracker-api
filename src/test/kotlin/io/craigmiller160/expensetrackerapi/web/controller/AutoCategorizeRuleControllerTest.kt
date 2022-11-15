@@ -1,6 +1,7 @@
 package io.craigmiller160.expensetrackerapi.web.controller
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import io.craigmiller160.expensetrackerapi.common.data.typedid.TypedId
 import io.craigmiller160.expensetrackerapi.data.model.Category
 import io.craigmiller160.expensetrackerapi.data.repository.AutoCategorizeRuleRepository
 import io.craigmiller160.expensetrackerapi.testcore.ExpenseTrackerIntegrationTest
@@ -15,6 +16,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.http.MediaType
 import org.springframework.test.web.servlet.MockMvc
+import org.springframework.test.web.servlet.ResultActionsDsl
 import org.springframework.test.web.servlet.post
 
 @ExpenseTrackerIntegrationTest
@@ -80,7 +82,37 @@ class AutoCategorizeRuleControllerTest(
 
   @Test
   fun createRule_invalidCategory() {
-    TODO("Category doesn't exist, and category is not owned by user")
+    val notExistCategory =
+      AutoCategorizeRuleRequest(
+        categoryId = TypedId(),
+        regex = ".*",
+        startDate = LocalDate.of(2022, 1, 1),
+        endDate = LocalDate.of(2022, 2, 2),
+        minAmount = BigDecimal("10.00"),
+        maxAmount = BigDecimal("20.00"))
+    val wrongUserCategory =
+      AutoCategorizeRuleRequest(
+        categoryId = cat2.id,
+        regex = ".*",
+        startDate = LocalDate.of(2022, 1, 1),
+        endDate = LocalDate.of(2022, 2, 2),
+        minAmount = BigDecimal("10.00"),
+        maxAmount = BigDecimal("20.00"))
+
+    val testBadRequest: (AutoCategorizeRuleRequest) -> ResultActionsDsl = { request ->
+      mockMvc
+        .post("/categories/rules") {
+          secure = true
+          header("Authorization", "Bearer $token")
+          contentType = MediaType.APPLICATION_JSON
+          content = objectMapper.writeValueAsString(request)
+        }
+        .andExpect { status { isBadRequest() } }
+      // TODO do I want to test response content?
+    }
+
+    testBadRequest(notExistCategory)
+    testBadRequest(wrongUserCategory)
   }
 
   @Test
