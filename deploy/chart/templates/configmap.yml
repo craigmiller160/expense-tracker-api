@@ -8,3 +8,4 @@ data:
   spring.datasource.port: "5432"
   oauth2.auth-server-host: https://sso-oauth2-server:8443
   oauth2.client-name: expense-tracker-api
+  spring.datasource.db_name: expense_tracker_prod
