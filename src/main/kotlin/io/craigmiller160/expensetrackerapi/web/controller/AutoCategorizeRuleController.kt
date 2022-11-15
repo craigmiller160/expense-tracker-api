@@ -74,4 +74,16 @@ class AutoCategorizeRuleController {
   @DeleteMapping("/{ruleId}")
   // TODO must fix all ordinals
   fun deleteRule(@PathVariable ruleId: TypedId<AutoCategorizeRuleId>): TryEither<Unit> = TODO()
+
+  @ApiResponse(
+    content =
+      [
+        Content(
+          mediaType = "application/json",
+          array = ArraySchema(schema = Schema(implementation = Unit::class)))])
+  @PutMapping("/{ruleId}/reOrder/{ordinal}")
+  fun reOrderRule(
+    @PathVariable ruleId: TypedId<AutoCategorizeRuleId>,
+    @PathVariable ordinal: Int
+  ): TryEither<Unit> = TODO()
 }
