@@ -16,6 +16,7 @@ import org.hibernate.annotations.TypeDef
 @Table(name = "last_rule_applied")
 @TypeDef(defaultForType = TypedId::class, typeClass = TypedIdJpaType::class)
 data class LastRuleApplied(
+  val userId: Long,
   val ruleId: TypedId<AutoCategorizeRuleId>,
   val transactionId: TypedId<TransactionId>,
   @Id override val id: TypedId<LastRuleAppliedId> = TypedId(),
