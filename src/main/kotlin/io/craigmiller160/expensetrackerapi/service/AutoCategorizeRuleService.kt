@@ -8,12 +8,14 @@ import io.craigmiller160.expensetrackerapi.web.types.rules.AutoCategorizeRulePag
 import io.craigmiller160.expensetrackerapi.web.types.rules.AutoCategorizeRulePageResponse
 import io.craigmiller160.expensetrackerapi.web.types.rules.AutoCategorizeRuleRequest
 import io.craigmiller160.expensetrackerapi.web.types.rules.AutoCategorizeRuleResponse
+import io.craigmiller160.oauth2.service.OAuth2Service
 import javax.transaction.Transactional
 import org.springframework.stereotype.Service
 
 @Service
 class AutoCategorizeRuleService(
-  private val autoCategorizeRuleRepository: AutoCategorizeRuleRepository
+  private val autoCategorizeRuleRepository: AutoCategorizeRuleRepository,
+  private val oAuth2Service: OAuth2Service
 ) {
   fun getAllRules(
     request: AutoCategorizeRulePageRequest
