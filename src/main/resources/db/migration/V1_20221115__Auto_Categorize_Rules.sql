@@ -14,7 +14,7 @@ CREATE TABLE auto_categorize_rules (
     FOREIGN KEY (category_id) REFERENCES categories (id)
 );
 
-CREATE TABLE unconfirmed_transaction_last_applied_rule (
+CREATE TABLE last_rule_applied (
     id UUID NOT NULL,
     rule_id UUID NOT NULL,
     transaction_id UUID NOT NULL,
