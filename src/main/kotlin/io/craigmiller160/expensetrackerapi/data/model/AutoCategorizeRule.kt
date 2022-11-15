@@ -18,6 +18,7 @@ import org.hibernate.annotations.TypeDef
 @Table(name = "auto_categorize_rules")
 @TypeDef(defaultForType = TypedId::class, typeClass = TypedIdJpaType::class)
 data class AutoCategorizeRule(
+  val userId: Long,
   val categoryId: TypedId<CategoryId>,
   val ordinal: Int,
   val regex: String,
