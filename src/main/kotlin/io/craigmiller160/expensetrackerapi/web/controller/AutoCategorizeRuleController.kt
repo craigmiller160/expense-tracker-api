@@ -89,7 +89,6 @@ class AutoCategorizeRuleController(
           array = ArraySchema(schema = Schema(implementation = Unit::class)))])
   @PutMapping("/{ruleId}/reOrder/{ordinal}")
   @ResponseStatus(HttpStatus.NO_CONTENT)
-  // TODO must change other record ordering too
   fun reOrderRule(
     @PathVariable ruleId: TypedId<AutoCategorizeRuleId>,
     @PathVariable ordinal: Int
