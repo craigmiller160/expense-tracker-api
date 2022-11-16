@@ -131,7 +131,7 @@ class AutoCategorizeRuleService(
   @Transactional
   fun reOrderRule(ruleId: TypedId<AutoCategorizeRuleId>, ordinal: Int): TryEither<Unit> {
     val userId = oAuth2Service.getAuthenticatedUser().userId
-    validateOrdinal(userId, ordinal)
+    validateOrdinal(userId, ordinal).flatMap { getRuleIfValid(ruleId, userId) }
 
     TODO()
   }

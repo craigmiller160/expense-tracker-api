@@ -439,4 +439,15 @@ constructor(
       }
       .andExpect { status { isBadRequest() } }
   }
+
+  @Test
+  fun reOrderRule_invalidRule() {
+    val id = TypedId<AutoCategorizeRuleId>()
+    mockMvc
+      .put("/categories/rules/$id/reOrder/10") {
+        secure = true
+        header("Authorization", "Bearer $token")
+      }
+      .andExpect { status { isBadRequest() } }
+  }
 }
