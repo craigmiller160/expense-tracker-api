@@ -47,6 +47,11 @@ constructor(
   }
 
   @Test
+  fun getAllRules_byCategoryId() {
+    TODO()
+  }
+
+  @Test
   fun createRule() {
     val request =
       AutoCategorizeRuleRequest(
