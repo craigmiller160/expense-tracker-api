@@ -137,26 +137,41 @@ class AutoCategorizeRuleService(
         if (rule.ordinal == ordinal) {
           Either.Right(rule)
         } else {
-          setTemporaryOrdinal(rule).flatMap { ruleWithTempOrdinal ->
-            changeRuleOrdinals(userId, rule.ordinal, ordinal).flatMapCatch {
-              autoCategorizeRuleRepository.save(ruleWithTempOrdinal.copy(ordinal = ordinal))
+          val oldOrdinal = rule.ordinal
+          setTemporaryOrdinals(userId, oldOrdinal, ordinal)
+            .flatMap { changeOtherRuleOrdinals(userId, rule.ordinal, ordinal) }
+            .flatMapCatch {
+              autoCategorizeRuleRepository.setSingleRuleOrdinal(userId, rule.id, ordinal)
             }
-          }
         }
       }
       .map { Unit }
   }
 
-  private fun setTemporaryOrdinal(rule: AutoCategorizeRule): TryEither<AutoCategorizeRule> =
-    Either.catch { autoCategorizeRuleRepository.save(rule.copy(ordinal = -1)) }
+  /** Necessary because unique constraint prevents directly making the change */
+  private fun setTemporaryOrdinals(
+    userId: Long,
+    oldOrdinal: Int,
+    newOrdinal: Int
+  ): TryEither<Unit> =
+    Either.catch {
+      if (oldOrdinal > newOrdinal) {
+        autoCategorizeRuleRepository.temporarilyNegateOrdinals(userId, newOrdinal, oldOrdinal)
+      } else {
+        autoCategorizeRuleRepository.temporarilyNegateOrdinals(userId, oldOrdinal, newOrdinal)
+      }
+    }
 
-  private fun changeRuleOrdinals(userId: Long, oldOrdinal: Int, newOrdinal: Int): TryEither<Unit> {
-    return Either.catch {
+  private fun changeOtherRuleOrdinals(
+    userId: Long,
+    oldOrdinal: Int,
+    newOrdinal: Int
+  ): TryEither<Unit> =
+    Either.catch {
       if (oldOrdinal < newOrdinal) {
         autoCategorizeRuleRepository.decrementOrdinals(userId, oldOrdinal, newOrdinal - 1)
       } else {
         autoCategorizeRuleRepository.incrementOrdinals(userId, newOrdinal, oldOrdinal - 1)
       }
     }
-  }
 }
