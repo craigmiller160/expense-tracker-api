@@ -103,7 +103,7 @@ constructor(
         autoCategorizeRuleRepository.save(it.copy(regex = "Hello World"))
       }
     val rule3 = dataHelper.createRule(1L, cat1.id)
-    entityMananger.flush()
+    entityManager.flush()
 
     val expectedResponse =
       AutoCategorizeRulePageResponse(
