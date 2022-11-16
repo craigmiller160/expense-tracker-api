@@ -32,6 +32,7 @@ constructor(
   private val entityManager: EntityManager
 ) {
   // TODO add validations for start/end dates and min/max amounts
+  // TODO make sure categoryId is validated for create & update
 
   private lateinit var token: String
 
@@ -190,7 +191,6 @@ constructor(
           content = objectMapper.writeValueAsString(request)
         }
         .andExpect { status { isBadRequest() } }
-      // TODO do I want to test response content?
     }
 
     testBadRequest(notExistCategory)
@@ -229,10 +229,8 @@ constructor(
         content = objectMapper.writeValueAsString(request)
       }
       .andExpect {
-        status {
-          isOk()
-          content { json(objectMapper.writeValueAsString(expectedResponse), true) }
-        }
+        status { isOk() }
+        content { json(objectMapper.writeValueAsString(expectedResponse), true) }
       }
 
     val dbRule = autoCategorizeRuleRepository.findById(rule.id).orElseThrow()
@@ -241,7 +239,24 @@ constructor(
 
   @Test
   fun updateRule_invalidCategory() {
-    TODO()
+    val rule = dataHelper.createRule(1L, cat1.id)
+    val request =
+      AutoCategorizeRuleRequest(
+        categoryId = TypedId(),
+        regex = "Hello.*",
+        startDate = LocalDate.of(2022, 1, 1),
+        endDate = LocalDate.of(2022, 2, 2),
+        minAmount = BigDecimal("10.0"),
+        maxAmount = BigDecimal("20.0"))
+
+    mockMvc
+      .put("/categories/rules/${rule.id}") {
+        secure = true
+        header("Authorization", "Bearer $token")
+        contentType = MediaType.APPLICATION_JSON
+        content = objectMapper.writeValueAsString(request)
+      }
+      .andExpect { status { isBadRequest() } }
   }
 
   @Test
