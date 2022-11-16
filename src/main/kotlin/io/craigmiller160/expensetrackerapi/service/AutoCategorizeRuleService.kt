@@ -2,9 +2,11 @@ package io.craigmiller160.expensetrackerapi.service
 
 import arrow.core.Either
 import arrow.core.filterOrElse
+import arrow.core.flatMap
 import arrow.core.leftIfNull
 import io.craigmiller160.expensetrackerapi.common.data.typedid.TypedId
 import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.AutoCategorizeRuleId
+import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.CategoryId
 import io.craigmiller160.expensetrackerapi.common.error.BadRequestException
 import io.craigmiller160.expensetrackerapi.data.model.AutoCategorizeRule
 import io.craigmiller160.expensetrackerapi.data.repository.AutoCategorizeRuleRepository
@@ -55,17 +57,26 @@ class AutoCategorizeRuleService(
       .map { AutoCategorizeRuleResponse.from(it) }
   }
 
+  private fun validateCategory(categoryId: TypedId<CategoryId>, userId: Long): TryEither<Unit> =
+    Either.catch { categoryRepository.existsByIdAndUserId(categoryId, userId) }
+      .filterOrElse({ it }) { BadRequestException("Invalid Category: $categoryId") }
+      .map { Unit }
+
+  private fun getRuleIfValid(
+    ruleId: TypedId<AutoCategorizeRuleId>,
+    userId: Long
+  ): TryEither<AutoCategorizeRule> =
+    Either.catch { autoCategorizeRuleRepository.findByIdAndUserId(ruleId, userId) }
+      .leftIfNull { BadRequestException("Invalid rule: $ruleId") }
+
   @Transactional
   fun updateRule(
     ruleId: TypedId<AutoCategorizeRuleId>,
     request: AutoCategorizeRuleRequest
   ): TryEither<AutoCategorizeRuleResponse> {
     val userId = oAuth2Service.getAuthenticatedUser().userId
-    // TODO replicate on create method
-    return Either.catch { categoryRepository.existsByIdAndUserId(request.categoryId, userId) }
-      .filterOrElse({ it }) { BadRequestException("Invalid Category: ${request.categoryId}") }
-      .flatMapCatch { autoCategorizeRuleRepository.findByIdAndUserId(ruleId, userId) }
-      .leftIfNull { BadRequestException("Invalid rule: $ruleId") }
+    return validateCategory(request.categoryId, userId)
+      .flatMap { getRuleIfValid(ruleId, userId) }
       .map { rule ->
         rule.copy(
           categoryId = request.categoryId,
