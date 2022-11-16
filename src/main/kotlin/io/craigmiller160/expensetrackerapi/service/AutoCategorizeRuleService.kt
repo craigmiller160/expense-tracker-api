@@ -38,22 +38,20 @@ class AutoCategorizeRuleService(
   @Transactional
   fun createRule(request: AutoCategorizeRuleRequest): TryEither<AutoCategorizeRuleResponse> {
     val userId = oAuth2Service.getAuthenticatedUser().userId
-    if (!categoryRepository.existsByIdAndUserId(request.categoryId, userId)) {
-      return Either.Left(BadRequestException("Invalid Category: ${request.categoryId}"))
-    }
-
-    val count = autoCategorizeRuleRepository.countAllByUserId(userId)
-    val rule =
-      AutoCategorizeRule(
-        userId = userId,
-        categoryId = request.categoryId,
-        ordinal = (count + 1).toInt(),
-        regex = request.regex,
-        startDate = request.startDate,
-        endDate = request.endDate,
-        minAmount = request.minAmount,
-        maxAmount = request.maxAmount)
-    return Either.catch { autoCategorizeRuleRepository.save(rule) }
+    return validateCategory(request.categoryId, userId)
+      .flatMapCatch { autoCategorizeRuleRepository.countAllByUserId(userId) }
+      .map { count ->
+        AutoCategorizeRule(
+          userId = userId,
+          categoryId = request.categoryId,
+          ordinal = (count + 1).toInt(),
+          regex = request.regex,
+          startDate = request.startDate,
+          endDate = request.endDate,
+          minAmount = request.minAmount,
+          maxAmount = request.maxAmount)
+      }
+      .flatMapCatch { rule -> autoCategorizeRuleRepository.save(rule) }
       .map { AutoCategorizeRuleResponse.from(it) }
   }
 
