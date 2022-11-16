@@ -93,6 +93,36 @@ constructor(
   }
 
   @Test
+  fun getAllRules_byRegex() {
+    val rule1 =
+      dataHelper.createRule(1L, cat1.id).let {
+        autoCategorizeRuleRepository.save(it.copy(regex = "hello.*"))
+      }
+    val rule2 =
+      dataHelper.createRule(1L, cat1.id).let {
+        autoCategorizeRuleRepository.save(it.copy(regex = "Hello World"))
+      }
+    val rule3 = dataHelper.createRule(1L, cat1.id)
+
+    val expectedResponse =
+      AutoCategorizeRulePageResponse(
+        pageNumber = 0,
+        totalItems = 2,
+        rules =
+          listOf(AutoCategorizeRuleResponse.from(rule1), AutoCategorizeRuleResponse.from(rule2)))
+
+    mockMvc
+      .get("/categories/rules?pageNumber=0&pageSize=25&regex=hello") {
+        secure = true
+        header("Authorization", "Bearer $token")
+      }
+      .andExpect {
+        status { isOk() }
+        content { json(objectMapper.writeValueAsString(expectedResponse), true) }
+      }
+  }
+
+  @Test
   fun createRule() {
     val request =
       AutoCategorizeRuleRequest(
