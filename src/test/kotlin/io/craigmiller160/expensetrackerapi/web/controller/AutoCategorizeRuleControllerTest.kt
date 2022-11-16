@@ -264,7 +264,29 @@ constructor(
 
   @Test
   fun updateRule_invalidRuleValues() {
-    TODO()
+    val rule = dataHelper.createRule(1L, cat1.id)
+    val baseRequest =
+      AutoCategorizeRuleRequest(
+        categoryId = cat1.id,
+        regex = ".*",
+        startDate = LocalDate.of(2022, 1, 1),
+        endDate = LocalDate.of(2022, 2, 2),
+        minAmount = BigDecimal("10.00"),
+        maxAmount = BigDecimal("20.00"))
+
+    val operation: (AutoCategorizeRuleRequest) -> ResultActionsDsl = { request ->
+      mockMvc
+        .put("/categories/rules/${rule.id}") {
+          secure = true
+          header("Authorization", "Bearer $token")
+          contentType = MediaType.APPLICATION_JSON
+          content = objectMapper.writeValueAsString(request)
+        }
+        .andExpect { status { isBadRequest() } }
+    }
+
+    operation(baseRequest.copy(startDate = LocalDate.of(2022, 6, 1)))
+    operation(baseRequest.copy(minAmount = BigDecimal("30.0")))
   }
 
   @Test
