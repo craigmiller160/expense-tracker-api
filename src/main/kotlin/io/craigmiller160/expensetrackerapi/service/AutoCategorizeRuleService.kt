@@ -29,7 +29,6 @@ class AutoCategorizeRuleService(
   private val categoryRepository: CategoryRepository,
   private val oAuth2Service: OAuth2Service
 ) {
-  // TODO how do min/max amounts work when everything is supposed to be negative numbers?
   fun getAllRules(
     request: AutoCategorizeRulePageRequest
   ): TryEither<AutoCategorizeRulePageResponse> {

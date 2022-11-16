@@ -31,7 +31,6 @@ constructor(
   private val autoCategorizeRuleRepository: AutoCategorizeRuleRepository,
   private val entityManager: EntityManager
 ) {
-  // TODO add validations for start/end dates and min/max amounts
 
   private lateinit var token: String
 
@@ -163,6 +162,11 @@ constructor(
   }
 
   @Test
+  fun createRule_invalidRuleValues() {
+    TODO()
+  }
+
+  @Test
   fun createRule_invalidCategory() {
     val notExistCategory =
       AutoCategorizeRuleRequest(
@@ -234,6 +238,11 @@ constructor(
 
     val dbRule = autoCategorizeRuleRepository.findById(rule.id).orElseThrow()
     assertThat(AutoCategorizeRuleResponse.from(dbRule)).isEqualTo(expectedResponse)
+  }
+
+  @Test
+  fun updateRule_invalidRuleValues() {
+    TODO()
   }
 
   @Test
