@@ -10,6 +10,7 @@ import io.craigmiller160.expensetrackerapi.web.types.rules.AutoCategorizeRulePag
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.PageRequest
+import org.springframework.data.domain.Sort
 import org.springframework.stereotype.Repository
 
 @Repository
@@ -21,7 +22,8 @@ class AutoCategorizeRuleRepositoryCustomImpl(
     request: AutoCategorizeRulePageRequest,
     userId: Long
   ): Page<AutoCategorizeRule> {
-    val pageable = PageRequest.of(request.pageNumber, request.pageSize)
+    val sort = Sort.by(Sort.Order.asc("ordinal"))
+    val pageable = PageRequest.of(request.pageNumber, request.pageSize, sort)
 
     val whereClause =
       BooleanBuilder(QAutoCategorizeRule.autoCategorizeRule.userId.eq(userId))
