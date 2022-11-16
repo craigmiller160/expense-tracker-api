@@ -240,7 +240,7 @@ constructor(
   @Test
   fun updateRule_invalidCategory() {
     val rule = dataHelper.createRule(1L, cat1.id)
-    val request =
+    val baseRequest =
       AutoCategorizeRuleRequest(
         categoryId = TypedId(),
         regex = "Hello.*",
@@ -249,19 +249,46 @@ constructor(
         minAmount = BigDecimal("10.0"),
         maxAmount = BigDecimal("20.0"))
 
-    mockMvc
-      .put("/categories/rules/${rule.id}") {
-        secure = true
-        header("Authorization", "Bearer $token")
-        contentType = MediaType.APPLICATION_JSON
-        content = objectMapper.writeValueAsString(request)
-      }
-      .andExpect { status { isBadRequest() } }
+    val operation: (AutoCategorizeRuleRequest) -> ResultActionsDsl = { request ->
+      mockMvc
+        .put("/categories/rules/${rule.id}") {
+          secure = true
+          header("Authorization", "Bearer $token")
+          contentType = MediaType.APPLICATION_JSON
+          content = objectMapper.writeValueAsString(request)
+        }
+        .andExpect { status { isBadRequest() } }
+    }
+
+    operation(baseRequest)
+    operation(baseRequest.copy(categoryId = cat2.id))
   }
 
   @Test
   fun updateRule_invalidRule() {
-    TODO()
+    val rule = dataHelper.createRule(2L, cat1.id)
+    val request =
+      AutoCategorizeRuleRequest(
+        categoryId = cat1.id,
+        regex = "Hello.*",
+        startDate = LocalDate.of(2022, 1, 1),
+        endDate = LocalDate.of(2022, 2, 2),
+        minAmount = BigDecimal("10.0"),
+        maxAmount = BigDecimal("20.0"))
+
+    val operation: (TypedId<AutoCategorizeRuleId>) -> ResultActionsDsl = { id ->
+      mockMvc
+        .put("/categories/rules/$id") {
+          secure = true
+          header("Authorization", "Bearer $token")
+          contentType = MediaType.APPLICATION_JSON
+          content = objectMapper.writeValueAsString(request)
+        }
+        .andExpect { status { isBadRequest() } }
+    }
+
+    operation(rule.id)
+    operation(TypedId())
   }
 
   @Test
