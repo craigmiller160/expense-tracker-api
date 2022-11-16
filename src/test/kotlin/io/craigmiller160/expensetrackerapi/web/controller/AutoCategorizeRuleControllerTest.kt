@@ -32,7 +32,6 @@ constructor(
   private val entityManager: EntityManager
 ) {
   // TODO add validations for start/end dates and min/max amounts
-  // TODO make sure categoryId is validated for create & update
 
   private lateinit var token: String
 
