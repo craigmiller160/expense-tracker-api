@@ -13,15 +13,13 @@ import io.craigmiller160.expensetrackerapi.web.types.rules.AutoCategorizeRuleReq
 import io.craigmiller160.expensetrackerapi.web.types.rules.AutoCategorizeRuleResponse
 import java.math.BigDecimal
 import java.time.LocalDate
+import javax.persistence.EntityManager
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.MediaType
-import org.springframework.test.web.servlet.MockMvc
-import org.springframework.test.web.servlet.ResultActionsDsl
-import org.springframework.test.web.servlet.get
-import org.springframework.test.web.servlet.post
+import org.springframework.test.web.servlet.*
 
 @ExpenseTrackerIntegrationTest
 class AutoCategorizeRuleControllerTest
@@ -30,7 +28,8 @@ constructor(
   private val mockMvc: MockMvc,
   private val dataHelper: DataHelper,
   private val objectMapper: ObjectMapper,
-  private val autoCategorizeRuleRepository: AutoCategorizeRuleRepository
+  private val autoCategorizeRuleRepository: AutoCategorizeRuleRepository,
+  private val entityManager: EntityManager
 ) {
   private lateinit var token: String
 
@@ -104,6 +103,7 @@ constructor(
         autoCategorizeRuleRepository.save(it.copy(regex = "Hello World"))
       }
     val rule3 = dataHelper.createRule(1L, cat1.id)
+    entityMananger.flush()
 
     val expectedResponse =
       AutoCategorizeRulePageResponse(
@@ -241,12 +241,14 @@ constructor(
 
   @Test
   fun deleteRule() {
-    TODO()
-  }
+    val rule = dataHelper.createRule(1L, cat1.id)
 
-  @Test
-  fun deleteRule_invalidRule() {
-    TODO()
+    mockMvc
+      .delete("/categories/rules/${rule.id}") {
+        secure = true
+        header("Authorization", "Bearer $token")
+      }
+      .andExpect { status { isNoContent() } }
   }
 
   @Test
