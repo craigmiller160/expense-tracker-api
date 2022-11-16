@@ -120,7 +120,11 @@ class AutoCategorizeRuleService(
   @Transactional
   fun deleteRule(ruleId: TypedId<AutoCategorizeRuleId>): TryEither<Unit> {
     val userId = oAuth2Service.getAuthenticatedUser().userId
-    return Either.catch { autoCategorizeRuleRepository.deleteByIdAndUserId(ruleId, userId) }
+    return getRuleIfValid(ruleId, userId).flatMapCatch { rule ->
+      autoCategorizeRuleRepository.delete(rule)
+      // TODO need real count
+      autoCategorizeRuleRepository.decrementOrdinals(userId, rule.ordinal, 1000)
+    }
   }
 
   private fun validateOrdinal(userId: Long, ordinal: Int): TryEither<Int> =
