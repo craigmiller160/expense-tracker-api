@@ -123,6 +123,16 @@ class AutoCategorizeRuleService(
     return Either.catch { autoCategorizeRuleRepository.deleteByIdAndUserId(ruleId, userId) }
   }
 
+  private fun validateOrdinal(userId: Long, ordinal: Int): TryEither<Int> =
+    Either.catch { autoCategorizeRuleRepository.countAllByUserId(userId) }
+      .filterOrElse({ it >= ordinal }) { BadRequestException("Invalid ordinal: $ordinal") }
+      .map { ordinal }
+
   @Transactional
-  fun reOrderRule(ruleId: TypedId<AutoCategorizeRuleId>, ordinal: Int): TryEither<Unit> = TODO()
+  fun reOrderRule(ruleId: TypedId<AutoCategorizeRuleId>, ordinal: Int): TryEither<Unit> {
+    val userId = oAuth2Service.getAuthenticatedUser().userId
+    validateOrdinal(userId, ordinal)
+
+    TODO()
+  }
 }
