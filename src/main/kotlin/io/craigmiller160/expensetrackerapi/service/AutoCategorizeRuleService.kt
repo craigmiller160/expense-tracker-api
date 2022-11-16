@@ -1,6 +1,7 @@
 package io.craigmiller160.expensetrackerapi.service
 
 import arrow.core.Either
+import arrow.core.leftIfNull
 import io.craigmiller160.expensetrackerapi.common.data.typedid.TypedId
 import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.AutoCategorizeRuleId
 import io.craigmiller160.expensetrackerapi.common.error.BadRequestException
@@ -58,7 +59,12 @@ class AutoCategorizeRuleService(
     request: AutoCategorizeRuleRequest
   ): TryEither<AutoCategorizeRuleResponse> = TODO()
 
-  fun getRule(ruleId: TypedId<AutoCategorizeRuleId>): TryEither<AutoCategorizeRuleResponse> = TODO()
+  fun getRule(ruleId: TypedId<AutoCategorizeRuleId>): TryEither<AutoCategorizeRuleResponse> {
+    val userId = oAuth2Service.getAuthenticatedUser().userId
+    return Either.catch { autoCategorizeRuleRepository.findByIdAndUserId(ruleId, userId) }
+      .leftIfNull { BadRequestException("Rule does not exist") }
+      .map { AutoCategorizeRuleResponse.from(it) }
+  }
 
   @Transactional fun deleteRule(ruleId: TypedId<AutoCategorizeRuleId>): TryEither<Unit> = TODO()
 

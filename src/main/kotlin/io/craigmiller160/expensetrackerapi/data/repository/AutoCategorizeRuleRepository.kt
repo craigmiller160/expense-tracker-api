@@ -9,4 +9,6 @@ interface AutoCategorizeRuleRepository :
   JpaRepository<AutoCategorizeRule, TypedId<AutoCategorizeRuleId>>,
   AutoCategorizeRuleRepositoryCustom {
   fun countAllByUserId(userId: Long): Long
+
+  fun findByIdAndUserId(id: TypedId<AutoCategorizeRuleId>, userId: Long): AutoCategorizeRule?
 }
