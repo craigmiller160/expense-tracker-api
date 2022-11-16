@@ -415,6 +415,8 @@ constructor(
       }
       .andExpect { status { isNoContent() } }
 
+    entityManager.flush()
+
     val checkOrdinal: (TypedId<AutoCategorizeRuleId>, Int) -> Unit = { id, ordinal ->
       assertThat(autoCategorizeRuleRepository.findById(id))
         .isPresent
@@ -449,6 +451,8 @@ constructor(
         header("Authorization", "Bearer $token")
       }
       .andExpect { status { isNoContent() } }
+
+    entityManager.flush()
 
     val checkOrdinal: (TypedId<AutoCategorizeRuleId>, Int) -> Unit = { id, ordinal ->
       assertThat(autoCategorizeRuleRepository.findById(id))
