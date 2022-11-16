@@ -48,33 +48,4 @@ interface AutoCategorizeRuleRepository :
     @Param("minOrdinal") minOrdinal: Int,
     @Param("maxOrdinal") maxOrdinal: Int
   )
-
-  @Query(
-    """
-    UPDATE AutoCategorizeRule r
-    SET r.ordinal = r.ordinal * -1, r.version = r.version + 1
-    WHERE r.ordinal <= :maxOrdinal
-    AND r.ordinal >= :minOrdinal
-    AND r.userId = :userId
-  """)
-  @Modifying(flushAutomatically = true, clearAutomatically = true)
-  fun temporarilyNegateOrdinals(
-    @Param("userId") userId: Long,
-    @Param("minOrdinal") minOrdinal: Int,
-    @Param("maxOrdinal") maxOrdinal: Int
-  )
-
-  @Query(
-    """
-    UPDATE AutoCategorizeRule r
-    SET r.ordinal = :newOrdinal, r.version = r.version + 1
-    WHERE r.id = :id
-    AND r.userId = :userId
-  """)
-  @Modifying(flushAutomatically = true, clearAutomatically = true)
-  fun setSingleRuleOrdinal(
-    @Param("userId") userId: Long,
-    @Param("id") id: TypedId<AutoCategorizeRuleId>,
-    @Param("newOrdinal") newOrdinal: Int
-  )
 }
