@@ -206,7 +206,18 @@ constructor(
 
   @Test
   fun getRule() {
-    TODO()
+    val rule = dataHelper.createRule(1L, cat1.id)
+    val expectedResponse = AutoCategorizeRuleResponse.from(rule)
+
+    mockMvc
+      .get("/categories/rules/${rule.id}") {
+        secure = true
+        header("Authorization", "Bearer $token")
+      }
+      .andExpect {
+        status { isOk() }
+        content { json(objectMapper.writeValueAsString(expectedResponse), true) }
+      }
   }
 
   @Test
