@@ -463,8 +463,8 @@ constructor(
 
     checkOrdinal(rule1.id, 1)
     checkOrdinal(rule3.id, 2)
-    checkOrdinal(rule4.id, 3)
-    checkOrdinal(rule2.id, 4)
+    checkOrdinal(rule2.id, 3)
+    checkOrdinal(rule4.id, 4)
     checkOrdinal(rule5.id, 5)
   }
 
