@@ -2,6 +2,7 @@ package io.craigmiller160.expensetrackerapi.web.controller
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.craigmiller160.expensetrackerapi.common.data.typedid.TypedId
+import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.AutoCategorizeRuleId
 import io.craigmiller160.expensetrackerapi.data.model.Category
 import io.craigmiller160.expensetrackerapi.data.repository.AutoCategorizeRuleRepository
 import io.craigmiller160.expensetrackerapi.testcore.ExpenseTrackerIntegrationTest
@@ -221,7 +222,30 @@ constructor(
   }
 
   @Test
+  fun getRule_invalidRule() {
+    val rule1 = dataHelper.createRule(1L, cat1.id)
+    val rule2 = dataHelper.createRule(2L, cat2.id)
+
+    val operation: (TypedId<AutoCategorizeRuleId>) -> ResultActionsDsl = { id ->
+      mockMvc
+        .get("/categories/rules/$id") {
+          secure = true
+          header("Authorization", "Bearer $token")
+        }
+        .andExpect { status { isBadRequest() } }
+    }
+
+    operation(rule2.id)
+    operation(TypedId())
+  }
+
+  @Test
   fun deleteRule() {
+    TODO()
+  }
+
+  @Test
+  fun deleteRule_invalidRule() {
     TODO()
   }
 
