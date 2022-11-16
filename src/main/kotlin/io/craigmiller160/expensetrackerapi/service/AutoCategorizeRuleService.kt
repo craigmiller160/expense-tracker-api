@@ -145,6 +145,15 @@ class AutoCategorizeRuleService(
       .map { Unit }
   }
 
-  private fun changeRuleOrdinals(userId: Long, oldOrdinal: Int, newOrdinal: Int): TryEither<Unit> =
-    TODO()
+  private fun changeRuleOrdinals(userId: Long, oldOrdinal: Int, newOrdinal: Int): TryEither<Unit> {
+    return if (oldOrdinal < newOrdinal) {
+      Either.catch {
+        autoCategorizeRuleRepository.decrementOrdinals(userId, oldOrdinal, newOrdinal - 1)
+      }
+    } else {
+      Either.catch {
+        autoCategorizeRuleRepository.incrementOrdinals(userId, newOrdinal, oldOrdinal - 1)
+      }
+    }
+  }
 }
