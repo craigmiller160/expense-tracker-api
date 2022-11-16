@@ -18,6 +18,8 @@ import io.craigmiller160.expensetrackerapi.web.types.rules.AutoCategorizeRulePag
 import io.craigmiller160.expensetrackerapi.web.types.rules.AutoCategorizeRuleRequest
 import io.craigmiller160.expensetrackerapi.web.types.rules.AutoCategorizeRuleResponse
 import io.craigmiller160.oauth2.service.OAuth2Service
+import java.math.BigDecimal
+import java.time.LocalDate
 import javax.transaction.Transactional
 import org.springframework.stereotype.Service
 
@@ -27,12 +29,31 @@ class AutoCategorizeRuleService(
   private val categoryRepository: CategoryRepository,
   private val oAuth2Service: OAuth2Service
 ) {
+  // TODO how do min/max amounts work when everything is supposed to be negative numbers?
   fun getAllRules(
     request: AutoCategorizeRulePageRequest
   ): TryEither<AutoCategorizeRulePageResponse> {
     val userId = oAuth2Service.getAuthenticatedUser().userId
     return Either.catch { autoCategorizeRuleRepository.searchForRules(request, userId) }
       .map { AutoCategorizeRulePageResponse.from(it) }
+  }
+
+  private fun validateRule(rule: AutoCategorizeRule): TryEither<AutoCategorizeRule> {
+    val startDate = rule.startDate ?: LocalDate.MIN
+    val endDate = rule.endDate ?: LocalDate.MAX
+    val minAmount = rule.minAmount ?: BigDecimal(Double.MIN_VALUE)
+    val maxAmount = rule.maxAmount ?: BigDecimal(Double.MAX_VALUE)
+
+    if (startDate > endDate) {
+      return Either.Left(BadRequestException("Rule Start Date cannot be after Rule End Date"))
+    }
+
+    if (minAmount > maxAmount) {
+      return Either.Left(
+        BadRequestException("Rule Min Amount cannot be greater than Rule Max Amount"))
+    }
+
+    return Either.Right(rule)
   }
 
   @Transactional
@@ -51,6 +72,7 @@ class AutoCategorizeRuleService(
           minAmount = request.minAmount,
           maxAmount = request.maxAmount)
       }
+      .flatMap { validateRule(it) }
       .flatMapCatch { rule -> autoCategorizeRuleRepository.save(rule) }
       .map { AutoCategorizeRuleResponse.from(it) }
   }
@@ -84,6 +106,7 @@ class AutoCategorizeRuleService(
           minAmount = request.minAmount,
           maxAmount = request.maxAmount)
       }
+      .flatMap { validateRule(it) }
       .flatMapCatch { autoCategorizeRuleRepository.save(it) }
       .map { AutoCategorizeRuleResponse.from(it) }
   }
