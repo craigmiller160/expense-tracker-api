@@ -31,6 +31,7 @@ constructor(
   private val autoCategorizeRuleRepository: AutoCategorizeRuleRepository,
   private val entityManager: EntityManager
 ) {
+  // TODO validate bad request messages
 
   private lateinit var token: String
 
@@ -163,7 +164,28 @@ constructor(
 
   @Test
   fun createRule_invalidRuleValues() {
-    TODO()
+    val baseRequest =
+      AutoCategorizeRuleRequest(
+        categoryId = cat1.id,
+        regex = ".*",
+        startDate = LocalDate.of(2022, 1, 1),
+        endDate = LocalDate.of(2022, 2, 2),
+        minAmount = BigDecimal("10.00"),
+        maxAmount = BigDecimal("20.00"))
+
+    val operation: (AutoCategorizeRuleRequest) -> ResultActionsDsl = { request ->
+      mockMvc
+        .post("/categories/rules") {
+          secure = true
+          header("Authorization", "Bearer $token")
+          contentType = MediaType.APPLICATION_JSON
+          content = objectMapper.writeValueAsString(request)
+        }
+        .andExpect { status { isBadRequest() } }
+    }
+
+    operation(baseRequest.copy(startDate = LocalDate.of(2022, 6, 1)))
+    operation(baseRequest.copy(minAmount = BigDecimal("30.0")))
   }
 
   @Test
