@@ -8,6 +8,7 @@ import io.craigmiller160.expensetrackerapi.data.querydsl.QueryDSLSupport
 import io.craigmiller160.expensetrackerapi.data.repository.AutoCategorizeRuleRepositoryCustom
 import io.craigmiller160.expensetrackerapi.web.types.rules.AutoCategorizeRulePageRequest
 import org.springframework.data.domain.Page
+import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Repository
 
@@ -36,6 +37,13 @@ class AutoCategorizeRuleRepositoryCustomImpl(
     val baseQuery =
       queryFactory.query().from(QAutoCategorizeRule.autoCategorizeRule).where(whereClause)
 
-    TODO("Not yet implemented")
+    val count = baseQuery.select(QAutoCategorizeRule.autoCategorizeRule.count()).fetchFirst()
+    val results =
+      baseQuery
+        .select(QAutoCategorizeRule.autoCategorizeRule)
+        .let(queryDslSupport.applyPagination(pageable, AutoCategorizeRule::class.java))
+        .fetch()
+
+    return PageImpl(results, pageable, count)
   }
 }
