@@ -22,6 +22,7 @@ interface AutoCategorizeRuleRepository :
     SET r.ordinal = r.ordinal - 1
     WHERE r.ordinal <= :maxOrdinal
     AND r.ordinal >= :minOrdinal
+    AND r.userId = :userId
   """)
   fun decrementOrdinals(
     @Param("userId") userId: Long,
@@ -35,6 +36,7 @@ interface AutoCategorizeRuleRepository :
     SET r.ordinal = r.ordinal + 1
     WHERE r.ordinal <= :maxOrdinal
     AND r.ordinal >= :minOrdinal
+    AND r.userId = :userId
   """)
   fun incrementOrdinals(
     @Param("userId") userId: Long,
