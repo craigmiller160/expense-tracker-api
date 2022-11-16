@@ -137,13 +137,18 @@ class AutoCategorizeRuleService(
         if (rule.ordinal == ordinal) {
           Either.Right(rule)
         } else {
-          changeRuleOrdinals(userId, rule.ordinal, ordinal).flatMapCatch {
-            autoCategorizeRuleRepository.save(rule.copy(ordinal = ordinal))
+          setTemporaryOrdinal(rule).flatMap { ruleWithTempOrdinal ->
+            changeRuleOrdinals(userId, rule.ordinal, ordinal).flatMapCatch {
+              autoCategorizeRuleRepository.save(ruleWithTempOrdinal.copy(ordinal = ordinal))
+            }
           }
         }
       }
       .map { Unit }
   }
+
+  private fun setTemporaryOrdinal(rule: AutoCategorizeRule): TryEither<AutoCategorizeRule> =
+    Either.catch { autoCategorizeRuleRepository.save(rule.copy(ordinal = -1)) }
 
   private fun changeRuleOrdinals(userId: Long, oldOrdinal: Int, newOrdinal: Int): TryEither<Unit> {
     return Either.catch {
