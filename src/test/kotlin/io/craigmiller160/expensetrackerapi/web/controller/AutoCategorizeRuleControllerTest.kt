@@ -390,6 +390,11 @@ constructor(
   }
 
   @Test
+  fun deleteRule_ordinalReOrdering() {
+    TODO()
+  }
+
+  @Test
   fun reOrderRule_lowerOrdinal() {
     val rule1 = dataHelper.createRule(1L, cat1.id)
     val rule2 = dataHelper.createRule(1L, cat1.id)
