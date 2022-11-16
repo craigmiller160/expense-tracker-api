@@ -4,6 +4,7 @@ import io.craigmiller160.expensetrackerapi.common.data.typedid.TypedId
 import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.AutoCategorizeRuleId
 import io.craigmiller160.expensetrackerapi.data.model.AutoCategorizeRule
 import org.springframework.data.jpa.repository.JpaRepository
+import org.springframework.data.jpa.repository.Modifying
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.query.Param
 
@@ -24,6 +25,7 @@ interface AutoCategorizeRuleRepository :
     AND r.ordinal >= :minOrdinal
     AND r.userId = :userId
   """)
+  @Modifying(flushAutomatically = true, clearAutomatically = true)
   fun decrementOrdinals(
     @Param("userId") userId: Long,
     @Param("minOrdinal") minOrdinal: Int,
@@ -38,6 +40,7 @@ interface AutoCategorizeRuleRepository :
     AND r.ordinal >= :minOrdinal
     AND r.userId = :userId
   """)
+  @Modifying(flushAutomatically = true, clearAutomatically = true)
   fun incrementOrdinals(
     @Param("userId") userId: Long,
     @Param("minOrdinal") minOrdinal: Int,
