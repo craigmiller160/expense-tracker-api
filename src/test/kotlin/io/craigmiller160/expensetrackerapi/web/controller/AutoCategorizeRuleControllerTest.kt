@@ -404,7 +404,7 @@ constructor(
     assertThat(rule5).hasFieldOrPropertyWithValue("ordinal", 5)
 
     mockMvc
-      .put("/categories/rules/${rule3.id}/reOrder/2") {
+      .put("/categories/rules/${rule4.id}/reOrder/2") {
         secure = true
         header("Authorization", "Bearer $token")
       }
@@ -418,9 +418,9 @@ constructor(
     }
 
     checkOrdinal(rule1.id, 1)
-    checkOrdinal(rule3.id, 2)
+    checkOrdinal(rule4.id, 2)
     checkOrdinal(rule2.id, 3)
-    checkOrdinal(rule4.id, 4)
+    checkOrdinal(rule3.id, 4)
     checkOrdinal(rule5.id, 5)
   }
 
