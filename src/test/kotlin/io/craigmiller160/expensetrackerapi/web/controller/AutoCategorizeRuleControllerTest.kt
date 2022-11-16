@@ -31,6 +31,8 @@ constructor(
   private val autoCategorizeRuleRepository: AutoCategorizeRuleRepository,
   private val entityManager: EntityManager
 ) {
+  // TODO add validations for start/end dates and min/max amounts
+
   private lateinit var token: String
 
   private lateinit var cat1: Category
@@ -197,11 +199,50 @@ constructor(
 
   @Test
   fun updateRule() {
-    TODO()
+    val rule = dataHelper.createRule(1L, cat1.id)
+    val cat3 = dataHelper.createCategory(1L, "Hello")
+    val request =
+      AutoCategorizeRuleRequest(
+        categoryId = cat3.id,
+        regex = "Hello.*",
+        startDate = LocalDate.of(2022, 1, 1),
+        endDate = LocalDate.of(2022, 2, 2),
+        minAmount = BigDecimal("10.0"),
+        maxAmount = BigDecimal("20.0"))
+
+    val expectedResponse =
+      AutoCategorizeRuleResponse(
+        id = rule.id,
+        ordinal = rule.ordinal,
+        categoryId = request.categoryId,
+        regex = request.regex,
+        startDate = request.startDate,
+        endDate = request.endDate,
+        minAmount = request.minAmount,
+        maxAmount = request.maxAmount)
+
+    mockMvc
+      .put("/categories/rules/${rule.id}") {
+        secure = true
+        header("Authorization", "Bearer $token")
+        contentType = MediaType.APPLICATION_JSON
+        content = objectMapper.writeValueAsString(request)
+      }
+      .andExpect {
+        status {
+          isOk()
+          content { json(objectMapper.writeValueAsString(expectedResponse), true) }
+        }
+      }
   }
 
   @Test
   fun updateRule_invalidCategory() {
+    TODO()
+  }
+
+  @Test
+  fun updateRule_invalidRule() {
     TODO()
   }
 
