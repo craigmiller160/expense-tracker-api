@@ -69,7 +69,27 @@ constructor(
 
   @Test
   fun getAllRules_byCategoryId() {
-    TODO()
+    val cat3 = dataHelper.createCategory(1L, "Stuff")
+    val rule1 = dataHelper.createRule(1L, cat1.id)
+    val rule2 = dataHelper.createRule(1L, cat1.id)
+    val rule3 = dataHelper.createRule(1L, cat3.id)
+
+    val expectedResponse =
+      AutoCategorizeRulePageResponse(
+        pageNumber = 0,
+        totalItems = 2,
+        rules =
+          listOf(AutoCategorizeRuleResponse.from(rule1), AutoCategorizeRuleResponse.from(rule2)))
+
+    mockMvc
+      .get("/categories/rules?pageNumber=0&pageSize=25&categoryId=${cat1.id}") {
+        secure = true
+        header("Authorization", "Bearer $token")
+      }
+      .andExpect {
+        status { isOk() }
+        content { json(objectMapper.writeValueAsString(expectedResponse), true) }
+      }
   }
 
   @Test
