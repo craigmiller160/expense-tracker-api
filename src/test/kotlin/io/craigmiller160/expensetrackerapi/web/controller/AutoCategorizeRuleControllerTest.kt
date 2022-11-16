@@ -7,6 +7,7 @@ import io.craigmiller160.expensetrackerapi.data.repository.AutoCategorizeRuleRep
 import io.craigmiller160.expensetrackerapi.testcore.ExpenseTrackerIntegrationTest
 import io.craigmiller160.expensetrackerapi.testcore.OAuth2Extension
 import io.craigmiller160.expensetrackerapi.testutils.DataHelper
+import io.craigmiller160.expensetrackerapi.web.types.rules.AutoCategorizeRulePageResponse
 import io.craigmiller160.expensetrackerapi.web.types.rules.AutoCategorizeRuleRequest
 import io.craigmiller160.expensetrackerapi.web.types.rules.AutoCategorizeRuleResponse
 import java.math.BigDecimal
@@ -18,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.MediaType
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.ResultActionsDsl
+import org.springframework.test.web.servlet.get
 import org.springframework.test.web.servlet.post
 
 @ExpenseTrackerIntegrationTest
@@ -43,7 +45,26 @@ constructor(
 
   @Test
   fun getAllRules() {
-    TODO()
+    val rule1 = dataHelper.createRule(1L, cat1.id)
+    val rule2 = dataHelper.createRule(1L, cat1.id)
+    val rule3 = dataHelper.createRule(2L, cat2.id)
+
+    val expectedResponse =
+      AutoCategorizeRulePageResponse(
+        pageNumber = 0,
+        totalItems = 2,
+        rules =
+          listOf(AutoCategorizeRuleResponse.from(rule1), AutoCategorizeRuleResponse.from(rule2)))
+
+    mockMvc
+      .get("/categories/rules?pageNumber=0&pageSize=25") {
+        secure = true
+        header("Authorization", "Bearer $token")
+      }
+      .andExpect {
+        status { isOk() }
+        content { json(objectMapper.writeValueAsString(expectedResponse), true) }
+      }
   }
 
   @Test
