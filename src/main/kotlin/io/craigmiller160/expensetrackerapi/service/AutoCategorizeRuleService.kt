@@ -169,7 +169,7 @@ class AutoCategorizeRuleService(
   ): TryEither<Unit> =
     Either.catch {
       if (oldOrdinal < newOrdinal) {
-        autoCategorizeRuleRepository.decrementOrdinals(userId, oldOrdinal, newOrdinal - 1)
+        autoCategorizeRuleRepository.decrementOrdinals(userId, oldOrdinal + 1, newOrdinal)
       } else {
         autoCategorizeRuleRepository.incrementOrdinals(userId, newOrdinal, oldOrdinal - 1)
       }
