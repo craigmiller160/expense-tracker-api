@@ -24,7 +24,11 @@ class AutoCategorizeRuleService(
 ) {
   fun getAllRules(
     request: AutoCategorizeRulePageRequest
-  ): TryEither<AutoCategorizeRulePageResponse> = TODO()
+  ): TryEither<AutoCategorizeRulePageResponse> {
+    val userId = oAuth2Service.getAuthenticatedUser().userId
+    return Either.catch { autoCategorizeRuleRepository.searchForRules(request, userId) }
+      .map { AutoCategorizeRulePageResponse.from(it) }
+  }
 
   @Transactional
   fun createRule(request: AutoCategorizeRuleRequest): TryEither<AutoCategorizeRuleResponse> {
