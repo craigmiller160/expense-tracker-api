@@ -11,4 +11,6 @@ interface AutoCategorizeRuleRepository :
   fun countAllByUserId(userId: Long): Long
 
   fun findByIdAndUserId(id: TypedId<AutoCategorizeRuleId>, userId: Long): AutoCategorizeRule?
+
+  fun deleteByIdAndUserId(id: TypedId<AutoCategorizeRuleId>, userId: Long)
 }

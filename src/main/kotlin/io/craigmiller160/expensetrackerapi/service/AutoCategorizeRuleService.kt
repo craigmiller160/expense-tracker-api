@@ -66,7 +66,11 @@ class AutoCategorizeRuleService(
       .map { AutoCategorizeRuleResponse.from(it) }
   }
 
-  @Transactional fun deleteRule(ruleId: TypedId<AutoCategorizeRuleId>): TryEither<Unit> = TODO()
+  @Transactional
+  fun deleteRule(ruleId: TypedId<AutoCategorizeRuleId>): TryEither<Unit> {
+    val userId = oAuth2Service.getAuthenticatedUser().userId
+    return Either.catch { autoCategorizeRuleRepository.deleteByIdAndUserId(ruleId, userId) }
+  }
 
   @Transactional
   fun reOrderRule(ruleId: TypedId<AutoCategorizeRuleId>, ordinal: Int): TryEither<Unit> = TODO()
