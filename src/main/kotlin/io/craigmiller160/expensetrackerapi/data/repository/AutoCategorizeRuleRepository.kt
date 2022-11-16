@@ -17,13 +17,12 @@ interface AutoCategorizeRuleRepository :
 
   fun deleteByIdAndUserId(id: TypedId<AutoCategorizeRuleId>, userId: Long)
 
-  // TODO better solution
   @Query(
     """
     UPDATE AutoCategorizeRule r
-    SET r.ordinal = ABS(r.ordinal) - 1, r.version = r.version + 1
-    WHERE ABS(r.ordinal) <= :maxOrdinal
-    AND ABS(r.ordinal) >= :minOrdinal
+    SET r.ordinal = r.ordinal - 1, r.version = r.version + 1
+    WHERE r.ordinal <= :maxOrdinal
+    AND r.ordinal >= :minOrdinal
     AND r.userId = :userId
   """)
   @Modifying(flushAutomatically = true, clearAutomatically = true)
@@ -33,13 +32,12 @@ interface AutoCategorizeRuleRepository :
     @Param("maxOrdinal") maxOrdinal: Int
   )
 
-  // TODO better solution
   @Query(
     """
     UPDATE AutoCategorizeRule r
-    SET r.ordinal = ABS(r.ordinal) + 1, r.version = r.version + 1 
-    WHERE ABS(r.ordinal) <= :maxOrdinal
-    AND ABS(r.ordinal) >= :minOrdinal
+    SET r.ordinal = r.ordinal + 1, r.version = r.version + 1 
+    WHERE r.ordinal <= :maxOrdinal
+    AND r.ordinal >= :minOrdinal
     AND r.userId = :userId
   """)
   @Modifying(flushAutomatically = true, clearAutomatically = true)
