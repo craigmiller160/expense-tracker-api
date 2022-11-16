@@ -20,8 +20,25 @@ interface AutoCategorizeRuleRepository :
     """
     UPDATE AutoCategorizeRule r
     SET r.ordinal = r.ordinal - 1
-    WHERE r.ordinal < :maxOrdinal
+    WHERE r.ordinal <= :maxOrdinal
     AND r.ordinal >= :minOrdinal
   """)
-  fun decrementOrdinals(@Param("minOrdinal") minOrdinal: Int, @Param("maxOrdinal") maxOrdinal: Int)
+  fun decrementOrdinals(
+    @Param("userId") userId: Long,
+    @Param("minOrdinal") minOrdinal: Int,
+    @Param("maxOrdinal") maxOrdinal: Int
+  )
+
+  @Query(
+    """
+    UPDATE AutoCategorizeRule r
+    SET r.ordinal = r.ordinal + 1
+    WHERE r.ordinal <= :maxOrdinal
+    AND r.ordinal >= :minOrdinal
+  """)
+  fun incrementOrdinals(
+    @Param("userId") userId: Long,
+    @Param("minOrdinal") minOrdinal: Int,
+    @Param("maxOrdinal") maxOrdinal: Int
+  )
 }

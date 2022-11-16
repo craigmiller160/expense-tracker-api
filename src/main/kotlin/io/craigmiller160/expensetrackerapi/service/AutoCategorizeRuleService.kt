@@ -137,7 +137,7 @@ class AutoCategorizeRuleService(
         if (rule.ordinal == ordinal) {
           Either.Right(rule)
         } else {
-          changeRuleOrdinals(rule.ordinal, ordinal).flatMapCatch {
+          changeRuleOrdinals(userId, rule.ordinal, ordinal).flatMapCatch {
             autoCategorizeRuleRepository.save(rule.copy(ordinal = ordinal))
           }
         }
@@ -145,5 +145,6 @@ class AutoCategorizeRuleService(
       .map { Unit }
   }
 
-  private fun changeRuleOrdinals(oldOrdinal: Int, newOrdinal: Int): TryEither<Unit> = TODO()
+  private fun changeRuleOrdinals(userId: Long, oldOrdinal: Int, newOrdinal: Int): TryEither<Unit> =
+    TODO()
 }
