@@ -26,7 +26,11 @@ class AutoCategorizeRuleRepositoryCustomImpl(
       BooleanBuilder(QAutoCategorizeRule.autoCategorizeRule.userId.eq(userId))
         .let(
           QueryDSLSupport.andIfNotNull(request.categoryId) {
-            QAutoCategorizeRule.autoCategorizeRule.categoryId.eq(request.categoryId)
+            QAutoCategorizeRule.autoCategorizeRule.categoryId.eq(it)
+          })
+        .let(
+          QueryDSLSupport.andIfNotNull(request.regex) {
+            QAutoCategorizeRule.autoCategorizeRule.regex.toLowerCase().like("%${it.lowercase()}%")
           })
 
     val baseQuery =
