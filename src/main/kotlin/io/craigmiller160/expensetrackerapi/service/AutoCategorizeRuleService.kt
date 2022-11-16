@@ -146,12 +146,10 @@ class AutoCategorizeRuleService(
   }
 
   private fun changeRuleOrdinals(userId: Long, oldOrdinal: Int, newOrdinal: Int): TryEither<Unit> {
-    return if (oldOrdinal < newOrdinal) {
-      Either.catch {
+    return Either.catch {
+      if (oldOrdinal < newOrdinal) {
         autoCategorizeRuleRepository.decrementOrdinals(userId, oldOrdinal, newOrdinal - 1)
-      }
-    } else {
-      Either.catch {
+      } else {
         autoCategorizeRuleRepository.incrementOrdinals(userId, newOrdinal, oldOrdinal - 1)
       }
     }
