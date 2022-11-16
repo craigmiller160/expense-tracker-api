@@ -234,6 +234,9 @@ constructor(
           content { json(objectMapper.writeValueAsString(expectedResponse), true) }
         }
       }
+
+    val dbRule = autoCategorizeRuleRepository.findById(rule.id).orElseThrow()
+    assertThat(AutoCategorizeRuleResponse.from(dbRule)).isEqualTo(expectedResponse)
   }
 
   @Test
