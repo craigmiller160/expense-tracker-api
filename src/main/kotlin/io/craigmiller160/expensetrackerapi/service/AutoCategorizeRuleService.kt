@@ -27,7 +27,8 @@ import org.springframework.stereotype.Service
 class AutoCategorizeRuleService(
   private val autoCategorizeRuleRepository: AutoCategorizeRuleRepository,
   private val categoryRepository: CategoryRepository,
-  private val oAuth2Service: OAuth2Service
+  private val oAuth2Service: OAuth2Service,
+  private val applyCategoriesToTransactionsService: ApplyCategoriesToTransactionsService
 ) {
   fun getAllRules(
     request: AutoCategorizeRulePageRequest
@@ -73,6 +74,11 @@ class AutoCategorizeRuleService(
       }
       .flatMap { validateRule(it) }
       .flatMapCatch { rule -> autoCategorizeRuleRepository.save(rule) }
+      .flatMap { rule ->
+        applyCategoriesToTransactionsService.applyCategoriesToUnconfirmedTransactions(userId).map {
+          rule
+        }
+      }
       .map { AutoCategorizeRuleResponse.from(it) }
   }
 
@@ -107,6 +113,11 @@ class AutoCategorizeRuleService(
       }
       .flatMap { validateRule(it) }
       .flatMapCatch { autoCategorizeRuleRepository.save(it) }
+      .flatMap { rule ->
+        applyCategoriesToTransactionsService.applyCategoriesToUnconfirmedTransactions(userId).map {
+          rule
+        }
+      }
       .map { AutoCategorizeRuleResponse.from(it) }
   }
 
@@ -118,11 +129,15 @@ class AutoCategorizeRuleService(
   @Transactional
   fun deleteRule(ruleId: TypedId<AutoCategorizeRuleId>): TryEither<Unit> {
     val userId = oAuth2Service.getAuthenticatedUser().userId
-    return getRuleIfValid(ruleId, userId).flatMapCatch { rule ->
-      val count = autoCategorizeRuleRepository.countAllByUserId(userId)
-      autoCategorizeRuleRepository.delete(rule)
-      autoCategorizeRuleRepository.decrementOrdinals(userId, rule.ordinal, count.toInt())
-    }
+    return getRuleIfValid(ruleId, userId)
+      .flatMapCatch { rule ->
+        val count = autoCategorizeRuleRepository.countAllByUserId(userId)
+        autoCategorizeRuleRepository.delete(rule)
+        autoCategorizeRuleRepository.decrementOrdinals(userId, rule.ordinal, count.toInt())
+      }
+      .flatMap {
+        applyCategoriesToTransactionsService.applyCategoriesToUnconfirmedTransactions(userId)
+      }
   }
 
   private fun validateOrdinal(userId: Long, ordinal: Int): TryEither<Int> =
@@ -144,7 +159,9 @@ class AutoCategorizeRuleService(
           }
         }
       }
-      .map { Unit }
+      .flatMap {
+        applyCategoriesToTransactionsService.applyCategoriesToUnconfirmedTransactions(userId)
+      }
   }
 
   private fun changeOtherRuleOrdinals(
