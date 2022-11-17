@@ -10,6 +10,7 @@ import io.craigmiller160.expensetrackerapi.data.utils.TransactionContentHash
 import io.craigmiller160.expensetrackerapi.service.TransactionImportType
 import io.craigmiller160.expensetrackerapi.testcore.ExpenseTrackerIntegrationTest
 import io.craigmiller160.expensetrackerapi.testcore.OAuth2Extension
+import io.craigmiller160.expensetrackerapi.testutils.DataHelper
 import io.craigmiller160.expensetrackerapi.testutils.ResourceUtils
 import io.craigmiller160.expensetrackerapi.web.types.importing.ImportTypeResponse
 import io.kotest.assertions.arrow.core.shouldBeRight
@@ -33,7 +34,8 @@ constructor(
   private val transactionRepository: TransactionRepository,
   private val mockMvc: MockMvc,
   private val objectMapper: ObjectMapper,
-  private val entityManager: EntityManager
+  private val entityManager: EntityManager,
+  private val dataHelper: DataHelper
 ) {
   private lateinit var token: String
 
@@ -161,6 +163,7 @@ constructor(
       .hasFieldOrPropertyWithValue("expenseDate", LocalDate.of(2022, 4, 18))
       .hasFieldOrPropertyWithValue("description", "PARTY CITY 1084 TAMPA FL01837R")
       .hasFieldOrPropertyWithValue("amount", BigDecimal("-36.87"))
+      .hasFieldOrPropertyWithValue("categoryId", null)
 
     assertThat(transactions[41])
       .hasFieldOrPropertyWithValue("userId", 1L)
@@ -168,12 +171,49 @@ constructor(
       .hasFieldOrPropertyWithValue(
         "description", "DIRECTPAY FULL BALANCESEE DETAILS OF YOUR NEXT DIRECTPAY BELOW")
       .hasFieldOrPropertyWithValue("amount", BigDecimal("1928.54"))
+      .hasFieldOrPropertyWithValue("categoryId", null)
 
     assertThat(transactions.last())
       .hasFieldOrPropertyWithValue("userId", 1L)
       .hasFieldOrPropertyWithValue("expenseDate", LocalDate.of(2022, 5, 18))
       .hasFieldOrPropertyWithValue("description", "PANDA EXPRESS 1679 RIVERVIEW FL")
       .hasFieldOrPropertyWithValue("amount", BigDecimal("-5.81"))
+      .hasFieldOrPropertyWithValue("categoryId", null)
+  }
+
+  @Test
+  fun `importTransactions - DISCOVER_CSV, with auto-categorization rules`() {
+    val category = dataHelper.createCategory(1L, "Hello")
+    dataHelper.createRule(1L, category.id)
+
+    ResourceUtils.getResourceBytes("data/discover1.csv")
+      .flatMap { bytes ->
+        Either.catch {
+          mockMvc
+            .multipart("/transaction-import?type=${TransactionImportType.DISCOVER_CSV.name}") {
+              secure = true
+              header("Authorization", "Bearer $token")
+              header("Content-Type", MediaType.MULTIPART_FORM_DATA_VALUE)
+              file("file", bytes)
+            }
+            .andExpect {
+              status { isOk() }
+              content { json("""{"transactionsImported":57}""", true) }
+            }
+        }
+      }
+      .shouldBeRight()
+
+    entityManager.flush()
+    entityManager.clear()
+
+    val transactions = transactionRepository.findAllByUserIdOrderByExpenseDateAscDescriptionAsc(1L)
+    val expectedSize = 57
+    val expectedCategoryIds = (1..expectedSize).map { category.id }
+    assertThat(transactions)
+      .hasSize(expectedSize)
+      .extracting("categoryId")
+      .contains(*expectedCategoryIds.toTypedArray())
   }
 
   @Test
@@ -208,6 +248,7 @@ constructor(
       .hasFieldOrPropertyWithValue(
         "description", "FID BKG SVC LLC  MONEYLINE                  PPD ID: 1035141383")
       .hasFieldOrPropertyWithValue("amount", BigDecimal("-250.00"))
+      .hasFieldOrPropertyWithValue("categoryId", null)
 
     assertThat(transactions[20])
       .hasFieldOrPropertyWithValue("userId", 1L)
@@ -215,6 +256,7 @@ constructor(
       .hasFieldOrPropertyWithValue(
         "description", "C89303 CLEARSPEN DIR DEP                    PPD ID: 4462283648")
       .hasFieldOrPropertyWithValue("amount", BigDecimal("4097.76"))
+      .hasFieldOrPropertyWithValue("categoryId", null)
 
     assertThat(transactions[21])
       .hasFieldOrPropertyWithValue("userId", 1L)
@@ -222,5 +264,6 @@ constructor(
       .hasFieldOrPropertyWithValue(
         "description", "FRONTIER COMM CORP WE 800-921-8101 CT        06/14")
       .hasFieldOrPropertyWithValue("amount", BigDecimal("-64.99"))
+      .hasFieldOrPropertyWithValue("categoryId", null)
   }
 }

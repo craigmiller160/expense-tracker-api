@@ -3,6 +3,7 @@ package io.craigmiller160.expensetrackerapi.data.repository
 import io.craigmiller160.expensetrackerapi.common.data.typedid.TypedId
 import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.AutoCategorizeRuleId
 import io.craigmiller160.expensetrackerapi.data.model.AutoCategorizeRule
+import java.util.stream.Stream
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Modifying
 import org.springframework.data.jpa.repository.Query
@@ -16,6 +17,8 @@ interface AutoCategorizeRuleRepository :
   fun findByIdAndUserId(id: TypedId<AutoCategorizeRuleId>, userId: Long): AutoCategorizeRule?
 
   fun deleteByIdAndUserId(id: TypedId<AutoCategorizeRuleId>, userId: Long)
+
+  fun streamAllByUserIdOrderByOrdinal(userId: Long): Stream<AutoCategorizeRule>
 
   @Query(
     """
