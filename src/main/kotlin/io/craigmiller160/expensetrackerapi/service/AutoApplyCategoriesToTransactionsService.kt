@@ -1,5 +1,6 @@
 package io.craigmiller160.expensetrackerapi.service
 
+import arrow.core.Either
 import io.craigmiller160.expensetrackerapi.common.data.typedid.TypedId
 import io.craigmiller160.expensetrackerapi.data.model.AutoCategorizeRule
 import io.craigmiller160.expensetrackerapi.data.model.Transaction
@@ -17,16 +18,18 @@ class AutoApplyCategoriesToTransactionsService(
 ) {
   fun applyCategoriesToTransactions(transactions: List<Transaction>): TryEither<List<Transaction>> {
     val userId = oAuth2Service.getAuthenticatedUser().userId
-    // TODO wrap in Either
-    autoCategorizeRuleRepository.streamAllByUserIdOrderByOrdinal(userId).use { ruleStream ->
-      ruleStream
-        .map { RuleTransactionsWrapper.fromRule(it) }
-        .reduce(RuleTransactionsWrapper.fromTransactions(transactions)) { (_, transactions), (rule)
-          ->
-          RuleTransactionsWrapper.fromTransactions(transactions.map { applyRule(it, rule) })
-        }
+    return Either.catch {
+      autoCategorizeRuleRepository.streamAllByUserIdOrderByOrdinal(userId).use { ruleStream ->
+        ruleStream
+          .map { RuleTransactionsWrapper.fromRule(it) }
+          .reduce(RuleTransactionsWrapper.fromTransactions(transactions)) {
+            (_, transactions),
+            (rule) ->
+            RuleTransactionsWrapper.fromTransactions(transactions.map { applyRule(it, rule) })
+          }
+          .transactions
+      }
     }
-    TODO()
   }
 
   private fun applyRule(transaction: Transaction, rule: AutoCategorizeRule): Transaction =
