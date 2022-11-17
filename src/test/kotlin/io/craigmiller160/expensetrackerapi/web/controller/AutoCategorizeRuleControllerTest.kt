@@ -3,6 +3,7 @@ package io.craigmiller160.expensetrackerapi.web.controller
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.craigmiller160.expensetrackerapi.common.data.typedid.TypedId
 import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.AutoCategorizeRuleId
+import io.craigmiller160.expensetrackerapi.data.model.AutoCategorizeRule
 import io.craigmiller160.expensetrackerapi.data.model.Category
 import io.craigmiller160.expensetrackerapi.data.repository.AutoCategorizeRuleRepository
 import io.craigmiller160.expensetrackerapi.testcore.ExpenseTrackerIntegrationTest
@@ -503,49 +504,31 @@ constructor(
 
   @Test
   fun reOrderRule_noChange() {
-    val rule1 = dataHelper.createRule(1L, cat1.id)
-    val rule2 = dataHelper.createRule(1L, cat1.id)
-    val rule3 = dataHelper.createRule(1L, cat1.id)
-    val rule4 = dataHelper.createRule(1L, cat1.id)
-    val rule5 = dataHelper.createRule(1L, cat1.id)
-
-    assertThat(rule1).hasFieldOrPropertyWithValue("ordinal", 1)
-    assertThat(rule2).hasFieldOrPropertyWithValue("ordinal", 2)
-    assertThat(rule3).hasFieldOrPropertyWithValue("ordinal", 3)
-    assertThat(rule4).hasFieldOrPropertyWithValue("ordinal", 4)
-    assertThat(rule5).hasFieldOrPropertyWithValue("ordinal", 5)
+    val rules = createRulesForOrdinalValidation()
 
     mockMvc
-      .put("/categories/rules/${rule2.id}/reOrder/2") {
+      .put("/categories/rules/${rules[1].id}/reOrder/2") {
         secure = true
         header("Authorization", "Bearer $token")
       }
       .andExpect { status { isNoContent() } }
 
-    val checkOrdinal: (TypedId<AutoCategorizeRuleId>, Int) -> Unit = { id, ordinal ->
-      assertThat(autoCategorizeRuleRepository.findById(id))
-        .isPresent
-        .get()
-        .hasFieldOrPropertyWithValue("ordinal", ordinal)
-    }
-
-    checkOrdinal(rule1.id, 1)
-    checkOrdinal(rule2.id, 2)
-    checkOrdinal(rule3.id, 3)
-    checkOrdinal(rule4.id, 4)
-    checkOrdinal(rule5.id, 5)
+    val expectedOrdinals =
+      listOf(
+        RuleIdAndOrdinal(rules[0].id, 1),
+        RuleIdAndOrdinal(rules[1].id, 2),
+        RuleIdAndOrdinal(rules[2].id, 3),
+        RuleIdAndOrdinal(rules[3].id, 4),
+        RuleIdAndOrdinal(rules[4].id, 5))
+    validateOrdinalsById(expectedOrdinals)
   }
 
   @Test
   fun reOrderRule_invalidOrdinal() {
-    val rule1 = dataHelper.createRule(1L, cat1.id)
-    val rule2 = dataHelper.createRule(1L, cat1.id)
-    val rule3 = dataHelper.createRule(1L, cat1.id)
-    val rule4 = dataHelper.createRule(1L, cat1.id)
-    val rule5 = dataHelper.createRule(1L, cat1.id)
+    val rules = createRulesForOrdinalValidation()
 
     mockMvc
-      .put("/categories/rules/${rule3.id}/reOrder/10") {
+      .put("/categories/rules/${rules[2].id}/reOrder/10") {
         secure = true
         header("Authorization", "Bearer $token")
       }
@@ -562,4 +545,32 @@ constructor(
       }
       .andExpect { status { isBadRequest() } }
   }
+
+  private fun createRulesForOrdinalValidation(): List<AutoCategorizeRule> {
+    val rules =
+      (1..5).map { ordinal ->
+        RuleAndOrdinal(rule = dataHelper.createRule(1L, cat1.id), ordinal = ordinal)
+      }
+    validateOrdinalsByRule(rules)
+    return rules.map { it.rule }
+  }
+
+  private fun validateOrdinalsById(ruleIdsAndOrdinals: List<RuleIdAndOrdinal>) {
+    val rulesAndOrdinals =
+      ruleIdsAndOrdinals.map { ruleIdAndOrdinal ->
+        RuleAndOrdinal(
+          rule = autoCategorizeRuleRepository.findById(ruleIdAndOrdinal.ruleId).orElseThrow(),
+          ordinal = ruleIdAndOrdinal.ordinal)
+      }
+    validateOrdinalsByRule(rulesAndOrdinals)
+  }
+
+  private fun validateOrdinalsByRule(rulesAndOrdinals: List<RuleAndOrdinal>) {
+    rulesAndOrdinals.forEach { ruleAndOrdinal ->
+      assertThat(ruleAndOrdinal.rule).hasFieldOrPropertyWithValue("ordinal", ruleAndOrdinal.ordinal)
+    }
+  }
+
+  private data class RuleIdAndOrdinal(val ruleId: TypedId<AutoCategorizeRuleId>, val ordinal: Int)
+  private data class RuleAndOrdinal(val rule: AutoCategorizeRule, val ordinal: Int)
 }
