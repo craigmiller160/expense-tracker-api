@@ -213,7 +213,7 @@ constructor(
     assertThat(transactions)
       .hasSize(expectedSize)
       .extracting("categoryId")
-      .contains(expectedCategoryIds)
+      .contains(*expectedCategoryIds.toTypedArray())
   }
 
   @Test
