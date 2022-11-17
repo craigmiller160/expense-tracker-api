@@ -86,7 +86,7 @@ class AutoCategorizeRuleService(
     userId: Long
   ): TryEither<AutoCategorizeRule> =
     Either.catch { autoCategorizeRuleRepository.findByIdAndUserId(ruleId, userId) }
-      .leftIfNull { BadRequestException("Invalid rule: $ruleId") }
+      .leftIfNull { BadRequestException("Invalid Rule: $ruleId") }
 
   @Transactional
   fun updateRule(

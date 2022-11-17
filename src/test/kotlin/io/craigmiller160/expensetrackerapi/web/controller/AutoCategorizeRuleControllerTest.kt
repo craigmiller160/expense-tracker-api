@@ -33,7 +33,6 @@ constructor(
   private val autoCategorizeRuleRepository: AutoCategorizeRuleRepository,
   private val entityManager: EntityManager
 ) {
-  // TODO validate bad request messages
 
   private lateinit var token: String
 
@@ -183,7 +182,6 @@ constructor(
           contentType = MediaType.APPLICATION_JSON
           content = objectMapper.writeValueAsString(request)
         }
-        .andDo { print() }
         .andExpect {
           status { isBadRequest() }
           jsonPath("$.message", equalTo(message))
@@ -217,19 +215,23 @@ constructor(
         minAmount = BigDecimal("10.00"),
         maxAmount = BigDecimal("20.00"))
 
-    val testBadRequest: (AutoCategorizeRuleRequest) -> ResultActionsDsl = { request ->
-      mockMvc
-        .post("/categories/rules") {
-          secure = true
-          header("Authorization", "Bearer $token")
-          contentType = MediaType.APPLICATION_JSON
-          content = objectMapper.writeValueAsString(request)
-        }
-        .andExpect { status { isBadRequest() } }
-    }
+    val testBadRequest: (AutoCategorizeRuleRequest, String) -> ResultActionsDsl =
+      { request, message ->
+        mockMvc
+          .post("/categories/rules") {
+            secure = true
+            header("Authorization", "Bearer $token")
+            contentType = MediaType.APPLICATION_JSON
+            content = objectMapper.writeValueAsString(request)
+          }
+          .andExpect {
+            status { isBadRequest() }
+            jsonPath("$.message", equalTo(message))
+          }
+      }
 
-    testBadRequest(notExistCategory)
-    testBadRequest(wrongUserCategory)
+    testBadRequest(notExistCategory, "Invalid Category: ${notExistCategory.categoryId}")
+    testBadRequest(wrongUserCategory, "Invalid Category: ${wrongUserCategory.categoryId}")
   }
 
   @Test
@@ -284,7 +286,7 @@ constructor(
         minAmount = BigDecimal("10.00"),
         maxAmount = BigDecimal("20.00"))
 
-    val operation: (AutoCategorizeRuleRequest) -> ResultActionsDsl = { request ->
+    val operation: (AutoCategorizeRuleRequest, String) -> ResultActionsDsl = { request, message ->
       mockMvc
         .put("/categories/rules/${rule.id}") {
           secure = true
@@ -292,11 +294,18 @@ constructor(
           contentType = MediaType.APPLICATION_JSON
           content = objectMapper.writeValueAsString(request)
         }
-        .andExpect { status { isBadRequest() } }
+        .andExpect {
+          status { isBadRequest() }
+          jsonPath("$.message", equalTo(message))
+        }
     }
 
-    operation(baseRequest.copy(startDate = LocalDate.of(2022, 6, 1)))
-    operation(baseRequest.copy(minAmount = BigDecimal("30.0")))
+    operation(
+      baseRequest.copy(startDate = LocalDate.of(2022, 6, 1)),
+      "Rule Start Date cannot be after Rule End Date")
+    operation(
+      baseRequest.copy(minAmount = BigDecimal("30.0")),
+      "Rule Min Amount cannot be greater than Rule Max Amount")
   }
 
   @Test
@@ -311,7 +320,7 @@ constructor(
         minAmount = BigDecimal("10.0"),
         maxAmount = BigDecimal("20.0"))
 
-    val operation: (AutoCategorizeRuleRequest) -> ResultActionsDsl = { request ->
+    val operation: (AutoCategorizeRuleRequest, String) -> ResultActionsDsl = { request, message ->
       mockMvc
         .put("/categories/rules/${rule.id}") {
           secure = true
@@ -319,11 +328,14 @@ constructor(
           contentType = MediaType.APPLICATION_JSON
           content = objectMapper.writeValueAsString(request)
         }
-        .andExpect { status { isBadRequest() } }
+        .andExpect {
+          status { isBadRequest() }
+          jsonPath("$.message", equalTo(message))
+        }
     }
 
-    operation(baseRequest)
-    operation(baseRequest.copy(categoryId = cat2.id))
+    operation(baseRequest, "Invalid Category: ${baseRequest.categoryId}")
+    operation(baseRequest.copy(categoryId = cat2.id), "Invalid Category: ${cat2.id}")
   }
 
   @Test
@@ -338,7 +350,7 @@ constructor(
         minAmount = BigDecimal("10.0"),
         maxAmount = BigDecimal("20.0"))
 
-    val operation: (TypedId<AutoCategorizeRuleId>) -> ResultActionsDsl = { id ->
+    val operation: (TypedId<AutoCategorizeRuleId>, String) -> ResultActionsDsl = { id, message ->
       mockMvc
         .put("/categories/rules/$id") {
           secure = true
@@ -346,11 +358,15 @@ constructor(
           contentType = MediaType.APPLICATION_JSON
           content = objectMapper.writeValueAsString(request)
         }
-        .andExpect { status { isBadRequest() } }
+        .andExpect {
+          status { isBadRequest() }
+          jsonPath("$.message", equalTo(message))
+        }
     }
 
-    operation(rule.id)
-    operation(TypedId())
+    operation(rule.id, "Invalid Rule: ${rule.id}")
+    val randomId = TypedId<AutoCategorizeRuleId>()
+    operation(randomId, "Invalid Rule: $randomId")
   }
 
   @Test
@@ -374,17 +390,21 @@ constructor(
     val rule1 = dataHelper.createRule(1L, cat1.id)
     val rule2 = dataHelper.createRule(2L, cat2.id)
 
-    val operation: (TypedId<AutoCategorizeRuleId>) -> ResultActionsDsl = { id ->
+    val operation: (TypedId<AutoCategorizeRuleId>, String) -> ResultActionsDsl = { id, message ->
       mockMvc
         .get("/categories/rules/$id") {
           secure = true
           header("Authorization", "Bearer $token")
         }
-        .andExpect { status { isBadRequest() } }
+        .andExpect {
+          status { isBadRequest() }
+          jsonPath("$.message", equalTo(message))
+        }
     }
 
-    operation(rule2.id)
-    operation(TypedId())
+    operation(rule2.id, "Invalid Rule: ${rule2.id}")
+    val randomId = TypedId<AutoCategorizeRuleId>()
+    operation(randomId, "Invalid Rule: $randomId")
   }
 
   @Test
@@ -499,7 +519,10 @@ constructor(
         secure = true
         header("Authorization", "Bearer $token")
       }
-      .andExpect { status { isBadRequest() } }
+      .andExpect {
+        status { isBadRequest() }
+        jsonPath("$.message", equalTo(""))
+      }
   }
 
   @Test
@@ -510,7 +533,10 @@ constructor(
         secure = true
         header("Authorization", "Bearer $token")
       }
-      .andExpect { status { isBadRequest() } }
+      .andExpect {
+        status { isBadRequest() }
+        jsonPath("$.message", equalTo(""))
+      }
   }
 
   private fun createRulesForOrdinalValidation(): List<AutoCategorizeRule> {
