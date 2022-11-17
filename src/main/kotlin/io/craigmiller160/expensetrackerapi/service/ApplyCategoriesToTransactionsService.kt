@@ -25,7 +25,6 @@ class ApplyCategoriesToTransactionsService(
     private const val PAGE_SIZE = 25
   }
 
-  // TODO should this really live here
   @Transactional
   fun applyCategoriesToUnconfirmedTransactions(userId: Long): TryEither<Unit> =
     applyCategoriesToUnconfirmedTransactions(userId, 0)
