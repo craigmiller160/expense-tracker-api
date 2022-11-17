@@ -133,7 +133,21 @@ constructor(
 
   @Test
   fun createRule_verifyApplyingRules() {
-    TODO()
+    val request = AutoCategorizeRuleRequest(categoryId = cat1.id, regex = ".*")
+
+    mockMvc
+      .post("/categories/rules") {
+        secure = true
+        header("Authorization", "Bearer $token")
+        contentType = MediaType.APPLICATION_JSON
+        content = objectMapper.writeValueAsString(request)
+      }
+      .andExpect { status { isOk() } }
+
+    assertThat(transactionRepository.findById(transaction.id))
+      .isPresent
+      .get()
+      .hasFieldOrPropertyWithValue("categoryId", cat1.id)
   }
 
   @Test
@@ -246,7 +260,22 @@ constructor(
 
   @Test
   fun updateRule_verifyApplyingRules() {
-    TODO()
+    val rule = dataHelper.createRule(1L, cat1.id)
+    val request = AutoCategorizeRuleRequest(categoryId = cat1.id, regex = ".*")
+
+    mockMvc
+      .put("/categories/rules/${rule.id}") {
+        secure = true
+        header("Authorization", "Bearer $token")
+        contentType = MediaType.APPLICATION_JSON
+        content = objectMapper.writeValueAsString(request)
+      }
+      .andExpect { status { isOk() } }
+
+    assertThat(transactionRepository.findById(transaction.id))
+      .isPresent
+      .get()
+      .hasFieldOrPropertyWithValue("categoryId", cat1.id)
   }
 
   @Test
@@ -424,7 +453,19 @@ constructor(
 
   @Test
   fun deleteRule_verifyApplyingRules() {
-    TODO()
+    val rule = dataHelper.createRule(1L, cat1.id)
+
+    mockMvc
+      .delete("/categories/rules/${rule.id}") {
+        secure = true
+        header("Authorization", "Bearer $token")
+      }
+      .andExpect { status { isNoContent() } }
+
+    assertThat(transactionRepository.findById(transaction.id))
+      .isPresent
+      .get()
+      .hasFieldOrPropertyWithValue("categoryId", cat1.id)
   }
 
   @Test
