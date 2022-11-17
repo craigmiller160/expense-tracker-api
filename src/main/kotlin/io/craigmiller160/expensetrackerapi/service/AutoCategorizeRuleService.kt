@@ -112,9 +112,7 @@ class AutoCategorizeRuleService(
 
   fun getRule(ruleId: TypedId<AutoCategorizeRuleId>): TryEither<AutoCategorizeRuleResponse> {
     val userId = oAuth2Service.getAuthenticatedUser().userId
-    return Either.catch { autoCategorizeRuleRepository.findByIdAndUserId(ruleId, userId) }
-      .leftIfNull { BadRequestException("Rule does not exist") }
-      .map { AutoCategorizeRuleResponse.from(it) }
+    return getRuleIfValid(ruleId, userId).map { AutoCategorizeRuleResponse.from(it) }
   }
 
   @Transactional
@@ -129,7 +127,7 @@ class AutoCategorizeRuleService(
 
   private fun validateOrdinal(userId: Long, ordinal: Int): TryEither<Int> =
     Either.catch { autoCategorizeRuleRepository.countAllByUserId(userId) }
-      .filterOrElse({ it >= ordinal }) { BadRequestException("Invalid ordinal: $ordinal") }
+      .filterOrElse({ it >= ordinal }) { BadRequestException("Invalid Ordinal: $ordinal") }
       .map { ordinal }
 
   @Transactional

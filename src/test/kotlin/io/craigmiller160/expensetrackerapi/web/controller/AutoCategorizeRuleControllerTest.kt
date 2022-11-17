@@ -521,7 +521,7 @@ constructor(
       }
       .andExpect {
         status { isBadRequest() }
-        jsonPath("$.message", equalTo(""))
+        jsonPath("$.message", equalTo("Invalid Ordinal: 10"))
       }
   }
 
@@ -529,7 +529,7 @@ constructor(
   fun reOrderRule_invalidRule() {
     val id = TypedId<AutoCategorizeRuleId>()
     mockMvc
-      .put("/categories/rules/$id/reOrder/10") {
+      .put("/categories/rules/$id/reOrder/1") {
         secure = true
         header("Authorization", "Bearer $token")
       }
