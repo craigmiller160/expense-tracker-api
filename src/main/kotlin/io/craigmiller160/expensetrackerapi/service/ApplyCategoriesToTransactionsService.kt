@@ -11,7 +11,7 @@ import java.time.LocalDate
 import org.springframework.stereotype.Service
 
 @Service
-class AutoApplyCategoriesToTransactionsService(
+class ApplyCategoriesToTransactionsService(
   private val autoCategorizeRuleRepository: AutoCategorizeRuleRepository
 ) {
   fun applyCategoriesToTransactions(

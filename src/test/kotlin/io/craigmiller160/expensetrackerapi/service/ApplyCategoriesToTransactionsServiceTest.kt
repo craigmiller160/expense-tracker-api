@@ -18,13 +18,13 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 
 @ExpenseTrackerIntegrationTest
-class AutoApplyCategoriesToTransactionsServiceTest
+class ApplyCategoriesToTransactionsServiceTest
 @Autowired
 constructor(
   private val dataHelper: DataHelper,
   private val autoCategorizeRuleRepository: AutoCategorizeRuleRepository,
   private val transactionRepository: TransactionRepository,
-  private val applyCategoriesToTransactionsService: AutoApplyCategoriesToTransactionsService
+  private val applyCategoriesToTransactionsService: ApplyCategoriesToTransactionsService
 ) {
 
   private var ruleCounter = 0
