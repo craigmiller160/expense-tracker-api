@@ -18,7 +18,7 @@ interface AutoCategorizeRuleRepository :
 
   fun deleteByIdAndUserId(id: TypedId<AutoCategorizeRuleId>, userId: Long)
 
-  fun streamAllByUserId(userId: Long): Stream<AutoCategorizeRule>
+  fun streamAllByUserIdOrderByOrdinal(userId: Long): Stream<AutoCategorizeRule>
 
   @Query(
     """

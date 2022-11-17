@@ -14,7 +14,7 @@ class AutoApplyCategoriesToTransactionsService(
   fun applyCategoriesToTransactions(transactions: List<Transaction>): TryEither<List<Transaction>> {
     val userId = oAuth2Service.getAuthenticatedUser().userId
     // TODO wrap in Either
-    autoCategorizeRuleRepository.streamAllByUserId(userId).use { ruleStream ->
+    autoCategorizeRuleRepository.streamAllByUserIdOrderByOrdinal(userId).use { ruleStream ->
       // TODO do a map reduce
     }
     TODO()
