@@ -1,5 +1,7 @@
 package io.craigmiller160.expensetrackerapi.service
 
+import io.craigmiller160.expensetrackerapi.common.data.typedid.TypedId
+import io.craigmiller160.expensetrackerapi.data.model.AutoCategorizeRule
 import io.craigmiller160.expensetrackerapi.data.model.Transaction
 import io.craigmiller160.expensetrackerapi.data.repository.AutoCategorizeRuleRepository
 import io.craigmiller160.expensetrackerapi.function.TryEither
@@ -24,5 +26,18 @@ class AutoApplyCategoriesToTransactionsService(
         }
     }
     TODO()
+  }
+
+  private data class RuleTransactionsWrapper(
+    val rule: AutoCategorizeRule,
+    val transactions: List<Transaction>
+  ) {
+    companion object {
+      private val EMPTY_RULE = AutoCategorizeRule(0L, TypedId(), 0, "")
+      fun fromRule(rule: AutoCategorizeRule): RuleTransactionsWrapper =
+        RuleTransactionsWrapper(rule, listOf())
+      fun fromTransactions(transactions: List<Transaction>): RuleTransactionsWrapper =
+        RuleTransactionsWrapper(EMPTY_RULE, transactions)
+    }
   }
 }
