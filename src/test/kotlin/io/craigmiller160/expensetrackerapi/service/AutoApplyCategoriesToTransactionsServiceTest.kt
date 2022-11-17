@@ -56,9 +56,9 @@ constructor(
 
     transactions = listOf(txn1, txn2, txn3, txn4, txn5, txn6)
 
-    val rule1 = createRule(categoryId = cat1.id, regex = "Target", minAmount = BigDecimal("90"))
-    val rule2 = createRule(categoryId = cat2.id, regex = "Target", maxAmount = BigDecimal("15"))
-    val rule3 = createRule(categoryId = cat3.id, regex = "Target")
+    createRule(categoryId = cat3.id, regex = "Target")
+    createRule(categoryId = cat1.id, regex = "Target", minAmount = BigDecimal("90"))
+    createRule(categoryId = cat2.id, regex = "Target", maxAmount = BigDecimal("15"))
   }
 
   private fun createTransaction(
