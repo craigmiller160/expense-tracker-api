@@ -132,6 +132,11 @@ constructor(
   }
 
   @Test
+  fun createRule_withOrdinal() {
+    TODO()
+  }
+
+  @Test
   fun createRule_verifyApplyingRules() {
     val request = AutoCategorizeRuleRequest(categoryId = cat1.id, regex = ".*")
 
@@ -276,6 +281,11 @@ constructor(
       .isPresent
       .get()
       .hasFieldOrPropertyWithValue("categoryId", cat1.id)
+  }
+
+  @Test
+  fun updateRule_withOrdinal() {
+    TODO()
   }
 
   @Test
