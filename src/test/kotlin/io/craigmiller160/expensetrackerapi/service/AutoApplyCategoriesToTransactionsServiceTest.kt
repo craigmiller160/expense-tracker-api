@@ -42,7 +42,7 @@ constructor(
     val cat5 = dataHelper.createCategory(1L, "Something")
     val cat6 = dataHelper.createCategory(1L, "Foo")
 
-    categories = listOf(cat1, cat2, cat3, cat4)
+    categories = listOf(cat1, cat2, cat3, cat4, cat5, cat6)
 
     val txn1 = createTransaction("Target", LocalDate.of(2022, 1, 1), BigDecimal("10"))
     val txn2 = createTransaction("Target", LocalDate.of(2022, 1, 1), BigDecimal("100"))
