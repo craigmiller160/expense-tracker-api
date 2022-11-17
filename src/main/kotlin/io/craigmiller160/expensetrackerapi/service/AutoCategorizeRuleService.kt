@@ -60,12 +60,15 @@ class AutoCategorizeRuleService(
   fun createRule(request: AutoCategorizeRuleRequest): TryEither<AutoCategorizeRuleResponse> {
     val userId = oAuth2Service.getAuthenticatedUser().userId
     return validateCategory(request.categoryId, userId)
-      .flatMapCatch { autoCategorizeRuleRepository.countAllByUserId(userId) }
-      .map { count ->
+      .flatMap {
+        request.ordinal?.let { ordinal -> validateOrdinal(userId, ordinal) }
+          ?: Either.catch { autoCategorizeRuleRepository.countAllByUserId(userId).toInt() + 1 }
+      }
+      .map { ordinal ->
         AutoCategorizeRule(
           userId = userId,
           categoryId = request.categoryId,
-          ordinal = (count + 1).toInt(),
+          ordinal = ordinal,
           regex = request.regex,
           startDate = request.startDate,
           endDate = request.endDate,
