@@ -16,6 +16,7 @@ import java.math.BigDecimal
 import java.time.LocalDate
 import javax.persistence.EntityManager
 import org.assertj.core.api.Assertions.assertThat
+import org.hamcrest.Matchers.equalTo
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -174,7 +175,7 @@ constructor(
         minAmount = BigDecimal("10.00"),
         maxAmount = BigDecimal("20.00"))
 
-    val operation: (AutoCategorizeRuleRequest) -> ResultActionsDsl = { request ->
+    val operation: (AutoCategorizeRuleRequest, String) -> ResultActionsDsl = { request, message ->
       mockMvc
         .post("/categories/rules") {
           secure = true
@@ -182,11 +183,19 @@ constructor(
           contentType = MediaType.APPLICATION_JSON
           content = objectMapper.writeValueAsString(request)
         }
-        .andExpect { status { isBadRequest() } }
+        .andDo { print() }
+        .andExpect {
+          status { isBadRequest() }
+          jsonPath("$.message", equalTo(message))
+        }
     }
 
-    operation(baseRequest.copy(startDate = LocalDate.of(2022, 6, 1)))
-    operation(baseRequest.copy(minAmount = BigDecimal("30.0")))
+    operation(
+      baseRequest.copy(startDate = LocalDate.of(2022, 6, 1)),
+      "Rule Start Date cannot be after Rule End Date")
+    operation(
+      baseRequest.copy(minAmount = BigDecimal("30.0")),
+      "Rule Min Amount cannot be greater than Rule Max Amount")
   }
 
   @Test
