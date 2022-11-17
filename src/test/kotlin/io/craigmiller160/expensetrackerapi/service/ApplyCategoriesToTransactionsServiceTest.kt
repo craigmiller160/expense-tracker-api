@@ -41,8 +41,9 @@ constructor(
     val cat4 = dataHelper.createCategory(1L, "Other")
     val cat5 = dataHelper.createCategory(1L, "Something")
     val cat6 = dataHelper.createCategory(1L, "Foo")
+    val cat7 = dataHelper.createCategory(1L, "To Somewhere")
 
-    categories = listOf(cat1, cat2, cat3, cat4, cat5, cat6)
+    categories = listOf(cat1, cat2, cat3, cat4, cat5, cat6, cat7)
 
     val txn1 = createTransaction("Target", LocalDate.of(2022, 1, 1), BigDecimal("10"))
     val txn2 = createTransaction("Target", LocalDate.of(2022, 1, 1), BigDecimal("100"))
@@ -50,8 +51,12 @@ constructor(
     val txn4 = createTransaction("AMC Theaters", LocalDate.of(2022, 6, 1), BigDecimal("10"))
     val txn5 = createTransaction("AMC Theaters 2", LocalDate.of(2022, 12, 10), BigDecimal("22"))
     val txn6 = createTransaction("Target", LocalDate.of(2022, 1, 1), BigDecimal("20"))
+    val txn7 =
+      createTransaction("Universe", LocalDate.now(), BigDecimal("10")).let {
+        transactionRepository.save(it.copy(categoryId = cat7.id))
+      }
 
-    transactions = listOf(txn1, txn2, txn3, txn4, txn5, txn6)
+    transactions = listOf(txn1, txn2, txn3, txn4, txn5, txn6, txn7)
 
     createRule(categoryId = cat3.id, regex = "Target")
     createRule(categoryId = cat1.id, regex = "Target", minAmount = BigDecimal("90"))
@@ -101,8 +106,7 @@ constructor(
     assertThat(result[4]).hasFieldOrPropertyWithValue("categoryId", categories[3].id)
     assertThat(result[2]).hasFieldOrPropertyWithValue("categoryId", categories[4].id)
     assertThat(result[3]).hasFieldOrPropertyWithValue("categoryId", categories[5].id)
-
-    TODO("Test that a category is removed when no rules match")
+    assertThat(result[6]).hasFieldOrPropertyWithValue("categoryId", null)
   }
 
   @Test
