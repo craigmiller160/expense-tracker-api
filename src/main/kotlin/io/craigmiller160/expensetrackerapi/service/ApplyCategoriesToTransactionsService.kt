@@ -14,6 +14,11 @@ import org.springframework.stereotype.Service
 class ApplyCategoriesToTransactionsService(
   private val autoCategorizeRuleRepository: AutoCategorizeRuleRepository
 ) {
+
+  fun applyCategoriesToUnconfirmedTransactions(userId: Long): TryEither<Unit> {
+    TODO("Is this really the place it should live?")
+  }
+
   fun applyCategoriesToTransactions(
     userId: Long,
     transactions: List<Transaction>
