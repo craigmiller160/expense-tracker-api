@@ -3,8 +3,10 @@ package io.craigmiller160.expensetrackerapi.testutils
 import com.github.javafaker.Faker
 import io.craigmiller160.expensetrackerapi.common.data.typedid.TypedId
 import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.CategoryId
+import io.craigmiller160.expensetrackerapi.data.model.AutoCategorizeRule
 import io.craigmiller160.expensetrackerapi.data.model.Category
 import io.craigmiller160.expensetrackerapi.data.model.Transaction
+import io.craigmiller160.expensetrackerapi.data.repository.AutoCategorizeRuleRepository
 import io.craigmiller160.expensetrackerapi.data.repository.CategoryRepository
 import io.craigmiller160.expensetrackerapi.data.repository.TransactionRepository
 import io.craigmiller160.expensetrackerapi.utils.StringToColor
@@ -15,7 +17,8 @@ import org.springframework.stereotype.Component
 @Component
 class DataHelper(
   private val transactionRepository: TransactionRepository,
-  private val categoryRepository: CategoryRepository
+  private val categoryRepository: CategoryRepository,
+  private val autoCategorizeRuleRepository: AutoCategorizeRuleRepository
 ) {
   private val faker = Faker()
   private var internalDate = LocalDate.now().minusDays(100)
@@ -30,6 +33,14 @@ class DataHelper(
         description = description,
         amount = amount,
         categoryId = categoryId))
+  }
+
+  fun createRule(userId: Long, categoryId: TypedId<CategoryId>): AutoCategorizeRule {
+    val count = autoCategorizeRuleRepository.countAllByUserId(userId)
+    val rule =
+      AutoCategorizeRule(
+        categoryId = categoryId, regex = ".*", ordinal = (count + 1).toInt(), userId = userId)
+    return autoCategorizeRuleRepository.saveAndFlush(rule)
   }
 
   fun createCategory(userId: Long, name: String): Category =

@@ -13,4 +13,6 @@ interface CategoryRepository : JpaRepository<Category, TypedId<CategoryId>> {
 
   @Modifying(flushAutomatically = true, clearAutomatically = true)
   fun deleteByIdAndUserId(id: TypedId<CategoryId>, userId: Long)
+
+  fun existsByIdAndUserId(id: TypedId<CategoryId>, userId: Long): Boolean
 }
