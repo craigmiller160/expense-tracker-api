@@ -1,22 +1,50 @@
 package io.craigmiller160.expensetrackerapi.service
 
 import arrow.core.Either
+import arrow.core.flatMap
 import io.craigmiller160.expensetrackerapi.common.data.typedid.TypedId
 import io.craigmiller160.expensetrackerapi.data.model.AutoCategorizeRule
 import io.craigmiller160.expensetrackerapi.data.model.Transaction
 import io.craigmiller160.expensetrackerapi.data.repository.AutoCategorizeRuleRepository
+import io.craigmiller160.expensetrackerapi.data.repository.TransactionRepository
 import io.craigmiller160.expensetrackerapi.function.TryEither
+import io.craigmiller160.expensetrackerapi.function.flatMapCatch
 import java.math.BigDecimal
 import java.time.LocalDate
+import javax.transaction.Transactional
+import org.springframework.data.domain.PageRequest
+import org.springframework.data.domain.Sort
 import org.springframework.stereotype.Service
 
 @Service
 class ApplyCategoriesToTransactionsService(
-  private val autoCategorizeRuleRepository: AutoCategorizeRuleRepository
+  private val autoCategorizeRuleRepository: AutoCategorizeRuleRepository,
+  private val transactionRepository: TransactionRepository
 ) {
+  companion object {
+    private const val PAGE_SIZE = 25
+  }
 
-  fun applyCategoriesToUnconfirmedTransactions(userId: Long): TryEither<Unit> {
-    TODO("Is this really the place it should live?")
+  // TODO should this really live here
+  @Transactional
+  fun applyCategoriesToUnconfirmedTransactions(userId: Long): TryEither<Unit> =
+    applyCategoriesToUnconfirmedTransactions(userId, 0)
+
+  private fun applyCategoriesToUnconfirmedTransactions(
+    userId: Long,
+    pageNumber: Int
+  ): TryEither<Unit> {
+    val page = PageRequest.of(pageNumber, PAGE_SIZE, Sort.by(Sort.Order.asc("id")))
+    val transactions = transactionRepository.findAllUnconfirmed(userId, page)
+    return applyCategoriesToTransactions(userId, transactions.content)
+      .flatMapCatch { transactionRepository.saveAll(it) }
+      .flatMap {
+        if ((pageNumber + 1) * PAGE_SIZE < transactions.totalElements) {
+          applyCategoriesToUnconfirmedTransactions(userId, pageNumber + 1)
+        } else {
+          Either.Right(Unit)
+        }
+      }
   }
 
   fun applyCategoriesToTransactions(
