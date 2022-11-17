@@ -16,6 +16,12 @@ class AutoApplyCategoriesToTransactionsService(
     // TODO wrap in Either
     autoCategorizeRuleRepository.streamAllByUserIdOrderByOrdinal(userId).use { ruleStream ->
       // TODO do a map reduce
+      ruleStream
+        .map { rule -> transactions to rule }
+        .reduce { (transactions, _), (_, rule) ->
+          // TODO what about the first element, need to apply the first rule to it
+          transactions to rule
+        }
     }
     TODO()
   }
