@@ -151,12 +151,8 @@ class AutoCategorizeRuleService(
     return validateOrdinal(userId, ordinal)
       .flatMap { getRuleIfValid(ruleId, userId) }
       .flatMap { rule ->
-        if (rule.ordinal == ordinal) {
-          Either.Right(rule)
-        } else {
-          changeOtherRuleOrdinals(userId, rule.ordinal, ordinal).flatMapCatch {
-            autoCategorizeRuleRepository.save(rule.copy(ordinal = ordinal))
-          }
+        changeOtherRuleOrdinals(userId, rule.ordinal, ordinal).flatMapCatch {
+          autoCategorizeRuleRepository.save(rule.copy(ordinal = ordinal))
         }
       }
       .flatMap {
@@ -170,7 +166,9 @@ class AutoCategorizeRuleService(
     newOrdinal: Int
   ): TryEither<Unit> =
     Either.catch {
-      if (oldOrdinal < newOrdinal) {
+      if (oldOrdinal == newOrdinal) {
+        Either.Right(Unit)
+      } else if (oldOrdinal < newOrdinal) {
         autoCategorizeRuleRepository.decrementOrdinals(userId, oldOrdinal + 1, newOrdinal)
       } else {
         autoCategorizeRuleRepository.incrementOrdinals(userId, newOrdinal, oldOrdinal - 1)
