@@ -51,19 +51,21 @@ class ApplyCategoriesToTransactionsService(
   fun applyCategoriesToTransactions(
     userId: Long,
     transactions: List<Transaction>
-  ): TryEither<List<Transaction>> =
-    Either.catch {
+  ): TryEither<List<Transaction>> {
+    val categoryLessTransactions = transactions.map { it.copy(categoryId = null) }
+    return Either.catch {
       autoCategorizeRuleRepository.streamAllByUserIdOrderByOrdinal(userId).use { ruleStream ->
         ruleStream
           .map { RuleTransactionsWrapper.fromRule(it) }
-          .reduce(RuleTransactionsWrapper.fromTransactions(transactions)) {
-            (_, transactions),
+          .reduce(RuleTransactionsWrapper.fromTransactions(categoryLessTransactions)) {
+            (_, txnsToCategorize),
             (rule) ->
-            RuleTransactionsWrapper.fromTransactions(transactions.map { applyRule(it, rule) })
+            RuleTransactionsWrapper.fromTransactions(txnsToCategorize.map { applyRule(it, rule) })
           }
           .transactions
       }
     }
+  }
 
   private fun applyRule(transaction: Transaction, rule: AutoCategorizeRule): Transaction =
     if (doesRuleApply(transaction, rule)) transaction.copy(categoryId = rule.categoryId)
