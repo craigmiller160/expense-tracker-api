@@ -6,18 +6,18 @@ import io.craigmiller160.expensetrackerapi.data.model.AutoCategorizeRule
 import io.craigmiller160.expensetrackerapi.data.model.Transaction
 import io.craigmiller160.expensetrackerapi.data.repository.AutoCategorizeRuleRepository
 import io.craigmiller160.expensetrackerapi.function.TryEither
-import io.craigmiller160.oauth2.service.OAuth2Service
 import java.math.BigDecimal
 import java.time.LocalDate
 import org.springframework.stereotype.Service
 
 @Service
 class AutoApplyCategoriesToTransactionsService(
-  private val oAuth2Service: OAuth2Service,
   private val autoCategorizeRuleRepository: AutoCategorizeRuleRepository
 ) {
-  fun applyCategoriesToTransactions(transactions: List<Transaction>): TryEither<List<Transaction>> {
-    val userId = oAuth2Service.getAuthenticatedUser().userId
+  fun applyCategoriesToTransactions(
+    userId: Long,
+    transactions: List<Transaction>
+  ): TryEither<List<Transaction>> {
     return Either.catch {
       autoCategorizeRuleRepository.streamAllByUserIdOrderByOrdinal(userId).use { ruleStream ->
         ruleStream

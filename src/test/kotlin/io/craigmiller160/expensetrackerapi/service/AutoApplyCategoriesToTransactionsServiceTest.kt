@@ -91,9 +91,9 @@ constructor(
   @Test
   fun applyCategoriesToTransactions() {
     val result =
-      applyCategoriesToTransactionsService.applyCategoriesToTransactions(transactions).getOrHandle {
-        throw it
-      }
+      applyCategoriesToTransactionsService
+        .applyCategoriesToTransactions(1L, transactions)
+        .getOrHandle { throw it }
     assertThat(result[1]).hasFieldOrPropertyWithValue("categoryId", categories[0].id)
   }
 }
