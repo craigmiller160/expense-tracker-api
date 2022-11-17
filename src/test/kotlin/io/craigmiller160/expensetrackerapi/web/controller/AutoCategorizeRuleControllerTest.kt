@@ -394,56 +394,32 @@ constructor(
 
   @Test
   fun deleteRule_ordinalReOrdering() {
-    val rule1 = dataHelper.createRule(1L, cat1.id)
-    val rule2 = dataHelper.createRule(1L, cat1.id)
-    val rule3 = dataHelper.createRule(1L, cat1.id)
-    val rule4 = dataHelper.createRule(1L, cat1.id)
-    val rule5 = dataHelper.createRule(1L, cat1.id)
-
-    assertThat(rule1).hasFieldOrPropertyWithValue("ordinal", 1)
-    assertThat(rule2).hasFieldOrPropertyWithValue("ordinal", 2)
-    assertThat(rule3).hasFieldOrPropertyWithValue("ordinal", 3)
-    assertThat(rule4).hasFieldOrPropertyWithValue("ordinal", 4)
-    assertThat(rule5).hasFieldOrPropertyWithValue("ordinal", 5)
+    val rules = createRulesForOrdinalValidation()
 
     mockMvc
-      .delete("/categories/rules/${rule3.id}") {
+      .delete("/categories/rules/${rules[2].id}") {
         secure = true
         header("Authorization", "Bearer $token")
       }
       .andExpect { status { isNoContent() } }
 
-    val checkOrdinal: (TypedId<AutoCategorizeRuleId>, Int) -> Unit = { id, ordinal ->
-      assertThat(autoCategorizeRuleRepository.findById(id))
-        .isPresent
-        .get()
-        .hasFieldOrPropertyWithValue("ordinal", ordinal)
-    }
+    assertThat(autoCategorizeRuleRepository.findById(rules[2].id)).isEmpty
 
-    assertThat(autoCategorizeRuleRepository.findById(rule3.id)).isEmpty
-
-    checkOrdinal(rule1.id, 1)
-    checkOrdinal(rule2.id, 2)
-    checkOrdinal(rule4.id, 3)
-    checkOrdinal(rule5.id, 4)
+    val expectedOrdinals =
+      listOf(
+        RuleIdAndOrdinal(rules[0].id, 1),
+        RuleIdAndOrdinal(rules[1].id, 2),
+        RuleIdAndOrdinal(rules[3].id, 3),
+        RuleIdAndOrdinal(rules[4].id, 4))
+    validateOrdinalsById(expectedOrdinals)
   }
 
   @Test
   fun reOrderRule_lowerOrdinal() {
-    val rule1 = dataHelper.createRule(1L, cat1.id)
-    val rule2 = dataHelper.createRule(1L, cat1.id)
-    val rule3 = dataHelper.createRule(1L, cat1.id)
-    val rule4 = dataHelper.createRule(1L, cat1.id)
-    val rule5 = dataHelper.createRule(1L, cat1.id)
-
-    assertThat(rule1).hasFieldOrPropertyWithValue("ordinal", 1)
-    assertThat(rule2).hasFieldOrPropertyWithValue("ordinal", 2)
-    assertThat(rule3).hasFieldOrPropertyWithValue("ordinal", 3)
-    assertThat(rule4).hasFieldOrPropertyWithValue("ordinal", 4)
-    assertThat(rule5).hasFieldOrPropertyWithValue("ordinal", 5)
+    val rules = createRulesForOrdinalValidation()
 
     mockMvc
-      .put("/categories/rules/${rule4.id}/reOrder/2") {
+      .put("/categories/rules/${rules[3].id}/reOrder/2") {
         secure = true
         header("Authorization", "Bearer $token")
       }
@@ -451,18 +427,14 @@ constructor(
 
     entityManager.flush()
 
-    val checkOrdinal: (TypedId<AutoCategorizeRuleId>, Int) -> Unit = { id, ordinal ->
-      assertThat(autoCategorizeRuleRepository.findById(id))
-        .isPresent
-        .get()
-        .hasFieldOrPropertyWithValue("ordinal", ordinal)
-    }
-
-    checkOrdinal(rule1.id, 1)
-    checkOrdinal(rule4.id, 2)
-    checkOrdinal(rule2.id, 3)
-    checkOrdinal(rule3.id, 4)
-    checkOrdinal(rule5.id, 5)
+    val expectedOrdinals =
+      listOf(
+        RuleIdAndOrdinal(rules[0].id, 1),
+        RuleIdAndOrdinal(rules[3].id, 2),
+        RuleIdAndOrdinal(rules[1].id, 3),
+        RuleIdAndOrdinal(rules[2].id, 4),
+        RuleIdAndOrdinal(rules[4].id, 5))
+    validateOrdinalsById(expectedOrdinals)
   }
 
   @Test
