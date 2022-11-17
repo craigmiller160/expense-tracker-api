@@ -101,6 +101,8 @@ constructor(
     assertThat(result[4]).hasFieldOrPropertyWithValue("categoryId", categories[3].id)
     assertThat(result[2]).hasFieldOrPropertyWithValue("categoryId", categories[4].id)
     assertThat(result[3]).hasFieldOrPropertyWithValue("categoryId", categories[5].id)
+
+    TODO("Test that a category is removed when no rules match")
   }
 
   @Test
