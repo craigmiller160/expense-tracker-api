@@ -387,11 +387,44 @@ constructor(
         header("Authorization", "Bearer $token")
       }
       .andExpect { status { isNoContent() } }
+
+    assertThat(autoCategorizeRuleRepository.findById(rule.id)).isEmpty
   }
 
   @Test
   fun deleteRule_ordinalReOrdering() {
-    TODO()
+    val rule1 = dataHelper.createRule(1L, cat1.id)
+    val rule2 = dataHelper.createRule(1L, cat1.id)
+    val rule3 = dataHelper.createRule(1L, cat1.id)
+    val rule4 = dataHelper.createRule(1L, cat1.id)
+    val rule5 = dataHelper.createRule(1L, cat1.id)
+
+    assertThat(rule1).hasFieldOrPropertyWithValue("ordinal", 1)
+    assertThat(rule2).hasFieldOrPropertyWithValue("ordinal", 2)
+    assertThat(rule3).hasFieldOrPropertyWithValue("ordinal", 3)
+    assertThat(rule4).hasFieldOrPropertyWithValue("ordinal", 4)
+    assertThat(rule5).hasFieldOrPropertyWithValue("ordinal", 5)
+
+    mockMvc
+      .delete("/categories/rules/${rule3.id}") {
+        secure = true
+        header("Authorization", "Bearer $token")
+      }
+      .andExpect { status { isNoContent() } }
+
+    val checkOrdinal: (TypedId<AutoCategorizeRuleId>, Int) -> Unit = { id, ordinal ->
+      assertThat(autoCategorizeRuleRepository.findById(id))
+        .isPresent
+        .get()
+        .hasFieldOrPropertyWithValue("ordinal", ordinal)
+    }
+
+    assertThat(autoCategorizeRuleRepository.findById(rule3.id)).isEmpty
+
+    checkOrdinal(rule1.id, 1)
+    checkOrdinal(rule2.id, 2)
+    checkOrdinal(rule4.id, 3)
+    checkOrdinal(rule5.id, 4)
   }
 
   @Test
