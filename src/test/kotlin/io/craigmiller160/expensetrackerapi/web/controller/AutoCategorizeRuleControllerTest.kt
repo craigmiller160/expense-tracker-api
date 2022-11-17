@@ -285,7 +285,53 @@ constructor(
 
   @Test
   fun updateRule_withOrdinal() {
-    TODO()
+    val rules = createRulesForOrdinalValidation()
+    val cat3 = dataHelper.createCategory(1L, "Hello")
+
+    val request =
+      AutoCategorizeRuleRequest(
+        categoryId = cat3.id,
+        regex = "Hello.*",
+        ordinal = 2,
+        startDate = LocalDate.of(2022, 1, 1),
+        endDate = LocalDate.of(2022, 2, 2),
+        minAmount = BigDecimal("10.0"),
+        maxAmount = BigDecimal("20.0"))
+
+    val expectedResponse =
+      AutoCategorizeRuleResponse(
+        id = rules[3].id,
+        ordinal = request.ordinal!!,
+        categoryId = request.categoryId,
+        regex = request.regex,
+        startDate = request.startDate,
+        endDate = request.endDate,
+        minAmount = request.minAmount,
+        maxAmount = request.maxAmount)
+
+    mockMvc
+      .put("/categories/rules/${rules[3].id}") {
+        secure = true
+        header("Authorization", "Bearer $token")
+        contentType = MediaType.APPLICATION_JSON
+        content = objectMapper.writeValueAsString(request)
+      }
+      .andExpect {
+        status { isOk() }
+        content { json(objectMapper.writeValueAsString(expectedResponse), true) }
+      }
+
+    val dbRule = autoCategorizeRuleRepository.findById(rules[3].id).orElseThrow()
+    assertThat(AutoCategorizeRuleResponse.from(dbRule)).isEqualTo(expectedResponse)
+
+    val expectedOrdinals =
+      listOf(
+        RuleIdAndOrdinal(rules[0].id, 1),
+        RuleIdAndOrdinal(rules[3].id, 2),
+        RuleIdAndOrdinal(rules[1].id, 3),
+        RuleIdAndOrdinal(rules[2].id, 4),
+        RuleIdAndOrdinal(rules[4].id, 5))
+    validateOrdinalsById(expectedOrdinals)
   }
 
   @Test
