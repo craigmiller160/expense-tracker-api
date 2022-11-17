@@ -9,7 +9,6 @@ import io.craigmiller160.expensetrackerapi.data.repository.AutoCategorizeRuleRep
 import io.craigmiller160.expensetrackerapi.data.repository.TransactionRepository
 import io.craigmiller160.expensetrackerapi.function.TryEither
 import io.craigmiller160.expensetrackerapi.function.flatMapCatch
-import java.math.BigDecimal
 import java.time.LocalDate
 import javax.transaction.Transactional
 import org.springframework.data.domain.PageRequest
@@ -74,8 +73,8 @@ class ApplyCategoriesToTransactionsService(
     Regex(rule.regex).matches(transaction.description) &&
       (rule.startDate ?: LocalDate.MIN) <= transaction.expenseDate &&
       (rule.endDate ?: LocalDate.MAX) >= transaction.expenseDate &&
-      (rule.minAmount ?: BigDecimal(Double.MIN_VALUE)) <= transaction.amount &&
-      (rule.maxAmount ?: BigDecimal(Double.MAX_VALUE)) >= transaction.amount
+      (rule.minAmount?.let { it <= transaction.amount } ?: false) &&
+      (rule.maxAmount?.let { it >= transaction.amount } ?: false)
 
   private data class RuleTransactionsWrapper(
     val rule: AutoCategorizeRule,
