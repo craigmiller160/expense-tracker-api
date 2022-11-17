@@ -1,7 +1,6 @@
 package io.craigmiller160.expensetrackerapi.service
 
 import arrow.core.Either
-import arrow.core.continuations.either
 import arrow.core.flatMap
 import io.craigmiller160.expensetrackerapi.common.data.typedid.TypedId
 import io.craigmiller160.expensetrackerapi.data.model.AutoCategorizeRule
@@ -36,14 +35,11 @@ class ApplyCategoriesToTransactionsService(
     pageNumber: Int
   ): TryEither<Unit> {
     val page = PageRequest.of(pageNumber, PAGE_SIZE, Sort.by(Sort.Order.asc("id")))
-    return either
-      .eager {
-        val transactions =
-          Either.catch { transactionRepository.findAllUnconfirmed(userId, page) }.bind()
+    return Either.catch { transactionRepository.findAllUnconfirmed(userId, page) }
+      .flatMap { transactions ->
         applyCategoriesToTransactions(userId, transactions.content)
           .flatMapCatch { transactionRepository.saveAll(it) }
-          .bind()
-        transactions.totalElements
+          .map { transactions.totalElements }
       }
       .flatMap { totalElements ->
         if ((pageNumber + 1) * PAGE_SIZE < totalElements) {
