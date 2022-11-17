@@ -5,7 +5,9 @@ import io.craigmiller160.expensetrackerapi.common.data.typedid.TypedId
 import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.AutoCategorizeRuleId
 import io.craigmiller160.expensetrackerapi.data.model.AutoCategorizeRule
 import io.craigmiller160.expensetrackerapi.data.model.Category
+import io.craigmiller160.expensetrackerapi.data.model.Transaction
 import io.craigmiller160.expensetrackerapi.data.repository.AutoCategorizeRuleRepository
+import io.craigmiller160.expensetrackerapi.data.repository.TransactionRepository
 import io.craigmiller160.expensetrackerapi.testcore.ExpenseTrackerIntegrationTest
 import io.craigmiller160.expensetrackerapi.testcore.OAuth2Extension
 import io.craigmiller160.expensetrackerapi.testutils.DataHelper
@@ -31,19 +33,22 @@ constructor(
   private val dataHelper: DataHelper,
   private val objectMapper: ObjectMapper,
   private val autoCategorizeRuleRepository: AutoCategorizeRuleRepository,
-  private val entityManager: EntityManager
+  private val entityManager: EntityManager,
+  private val transactionRepository: TransactionRepository
 ) {
 
   private lateinit var token: String
 
   private lateinit var cat1: Category
   private lateinit var cat2: Category
+  private lateinit var transaction: Transaction
 
   @BeforeEach
   fun setup() {
     token = OAuth2Extension.createJwt()
     cat1 = dataHelper.createCategory(1L, "Entertainment")
     cat2 = dataHelper.createCategory(2L, "Food")
+    transaction = dataHelper.createTransaction(1L)
   }
 
   @Test
@@ -558,7 +563,20 @@ constructor(
 
   @Test
   fun reOrderRule_verifyApplyingRules() {
-    TODO()
+    val rule = dataHelper.createRule(1L, cat1.id)
+    mockMvc
+      .put("/categories/rules/${rule.id}/reOrder/1") {
+        secure = true
+        header("Authorization", "Bearer $token")
+      }
+      .andExpect { status { isNoContent() } }
+
+    entityManager.flush()
+
+    assertThat(transactionRepository.findById(transaction.id))
+      .isPresent
+      .get()
+      .hasFieldOrPropertyWithValue("categoryId", cat1.id)
   }
 
   private fun createRulesForOrdinalValidation(): List<AutoCategorizeRule> {
