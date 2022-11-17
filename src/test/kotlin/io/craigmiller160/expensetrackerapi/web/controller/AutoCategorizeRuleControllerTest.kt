@@ -133,7 +133,32 @@ constructor(
 
   @Test
   fun createRule_withOrdinal() {
-    TODO()
+    val rules = createRulesForOrdinalValidation()
+    val request = AutoCategorizeRuleRequest(categoryId = cat1.id, regex = ".*", ordinal = 2)
+
+    val responseString =
+      mockMvc
+        .post("/categories/rules") {
+          secure = true
+          header("Authorization", "Bearer $token")
+          contentType = MediaType.APPLICATION_JSON
+          content = objectMapper.writeValueAsString(request)
+        }
+        .andExpect { status { isOk() } }
+        .andReturn()
+        .response
+        .contentAsString
+    val response = objectMapper.readValue(responseString, AutoCategorizeRuleResponse::class.java)
+
+    val expectedOrdinals =
+      listOf(
+        RuleIdAndOrdinal(rules[0].id, 1),
+        RuleIdAndOrdinal(response.id, 2),
+        RuleIdAndOrdinal(rules[1].id, 3),
+        RuleIdAndOrdinal(rules[2].id, 4),
+        RuleIdAndOrdinal(rules[3].id, 5),
+        RuleIdAndOrdinal(rules[4].id, 6))
+    validateOrdinalsById(expectedOrdinals)
   }
 
   @Test
@@ -298,17 +323,6 @@ constructor(
         minAmount = BigDecimal("10.0"),
         maxAmount = BigDecimal("20.0"))
 
-    val expectedResponse =
-      AutoCategorizeRuleResponse(
-        id = rules[3].id,
-        ordinal = request.ordinal!!,
-        categoryId = request.categoryId,
-        regex = request.regex,
-        startDate = request.startDate,
-        endDate = request.endDate,
-        minAmount = request.minAmount,
-        maxAmount = request.maxAmount)
-
     mockMvc
       .put("/categories/rules/${rules[3].id}") {
         secure = true
@@ -316,13 +330,7 @@ constructor(
         contentType = MediaType.APPLICATION_JSON
         content = objectMapper.writeValueAsString(request)
       }
-      .andExpect {
-        status { isOk() }
-        content { json(objectMapper.writeValueAsString(expectedResponse), true) }
-      }
-
-    val dbRule = autoCategorizeRuleRepository.findById(rules[3].id).orElseThrow()
-    assertThat(AutoCategorizeRuleResponse.from(dbRule)).isEqualTo(expectedResponse)
+      .andExpect { status { isOk() } }
 
     val expectedOrdinals =
       listOf(
