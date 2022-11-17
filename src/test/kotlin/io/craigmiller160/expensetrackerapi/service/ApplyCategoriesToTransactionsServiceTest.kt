@@ -1,6 +1,5 @@
 package io.craigmiller160.expensetrackerapi.service
 
-import arrow.core.getOrHandle
 import io.craigmiller160.expensetrackerapi.common.data.typedid.TypedId
 import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.CategoryId
 import io.craigmiller160.expensetrackerapi.data.model.AutoCategorizeRule
@@ -10,6 +9,7 @@ import io.craigmiller160.expensetrackerapi.data.repository.AutoCategorizeRuleRep
 import io.craigmiller160.expensetrackerapi.data.repository.TransactionRepository
 import io.craigmiller160.expensetrackerapi.testcore.ExpenseTrackerIntegrationTest
 import io.craigmiller160.expensetrackerapi.testutils.DataHelper
+import io.kotest.assertions.arrow.core.shouldBeRight
 import java.math.BigDecimal
 import java.time.LocalDate
 import org.assertj.core.api.Assertions.assertThat
@@ -94,7 +94,7 @@ constructor(
     val result =
       applyCategoriesToTransactionsService
         .applyCategoriesToTransactions(1L, transactions)
-        .getOrHandle { throw it }
+        .shouldBeRight()
     assertThat(result[1]).hasFieldOrPropertyWithValue("categoryId", categories[0].id)
     assertThat(result[0]).hasFieldOrPropertyWithValue("categoryId", categories[1].id)
     assertThat(result[5]).hasFieldOrPropertyWithValue("categoryId", categories[2].id)
@@ -109,7 +109,7 @@ constructor(
     val result =
       applyCategoriesToTransactionsService
         .applyCategoriesToTransactions(1L, transactions)
-        .getOrHandle { throw it }
+        .shouldBeRight()
     assertThat(result).isEqualTo(transactions)
   }
 }
