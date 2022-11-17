@@ -73,8 +73,8 @@ class ApplyCategoriesToTransactionsService(
     Regex(rule.regex).matches(transaction.description) &&
       (rule.startDate ?: LocalDate.MIN) <= transaction.expenseDate &&
       (rule.endDate ?: LocalDate.MAX) >= transaction.expenseDate &&
-      (rule.minAmount?.let { it <= transaction.amount } ?: false) &&
-      (rule.maxAmount?.let { it >= transaction.amount } ?: false)
+      (rule.minAmount?.let { it <= transaction.amount } ?: true) &&
+      (rule.maxAmount?.let { it >= transaction.amount } ?: true)
 
   private data class RuleTransactionsWrapper(
     val rule: AutoCategorizeRule,
