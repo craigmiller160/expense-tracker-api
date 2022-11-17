@@ -453,10 +453,12 @@ constructor(
 
   @Test
   fun deleteRule_verifyApplyingRules() {
-    val rule = dataHelper.createRule(1L, cat1.id)
+    val cat3 = dataHelper.createCategory(1L, "Hello")
+    val rule1 = dataHelper.createRule(1L, cat1.id)
+    val rule2 = dataHelper.createRule(1L, cat3.id)
 
     mockMvc
-      .delete("/categories/rules/${rule.id}") {
+      .delete("/categories/rules/${rule2.id}") {
         secure = true
         header("Authorization", "Bearer $token")
       }
