@@ -527,6 +527,8 @@ constructor(
 
   @Test
   fun reOrderRule_invalidRule() {
+    dataHelper.createRule(1L, cat1.id)
+
     val id = TypedId<AutoCategorizeRuleId>()
     mockMvc
       .put("/categories/rules/$id/reOrder/1") {
@@ -535,7 +537,7 @@ constructor(
       }
       .andExpect {
         status { isBadRequest() }
-        jsonPath("$.message", equalTo(""))
+        jsonPath("$.message", equalTo("Invalid Rule: $id"))
       }
   }
 
