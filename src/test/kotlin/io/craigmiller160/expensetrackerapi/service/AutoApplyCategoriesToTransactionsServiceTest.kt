@@ -31,8 +31,6 @@ constructor(
   private var ruleCounter = 0
 
   /*
-   * 1) Regex
-   * 3) Max Amount
    * 4) Start Date
    * 5) End Date
    */
@@ -54,10 +52,13 @@ constructor(
     val txn3 = createTransaction("AMC Theaters", LocalDate.of(2022, 3, 10), BigDecimal("22"))
     val txn4 = createTransaction("AMC Theaters", LocalDate.of(2022, 6, 1), BigDecimal("10"))
     val txn5 = createTransaction("AMC Theaters 2", LocalDate.of(2022, 3, 10), BigDecimal("22"))
+    val txn6 = createTransaction("Target", LocalDate.of(2022, 1, 1), BigDecimal("20"))
 
-    transactions = listOf(txn1, txn2, txn3, txn4, txn5)
+    transactions = listOf(txn1, txn2, txn3, txn4, txn5, txn6)
 
     val rule1 = createRule(categoryId = cat1.id, regex = "Target", minAmount = BigDecimal("90"))
+    val rule2 = createRule(categoryId = cat2.id, regex = "Target", maxAmount = BigDecimal("15"))
+    val rule3 = createRule(categoryId = cat3.id, regex = "Target")
   }
 
   private fun createTransaction(
@@ -95,5 +96,7 @@ constructor(
         .applyCategoriesToTransactions(1L, transactions)
         .getOrHandle { throw it }
     assertThat(result[1]).hasFieldOrPropertyWithValue("categoryId", categories[0].id)
+    assertThat(result[0]).hasFieldOrPropertyWithValue("categoryId", categories[1].id)
+    assertThat(result[5]).hasFieldOrPropertyWithValue("categoryId", categories[2].id)
   }
 }
