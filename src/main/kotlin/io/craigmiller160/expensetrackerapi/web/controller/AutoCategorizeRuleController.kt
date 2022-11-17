@@ -40,7 +40,6 @@ class AutoCategorizeRuleController(
           array =
             ArraySchema(schema = Schema(implementation = AutoCategorizeRuleResponse::class)))])
   @PostMapping
-  // TODO re-apply
   fun createRule(
     @RequestBody request: AutoCategorizeRuleRequest
   ): TryEither<AutoCategorizeRuleResponse> = autoCategorizeRuleService.createRule(request)
@@ -53,7 +52,6 @@ class AutoCategorizeRuleController(
           array =
             ArraySchema(schema = Schema(implementation = AutoCategorizeRuleResponse::class)))])
   @PutMapping("/{ruleId}")
-  // TODO re-apply
   fun updateRule(
     @PathVariable ruleId: TypedId<AutoCategorizeRuleId>,
     @RequestBody request: AutoCategorizeRuleRequest
@@ -79,7 +77,6 @@ class AutoCategorizeRuleController(
           array = ArraySchema(schema = Schema(implementation = Unit::class)))])
   @DeleteMapping("/{ruleId}")
   @ResponseStatus(HttpStatus.NO_CONTENT)
-  // TODO re-apply
   fun deleteRule(@PathVariable ruleId: TypedId<AutoCategorizeRuleId>): TryEither<Unit> =
     autoCategorizeRuleService.deleteRule(ruleId)
 
@@ -91,7 +88,6 @@ class AutoCategorizeRuleController(
           array = ArraySchema(schema = Schema(implementation = Unit::class)))])
   @PutMapping("/{ruleId}/reOrder/{ordinal}")
   @ResponseStatus(HttpStatus.NO_CONTENT)
-  // TODO re-apply
   fun reOrderRule(
     @PathVariable ruleId: TypedId<AutoCategorizeRuleId>,
     @PathVariable ordinal: Int

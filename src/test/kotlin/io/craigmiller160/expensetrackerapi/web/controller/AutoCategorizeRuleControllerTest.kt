@@ -127,6 +127,11 @@ constructor(
   }
 
   @Test
+  fun createRule_verifyApplyingRules() {
+    TODO()
+  }
+
+  @Test
   fun createRule() {
     val request =
       AutoCategorizeRuleRequest(
@@ -232,6 +237,11 @@ constructor(
 
     testBadRequest(notExistCategory, "Invalid Category: ${notExistCategory.categoryId}")
     testBadRequest(wrongUserCategory, "Invalid Category: ${wrongUserCategory.categoryId}")
+  }
+
+  @Test
+  fun updateRule_verifyApplyingRules() {
+    TODO()
   }
 
   @Test
@@ -408,6 +418,11 @@ constructor(
   }
 
   @Test
+  fun deleteRule_verifyApplyingRules() {
+    TODO()
+  }
+
+  @Test
   fun deleteRule() {
     val rule = dataHelper.createRule(1L, cat1.id)
 
@@ -539,6 +554,11 @@ constructor(
         status { isBadRequest() }
         jsonPath("$.message", equalTo("Invalid Rule: $id"))
       }
+  }
+
+  @Test
+  fun reOrderRule_verifyApplyingRules() {
+    TODO()
   }
 
   private fun createRulesForOrdinalValidation(): List<AutoCategorizeRule> {
