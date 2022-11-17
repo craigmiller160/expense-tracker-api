@@ -17,8 +17,8 @@ class AutoApplyCategoriesToTransactionsService(
   fun applyCategoriesToTransactions(
     userId: Long,
     transactions: List<Transaction>
-  ): TryEither<List<Transaction>> {
-    return Either.catch {
+  ): TryEither<List<Transaction>> =
+    Either.catch {
       autoCategorizeRuleRepository.streamAllByUserIdOrderByOrdinal(userId).use { ruleStream ->
         ruleStream
           .map { RuleTransactionsWrapper.fromRule(it) }
@@ -30,7 +30,6 @@ class AutoApplyCategoriesToTransactionsService(
           .transactions
       }
     }
-  }
 
   private fun applyRule(transaction: Transaction, rule: AutoCategorizeRule): Transaction =
     if (doesRuleApply(transaction, rule)) transaction.copy(categoryId = rule.categoryId)
