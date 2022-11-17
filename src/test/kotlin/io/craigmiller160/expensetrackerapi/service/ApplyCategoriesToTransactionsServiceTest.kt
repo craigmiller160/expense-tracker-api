@@ -108,14 +108,4 @@ constructor(
     assertThat(result[3]).hasFieldOrPropertyWithValue("categoryId", categories[5].id)
     assertThat(result[6]).hasFieldOrPropertyWithValue("categoryId", null)
   }
-
-  @Test
-  fun applyCategoriesToTransactions_noRules() {
-    autoCategorizeRuleRepository.deleteAll()
-    val result =
-      applyCategoriesToTransactionsService
-        .applyCategoriesToTransactions(1L, transactions)
-        .shouldBeRight()
-    assertThat(result).isEqualTo(transactions)
-  }
 }
