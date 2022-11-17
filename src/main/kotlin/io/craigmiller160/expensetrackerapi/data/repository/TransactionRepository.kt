@@ -4,6 +4,8 @@ import io.craigmiller160.expensetrackerapi.common.data.typedid.TypedId
 import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.CategoryId
 import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.TransactionId
 import io.craigmiller160.expensetrackerapi.data.model.Transaction
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor
 import org.springframework.data.jpa.repository.Modifying
@@ -116,4 +118,13 @@ interface TransactionRepository :
     @Param("transactionId") transactionId: TypedId<TransactionId>,
     @Param("userId") userId: Long,
   )
+
+  @Query(
+    """
+    SELECT t
+    FROM Transaction t
+    WHERE t.userId = :userId
+    AND t.confirmed = false
+  """)
+  fun findAllUnconfirmed(userId: Long, page: Pageable): Page<Transaction>
 }
