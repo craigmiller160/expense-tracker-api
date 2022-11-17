@@ -6,6 +6,8 @@ import io.craigmiller160.expensetrackerapi.data.model.Transaction
 import io.craigmiller160.expensetrackerapi.data.repository.AutoCategorizeRuleRepository
 import io.craigmiller160.expensetrackerapi.function.TryEither
 import io.craigmiller160.oauth2.service.OAuth2Service
+import java.math.BigDecimal
+import java.time.LocalDate
 import org.springframework.stereotype.Service
 
 @Service
@@ -19,13 +21,21 @@ class AutoApplyCategoriesToTransactionsService(
     autoCategorizeRuleRepository.streamAllByUserIdOrderByOrdinal(userId).use { ruleStream ->
       // TODO do a map reduce
       ruleStream
-        .map { rule -> transactions to rule }
-        .reduce { (transactions, _), (_, rule) ->
-          // TODO what about the first element, need to apply the first rule to it
-          transactions to rule
+        .map { RuleTransactionsWrapper.fromRule(it) }
+        .reduce(RuleTransactionsWrapper.fromTransactions(transactions)) { (_, transactions), (rule)
+          ->
+          RuleTransactionsWrapper.fromTransactions(transactions)
         }
     }
     TODO()
+  }
+
+  private fun doesRuleApply(transaction: Transaction, rule: AutoCategorizeRule): Boolean {
+    return Regex(rule.regex).matches(transaction.description) &&
+      (rule.startDate ?: LocalDate.MIN) <= transaction.expenseDate &&
+      (rule.endDate ?: LocalDate.MAX) >= transaction.expenseDate &&
+      (rule.minAmount ?: BigDecimal(Double.MIN_VALUE)) <= transaction.amount &&
+      (rule.maxAmount ?: BigDecimal(Double.MAX_VALUE)) >= transaction.amount
   }
 
   private data class RuleTransactionsWrapper(
