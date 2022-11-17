@@ -19,24 +19,26 @@ class AutoApplyCategoriesToTransactionsService(
     val userId = oAuth2Service.getAuthenticatedUser().userId
     // TODO wrap in Either
     autoCategorizeRuleRepository.streamAllByUserIdOrderByOrdinal(userId).use { ruleStream ->
-      // TODO do a map reduce
       ruleStream
         .map { RuleTransactionsWrapper.fromRule(it) }
         .reduce(RuleTransactionsWrapper.fromTransactions(transactions)) { (_, transactions), (rule)
           ->
-          RuleTransactionsWrapper.fromTransactions(transactions)
+          RuleTransactionsWrapper.fromTransactions(transactions.map { applyRule(it, rule) })
         }
     }
     TODO()
   }
 
-  private fun doesRuleApply(transaction: Transaction, rule: AutoCategorizeRule): Boolean {
-    return Regex(rule.regex).matches(transaction.description) &&
+  private fun applyRule(transaction: Transaction, rule: AutoCategorizeRule): Transaction =
+    if (doesRuleApply(transaction, rule)) transaction.copy(categoryId = rule.categoryId)
+    else transaction
+
+  private fun doesRuleApply(transaction: Transaction, rule: AutoCategorizeRule): Boolean =
+    Regex(rule.regex).matches(transaction.description) &&
       (rule.startDate ?: LocalDate.MIN) <= transaction.expenseDate &&
       (rule.endDate ?: LocalDate.MAX) >= transaction.expenseDate &&
       (rule.minAmount ?: BigDecimal(Double.MIN_VALUE)) <= transaction.amount &&
       (rule.maxAmount ?: BigDecimal(Double.MAX_VALUE)) >= transaction.amount
-  }
 
   private data class RuleTransactionsWrapper(
     val rule: AutoCategorizeRule,
