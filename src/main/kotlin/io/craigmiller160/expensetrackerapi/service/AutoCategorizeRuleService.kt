@@ -121,9 +121,9 @@ class AutoCategorizeRuleService(
   fun deleteRule(ruleId: TypedId<AutoCategorizeRuleId>): TryEither<Unit> {
     val userId = oAuth2Service.getAuthenticatedUser().userId
     return getRuleIfValid(ruleId, userId).flatMapCatch { rule ->
+      val count = autoCategorizeRuleRepository.countAllByUserId(userId)
       autoCategorizeRuleRepository.delete(rule)
-      // TODO need real count
-      autoCategorizeRuleRepository.decrementOrdinals(userId, rule.ordinal, 1000)
+      autoCategorizeRuleRepository.decrementOrdinals(userId, rule.ordinal, count.toInt())
     }
   }
 
