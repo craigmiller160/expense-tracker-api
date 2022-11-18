@@ -64,6 +64,9 @@ class AutoCategorizeRuleService(
         request.ordinal?.let { ordinal -> validateOrdinal(userId, ordinal) }
           ?: Either.catch { autoCategorizeRuleRepository.countAllByUserId(userId).toInt() + 1 }
       }
+      .flatMap { ordinal ->
+        changeOtherRuleOrdinals(userId, Integer.MAX_VALUE, ordinal).map { ordinal }
+      }
       .map { ordinal ->
         AutoCategorizeRule(
           userId = userId,
@@ -78,11 +81,9 @@ class AutoCategorizeRuleService(
       .flatMap { validateRule(it) }
       .flatMapCatch { rule -> autoCategorizeRuleRepository.save(rule) }
       .flatMap { rule ->
-        changeOtherRuleOrdinals(userId, Integer.MAX_VALUE, rule.ordinal + 1)
-          .flatMap {
-            applyCategoriesToTransactionsService.applyCategoriesToUnconfirmedTransactions(userId)
-          }
-          .map { rule }
+        applyCategoriesToTransactionsService.applyCategoriesToUnconfirmedTransactions(userId).map {
+          rule
+        }
       }
       .map { AutoCategorizeRuleResponse.from(it) }
   }
