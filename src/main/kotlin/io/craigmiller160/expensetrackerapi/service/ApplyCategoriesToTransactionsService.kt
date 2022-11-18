@@ -23,6 +23,7 @@ class ApplyCategoriesToTransactionsService(
   private val transactionRepository: TransactionRepository,
   private val lastRuleAppliedRepository: LastRuleAppliedRepository
 ) {
+  // TODO major refactor here is needed to clean this up
   companion object {
     private const val PAGE_SIZE = 25
   }
@@ -66,7 +67,7 @@ class ApplyCategoriesToTransactionsService(
               (_, txnsToCategorize),
               (rule) ->
               TemporaryRuleTransactionsWrapper.fromTransactionAndRules(
-                txnsToCategorize.map { applyRule(it.transaction, rule) })
+                txnsToCategorize.map { applyRule(it, rule) })
             }
             .transactions
         }
@@ -79,10 +80,15 @@ class ApplyCategoriesToTransactionsService(
       }
   }
 
-  private fun applyRule(transaction: Transaction, rule: AutoCategorizeRule): TransactionAndRule =
-    if (doesRuleApply(transaction, rule))
-      TransactionAndRule(transaction = transaction.copy(categoryId = rule.categoryId), rule = rule)
-    else TransactionAndRule(transaction)
+  private fun applyRule(
+    transactionAndRule: TransactionAndRule,
+    rule: AutoCategorizeRule
+  ): TransactionAndRule =
+    if (doesRuleApply(transactionAndRule.transaction, rule))
+      TransactionAndRule(
+        transaction = transactionAndRule.transaction.copy(categoryId = rule.categoryId),
+        rule = rule)
+    else transactionAndRule
 
   private fun doesRuleApply(transaction: Transaction, rule: AutoCategorizeRule): Boolean =
     Regex(rule.regex).matches(transaction.description) &&
