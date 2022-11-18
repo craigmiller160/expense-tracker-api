@@ -78,9 +78,11 @@ class AutoCategorizeRuleService(
       .flatMap { validateRule(it) }
       .flatMapCatch { rule -> autoCategorizeRuleRepository.save(rule) }
       .flatMap { rule ->
-        applyCategoriesToTransactionsService.applyCategoriesToUnconfirmedTransactions(userId).map {
-          rule
-        }
+        changeOtherRuleOrdinals(userId, Integer.MAX_VALUE, rule.ordinal)
+          .flatMap {
+            applyCategoriesToTransactionsService.applyCategoriesToUnconfirmedTransactions(userId)
+          }
+          .map { rule }
       }
       .map { AutoCategorizeRuleResponse.from(it) }
   }
