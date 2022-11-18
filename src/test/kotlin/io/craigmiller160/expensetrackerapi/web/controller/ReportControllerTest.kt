@@ -59,10 +59,9 @@ constructor(
       dataHelper.createTransaction(1L, cat2.id).let {
         transactionRepository.save(it.copy(expenseDate = month2.plusDays(4)))
       }
-    val txn5 =
-      dataHelper.createTransaction(2L, cat3.id).let {
-        transactionRepository.save(it.copy(expenseDate = month1.plusDays(5)))
-      }
+    dataHelper.createTransaction(2L, cat3.id).let {
+      transactionRepository.save(it.copy(expenseDate = month1.plusDays(5)))
+    }
     val txn6 =
       dataHelper.createTransaction(1L).let {
         transactionRepository.save(it.copy(expenseDate = month1.plusDays(6)))

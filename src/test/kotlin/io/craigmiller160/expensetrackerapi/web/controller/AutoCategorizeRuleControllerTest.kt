@@ -55,7 +55,7 @@ constructor(
   fun getAllRules() {
     val rule1 = dataHelper.createRule(1L, cat1.id)
     val rule2 = dataHelper.createRule(1L, cat1.id)
-    val rule3 = dataHelper.createRule(2L, cat2.id)
+    dataHelper.createRule(2L, cat2.id)
 
     val expectedResponse =
       AutoCategorizeRulePageResponse(
@@ -80,7 +80,7 @@ constructor(
     val cat3 = dataHelper.createCategory(1L, "Stuff")
     val rule1 = dataHelper.createRule(1L, cat1.id)
     val rule2 = dataHelper.createRule(1L, cat1.id)
-    val rule3 = dataHelper.createRule(1L, cat3.id)
+    dataHelper.createRule(1L, cat3.id)
 
     val expectedResponse =
       AutoCategorizeRulePageResponse(
@@ -110,7 +110,7 @@ constructor(
       dataHelper.createRule(1L, cat1.id).let {
         autoCategorizeRuleRepository.save(it.copy(regex = "Hello World"))
       }
-    val rule3 = dataHelper.createRule(1L, cat1.id)
+    dataHelper.createRule(1L, cat1.id)
     entityManager.flush()
 
     val expectedResponse =
@@ -501,7 +501,7 @@ constructor(
 
   @Test
   fun getRule_invalidRule() {
-    val rule1 = dataHelper.createRule(1L, cat1.id)
+    dataHelper.createRule(1L, cat1.id)
     val rule2 = dataHelper.createRule(2L, cat2.id)
 
     val operation: (TypedId<AutoCategorizeRuleId>, String) -> ResultActionsDsl = { id, message ->
@@ -524,7 +524,7 @@ constructor(
   @Test
   fun deleteRule_verifyApplyingRules() {
     val cat3 = dataHelper.createCategory(1L, "Hello")
-    val rule1 = dataHelper.createRule(1L, cat1.id)
+    dataHelper.createRule(1L, cat1.id)
     val rule2 = dataHelper.createRule(1L, cat3.id)
 
     mockMvc

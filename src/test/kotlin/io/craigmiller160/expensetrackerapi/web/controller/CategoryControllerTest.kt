@@ -45,7 +45,7 @@ constructor(
   fun getAllCategories() {
     val cat1 = dataHelper.createCategory(1L, "Category 1")
     val cat2 = dataHelper.createCategory(1L, "Category 2")
-    val cat3 = dataHelper.createCategory(2L, "Category 3")
+    dataHelper.createCategory(2L, "Category 3")
 
     entityManager.flush()
 

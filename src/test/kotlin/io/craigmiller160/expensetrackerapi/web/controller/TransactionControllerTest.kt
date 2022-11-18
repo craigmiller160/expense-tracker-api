@@ -304,7 +304,7 @@ constructor(
   @Test
   fun `search - only non-duplicates`() {
     val txn1 = user1Transactions[0]
-    val txn2 = transactionRepository.saveAndFlush(txn1.copy(id = TypedId()))
+    transactionRepository.saveAndFlush(txn1.copy(id = TypedId()))
     val request =
       SearchTransactionsRequest(
         isDuplicate = false,
@@ -886,8 +886,8 @@ constructor(
   @Test
   fun `getPossibleDuplicates - wrong user id`() {
     val txn1 = user2Transactions[0]
-    val txn2 = transactionRepository.saveAndFlush(txn1.copy(id = TypedId()))
-    val txn3 = transactionRepository.saveAndFlush(txn1.copy(id = TypedId()))
+    transactionRepository.saveAndFlush(txn1.copy(id = TypedId()))
+    transactionRepository.saveAndFlush(txn1.copy(id = TypedId()))
     entityManager.flush()
     entityManager.clear()
 
@@ -979,8 +979,8 @@ constructor(
   @Test
   fun `markNotDuplicate - different user id`() {
     val txn1 = user2Transactions[0]
-    val txn2 = transactionRepository.saveAndFlush(txn1.copy(id = TypedId()))
-    val txn3 = transactionRepository.saveAndFlush(txn1.copy(id = TypedId()))
+    transactionRepository.saveAndFlush(txn1.copy(id = TypedId()))
+    transactionRepository.saveAndFlush(txn1.copy(id = TypedId()))
     entityManager.flush()
     entityManager.clear()
 

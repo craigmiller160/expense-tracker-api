@@ -10,15 +10,14 @@ import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.stereotype.Repository
 
-private val needsAttentionCountRowMapper: RowMapper<NeedsAttentionCount> = RowMapper { rs, index ->
+private val needsAttentionCountRowMapper: RowMapper<NeedsAttentionCount> = RowMapper { rs, _ ->
   NeedsAttentionCount(NeedsAttentionType.valueOf(rs.getString("type")), rs.getLong("count"))
 }
 
-private val needsAttentionOldestRowMapper: RowMapper<NeedsAttentionOldest> =
-  RowMapper { rs, index ->
-    NeedsAttentionOldest(
-      NeedsAttentionType.valueOf(rs.getString("type")), rs.getDate("oldest")?.toLocalDate())
-  }
+private val needsAttentionOldestRowMapper: RowMapper<NeedsAttentionOldest> = RowMapper { rs, _ ->
+  NeedsAttentionOldest(
+    NeedsAttentionType.valueOf(rs.getString("type")), rs.getDate("oldest")?.toLocalDate())
+}
 
 @Repository
 class NeedsAttentionRepositoryImpl(
