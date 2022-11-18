@@ -609,6 +609,7 @@ constructor(
       .andExpect { status { isNoContent() } }
 
     entityManager.flush()
+    entityManager.clear()
 
     val expectedOrdinals =
       listOf(
