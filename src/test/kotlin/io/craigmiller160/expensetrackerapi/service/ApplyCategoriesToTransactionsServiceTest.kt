@@ -5,6 +5,7 @@ import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.AutoCategoriz
 import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.CategoryId
 import io.craigmiller160.expensetrackerapi.data.model.AutoCategorizeRule
 import io.craigmiller160.expensetrackerapi.data.model.Category
+import io.craigmiller160.expensetrackerapi.data.model.LastRuleApplied
 import io.craigmiller160.expensetrackerapi.data.model.Transaction
 import io.craigmiller160.expensetrackerapi.data.repository.AutoCategorizeRuleRepository
 import io.craigmiller160.expensetrackerapi.data.repository.LastRuleAppliedRepository
@@ -103,6 +104,8 @@ constructor(
 
   @Test
   fun applyCategoriesToTransactions() {
+    lastRuleAppliedRepository.saveAndFlush(
+      LastRuleApplied(userId = 1L, ruleId = rules[0].id, transactionId = transactions[6].id))
     val result =
       applyCategoriesToTransactionsService
         .applyCategoriesToTransactions(1L, transactions)
@@ -113,7 +116,7 @@ constructor(
     validateCategoryApplied(result[4], categories[3].id, rules[4].id)
     validateCategoryApplied(result[2], categories[4].id, rules[5].id)
     validateCategoryApplied(result[3], categories[5].id, rules[3].id)
-    validateCategoryApplied(result[6], null, null) // TODO add pre-existing record
+    validateCategoryApplied(result[6], null, null)
   }
 
   private fun validateCategoryApplied(
