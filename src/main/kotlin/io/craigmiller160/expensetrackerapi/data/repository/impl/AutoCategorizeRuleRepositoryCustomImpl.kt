@@ -57,8 +57,32 @@ class AutoCategorizeRuleRepositoryCustomImpl(
     maxOrdinal: Int,
     excludeId: TypedId<AutoCategorizeRuleId>?
   ) {
-    TODO("Not yet implemented")
+    val whereClause = createOrdinalUpdateWhereClause(userId, minOrdinal, maxOrdinal, excludeId)
+    queryFactory
+      .update(QAutoCategorizeRule.autoCategorizeRule)
+      .set(
+        QAutoCategorizeRule.autoCategorizeRule.ordinal,
+        QAutoCategorizeRule.autoCategorizeRule.ordinal.subtract(1))
+      .set(
+        QAutoCategorizeRule.autoCategorizeRule.version,
+        QAutoCategorizeRule.autoCategorizeRule.version.add(1))
+      .where(whereClause)
+      .execute()
   }
+
+  private fun createOrdinalUpdateWhereClause(
+    userId: Long,
+    minOrdinal: Int,
+    maxOrdinal: Int,
+    excludeId: TypedId<AutoCategorizeRuleId>?
+  ): BooleanBuilder =
+    BooleanBuilder(QAutoCategorizeRule.autoCategorizeRule.userId.eq(userId))
+      .and(QAutoCategorizeRule.autoCategorizeRule.ordinal.loe(maxOrdinal))
+      .and(QAutoCategorizeRule.autoCategorizeRule.ordinal.goe(minOrdinal))
+      .let(
+        QueryDSLSupport.andIfNotNull(excludeId) { id ->
+          QAutoCategorizeRule.autoCategorizeRule.id.ne(id)
+        })
 
   override fun incrementOrdinals(
     userId: Long,
@@ -66,6 +90,16 @@ class AutoCategorizeRuleRepositoryCustomImpl(
     maxOrdinal: Int,
     excludeId: TypedId<AutoCategorizeRuleId>?
   ) {
-    TODO("Not yet implemented")
+    val whereClause = createOrdinalUpdateWhereClause(userId, minOrdinal, maxOrdinal, excludeId)
+    queryFactory
+      .update(QAutoCategorizeRule.autoCategorizeRule)
+      .set(
+        QAutoCategorizeRule.autoCategorizeRule.ordinal,
+        QAutoCategorizeRule.autoCategorizeRule.ordinal.add(1))
+      .set(
+        QAutoCategorizeRule.autoCategorizeRule.version,
+        QAutoCategorizeRule.autoCategorizeRule.version.add(1))
+      .where(whereClause)
+      .execute()
   }
 }
