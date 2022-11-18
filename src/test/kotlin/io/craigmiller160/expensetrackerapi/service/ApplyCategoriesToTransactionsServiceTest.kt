@@ -103,13 +103,13 @@ constructor(
       applyCategoriesToTransactionsService
         .applyCategoriesToTransactions(1L, transactions)
         .shouldBeRight()
-    assertThat(result[1]).hasFieldOrPropertyWithValue("categoryId", categories[0].id)
-    assertThat(result[0]).hasFieldOrPropertyWithValue("categoryId", categories[1].id)
-    assertThat(result[5]).hasFieldOrPropertyWithValue("categoryId", categories[2].id)
-    assertThat(result[4]).hasFieldOrPropertyWithValue("categoryId", categories[3].id)
-    assertThat(result[2]).hasFieldOrPropertyWithValue("categoryId", categories[4].id)
-    assertThat(result[3]).hasFieldOrPropertyWithValue("categoryId", categories[5].id)
-    assertThat(result[6]).hasFieldOrPropertyWithValue("categoryId", null)
+    validateCategoryApplied(result[1], categories[0].id, null)
+    validateCategoryApplied(result[0], categories[1].id, null)
+    validateCategoryApplied(result[5], categories[2].id, null)
+    validateCategoryApplied(result[4], categories[3].id, null)
+    validateCategoryApplied(result[2], categories[4].id, null)
+    validateCategoryApplied(result[3], categories[5].id, null)
+    validateCategoryApplied(result[6], null, null)
   }
 
   private fun validateCategoryApplied(
@@ -121,7 +121,7 @@ constructor(
     ruleId?.let { nonNullRuleId ->
       assertThat(lastRuleAppliedRepository.findByUserIdAndTransactionId(1L, txn.id))
         .isNotNull
-        .hasFieldOrPropertyWithValue("ruleId", ruleId)
+        .hasFieldOrPropertyWithValue("ruleId", nonNullRuleId)
     }
       ?: assertThat(lastRuleAppliedRepository.findByUserIdAndTransactionId(1L, txn.id)).isNull()
   }
