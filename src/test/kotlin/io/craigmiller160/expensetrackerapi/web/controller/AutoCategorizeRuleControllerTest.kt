@@ -334,6 +334,8 @@ constructor(
       }
       .andExpect { status { isOk() } }
 
+    entityManager.flush()
+
     val expectedOrdinals =
       listOf(
         RuleIdAndOrdinal(rules[0].id, 1),
