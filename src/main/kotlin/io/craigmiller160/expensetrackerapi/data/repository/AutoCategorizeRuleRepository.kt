@@ -34,7 +34,7 @@ interface AutoCategorizeRuleRepository :
     @Param("userId") userId: Long,
     @Param("minOrdinal") minOrdinal: Int,
     @Param("maxOrdinal") maxOrdinal: Int,
-    @Param("excludeId") excludeId: TypedId<AutoCategorizeRuleId>?
+    @Param("excludeId") excludeId: TypedId<AutoCategorizeRuleId>? = null
   )
 
   @Query(
@@ -51,6 +51,6 @@ interface AutoCategorizeRuleRepository :
     @Param("userId") userId: Long,
     @Param("minOrdinal") minOrdinal: Int,
     @Param("maxOrdinal") maxOrdinal: Int,
-    @Param("excludeId") excludeId: TypedId<AutoCategorizeRuleId>?
+    @Param("excludeId") excludeId: TypedId<AutoCategorizeRuleId>? = null
   )
 }
