@@ -16,39 +16,4 @@ interface AutoCategorizeRuleRepository :
   fun deleteByIdAndUserId(id: TypedId<AutoCategorizeRuleId>, userId: Long)
 
   fun streamAllByUserIdOrderByOrdinal(userId: Long): Stream<AutoCategorizeRule>
-
-  // TODO cleanup below here
-  //  @Query(
-  //    """
-  //    UPDATE AutoCategorizeRule r
-  //    SET r.ordinal = r.ordinal - 1, r.version = r.version + 1
-  //    WHERE r.ordinal <= :maxOrdinal
-  //    AND r.ordinal >= :minOrdinal
-  //    AND r.userId = :userId
-  //    AND (:excludeId IS NULL OR :excludeId <> r.id)
-  //  """)
-  //  @Modifying(flushAutomatically = true, clearAutomatically = true)
-  //  fun decrementOrdinals(
-  //    @Param("userId") userId: Long,
-  //    @Param("minOrdinal") minOrdinal: Int,
-  //    @Param("maxOrdinal") maxOrdinal: Int,
-  //    @Param("excludeId") excludeId: TypedId<AutoCategorizeRuleId>? = null
-  //  )
-
-  //  @Query(
-  //    """
-  //    UPDATE AutoCategorizeRule r
-  //    SET r.ordinal = r.ordinal + 1, r.version = r.version + 1
-  //    WHERE r.ordinal <= :maxOrdinal
-  //    AND r.ordinal >= :minOrdinal
-  //    AND r.userId = :userId
-  //    AND (:excludeId IS NULL OR :excludeId <> r.id)
-  //  """)
-  //  @Modifying(flushAutomatically = true, clearAutomatically = true)
-  //  fun incrementOrdinals(
-  //    @Param("userId") userId: Long,
-  //    @Param("minOrdinal") minOrdinal: Int,
-  //    @Param("maxOrdinal") maxOrdinal: Int,
-  //    @Param("excludeId") excludeId: TypedId<AutoCategorizeRuleId>? = null
-  //  )
 }
