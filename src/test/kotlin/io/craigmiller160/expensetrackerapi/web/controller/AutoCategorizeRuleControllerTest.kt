@@ -151,6 +151,7 @@ constructor(
     val response = objectMapper.readValue(responseString, AutoCategorizeRuleResponse::class.java)
 
     entityManager.flush()
+    entityManager.clear()
 
     val expectedOrdinals =
       listOf(
@@ -335,6 +336,7 @@ constructor(
       .andExpect { status { isOk() } }
 
     entityManager.flush()
+    entityManager.clear()
 
     val expectedOrdinals =
       listOf(
@@ -563,6 +565,9 @@ constructor(
       }
       .andExpect { status { isNoContent() } }
 
+    entityManager.flush()
+    entityManager.clear()
+
     assertThat(autoCategorizeRuleRepository.findById(rules[2].id)).isEmpty
 
     val expectedOrdinals =
@@ -586,6 +591,7 @@ constructor(
       .andExpect { status { isNoContent() } }
 
     entityManager.flush()
+    entityManager.clear()
 
     val expectedOrdinals =
       listOf(
