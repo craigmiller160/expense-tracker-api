@@ -1,11 +1,13 @@
 package io.craigmiller160.expensetrackerapi.service
 
 import io.craigmiller160.expensetrackerapi.common.data.typedid.TypedId
+import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.AutoCategorizeRuleId
 import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.CategoryId
 import io.craigmiller160.expensetrackerapi.data.model.AutoCategorizeRule
 import io.craigmiller160.expensetrackerapi.data.model.Category
 import io.craigmiller160.expensetrackerapi.data.model.Transaction
 import io.craigmiller160.expensetrackerapi.data.repository.AutoCategorizeRuleRepository
+import io.craigmiller160.expensetrackerapi.data.repository.LastRuleAppliedRepository
 import io.craigmiller160.expensetrackerapi.data.repository.TransactionRepository
 import io.craigmiller160.expensetrackerapi.testcore.ExpenseTrackerIntegrationTest
 import io.craigmiller160.expensetrackerapi.testutils.DataHelper
@@ -24,7 +26,8 @@ constructor(
   private val dataHelper: DataHelper,
   private val autoCategorizeRuleRepository: AutoCategorizeRuleRepository,
   private val transactionRepository: TransactionRepository,
-  private val applyCategoriesToTransactionsService: ApplyCategoriesToTransactionsService
+  private val applyCategoriesToTransactionsService: ApplyCategoriesToTransactionsService,
+  private val lastRuleAppliedRepository: LastRuleAppliedRepository
 ) {
 
   private var ruleCounter = 0
@@ -107,5 +110,16 @@ constructor(
     assertThat(result[2]).hasFieldOrPropertyWithValue("categoryId", categories[4].id)
     assertThat(result[3]).hasFieldOrPropertyWithValue("categoryId", categories[5].id)
     assertThat(result[6]).hasFieldOrPropertyWithValue("categoryId", null)
+  }
+
+  private fun validateCategoryApplied(
+    txn: Transaction,
+    categoryId: TypedId<CategoryId>,
+    ruleId: TypedId<AutoCategorizeRuleId>
+  ) {
+    assertThat(txn).hasFieldOrPropertyWithValue("categoryId", categoryId)
+    assertThat(lastRuleAppliedRepository.findByUserIdAndTransactionId(1L, txn.id))
+      .isNotNull
+      .hasFieldOrPropertyWithValue("ruleId", ruleId)
   }
 }
