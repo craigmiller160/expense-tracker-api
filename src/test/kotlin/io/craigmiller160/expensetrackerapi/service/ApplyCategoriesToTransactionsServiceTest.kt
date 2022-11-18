@@ -114,12 +114,15 @@ constructor(
 
   private fun validateCategoryApplied(
     txn: Transaction,
-    categoryId: TypedId<CategoryId>,
-    ruleId: TypedId<AutoCategorizeRuleId>
+    categoryId: TypedId<CategoryId>?,
+    ruleId: TypedId<AutoCategorizeRuleId>?
   ) {
     assertThat(txn).hasFieldOrPropertyWithValue("categoryId", categoryId)
-    assertThat(lastRuleAppliedRepository.findByUserIdAndTransactionId(1L, txn.id))
-      .isNotNull
-      .hasFieldOrPropertyWithValue("ruleId", ruleId)
+    ruleId?.let { nonNullRuleId ->
+      assertThat(lastRuleAppliedRepository.findByUserIdAndTransactionId(1L, txn.id))
+        .isNotNull
+        .hasFieldOrPropertyWithValue("ruleId", ruleId)
+    }
+      ?: assertThat(lastRuleAppliedRepository.findByUserIdAndTransactionId(1L, txn.id)).isNull()
   }
 }
