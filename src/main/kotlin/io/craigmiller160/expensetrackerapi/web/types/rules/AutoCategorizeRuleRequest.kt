@@ -8,6 +8,7 @@ import java.time.LocalDate
 data class AutoCategorizeRuleRequest(
   val categoryId: TypedId<CategoryId>,
   val regex: String,
+  val ordinal: Int? = null,
   val startDate: LocalDate? = null,
   val endDate: LocalDate? = null,
   val minAmount: BigDecimal? = null,

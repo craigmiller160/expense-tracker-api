@@ -132,6 +132,39 @@ constructor(
   }
 
   @Test
+  fun createRule_withOrdinal() {
+    val rules = createRulesForOrdinalValidation()
+    val request = AutoCategorizeRuleRequest(categoryId = cat1.id, regex = ".*", ordinal = 2)
+
+    val responseString =
+      mockMvc
+        .post("/categories/rules") {
+          secure = true
+          header("Authorization", "Bearer $token")
+          contentType = MediaType.APPLICATION_JSON
+          content = objectMapper.writeValueAsString(request)
+        }
+        .andExpect { status { isOk() } }
+        .andReturn()
+        .response
+        .contentAsString
+    val response = objectMapper.readValue(responseString, AutoCategorizeRuleResponse::class.java)
+
+    entityManager.flush()
+    entityManager.clear()
+
+    val expectedOrdinals =
+      listOf(
+        RuleIdAndOrdinal(rules[0].id, 1),
+        RuleIdAndOrdinal(response.id, 2),
+        RuleIdAndOrdinal(rules[1].id, 3),
+        RuleIdAndOrdinal(rules[2].id, 4),
+        RuleIdAndOrdinal(rules[3].id, 5),
+        RuleIdAndOrdinal(rules[4].id, 6))
+    validateOrdinalsById(expectedOrdinals)
+  }
+
+  @Test
   fun createRule_verifyApplyingRules() {
     val request = AutoCategorizeRuleRequest(categoryId = cat1.id, regex = ".*")
 
@@ -276,6 +309,43 @@ constructor(
       .isPresent
       .get()
       .hasFieldOrPropertyWithValue("categoryId", cat1.id)
+  }
+
+  @Test
+  fun updateRule_withOrdinal() {
+    val rules = createRulesForOrdinalValidation()
+    val cat3 = dataHelper.createCategory(1L, "Hello")
+
+    val request =
+      AutoCategorizeRuleRequest(
+        categoryId = cat3.id,
+        regex = "Hello.*",
+        ordinal = 2,
+        startDate = LocalDate.of(2022, 1, 1),
+        endDate = LocalDate.of(2022, 2, 2),
+        minAmount = BigDecimal("10.0"),
+        maxAmount = BigDecimal("20.0"))
+
+    mockMvc
+      .put("/categories/rules/${rules[3].id}") {
+        secure = true
+        header("Authorization", "Bearer $token")
+        contentType = MediaType.APPLICATION_JSON
+        content = objectMapper.writeValueAsString(request)
+      }
+      .andExpect { status { isOk() } }
+
+    entityManager.flush()
+    entityManager.clear()
+
+    val expectedOrdinals =
+      listOf(
+        RuleIdAndOrdinal(rules[0].id, 1),
+        RuleIdAndOrdinal(rules[3].id, 2),
+        RuleIdAndOrdinal(rules[1].id, 3),
+        RuleIdAndOrdinal(rules[2].id, 4),
+        RuleIdAndOrdinal(rules[4].id, 5))
+    validateOrdinalsById(expectedOrdinals)
   }
 
   @Test
@@ -495,6 +565,9 @@ constructor(
       }
       .andExpect { status { isNoContent() } }
 
+    entityManager.flush()
+    entityManager.clear()
+
     assertThat(autoCategorizeRuleRepository.findById(rules[2].id)).isEmpty
 
     val expectedOrdinals =
@@ -518,6 +591,7 @@ constructor(
       .andExpect { status { isNoContent() } }
 
     entityManager.flush()
+    entityManager.clear()
 
     val expectedOrdinals =
       listOf(
@@ -541,6 +615,7 @@ constructor(
       .andExpect { status { isNoContent() } }
 
     entityManager.flush()
+    entityManager.clear()
 
     val expectedOrdinals =
       listOf(

@@ -60,12 +60,15 @@ class AutoCategorizeRuleService(
   fun createRule(request: AutoCategorizeRuleRequest): TryEither<AutoCategorizeRuleResponse> {
     val userId = oAuth2Service.getAuthenticatedUser().userId
     return validateCategory(request.categoryId, userId)
-      .flatMapCatch { autoCategorizeRuleRepository.countAllByUserId(userId) }
-      .map { count ->
+      .flatMap {
+        request.ordinal?.let { ordinal -> validateOrdinal(userId, ordinal) }
+          ?: Either.catch { autoCategorizeRuleRepository.countAllByUserId(userId).toInt() + 1 }
+      }
+      .map { ordinal ->
         AutoCategorizeRule(
           userId = userId,
           categoryId = request.categoryId,
-          ordinal = (count + 1).toInt(),
+          ordinal = ordinal,
           regex = request.regex,
           startDate = request.startDate,
           endDate = request.endDate,
@@ -73,6 +76,9 @@ class AutoCategorizeRuleService(
           maxAmount = request.maxAmount)
       }
       .flatMap { validateRule(it) }
+      .flatMap { rule ->
+        changeOtherRuleOrdinals(userId, Integer.MAX_VALUE, rule.ordinal).map { rule }
+      }
       .flatMapCatch { rule -> autoCategorizeRuleRepository.save(rule) }
       .flatMap { rule ->
         applyCategoriesToTransactionsService.applyCategoriesToUnconfirmedTransactions(userId).map {
@@ -112,6 +118,18 @@ class AutoCategorizeRuleService(
           maxAmount = request.maxAmount)
       }
       .flatMap { validateRule(it) }
+      .flatMap { rule ->
+        request.ordinal?.let { rawOrdinal ->
+          validateOrdinal(userId, rawOrdinal).map { ordinal ->
+            val oldOrdinal = rule.ordinal
+            rule.copy(ordinal = ordinal) to oldOrdinal
+          }
+        }
+          ?: Either.Right(rule to rule.ordinal)
+      }
+      .flatMap { (rule, oldOrdinal) ->
+        changeOtherRuleOrdinals(userId, oldOrdinal, rule.ordinal, rule.id).map { rule }
+      }
       .flatMapCatch { autoCategorizeRuleRepository.save(it) }
       .flatMap { rule ->
         applyCategoriesToTransactionsService.applyCategoriesToUnconfirmedTransactions(userId).map {
@@ -151,12 +169,8 @@ class AutoCategorizeRuleService(
     return validateOrdinal(userId, ordinal)
       .flatMap { getRuleIfValid(ruleId, userId) }
       .flatMap { rule ->
-        if (rule.ordinal == ordinal) {
-          Either.Right(rule)
-        } else {
-          changeOtherRuleOrdinals(userId, rule.ordinal, ordinal).flatMapCatch {
-            autoCategorizeRuleRepository.save(rule.copy(ordinal = ordinal))
-          }
+        changeOtherRuleOrdinals(userId, rule.ordinal, ordinal).flatMapCatch {
+          autoCategorizeRuleRepository.save(rule.copy(ordinal = ordinal))
         }
       }
       .flatMap {
@@ -167,13 +181,18 @@ class AutoCategorizeRuleService(
   private fun changeOtherRuleOrdinals(
     userId: Long,
     oldOrdinal: Int,
-    newOrdinal: Int
+    newOrdinal: Int,
+    excludeId: TypedId<AutoCategorizeRuleId>? = null
   ): TryEither<Unit> =
     Either.catch {
-      if (oldOrdinal < newOrdinal) {
-        autoCategorizeRuleRepository.decrementOrdinals(userId, oldOrdinal + 1, newOrdinal)
+      if (oldOrdinal == newOrdinal) {
+        Either.Right(Unit)
+      } else if (oldOrdinal < newOrdinal) {
+        autoCategorizeRuleRepository.decrementOrdinals(
+          userId, oldOrdinal + 1, newOrdinal, excludeId)
       } else {
-        autoCategorizeRuleRepository.incrementOrdinals(userId, newOrdinal, oldOrdinal - 1)
+        autoCategorizeRuleRepository.incrementOrdinals(
+          userId, newOrdinal, oldOrdinal - 1, excludeId)
       }
     }
 }
