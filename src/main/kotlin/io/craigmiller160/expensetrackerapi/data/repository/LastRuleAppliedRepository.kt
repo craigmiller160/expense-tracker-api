@@ -5,10 +5,17 @@ import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.LastRuleAppli
 import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.TransactionId
 import io.craigmiller160.expensetrackerapi.data.model.LastRuleApplied
 import org.springframework.data.jpa.repository.JpaRepository
+import org.springframework.data.jpa.repository.Modifying
 
 interface LastRuleAppliedRepository : JpaRepository<LastRuleApplied, TypedId<LastRuleAppliedId>> {
   fun findByUserIdAndTransactionId(
     userId: Long,
     transactionId: TypedId<TransactionId>
   ): LastRuleApplied?
+
+  @Modifying(flushAutomatically = true, clearAutomatically = true)
+  fun deleteAllByUserIdAndTransactionIdIn(
+    userId: Long,
+    transactionIds: List<TypedId<TransactionId>>
+  )
 }
