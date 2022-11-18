@@ -27,12 +27,14 @@ interface AutoCategorizeRuleRepository :
     WHERE r.ordinal <= :maxOrdinal
     AND r.ordinal >= :minOrdinal
     AND r.userId = :userId
+    AND (:excludeId IS NULL OR :excludeId <> r.id)
   """)
   @Modifying(flushAutomatically = true, clearAutomatically = true)
   fun decrementOrdinals(
     @Param("userId") userId: Long,
     @Param("minOrdinal") minOrdinal: Int,
-    @Param("maxOrdinal") maxOrdinal: Int
+    @Param("maxOrdinal") maxOrdinal: Int,
+    @Param("excludeId") excludeId: TypedId<AutoCategorizeRuleId>?
   )
 
   @Query(

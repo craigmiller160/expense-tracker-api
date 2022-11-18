@@ -185,8 +185,8 @@ class AutoCategorizeRuleService(
       if (oldOrdinal == newOrdinal) {
         Either.Right(Unit)
       } else if (oldOrdinal < newOrdinal) {
-        // TODO add exclude ID to this one if it works
-        autoCategorizeRuleRepository.decrementOrdinals(userId, oldOrdinal + 1, newOrdinal)
+        autoCategorizeRuleRepository.decrementOrdinals(
+          userId, oldOrdinal + 1, newOrdinal, excludeId)
       } else {
         autoCategorizeRuleRepository.incrementOrdinals(
           userId, newOrdinal, oldOrdinal - 1, excludeId)
