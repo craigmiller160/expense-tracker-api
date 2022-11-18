@@ -34,39 +34,43 @@ constructor(
 
   private lateinit var transactions: List<Transaction>
   private lateinit var categories: List<Category>
+  private lateinit var rules: List<AutoCategorizeRule>
 
   @BeforeEach
   fun setup() {
     ruleCounter = 0
-    val cat1 = dataHelper.createCategory(1L, "Entertainment")
-    val cat2 = dataHelper.createCategory(1L, "Food")
-    val cat3 = dataHelper.createCategory(1L, "Bills")
-    val cat4 = dataHelper.createCategory(1L, "Other")
-    val cat5 = dataHelper.createCategory(1L, "Something")
-    val cat6 = dataHelper.createCategory(1L, "Foo")
-    val cat7 = dataHelper.createCategory(1L, "To Somewhere")
+    val cat0 = dataHelper.createCategory(1L, "Entertainment")
+    val cat1 = dataHelper.createCategory(1L, "Food")
+    val cat2 = dataHelper.createCategory(1L, "Bills")
+    val cat3 = dataHelper.createCategory(1L, "Other")
+    val cat4 = dataHelper.createCategory(1L, "Something")
+    val cat5 = dataHelper.createCategory(1L, "Foo")
+    val cat6 = dataHelper.createCategory(1L, "To Somewhere")
 
-    categories = listOf(cat1, cat2, cat3, cat4, cat5, cat6, cat7)
+    categories = listOf(cat0, cat1, cat2, cat3, cat4, cat5, cat6)
 
-    val txn1 = createTransaction("Target", LocalDate.of(2022, 1, 1), BigDecimal("10"))
-    val txn2 = createTransaction("Target", LocalDate.of(2022, 1, 1), BigDecimal("100"))
-    val txn3 = createTransaction("AMC Theaters", LocalDate.of(2022, 3, 10), BigDecimal("22"))
-    val txn4 = createTransaction("AMC Theaters", LocalDate.of(2022, 6, 1), BigDecimal("10"))
-    val txn5 = createTransaction("AMC Theaters 2", LocalDate.of(2022, 12, 10), BigDecimal("22"))
-    val txn6 = createTransaction("Target", LocalDate.of(2022, 1, 1), BigDecimal("20"))
-    val txn7 =
+    val txn0 = createTransaction("Target", LocalDate.of(2022, 1, 1), BigDecimal("10"))
+    val txn1 = createTransaction("Target", LocalDate.of(2022, 1, 1), BigDecimal("100"))
+    val txn2 = createTransaction("AMC Theaters", LocalDate.of(2022, 3, 10), BigDecimal("22"))
+    val txn3 = createTransaction("AMC Theaters", LocalDate.of(2022, 6, 1), BigDecimal("10"))
+    val txn4 = createTransaction("AMC Theaters 2", LocalDate.of(2022, 12, 10), BigDecimal("22"))
+    val txn5 = createTransaction("Target", LocalDate.of(2022, 1, 1), BigDecimal("20"))
+    val txn6 =
       createTransaction("Universe", LocalDate.now(), BigDecimal("10")).let {
-        transactionRepository.save(it.copy(categoryId = cat7.id))
+        transactionRepository.save(it.copy(categoryId = cat6.id))
       }
 
-    transactions = listOf(txn1, txn2, txn3, txn4, txn5, txn6, txn7)
+    transactions = listOf(txn0, txn1, txn2, txn3, txn4, txn5, txn6)
 
-    createRule(categoryId = cat3.id, regex = "Target")
-    createRule(categoryId = cat1.id, regex = "Target", minAmount = BigDecimal("90"))
-    createRule(categoryId = cat2.id, regex = "Target", maxAmount = BigDecimal("15"))
-    createRule(categoryId = cat6.id, regex = "AMC.*")
-    createRule(categoryId = cat4.id, regex = "AMC.*", startDate = LocalDate.of(2022, 11, 1))
-    createRule(categoryId = cat5.id, regex = "AMC.*", endDate = LocalDate.of(2022, 4, 1))
+    val rule0 = createRule(categoryId = cat2.id, regex = "Target")
+    val rule1 = createRule(categoryId = cat0.id, regex = "Target", minAmount = BigDecimal("90"))
+    val rule2 = createRule(categoryId = cat1.id, regex = "Target", maxAmount = BigDecimal("15"))
+    val rule3 = createRule(categoryId = cat5.id, regex = "AMC.*")
+    val rule4 =
+      createRule(categoryId = cat3.id, regex = "AMC.*", startDate = LocalDate.of(2022, 11, 1))
+    val rule5 =
+      createRule(categoryId = cat4.id, regex = "AMC.*", endDate = LocalDate.of(2022, 4, 1))
+    rules = listOf(rule0, rule1, rule2, rule3, rule4, rule5)
   }
 
   private fun createTransaction(
@@ -103,13 +107,13 @@ constructor(
       applyCategoriesToTransactionsService
         .applyCategoriesToTransactions(1L, transactions)
         .shouldBeRight()
-    validateCategoryApplied(result[1], categories[0].id, null)
-    validateCategoryApplied(result[0], categories[1].id, null)
-    validateCategoryApplied(result[5], categories[2].id, null)
-    validateCategoryApplied(result[4], categories[3].id, null)
-    validateCategoryApplied(result[2], categories[4].id, null)
-    validateCategoryApplied(result[3], categories[5].id, null)
-    validateCategoryApplied(result[6], null, null)
+    validateCategoryApplied(result[1], categories[0].id, rules[1].id)
+    validateCategoryApplied(result[0], categories[1].id, rules[2].id)
+    validateCategoryApplied(result[5], categories[2].id, rules[0].id)
+    validateCategoryApplied(result[4], categories[3].id, rules[4].id)
+    validateCategoryApplied(result[2], categories[4].id, rules[5].id)
+    validateCategoryApplied(result[3], categories[5].id, rules[3].id)
+    validateCategoryApplied(result[6], null, null) // TODO add pre-existing record
   }
 
   private fun validateCategoryApplied(
