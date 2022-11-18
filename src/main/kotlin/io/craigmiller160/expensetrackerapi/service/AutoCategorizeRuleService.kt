@@ -125,7 +125,7 @@ class AutoCategorizeRuleService(
       }
       .flatMap { validateRule(it) }
       .flatMap { rule ->
-        changeOtherRuleOrdinals(userId, Integer.MAX_VALUE, rule.ordinal).map { rule }
+        changeOtherRuleOrdinals(userId, Integer.MAX_VALUE, rule.ordinal, rule.id).map { rule }
       }
       .flatMapCatch { autoCategorizeRuleRepository.save(it) }
       .flatMap { rule ->
@@ -178,15 +178,18 @@ class AutoCategorizeRuleService(
   private fun changeOtherRuleOrdinals(
     userId: Long,
     oldOrdinal: Int,
-    newOrdinal: Int
+    newOrdinal: Int,
+    excludeId: TypedId<AutoCategorizeRuleId>? = null
   ): TryEither<Unit> =
     Either.catch {
       if (oldOrdinal == newOrdinal) {
         Either.Right(Unit)
       } else if (oldOrdinal < newOrdinal) {
+        // TODO add exclude ID to this one if it works
         autoCategorizeRuleRepository.decrementOrdinals(userId, oldOrdinal + 1, newOrdinal)
       } else {
-        autoCategorizeRuleRepository.incrementOrdinals(userId, newOrdinal, oldOrdinal - 1)
+        autoCategorizeRuleRepository.incrementOrdinals(
+          userId, newOrdinal, oldOrdinal - 1, excludeId)
       }
     }
 }
