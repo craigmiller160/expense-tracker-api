@@ -65,7 +65,7 @@ class ApplyCategoriesToTransactionsService(
             .reduce(TemporaryRuleTransactionsWrapper.fromTransactions(categoryLessTransactions)) {
               (_, txnsToCategorize),
               (rule) ->
-              TemporaryRuleTransactionsWrapper.fromTransactions(
+              TemporaryRuleTransactionsWrapper.fromTransactionAndRules(
                 txnsToCategorize.map { applyRule(it.transaction, rule) })
             }
             .transactions
@@ -79,9 +79,10 @@ class ApplyCategoriesToTransactionsService(
       }
   }
 
-  private fun applyRule(transaction: Transaction, rule: AutoCategorizeRule): Transaction =
-    if (doesRuleApply(transaction, rule)) transaction.copy(categoryId = rule.categoryId)
-    else transaction
+  private fun applyRule(transaction: Transaction, rule: AutoCategorizeRule): TransactionAndRule =
+    if (doesRuleApply(transaction, rule))
+      TransactionAndRule(transaction = transaction.copy(categoryId = rule.categoryId), rule = rule)
+    else TransactionAndRule(transaction)
 
   private fun doesRuleApply(transaction: Transaction, rule: AutoCategorizeRule): Boolean =
     Regex(rule.regex).matches(transaction.description) &&
@@ -98,6 +99,7 @@ class ApplyCategoriesToTransactionsService(
       rule?.let { LastRuleApplied(userId = userId, ruleId = it.id, transactionId = transaction.id) }
   }
 
+  // TODO heavily refactor this and its use
   private data class TemporaryRuleTransactionsWrapper(
     val rule: AutoCategorizeRule,
     val transactions: List<TransactionAndRule>
@@ -108,6 +110,11 @@ class ApplyCategoriesToTransactionsService(
         TemporaryRuleTransactionsWrapper(rule, listOf())
       fun fromTransactions(transactions: List<Transaction>): TemporaryRuleTransactionsWrapper =
         TemporaryRuleTransactionsWrapper(EMPTY_RULE, transactions.map { TransactionAndRule(it) })
+
+      fun fromTransactionAndRules(
+        transactionAndRules: List<TransactionAndRule>
+      ): TemporaryRuleTransactionsWrapper =
+        TemporaryRuleTransactionsWrapper(EMPTY_RULE, transactionAndRules)
     }
   }
 }
