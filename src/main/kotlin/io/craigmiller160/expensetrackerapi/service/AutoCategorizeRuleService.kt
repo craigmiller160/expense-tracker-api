@@ -108,12 +108,6 @@ class AutoCategorizeRuleService(
     val userId = oAuth2Service.getAuthenticatedUser().userId
     return validateCategory(request.categoryId, userId)
       .flatMap { getRuleIfValid(ruleId, userId) }
-      .flatMap { rule ->
-        request.ordinal?.let { rawOrdinal ->
-          validateOrdinal(userId, rawOrdinal).map { ordinal -> rule.copy(ordinal = ordinal) }
-        }
-          ?: Either.Right(rule)
-      }
       .map { rule ->
         rule.copy(
           categoryId = request.categoryId,
@@ -125,7 +119,16 @@ class AutoCategorizeRuleService(
       }
       .flatMap { validateRule(it) }
       .flatMap { rule ->
-        changeOtherRuleOrdinals(userId, Integer.MAX_VALUE, rule.ordinal, rule.id).map { rule }
+        request.ordinal?.let { rawOrdinal ->
+          validateOrdinal(userId, rawOrdinal).map { ordinal ->
+            val oldOrdinal = rule.ordinal
+            rule.copy(ordinal = ordinal) to oldOrdinal
+          }
+        }
+          ?: Either.Right(rule to rule.ordinal)
+      }
+      .flatMap { (rule, oldOrdinal) ->
+        changeOtherRuleOrdinals(userId, oldOrdinal, rule.ordinal, rule.id).map { rule }
       }
       .flatMapCatch { autoCategorizeRuleRepository.save(it) }
       .flatMap { rule ->
