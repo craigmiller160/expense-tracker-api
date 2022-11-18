@@ -15,6 +15,7 @@ import io.craigmiller160.expensetrackerapi.testutils.DataHelper
 import io.kotest.assertions.arrow.core.shouldBeRight
 import java.math.BigDecimal
 import java.time.LocalDate
+import javax.persistence.EntityManager
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -28,7 +29,8 @@ constructor(
   private val autoCategorizeRuleRepository: AutoCategorizeRuleRepository,
   private val transactionRepository: TransactionRepository,
   private val applyCategoriesToTransactionsService: ApplyCategoriesToTransactionsService,
-  private val lastRuleAppliedRepository: LastRuleAppliedRepository
+  private val lastRuleAppliedRepository: LastRuleAppliedRepository,
+  private val entityManager: EntityManager
 ) {
 
   private var ruleCounter = 0
@@ -110,6 +112,10 @@ constructor(
       applyCategoriesToTransactionsService
         .applyCategoriesToTransactions(1L, transactions)
         .shouldBeRight()
+
+    entityManager.flush()
+    entityManager.clear()
+
     validateCategoryApplied(result[1], categories[0].id, rules[1].id)
     validateCategoryApplied(result[0], categories[1].id, rules[2].id)
     validateCategoryApplied(result[5], categories[2].id, rules[0].id)

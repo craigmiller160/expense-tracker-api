@@ -72,7 +72,7 @@ class ApplyCategoriesToTransactionsService(
         }
       }
       .flatMapCatch { transactionsAndRules ->
-        val lastRuleApplied = transactionsAndRules.map { it.toLastRuleApplied(userId) }
+        val lastRuleApplied = transactionsAndRules.mapNotNull { it.toLastRuleApplied(userId) }
         val transactionsToSave = transactionsAndRules.map { it.transaction }
         lastRuleAppliedRepository.saveAll(lastRuleApplied)
         transactionRepository.saveAll(transactionsToSave)
