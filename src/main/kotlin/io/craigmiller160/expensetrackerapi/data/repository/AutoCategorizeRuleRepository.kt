@@ -5,9 +5,6 @@ import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.AutoCategoriz
 import io.craigmiller160.expensetrackerapi.data.model.AutoCategorizeRule
 import java.util.stream.Stream
 import org.springframework.data.jpa.repository.JpaRepository
-import org.springframework.data.jpa.repository.Modifying
-import org.springframework.data.jpa.repository.Query
-import org.springframework.data.repository.query.Param
 
 interface AutoCategorizeRuleRepository :
   JpaRepository<AutoCategorizeRule, TypedId<AutoCategorizeRuleId>>,
@@ -20,37 +17,38 @@ interface AutoCategorizeRuleRepository :
 
   fun streamAllByUserIdOrderByOrdinal(userId: Long): Stream<AutoCategorizeRule>
 
-  @Query(
-    """
-    UPDATE AutoCategorizeRule r
-    SET r.ordinal = r.ordinal - 1, r.version = r.version + 1
-    WHERE r.ordinal <= :maxOrdinal
-    AND r.ordinal >= :minOrdinal
-    AND r.userId = :userId
-    AND (:excludeId IS NULL OR :excludeId <> r.id)
-  """)
-  @Modifying(flushAutomatically = true, clearAutomatically = true)
-  fun decrementOrdinals(
-    @Param("userId") userId: Long,
-    @Param("minOrdinal") minOrdinal: Int,
-    @Param("maxOrdinal") maxOrdinal: Int,
-    @Param("excludeId") excludeId: TypedId<AutoCategorizeRuleId>? = null
-  )
+  // TODO cleanup below here
+  //  @Query(
+  //    """
+  //    UPDATE AutoCategorizeRule r
+  //    SET r.ordinal = r.ordinal - 1, r.version = r.version + 1
+  //    WHERE r.ordinal <= :maxOrdinal
+  //    AND r.ordinal >= :minOrdinal
+  //    AND r.userId = :userId
+  //    AND (:excludeId IS NULL OR :excludeId <> r.id)
+  //  """)
+  //  @Modifying(flushAutomatically = true, clearAutomatically = true)
+  //  fun decrementOrdinals(
+  //    @Param("userId") userId: Long,
+  //    @Param("minOrdinal") minOrdinal: Int,
+  //    @Param("maxOrdinal") maxOrdinal: Int,
+  //    @Param("excludeId") excludeId: TypedId<AutoCategorizeRuleId>? = null
+  //  )
 
-  @Query(
-    """
-    UPDATE AutoCategorizeRule r
-    SET r.ordinal = r.ordinal + 1, r.version = r.version + 1 
-    WHERE r.ordinal <= :maxOrdinal
-    AND r.ordinal >= :minOrdinal
-    AND r.userId = :userId
-    AND (:excludeId IS NULL OR :excludeId <> r.id)
-  """)
-  @Modifying(flushAutomatically = true, clearAutomatically = true)
-  fun incrementOrdinals(
-    @Param("userId") userId: Long,
-    @Param("minOrdinal") minOrdinal: Int,
-    @Param("maxOrdinal") maxOrdinal: Int,
-    @Param("excludeId") excludeId: TypedId<AutoCategorizeRuleId>? = null
-  )
+  //  @Query(
+  //    """
+  //    UPDATE AutoCategorizeRule r
+  //    SET r.ordinal = r.ordinal + 1, r.version = r.version + 1
+  //    WHERE r.ordinal <= :maxOrdinal
+  //    AND r.ordinal >= :minOrdinal
+  //    AND r.userId = :userId
+  //    AND (:excludeId IS NULL OR :excludeId <> r.id)
+  //  """)
+  //  @Modifying(flushAutomatically = true, clearAutomatically = true)
+  //  fun incrementOrdinals(
+  //    @Param("userId") userId: Long,
+  //    @Param("minOrdinal") minOrdinal: Int,
+  //    @Param("maxOrdinal") maxOrdinal: Int,
+  //    @Param("excludeId") excludeId: TypedId<AutoCategorizeRuleId>? = null
+  //  )
 }

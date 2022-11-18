@@ -2,6 +2,8 @@ package io.craigmiller160.expensetrackerapi.data.repository.impl
 
 import com.querydsl.core.BooleanBuilder
 import com.querydsl.jpa.JPQLQueryFactory
+import io.craigmiller160.expensetrackerapi.common.data.typedid.TypedId
+import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.AutoCategorizeRuleId
 import io.craigmiller160.expensetrackerapi.data.model.AutoCategorizeRule
 import io.craigmiller160.expensetrackerapi.data.model.QAutoCategorizeRule
 import io.craigmiller160.expensetrackerapi.data.querydsl.QueryDSLSupport
@@ -47,5 +49,23 @@ class AutoCategorizeRuleRepositoryCustomImpl(
         .fetch()
 
     return PageImpl(results, pageable, count)
+  }
+
+  override fun decrementOrdinals(
+    userId: Long,
+    minOrdinal: Int,
+    maxOrdinal: Int,
+    excludeId: TypedId<AutoCategorizeRuleId>?
+  ) {
+    TODO("Not yet implemented")
+  }
+
+  override fun incrementOrdinals(
+    userId: Long,
+    minOrdinal: Int,
+    maxOrdinal: Int,
+    excludeId: TypedId<AutoCategorizeRuleId>?
+  ) {
+    TODO("Not yet implemented")
   }
 }
