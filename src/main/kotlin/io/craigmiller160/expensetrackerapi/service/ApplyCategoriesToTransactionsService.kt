@@ -4,8 +4,10 @@ import arrow.core.Either
 import arrow.core.flatMap
 import io.craigmiller160.expensetrackerapi.common.data.typedid.TypedId
 import io.craigmiller160.expensetrackerapi.data.model.AutoCategorizeRule
+import io.craigmiller160.expensetrackerapi.data.model.LastRuleApplied
 import io.craigmiller160.expensetrackerapi.data.model.Transaction
 import io.craigmiller160.expensetrackerapi.data.repository.AutoCategorizeRuleRepository
+import io.craigmiller160.expensetrackerapi.data.repository.LastRuleAppliedRepository
 import io.craigmiller160.expensetrackerapi.data.repository.TransactionRepository
 import io.craigmiller160.expensetrackerapi.function.TryEither
 import io.craigmiller160.expensetrackerapi.function.flatMapCatch
@@ -18,7 +20,8 @@ import org.springframework.stereotype.Service
 @Service
 class ApplyCategoriesToTransactionsService(
   private val autoCategorizeRuleRepository: AutoCategorizeRuleRepository,
-  private val transactionRepository: TransactionRepository
+  private val transactionRepository: TransactionRepository,
+  private val lastRuleAppliedRepository: LastRuleAppliedRepository
 ) {
   companion object {
     private const val PAGE_SIZE = 25
@@ -35,9 +38,9 @@ class ApplyCategoriesToTransactionsService(
     val page = PageRequest.of(pageNumber, PAGE_SIZE, Sort.by(Sort.Order.asc("id")))
     return Either.catch { transactionRepository.findAllUnconfirmed(userId, page) }
       .flatMap { transactions ->
-        applyCategoriesToTransactions(userId, transactions.content)
-          .flatMapCatch { transactionRepository.saveAll(it) }
-          .map { transactions.totalElements }
+        applyCategoriesToTransactions(userId, transactions.content).map {
+          transactions.totalElements
+        }
       }
       .flatMap { totalElements ->
         if ((pageNumber + 1) * PAGE_SIZE < totalElements) {
@@ -53,18 +56,27 @@ class ApplyCategoriesToTransactionsService(
     transactions: List<Transaction>
   ): TryEither<List<Transaction>> {
     val categoryLessTransactions = transactions.map { it.copy(categoryId = null) }
+    lastRuleAppliedRepository.deleteAllByUserIdAndTransactionIdIn(
+      userId, categoryLessTransactions.map { it.id })
     return Either.catch {
-      autoCategorizeRuleRepository.streamAllByUserIdOrderByOrdinal(userId).use { ruleStream ->
-        ruleStream
-          .map { RuleTransactionsWrapper.fromRule(it) }
-          .reduce(RuleTransactionsWrapper.fromTransactions(categoryLessTransactions)) {
-            (_, txnsToCategorize),
-            (rule) ->
-            RuleTransactionsWrapper.fromTransactions(txnsToCategorize.map { applyRule(it, rule) })
-          }
-          .transactions
+        autoCategorizeRuleRepository.streamAllByUserIdOrderByOrdinal(userId).use { ruleStream ->
+          ruleStream
+            .map { TemporaryRuleTransactionsWrapper.fromRule(it) }
+            .reduce(TemporaryRuleTransactionsWrapper.fromTransactions(categoryLessTransactions)) {
+              (_, txnsToCategorize),
+              (rule) ->
+              TemporaryRuleTransactionsWrapper.fromTransactions(
+                txnsToCategorize.map { applyRule(it.transaction, rule) })
+            }
+            .transactions
+        }
       }
-    }
+      .flatMapCatch { transactionsAndRules ->
+        val lastRuleApplied = transactionsAndRules.map { it.toLastRuleApplied(userId) }
+        val transactionsToSave = transactionsAndRules.map { it.transaction }
+        lastRuleAppliedRepository.saveAll(lastRuleApplied)
+        transactionRepository.saveAll(transactionsToSave)
+      }
   }
 
   private fun applyRule(transaction: Transaction, rule: AutoCategorizeRule): Transaction =
@@ -78,16 +90,24 @@ class ApplyCategoriesToTransactionsService(
       (rule.minAmount?.let { it <= transaction.amount } ?: true) &&
       (rule.maxAmount?.let { it >= transaction.amount } ?: true)
 
-  private data class RuleTransactionsWrapper(
+  private data class TransactionAndRule(
+    val transaction: Transaction,
+    val rule: AutoCategorizeRule? = null
+  ) {
+    fun toLastRuleApplied(userId: Long): LastRuleApplied? =
+      rule?.let { LastRuleApplied(userId = userId, ruleId = it.id, transactionId = transaction.id) }
+  }
+
+  private data class TemporaryRuleTransactionsWrapper(
     val rule: AutoCategorizeRule,
-    val transactions: List<Transaction>
+    val transactions: List<TransactionAndRule>
   ) {
     companion object {
       private val EMPTY_RULE = AutoCategorizeRule(0L, TypedId(), 0, "")
-      fun fromRule(rule: AutoCategorizeRule): RuleTransactionsWrapper =
-        RuleTransactionsWrapper(rule, listOf())
-      fun fromTransactions(transactions: List<Transaction>): RuleTransactionsWrapper =
-        RuleTransactionsWrapper(EMPTY_RULE, transactions)
+      fun fromRule(rule: AutoCategorizeRule): TemporaryRuleTransactionsWrapper =
+        TemporaryRuleTransactionsWrapper(rule, listOf())
+      fun fromTransactions(transactions: List<Transaction>): TemporaryRuleTransactionsWrapper =
+        TemporaryRuleTransactionsWrapper(EMPTY_RULE, transactions.map { TransactionAndRule(it) })
     }
   }
 }
