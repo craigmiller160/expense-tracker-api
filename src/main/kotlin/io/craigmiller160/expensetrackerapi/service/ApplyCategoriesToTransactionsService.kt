@@ -57,9 +57,11 @@ class ApplyCategoriesToTransactionsService(
     transactions: List<Transaction>
   ): TryEither<List<Transaction>> {
     val categoryLessTransactions = transactions.map { it.copy(categoryId = null) }
-    lastRuleAppliedRepository.deleteAllByUserIdAndTransactionIdIn(
-      userId, categoryLessTransactions.map { it.id })
     return Either.catch {
+        lastRuleAppliedRepository.deleteAllByUserIdAndTransactionIdIn(
+          userId, categoryLessTransactions.map { it.id })
+      }
+      .flatMapCatch {
         autoCategorizeRuleRepository.streamAllByUserIdOrderByOrdinal(userId).use { ruleStream ->
           ruleStream
             .map { TemporaryRuleTransactionsWrapper.fromRule(it) }
