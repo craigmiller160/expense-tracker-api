@@ -55,16 +55,21 @@ class ApplyCategoriesToTransactionsService(
       }
   }
 
+  private fun deleteLastRuleAppliedForTransactions(
+    userId: Long,
+    transactionIds: List<TypedId<TransactionId>>
+  ): TryEither<Unit> =
+    Either.catch {
+      lastRuleAppliedRepository.deleteAllByUserIdAndTransactionIdIn(userId, transactionIds)
+    }
+
   // TODO this returns transactions out of order
   fun applyCategoriesToTransactions(
     userId: Long,
     transactions: List<Transaction>
   ): TryEither<List<Transaction>> {
     val categoryLessTransactions = transactions.map { it.copy(categoryId = null) }
-    return Either.catch {
-        lastRuleAppliedRepository.deleteAllByUserIdAndTransactionIdIn( // TODO flush this... maybe?
-          userId, categoryLessTransactions.map { it.id })
-      }
+    return deleteLastRuleAppliedForTransactions(userId, categoryLessTransactions.map { it.id })
       .flatMapCatch {
         autoCategorizeRuleRepository.streamAllByUserIdOrderByOrdinal(userId).use { ruleStream ->
           ruleStream
