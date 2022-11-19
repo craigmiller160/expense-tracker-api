@@ -63,7 +63,31 @@ class ApplyCategoriesToTransactionsService(
       lastRuleAppliedRepository.deleteAllByUserIdAndTransactionIdIn(userId, transactionIds)
     }
 
-  // TODO this returns transactions out of order
+  private fun categorizeTransactionsReducer(
+    fullContext: TransactionRuleContext,
+    singleRuleContext: TransactionRuleContext
+  ): TransactionRuleContext {
+    val (_, _, rule) = singleRuleContext
+    val (matches, noMatches) = fullContext.allTransactions.partition { doesRuleApply(it, rule) }
+    val matchesWithCategories = matches.map { it.copy(categoryId = rule.categoryId) }
+    val lastMatchingRules = matches.associate { it.id to rule.id }
+    return fullContext.copy(
+      allTransactions = matchesWithCategories + noMatches,
+      lastRulesApplied = fullContext.lastRulesApplied + lastMatchingRules)
+  }
+
+  private fun saveCategorizedTransactions(
+    context: TransactionRuleContext
+  ): TryEither<List<Transaction>> =
+    Either.catch {
+      lastRuleAppliedRepository.saveAll(
+        context.lastRulesApplied.map {
+          LastRuleApplied(userId = userId, transactionId = it.key, ruleId = it.value)
+        })
+      transactionRepository.saveAll(context.allTransactions)
+    }
+
+  /** This returns the transactions in a different order from the method. */
   fun applyCategoriesToTransactions(
     userId: Long,
     transactions: List<Transaction>
@@ -74,26 +98,12 @@ class ApplyCategoriesToTransactionsService(
         autoCategorizeRuleRepository.streamAllByUserIdOrderByOrdinal(userId).use { ruleStream ->
           ruleStream
             .map { TransactionRuleContext.forCurrentRule(it) }
-            .reduce(TransactionRuleContext.forAllTransactions(categoryLessTransactions)) {
-              context,
-              (_, _, rule) ->
-              val (matches, noMatches) =
-                context.allTransactions.partition { doesRuleApply(it, rule) }
-              val matchesWithCategories = matches.map { it.copy(categoryId = rule.categoryId) }
-              val lastMatchingRules = matches.associate { it.id to rule.id }
-              context.copy(
-                allTransactions = matchesWithCategories + noMatches,
-                lastRulesApplied = context.lastRulesApplied + lastMatchingRules)
-            }
+            .reduce(
+              TransactionRuleContext.forAllTransactions(categoryLessTransactions),
+              this::categorizeTransactionsReducer)
         }
       }
-      .flatMapCatch { context ->
-        lastRuleAppliedRepository.saveAll(
-          context.lastRulesApplied.map {
-            LastRuleApplied(userId = userId, transactionId = it.key, ruleId = it.value)
-          })
-        transactionRepository.saveAll(context.allTransactions)
-      }
+      .flatMap(this::saveCategorizedTransactions)
   }
 
   private fun doesRuleApply(transaction: Transaction, rule: AutoCategorizeRule): Boolean =
