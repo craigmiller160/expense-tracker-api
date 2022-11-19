@@ -55,13 +55,14 @@ class ApplyCategoriesToTransactionsService(
       }
   }
 
+  // TODO this returns transactions out of order
   fun applyCategoriesToTransactions(
     userId: Long,
     transactions: List<Transaction>
   ): TryEither<List<Transaction>> {
     val categoryLessTransactions = transactions.map { it.copy(categoryId = null) }
     return Either.catch {
-        lastRuleAppliedRepository.deleteAllByUserIdAndTransactionIdIn(
+        lastRuleAppliedRepository.deleteAllByUserIdAndTransactionIdIn( // TODO flush this... maybe?
           userId, categoryLessTransactions.map { it.id })
       }
       .flatMapCatch {

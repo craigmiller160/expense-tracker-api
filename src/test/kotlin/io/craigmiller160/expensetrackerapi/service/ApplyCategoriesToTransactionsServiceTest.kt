@@ -116,13 +116,13 @@ constructor(
     entityManager.flush()
     entityManager.clear()
 
-    validateCategoryApplied(result[1], categories[0].id, rules[1].id)
-    validateCategoryApplied(result[0], categories[1].id, rules[2].id)
-    validateCategoryApplied(result[5], categories[2].id, rules[0].id)
-    validateCategoryApplied(result[4], categories[3].id, rules[4].id)
-    validateCategoryApplied(result[2], categories[4].id, rules[5].id)
-    validateCategoryApplied(result[3], categories[5].id, rules[3].id)
-    validateCategoryApplied(result[6], null, null)
+    validateCategoryApplied(transactions[1], categories[0].id, rules[1].id)
+    validateCategoryApplied(transactions[0], categories[1].id, rules[2].id)
+    validateCategoryApplied(transactions[5], categories[2].id, rules[0].id)
+    validateCategoryApplied(transactions[4], categories[3].id, rules[4].id)
+    validateCategoryApplied(transactions[2], categories[4].id, rules[5].id)
+    validateCategoryApplied(transactions[3], categories[5].id, rules[3].id)
+    validateCategoryApplied(transactions[6], null, null)
   }
 
   private fun validateCategoryApplied(
@@ -130,7 +130,10 @@ constructor(
     categoryId: TypedId<CategoryId>?,
     ruleId: TypedId<AutoCategorizeRuleId>?
   ) {
-    assertThat(txn).hasFieldOrPropertyWithValue("categoryId", categoryId)
+    assertThat(transactionRepository.findById(txn.id))
+      .isPresent
+      .get()
+      .hasFieldOrPropertyWithValue("categoryId", categoryId)
     ruleId?.let { nonNullRuleId ->
       assertThat(lastRuleAppliedRepository.findByUserIdAndTransactionId(1L, txn.id))
         .isNotNull
