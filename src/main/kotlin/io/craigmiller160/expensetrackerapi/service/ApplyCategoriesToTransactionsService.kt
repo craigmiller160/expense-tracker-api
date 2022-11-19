@@ -25,7 +25,7 @@ class ApplyCategoriesToTransactionsService(
   private val transactionRepository: TransactionRepository,
   private val lastRuleAppliedRepository: LastRuleAppliedRepository
 ) {
-  // TODO look into persitent collections option for this
+  // TODO look into persistent collections option for this
   // TODO major refactor here is needed to clean this up
   companion object {
     private const val PAGE_SIZE = 25
@@ -80,23 +80,9 @@ class ApplyCategoriesToTransactionsService(
                 allTransactions = matchesWithCategories + noMatches,
                 lastRulesApplied = context.lastRulesApplied + lastMatchingRules)
             }
-
-          //          ruleStream
-          //            .map { TemporaryRuleTransactionsWrapper.fromRule(it) }
-          //
-          // .reduce(TemporaryRuleTransactionsWrapper.fromTransactions(categoryLessTransactions)) {
-          //              (_, txnsToCategorize),
-          //              (rule) ->
-          //              TemporaryRuleTransactionsWrapper.fromTransactionAndRules(
-          //                txnsToCategorize.map { applyRule(it, rule) })
-          //            }
-          //            .transactions
         }
       }
       .flatMapCatch { context ->
-        //        val lastRuleApplied = transactionsAndRules.mapNotNull {
-        // it.toLastRuleApplied(userId) }
-        //        val transactionsToSave = transactionsAndRules.map { it.transaction }
         lastRuleAppliedRepository.saveAll(
           context.lastRulesApplied.map {
             LastRuleApplied(userId = userId, transactionId = it.key, ruleId = it.value)
@@ -105,49 +91,12 @@ class ApplyCategoriesToTransactionsService(
       }
   }
 
-  private fun applyRule(
-    transactionAndRule: TransactionAndRule2,
-    rule: AutoCategorizeRule
-  ): TransactionAndRule2 =
-    if (doesRuleApply(transactionAndRule.transaction, rule))
-      TransactionAndRule2(
-        transaction = transactionAndRule.transaction.copy(categoryId = rule.categoryId),
-        rule = rule)
-    else transactionAndRule
-
   private fun doesRuleApply(transaction: Transaction, rule: AutoCategorizeRule): Boolean =
     Regex(rule.regex).matches(transaction.description) &&
       (rule.startDate ?: LocalDate.MIN) <= transaction.expenseDate &&
       (rule.endDate ?: LocalDate.MAX) >= transaction.expenseDate &&
       (rule.minAmount?.let { it <= transaction.amount } ?: true) &&
       (rule.maxAmount?.let { it >= transaction.amount } ?: true)
-
-  private data class TransactionAndRule2(
-    val transaction: Transaction,
-    val rule: AutoCategorizeRule? = null
-  ) {
-    fun toLastRuleApplied(userId: Long): LastRuleApplied? =
-      rule?.let { LastRuleApplied(userId = userId, ruleId = it.id, transactionId = transaction.id) }
-  }
-
-  // TODO heavily refactor this and its use
-  private data class TemporaryRuleTransactionsWrapper(
-    val rule: AutoCategorizeRule,
-    val transactions: List<TransactionAndRule2>
-  ) {
-    companion object {
-      private val EMPTY_RULE = AutoCategorizeRule(0L, TypedId(), 0, "")
-      fun fromRule(rule: AutoCategorizeRule): TemporaryRuleTransactionsWrapper =
-        TemporaryRuleTransactionsWrapper(rule, listOf())
-      fun fromTransactions(transactions: List<Transaction>): TemporaryRuleTransactionsWrapper =
-        TemporaryRuleTransactionsWrapper(EMPTY_RULE, transactions.map { TransactionAndRule2(it) })
-
-      fun fromTransactionAndRules(
-        transactionAndRules: List<TransactionAndRule2>
-      ): TemporaryRuleTransactionsWrapper =
-        TemporaryRuleTransactionsWrapper(EMPTY_RULE, transactionAndRules)
-    }
-  }
 
   private data class TransactionRuleContext(
     val allTransactions: List<Transaction>,
