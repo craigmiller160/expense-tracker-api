@@ -3,6 +3,8 @@ package io.craigmiller160.expensetrackerapi.service
 import arrow.core.Either
 import arrow.core.flatMap
 import io.craigmiller160.expensetrackerapi.common.data.typedid.TypedId
+import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.AutoCategorizeRuleId
+import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.TransactionId
 import io.craigmiller160.expensetrackerapi.data.model.AutoCategorizeRule
 import io.craigmiller160.expensetrackerapi.data.model.LastRuleApplied
 import io.craigmiller160.expensetrackerapi.data.model.Transaction
@@ -23,6 +25,7 @@ class ApplyCategoriesToTransactionsService(
   private val transactionRepository: TransactionRepository,
   private val lastRuleAppliedRepository: LastRuleAppliedRepository
 ) {
+  // TODO look into persitent collections option for this
   // TODO major refactor here is needed to clean this up
   companion object {
     private const val PAGE_SIZE = 25
@@ -64,30 +67,49 @@ class ApplyCategoriesToTransactionsService(
       .flatMapCatch {
         autoCategorizeRuleRepository.streamAllByUserIdOrderByOrdinal(userId).use { ruleStream ->
           ruleStream
-            .map { TemporaryRuleTransactionsWrapper.fromRule(it) }
-            .reduce(TemporaryRuleTransactionsWrapper.fromTransactions(categoryLessTransactions)) {
-              (_, txnsToCategorize),
-              (rule) ->
-              TemporaryRuleTransactionsWrapper.fromTransactionAndRules(
-                txnsToCategorize.map { applyRule(it, rule) })
+            .map { TransactionRuleContext.forCurrentRule(it) }
+            .reduce(TransactionRuleContext.forAllTransactions(categoryLessTransactions)) {
+              context,
+              (_, _, rule) ->
+              val (matches, noMatches) =
+                context.allTransactions.partition { doesRuleApply(it, rule) }
+              val matchesWithCategories = matches.map { it.copy(categoryId = rule.categoryId) }
+              val lastMatchingRules = matches.associate { it.id to rule.id }
+              context.copy(
+                allTransactions = matchesWithCategories + noMatches,
+                lastRulesApplied = context.lastRulesApplied + lastMatchingRules)
             }
-            .transactions
+
+          //          ruleStream
+          //            .map { TemporaryRuleTransactionsWrapper.fromRule(it) }
+          //
+          // .reduce(TemporaryRuleTransactionsWrapper.fromTransactions(categoryLessTransactions)) {
+          //              (_, txnsToCategorize),
+          //              (rule) ->
+          //              TemporaryRuleTransactionsWrapper.fromTransactionAndRules(
+          //                txnsToCategorize.map { applyRule(it, rule) })
+          //            }
+          //            .transactions
         }
       }
-      .flatMapCatch { transactionsAndRules ->
-        val lastRuleApplied = transactionsAndRules.mapNotNull { it.toLastRuleApplied(userId) }
-        val transactionsToSave = transactionsAndRules.map { it.transaction }
-        lastRuleAppliedRepository.saveAll(lastRuleApplied)
-        transactionRepository.saveAll(transactionsToSave)
+      .flatMapCatch { context ->
+        //        val lastRuleApplied = transactionsAndRules.mapNotNull {
+        // it.toLastRuleApplied(userId) }
+        //        val transactionsToSave = transactionsAndRules.map { it.transaction }
+        lastRuleAppliedRepository.saveAll(
+          context.lastRulesApplied.map {
+            LastRuleApplied(userId = userId, transactionId = it.key, ruleId = it.value)
+          })
+        transactionRepository.saveAll(context.allTransactions)
       }
   }
 
   private fun applyRule(
-    transactionAndRule: TransactionAndRule,
+    transactionAndRule: TransactionAndRule2,
     rule: AutoCategorizeRule
-  ): TransactionAndRule =
+  ): TransactionAndRule2 =
     if (doesRuleApply(transactionAndRule.transaction, rule))
-      TransactionAndRule(
+      TransactionAndRule2(
         transaction = transactionAndRule.transaction.copy(categoryId = rule.categoryId),
         rule = rule)
     else transactionAndRule
@@ -99,7 +121,7 @@ class ApplyCategoriesToTransactionsService(
       (rule.minAmount?.let { it <= transaction.amount } ?: true) &&
       (rule.maxAmount?.let { it >= transaction.amount } ?: true)
 
-  private data class TransactionAndRule(
+  private data class TransactionAndRule2(
     val transaction: Transaction,
     val rule: AutoCategorizeRule? = null
   ) {
@@ -110,19 +132,34 @@ class ApplyCategoriesToTransactionsService(
   // TODO heavily refactor this and its use
   private data class TemporaryRuleTransactionsWrapper(
     val rule: AutoCategorizeRule,
-    val transactions: List<TransactionAndRule>
+    val transactions: List<TransactionAndRule2>
   ) {
     companion object {
       private val EMPTY_RULE = AutoCategorizeRule(0L, TypedId(), 0, "")
       fun fromRule(rule: AutoCategorizeRule): TemporaryRuleTransactionsWrapper =
         TemporaryRuleTransactionsWrapper(rule, listOf())
       fun fromTransactions(transactions: List<Transaction>): TemporaryRuleTransactionsWrapper =
-        TemporaryRuleTransactionsWrapper(EMPTY_RULE, transactions.map { TransactionAndRule(it) })
+        TemporaryRuleTransactionsWrapper(EMPTY_RULE, transactions.map { TransactionAndRule2(it) })
 
       fun fromTransactionAndRules(
-        transactionAndRules: List<TransactionAndRule>
+        transactionAndRules: List<TransactionAndRule2>
       ): TemporaryRuleTransactionsWrapper =
         TemporaryRuleTransactionsWrapper(EMPTY_RULE, transactionAndRules)
+    }
+  }
+
+  private data class TransactionRuleContext(
+    val allTransactions: List<Transaction>,
+    val lastRulesApplied: Map<TypedId<TransactionId>, TypedId<AutoCategorizeRuleId>>,
+    val currentRule: AutoCategorizeRule
+  ) {
+    companion object {
+      private val EMPTY_RULE = AutoCategorizeRule(0L, TypedId(), 0, "")
+
+      fun forAllTransactions(allTransactions: List<Transaction>): TransactionRuleContext =
+        TransactionRuleContext(allTransactions, mapOf(), EMPTY_RULE)
+      fun forCurrentRule(currentRule: AutoCategorizeRule): TransactionRuleContext =
+        TransactionRuleContext(listOf(), mapOf(), currentRule)
     }
   }
 }
