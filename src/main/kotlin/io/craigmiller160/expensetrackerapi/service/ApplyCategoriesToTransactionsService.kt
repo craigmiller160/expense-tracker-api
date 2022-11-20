@@ -77,6 +77,7 @@ class ApplyCategoriesToTransactionsService(
   }
 
   private fun saveCategorizedTransactions(
+    userId: Long,
     context: TransactionRuleContext
   ): TryEither<List<Transaction>> =
     Either.catch {
@@ -103,7 +104,7 @@ class ApplyCategoriesToTransactionsService(
               this::categorizeTransactionsReducer)
         }
       }
-      .flatMap(this::saveCategorizedTransactions)
+      .flatMap { saveCategorizedTransactions(userId, it) }
   }
 
   private fun doesRuleApply(transaction: Transaction, rule: AutoCategorizeRule): Boolean =
