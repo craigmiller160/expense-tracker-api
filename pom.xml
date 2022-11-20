@@ -51,7 +51,6 @@
         <maven.compiler.plugin.version>3.10.1</maven.compiler.plugin.version>
         <java.version>18</java.version>
         <springdoc.openapi.version>1.6.11</springdoc.openapi.version>
-        <kotlinx.collections.version>0.3.5</kotlinx.collections.version>
     </properties>
 
     <distributionManagement>
@@ -68,11 +67,6 @@
     </distributionManagement>
 
     <dependencies>
-        <dependency>
-            <groupId>org.jetbrains.kotlinx</groupId>
-            <artifactId>kotlinx-collections-immutable-jvm</artifactId>
-            <version>${kotlinx.collections.version}</version>
-        </dependency>
         <dependency>
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-kotlin</artifactId>
