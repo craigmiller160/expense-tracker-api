@@ -63,6 +63,10 @@ class ApplyCategoriesToTransactionsService(
       lastRuleAppliedRepository.deleteAllByUserIdAndTransactionIdIn(userId, transactionIds)
     }
 
+  /**
+   * This whole method is already O(n^2) complexity, so the read-only collection complexity doesn't
+   * make it any worse.
+   */
   private fun categorizeTransactionsReducer(
     fullContext: TransactionRuleContext,
     singleRuleContext: TransactionRuleContext
@@ -71,8 +75,6 @@ class ApplyCategoriesToTransactionsService(
     val (matches, noMatches) = fullContext.allTransactions.partition { doesRuleApply(it, rule) }
     val matchesWithCategories = matches.map { it.copy(categoryId = rule.categoryId) }
     val lastMatchingRules = matches.associate { it.id to rule.id }
-    // TODO the collection concatenation here results in O(n^2) complexity. This needs to be
-    // resolved
     return fullContext.copy(
       allTransactions = matchesWithCategories + noMatches,
       lastRulesApplied = fullContext.lastRulesApplied + lastMatchingRules)
