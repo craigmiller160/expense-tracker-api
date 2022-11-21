@@ -1092,6 +1092,12 @@ constructor(
 
   @Test
   fun `updateTransactionDetails - confirming and or setting category clears last rule applied`() {
+    transactionRepository.saveAndFlush(
+      user1Transactions[0].copy(categoryId = null, confirmed = false))
+    transactionRepository.saveAndFlush(
+      user1Transactions[1].copy(categoryId = null, confirmed = false))
+    transactionRepository.saveAndFlush(
+      user1Transactions[2].copy(categoryId = null, confirmed = false))
     dataHelper.createLastRuleApplied(1L, user1Transactions[0].id, rule.id)
     dataHelper.createLastRuleApplied(1L, user1Transactions[1].id, rule.id)
     dataHelper.createLastRuleApplied(1L, user1Transactions[2].id, rule.id)
