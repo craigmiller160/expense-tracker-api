@@ -21,6 +21,7 @@ class AutoCategorizeRuleController(
   private val autoCategorizeRuleService: AutoCategorizeRuleService
 ) {
   @ApiResponse(
+    responseCode = "200",
     content =
       [
         Content(
@@ -33,6 +34,7 @@ class AutoCategorizeRuleController(
   ): TryEither<AutoCategorizeRulePageResponse> = autoCategorizeRuleService.getAllRules(request)
 
   @ApiResponse(
+    responseCode = "200",
     content =
       [
         Content(
@@ -45,6 +47,7 @@ class AutoCategorizeRuleController(
   ): TryEither<AutoCategorizeRuleResponse> = autoCategorizeRuleService.createRule(request)
 
   @ApiResponse(
+    responseCode = "200",
     content =
       [
         Content(
@@ -58,6 +61,7 @@ class AutoCategorizeRuleController(
   ): TryEither<AutoCategorizeRuleResponse> = autoCategorizeRuleService.updateRule(ruleId, request)
 
   @ApiResponse(
+    responseCode = "200",
     content =
       [
         Content(
@@ -70,22 +74,22 @@ class AutoCategorizeRuleController(
   ): TryEither<AutoCategorizeRuleResponse> = autoCategorizeRuleService.getRule(ruleId)
 
   @ApiResponse(
+    responseCode = "204",
     content =
       [
         Content(
-          mediaType = "application/json",
-          array = ArraySchema(schema = Schema(implementation = Unit::class)))])
+          mediaType = "application/json", array = ArraySchema(schema = Schema(hidden = true)))])
   @DeleteMapping("/{ruleId}")
   @ResponseStatus(HttpStatus.NO_CONTENT)
   fun deleteRule(@PathVariable ruleId: TypedId<AutoCategorizeRuleId>): TryEither<Unit> =
     autoCategorizeRuleService.deleteRule(ruleId)
 
   @ApiResponse(
+    responseCode = "204",
     content =
       [
         Content(
-          mediaType = "application/json",
-          array = ArraySchema(schema = Schema(implementation = Unit::class)))])
+          mediaType = "application/json", array = ArraySchema(schema = Schema(hidden = true)))])
   @PutMapping("/{ruleId}/reOrder/{ordinal}")
   @ResponseStatus(HttpStatus.NO_CONTENT)
   fun reOrderRule(
