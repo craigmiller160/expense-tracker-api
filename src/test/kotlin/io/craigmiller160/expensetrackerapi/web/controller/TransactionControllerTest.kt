@@ -1021,11 +1021,16 @@ constructor(
 
   @Test
   fun `confirmTransactions - clears last rule applied`() {
+    transactionRepository.saveAndFlush(user1Transactions[0].copy(confirmed = false))
+    transactionRepository.saveAndFlush(user1Transactions[1].copy(confirmed = false))
     dataHelper.createLastRuleApplied(1L, user1Transactions[0].id, rule.id)
+    dataHelper.createLastRuleApplied(1L, user1Transactions[1].id, rule.id)
     val request =
       ConfirmTransactionsRequest(
         transactionsToConfirm =
-          setOf(TransactionToConfirm(transactionId = user1Transactions[0].id, confirmed = true)))
+          setOf(
+            TransactionToConfirm(transactionId = user1Transactions[0].id, confirmed = true),
+            TransactionToConfirm(transactionId = user1Transactions[1].id, confirmed = false)))
 
     mockMvc
       .put("/transactions/confirm") {
@@ -1038,6 +1043,8 @@ constructor(
 
     assertThat(lastRuleAppliedRepository.findByUserIdAndTransactionId(1L, user1Transactions[0].id))
       .isNull()
+    assertThat(lastRuleAppliedRepository.findByUserIdAndTransactionId(1L, user1Transactions[1].id))
+      .isNotNull
   }
 
   @Test
