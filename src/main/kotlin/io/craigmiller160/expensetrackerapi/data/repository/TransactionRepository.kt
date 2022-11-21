@@ -54,13 +54,14 @@ interface TransactionRepository :
         t.version = t.version + 1
       WHERE t.id = :transactionId
       AND t.userId = :userId
+      AND t.confirmed != :confirmed
   """)
   @Modifying(flushAutomatically = true, clearAutomatically = true)
   fun confirmTransaction(
     @Param("transactionId") transactionId: TypedId<TransactionId>,
     @Param("confirmed") confirmed: Boolean,
     @Param("userId") userId: Long
-  )
+  ): Int
 
   @Query(
     """

@@ -54,17 +54,20 @@ class TransactionService(
         }
       }
       .sequence()
-      .map { results ->
-        results
-          .filter { (_, modifiedCount) -> modifiedCount > 0 }
-          .map { (transactionId) -> transactionId }
-      }
+      .map(this::filterToModifiedTransactions)
       .flatMapCatch { transactionsWithModifiedCategory ->
         lastRuleAppliedRepository.deleteAllByUserIdAndTransactionIdIn(
           userId, transactionsWithModifiedCategory)
       }
       .map { Unit }
   }
+
+  private fun filterToModifiedTransactions(
+    results: List<Pair<TypedId<TransactionId>, Int>>
+  ): List<TypedId<TransactionId>> =
+    results
+      .filter { (_, modifiedCount) -> modifiedCount > 0 }
+      .map { (transactionId) -> transactionId }
 
   @Transactional
   fun confirmTransactions(
@@ -74,11 +77,17 @@ class TransactionService(
     return transactionsToConfirm
       .map { txnToConfirm ->
         Either.catch {
-          transactionRepository.confirmTransaction(
-            txnToConfirm.transactionId, txnToConfirm.confirmed, userId)
+          txnToConfirm.transactionId to
+            transactionRepository.confirmTransaction(
+              txnToConfirm.transactionId, txnToConfirm.confirmed, userId)
         }
       }
       .sequence()
+      .map(this::filterToModifiedTransactions)
+      .flatMapCatch { transactionsWithModifiedCategory ->
+        lastRuleAppliedRepository.deleteAllByUserIdAndTransactionIdIn(
+          userId, transactionsWithModifiedCategory)
+      }
       .map { Unit }
   }
 
