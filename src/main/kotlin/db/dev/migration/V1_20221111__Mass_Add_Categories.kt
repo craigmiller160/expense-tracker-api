@@ -1,5 +1,6 @@
 package db.dev.migration
 
+import io.craigmiller160.expensetrackerapi.extension.getUUID
 import java.util.UUID
 import org.flywaydb.core.api.migration.BaseJavaMigration
 import org.flywaydb.core.api.migration.Context
@@ -43,9 +44,7 @@ class V1_20221111__Mass_Add_Categories : BaseJavaMigration() {
   }
 
   private fun getTransactionIds(jdbcTemplate: NamedParameterJdbcTemplate): List<UUID> =
-    jdbcTemplate.query(GET_HALF_TRANSACTIONS, MapSqlParameterSource()) { rs, _ ->
-      UUID.fromString(rs.getString("id"))
-    }
+    jdbcTemplate.query(GET_HALF_TRANSACTIONS, MapSqlParameterSource()) { rs, _ -> rs.getUUID("id") }
 
   private fun setCategoryOnTransaction(
     jdbcTemplate: NamedParameterJdbcTemplate,
