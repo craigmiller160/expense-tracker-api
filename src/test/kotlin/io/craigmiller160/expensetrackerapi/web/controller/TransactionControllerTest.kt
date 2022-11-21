@@ -1059,7 +1059,7 @@ constructor(
         transactionId = user1Transactions[1].id, categoryId = null, confirmed = true)
     val transactionToDoNothing =
       TransactionToUpdate(
-        transactionId = user1Transactions[2].id, categoryId = null, confirmed = false)
+        transactionId = user1Transactions[3].id, categoryId = null, confirmed = false)
     dataHelper.createLastRuleApplied(1L, transactionToCategorize.transactionId, rule.id)
     dataHelper.createLastRuleApplied(1L, transactionToConfirm.transactionId, rule.id)
     dataHelper.createLastRuleApplied(1L, transactionToDoNothing.transactionId, rule.id)
