@@ -3,6 +3,7 @@ package io.craigmiller160.expensetrackerapi.web.controller
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.craigmiller160.expensetrackerapi.common.data.typedid.TypedId
 import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.CategoryId
+import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.TransactionId
 import io.craigmiller160.expensetrackerapi.data.model.AutoCategorizeRule
 import io.craigmiller160.expensetrackerapi.data.model.Category
 import io.craigmiller160.expensetrackerapi.data.model.Transaction
@@ -24,6 +25,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.mockito.kotlin.isNotNull
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.PageRequest
 import org.springframework.http.MediaType
@@ -1070,7 +1072,44 @@ constructor(
 
   @Test
   fun `updateTransactionDetails - confirming and or setting category clears last rule applied`() {
-    TODO()
+    dataHelper.createLastRuleApplied(1L, user1Transactions[0].id, rule.id)
+    dataHelper.createLastRuleApplied(1L, user1Transactions[1].id, rule.id)
+    dataHelper.createLastRuleApplied(1L, user1Transactions[2].id, rule.id)
+
+    val doUpdate: (TypedId<TransactionId>, TypedId<CategoryId>?, Boolean) -> Unit =
+      { transactionId, categoryId, confirmed ->
+        val request =
+          UpdateTransactionDetailsRequest(
+            transactionId = transactionId,
+            confirmed = confirmed,
+            expenseDate = LocalDate.of(1990, 1, 1),
+            description = "New Description",
+            amount = BigDecimal("-112.57"),
+            categoryId = categoryId)
+
+        mockMvc
+          .put("/transactions/$transactionId/details") {
+            secure = true
+            content = objectMapper.writeValueAsString(request)
+            contentType = MediaType.APPLICATION_JSON
+            header("Authorization", "Bearer $token")
+          }
+          .andExpect { status { isNoContent() } }
+      }
+
+    // Categorize
+    doUpdate(user1Transactions[0].id, user1Categories[0].id, false)
+    // Confirm
+    doUpdate(user1Transactions[1].id, null, true)
+    // Neither
+    doUpdate(user1Transactions[2].id, null, false)
+
+    assertThat(lastRuleAppliedRepository.findByUserIdAndTransactionId(1L, user1Transactions[0].id))
+      .isNull()
+    assertThat(lastRuleAppliedRepository.findByUserIdAndTransactionId(1L, user1Transactions[1].id))
+      .isNull()
+    assertThat(lastRuleAppliedRepository.findByUserIdAndTransactionId(1L, user1Transactions[2].id))
+      .isNotNull
   }
 
   @Test
