@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.RestController
 @RequestMapping("/categories")
 class CategoryController(private val categoryService: CategoryService) {
   @ApiResponse(
+    responseCode = "200",
     content =
       [
         Content(
@@ -34,6 +35,7 @@ class CategoryController(private val categoryService: CategoryService) {
   fun getAllCategories(): TryEither<List<CategoryResponse>> = categoryService.getAllCategories()
 
   @ApiResponse(
+    responseCode = "200",
     content =
       [
         Content(
@@ -44,8 +46,8 @@ class CategoryController(private val categoryService: CategoryService) {
     categoryService.createCategory(request)
 
   @ApiResponse(
-    content =
-      [Content(mediaType = "application/json", schema = Schema(implementation = Unit::class))])
+    responseCode = "204",
+    content = [Content(mediaType = "application/json", schema = Schema(hidden = true))])
   @PutMapping("/{categoryId}")
   @ResponseStatus(HttpStatus.NO_CONTENT)
   fun updateCategory(
@@ -54,8 +56,8 @@ class CategoryController(private val categoryService: CategoryService) {
   ): TryEither<Unit> = categoryService.updateCategory(categoryId, request)
 
   @ApiResponse(
-    content =
-      [Content(mediaType = "application/json", schema = Schema(implementation = Unit::class))])
+    responseCode = "204",
+    content = [Content(mediaType = "application/json", schema = Schema(hidden = true))])
   @DeleteMapping("/{categoryId}")
   @ResponseStatus(HttpStatus.NO_CONTENT)
   fun deleteCategory(@PathVariable("categoryId") categoryId: TypedId<CategoryId>): TryEither<Unit> =
