@@ -4,6 +4,7 @@ import arrow.core.Either
 import arrow.core.continuations.either
 import arrow.core.flatMap
 import arrow.core.leftIfNull
+import arrow.core.sequence
 import io.craigmiller160.expensetrackerapi.common.data.typedid.TypedId
 import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.CategoryId
 import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.TransactionId
@@ -37,16 +38,17 @@ class TransactionService(
     transactionsAndCategories: Set<TransactionAndCategoryUpdateItem>
   ): TryEither<Unit> {
     val userId = oAuth2Service.getAuthenticatedUser().userId
-    return transactionsAndCategories.toList().foldRight<
-      TransactionAndCategoryUpdateItem, TryEither<Unit>>(
-      Either.Right(Unit)) { txnAndCat, result ->
-        result.flatMapCatch {
+    return transactionsAndCategories
+      .map { txnAndCat ->
+        Either.catch {
           txnAndCat.categoryId?.let {
             transactionRepository.setTransactionCategory(txnAndCat.transactionId, it, userId)
           }
             ?: transactionRepository.removeTransactionCategory(txnAndCat.transactionId, userId)
         }
       }
+      .sequence()
+      .map { Unit }
   }
 
   @Transactional
