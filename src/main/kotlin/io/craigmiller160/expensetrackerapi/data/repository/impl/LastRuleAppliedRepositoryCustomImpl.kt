@@ -20,7 +20,6 @@ class LastRuleAppliedRepositoryCustomImpl(
     userId: Long,
     transactionId: TypedId<TransactionId>
   ): LastRuleAppliedForTransaction? {
-    // TODO can I get TypedId to work directly here?
     val params =
       MapSqlParameterSource()
         .addValue("userId", userId)
