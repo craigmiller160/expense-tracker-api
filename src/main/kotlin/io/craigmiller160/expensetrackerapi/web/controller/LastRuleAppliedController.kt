@@ -3,6 +3,7 @@ package io.craigmiller160.expensetrackerapi.web.controller
 import io.craigmiller160.expensetrackerapi.common.data.typedid.TypedId
 import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.TransactionId
 import io.craigmiller160.expensetrackerapi.function.TryEither
+import io.craigmiller160.expensetrackerapi.service.LastRuleAppliedService
 import io.craigmiller160.expensetrackerapi.web.types.rules.LastRuleAppliedResponse
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.Schema
@@ -14,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @RequestMapping("/transactions/rules/last-applied")
-class LastRuleAppliedController {
+class LastRuleAppliedController(private val lastRuleAppliedService: LastRuleAppliedService) {
 
   @ApiResponse(
     content =
@@ -25,7 +26,6 @@ class LastRuleAppliedController {
   @GetMapping("/{transactionId}")
   fun getLastAppliedRuleForTransaction(
     @PathVariable transactionId: TypedId<TransactionId>
-  ): TryEither<LastRuleAppliedResponse> {
-    TODO()
-  }
+  ): TryEither<LastRuleAppliedResponse> =
+    lastRuleAppliedService.getLastAppliedRuleForTransaction(transactionId)
 }
