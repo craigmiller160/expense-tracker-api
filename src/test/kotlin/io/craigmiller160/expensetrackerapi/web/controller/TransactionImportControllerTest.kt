@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import io.craigmiller160.expensetrackerapi.data.model.Transaction
 import io.craigmiller160.expensetrackerapi.data.repository.TransactionRepository
 import io.craigmiller160.expensetrackerapi.data.utils.TransactionContentHash
+import io.craigmiller160.expensetrackerapi.extension.flushAndClear
 import io.craigmiller160.expensetrackerapi.service.TransactionImportType
 import io.craigmiller160.expensetrackerapi.testcore.ExpenseTrackerIntegrationTest
 import io.craigmiller160.expensetrackerapi.testcore.OAuth2Extension
@@ -86,8 +87,7 @@ constructor(
         content { json("""{"transactionsImported":57}""", true) }
       }
 
-    entityManager.flush()
-    entityManager.clear()
+    entityManager.flushAndClear()
 
     val allDuplicateTransactions =
       transactionRepository.findAllByUserIdAndContentHashInOrderByCreated(
@@ -118,8 +118,7 @@ constructor(
         content { json("""{"transactionsImported":58}""", true) }
       }
 
-    entityManager.flush()
-    entityManager.clear()
+    entityManager.flushAndClear()
 
     val contentHash =
       TransactionContentHash.hash(
@@ -152,8 +151,7 @@ constructor(
       }
       .shouldBeRight()
 
-    entityManager.flush()
-    entityManager.clear()
+    entityManager.flushAndClear()
 
     val transactions = transactionRepository.findAllByUserIdOrderByExpenseDateAscDescriptionAsc(1L)
     assertThat(transactions).hasSize(57)
@@ -204,8 +202,7 @@ constructor(
       }
       .shouldBeRight()
 
-    entityManager.flush()
-    entityManager.clear()
+    entityManager.flushAndClear()
 
     val transactions = transactionRepository.findAllByUserIdOrderByExpenseDateAscDescriptionAsc(1L)
     val expectedSize = 57
@@ -236,8 +233,7 @@ constructor(
       }
       .shouldBeRight()
 
-    entityManager.flush()
-    entityManager.clear()
+    entityManager.flushAndClear()
 
     val transactions = transactionRepository.findAllByUserIdOrderByExpenseDateAscDescriptionAsc(1L)
     assertThat(transactions).hasSize(23)

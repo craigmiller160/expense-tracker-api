@@ -38,13 +38,14 @@ interface TransactionRepository :
         t.version = t.version + 1
     WHERE t.id = :transactionId
     AND t.userId = :userId
+    AND (t.categoryId IS NULL OR t.categoryId <> :categoryId)
   """)
   @Modifying(flushAutomatically = true, clearAutomatically = true)
   fun setTransactionCategory(
     @Param("transactionId") transactionId: TypedId<TransactionId>,
     @Param("categoryId") categoryId: TypedId<CategoryId>,
     @Param("userId") userId: Long
-  )
+  ): Int
 
   @Query(
     """
@@ -53,13 +54,14 @@ interface TransactionRepository :
         t.version = t.version + 1
       WHERE t.id = :transactionId
       AND t.userId = :userId
+      AND t.confirmed <> :confirmed
   """)
   @Modifying(flushAutomatically = true, clearAutomatically = true)
   fun confirmTransaction(
     @Param("transactionId") transactionId: TypedId<TransactionId>,
     @Param("confirmed") confirmed: Boolean,
     @Param("userId") userId: Long
-  )
+  ): Int
 
   @Query(
     """
@@ -98,12 +100,13 @@ interface TransactionRepository :
       SET t.categoryId = null
       WHERE t.id = :transactionId
       AND t.userId = :userId
+      AND t.categoryId IS NOT NULL
   """)
   @Modifying(flushAutomatically = true, clearAutomatically = true)
   fun removeTransactionCategory(
     @Param("transactionId") transactionId: TypedId<TransactionId>,
     @Param("userId") userId: Long
-  )
+  ): Int
 
   @Query(
     """

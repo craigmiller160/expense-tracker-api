@@ -10,6 +10,7 @@ import io.craigmiller160.expensetrackerapi.data.model.Transaction
 import io.craigmiller160.expensetrackerapi.data.repository.AutoCategorizeRuleRepository
 import io.craigmiller160.expensetrackerapi.data.repository.LastRuleAppliedRepository
 import io.craigmiller160.expensetrackerapi.data.repository.TransactionRepository
+import io.craigmiller160.expensetrackerapi.extension.flushAndClear
 import io.craigmiller160.expensetrackerapi.testcore.ExpenseTrackerIntegrationTest
 import io.craigmiller160.expensetrackerapi.testutils.DataHelper
 import io.kotest.assertions.arrow.core.shouldBeRight
@@ -113,8 +114,7 @@ constructor(
         .applyCategoriesToTransactions(1L, transactions)
         .shouldBeRight()
 
-    entityManager.flush()
-    entityManager.clear()
+    entityManager.flushAndClear()
 
     validateCategoryApplied(transactions[1], categories[0].id, rules[1].id)
     validateCategoryApplied(transactions[0], categories[1].id, rules[2].id)

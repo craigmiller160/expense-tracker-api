@@ -3,7 +3,8 @@ package io.craigmiller160.expensetrackerapi.service
 import arrow.core.Either
 import arrow.core.continuations.either
 import arrow.core.flatMap
-import arrow.core.flatten
+import arrow.core.leftIfNull
+import arrow.core.sequence
 import io.craigmiller160.expensetrackerapi.common.data.typedid.TypedId
 import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.CategoryId
 import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.TransactionId
@@ -13,13 +14,16 @@ import io.craigmiller160.expensetrackerapi.data.model.Transaction
 import io.craigmiller160.expensetrackerapi.data.model.toColumnName
 import io.craigmiller160.expensetrackerapi.data.model.toSpringSortDirection
 import io.craigmiller160.expensetrackerapi.data.repository.CategoryRepository
+import io.craigmiller160.expensetrackerapi.data.repository.LastRuleAppliedRepository
 import io.craigmiller160.expensetrackerapi.data.repository.TransactionRepository
 import io.craigmiller160.expensetrackerapi.data.repository.TransactionViewRepository
+import io.craigmiller160.expensetrackerapi.extension.detachAndReturn
 import io.craigmiller160.expensetrackerapi.function.TryEither
 import io.craigmiller160.expensetrackerapi.function.flatMapCatch
 import io.craigmiller160.expensetrackerapi.web.types.*
 import io.craigmiller160.expensetrackerapi.web.types.transaction.*
 import io.craigmiller160.oauth2.service.OAuth2Service
+import javax.persistence.EntityManager
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
 import org.springframework.stereotype.Service
@@ -29,44 +33,74 @@ import org.springframework.transaction.annotation.Transactional
 class TransactionService(
   private val transactionRepository: TransactionRepository,
   private val transactionViewRepository: TransactionViewRepository,
+  private val lastRuleAppliedRepository: LastRuleAppliedRepository,
   private val categoryRepository: CategoryRepository,
-  private val oAuth2Service: OAuth2Service
+  private val oAuth2Service: OAuth2Service,
+  private val entityManager: EntityManager
 ) {
   @Transactional
   fun categorizeTransactions(
     transactionsAndCategories: Set<TransactionAndCategoryUpdateItem>
   ): TryEither<Unit> {
     val userId = oAuth2Service.getAuthenticatedUser().userId
-    return transactionsAndCategories.toList().foldRight<
-      TransactionAndCategoryUpdateItem, TryEither<Unit>>(
-      Either.Right(Unit)) { txnAndCat, result ->
-        result.flatMapCatch {
+    return transactionsAndCategories
+      .map { txnAndCat ->
+        Either.catch {
           txnAndCat.categoryId?.let {
-            transactionRepository.setTransactionCategory(txnAndCat.transactionId, it, userId)
+            txnAndCat.transactionId to
+              transactionRepository.setTransactionCategory(txnAndCat.transactionId, it, userId)
           }
-            ?: transactionRepository.removeTransactionCategory(txnAndCat.transactionId, userId)
+            ?: run {
+              txnAndCat.transactionId to
+                transactionRepository.removeTransactionCategory(txnAndCat.transactionId, userId)
+            }
         }
       }
+      .sequence()
+      .map(this::filterToModifiedTransactions)
+      .flatMapCatch { transactionsWithModifiedCategory ->
+        lastRuleAppliedRepository.deleteAllByUserIdAndTransactionIdIn(
+          userId, transactionsWithModifiedCategory)
+      }
+      .map { Unit }
   }
+
+  private fun filterToModifiedTransactions(
+    results: List<Pair<TypedId<TransactionId>, Int>>
+  ): List<TypedId<TransactionId>> =
+    results
+      .filter { (_, modifiedCount) -> modifiedCount > 0 }
+      .map { (transactionId) -> transactionId }
 
   @Transactional
   fun confirmTransactions(
     transactionsToConfirm: Set<TransactionAndConfirmUpdateItem>
   ): TryEither<Unit> {
     val userId = oAuth2Service.getAuthenticatedUser().userId
-    return transactionsToConfirm.toList().foldRight<
-      TransactionAndConfirmUpdateItem, TryEither<Unit>>(
-      Either.Right(Unit)) { txn, result ->
-        result.flatMapCatch {
-          transactionRepository.confirmTransaction(txn.transactionId, txn.confirmed, userId)
+    return transactionsToConfirm
+      .map { txnToConfirm ->
+        Either.catch {
+          txnToConfirm.transactionId to
+            transactionRepository.confirmTransaction(
+              txnToConfirm.transactionId, txnToConfirm.confirmed, userId)
         }
       }
+      .sequence()
+      .map(this::filterToModifiedTransactions)
+      .flatMapCatch { transactionsWithModifiedCategory ->
+        lastRuleAppliedRepository.deleteAllByUserIdAndTransactionIdIn(
+          userId, transactionsWithModifiedCategory)
+      }
+      .map { Unit }
   }
 
   @Transactional
   fun deleteTransactions(request: DeleteTransactionsRequest): TryEither<Unit> {
     val userId = oAuth2Service.getAuthenticatedUser().userId
-    return Either.catch { transactionRepository.deleteTransactions(request.ids, userId) }
+    return Either.catch {
+        lastRuleAppliedRepository.deleteAllByUserIdAndTransactionIdIn(userId, request.ids)
+      }
+      .flatMapCatch { transactionRepository.deleteTransactions(request.ids, userId) }
   }
 
   @Transactional
@@ -126,22 +160,37 @@ class TransactionService(
   ): TryEither<Unit> {
     val userId = oAuth2Service.getAuthenticatedUser().userId
 
-    return Either.catch {
+    return either
+      .eager {
+        val oldTransaction =
+          Either.catch { transactionRepository.findByIdAndUserId(transactionId, userId) }
+            .leftIfNull { BadRequestException("No transaction with ID: $transactionId") }
+            .flatMapCatch { entityManager.detachAndReturn(it) }
+            .bind()
         val validCategoryId =
-          request.categoryId?.let { categoryRepository.findByIdAndUserId(it, userId) }?.id
-        transactionRepository
-          .findByIdAndUserId(transactionId, userId)
-          ?.copy(
+          Either.catch {
+              request.categoryId?.let { categoryRepository.findByIdAndUserId(it, userId) }?.id
+            }
+            .bind()
+        oldTransaction to
+          oldTransaction.copy(
             confirmed = request.confirmed,
             expenseDate = request.expenseDate,
             description = request.description,
             amount = request.amount,
             categoryId = validCategoryId)
-          ?.let { transactionRepository.save(it) }
-          ?.let { Either.Right(Unit) }
-          ?: Either.Left(BadRequestException("No transaction with ID: $transactionId"))
       }
-      .flatten()
+      .flatMapCatch { (oldTransaction, newTransaction) ->
+        oldTransaction to transactionRepository.save(newTransaction)
+      }
+      .flatMapCatch { (oldTransaction, newTransaction) ->
+        if (oldTransaction.categoryId != newTransaction.categoryId ||
+          oldTransaction.confirmed != newTransaction.confirmed) {
+          lastRuleAppliedRepository.deleteAllByUserIdAndTransactionIdIn(
+            userId, listOf(newTransaction.id))
+        }
+      }
+      .map { Unit }
   }
 
   fun getPossibleDuplicates(
