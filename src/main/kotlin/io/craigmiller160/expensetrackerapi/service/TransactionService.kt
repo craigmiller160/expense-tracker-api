@@ -22,6 +22,7 @@ import io.craigmiller160.expensetrackerapi.function.flatMapCatch
 import io.craigmiller160.expensetrackerapi.web.types.*
 import io.craigmiller160.expensetrackerapi.web.types.transaction.*
 import io.craigmiller160.oauth2.service.OAuth2Service
+import javax.persistence.EntityManager
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
 import org.springframework.stereotype.Service
@@ -33,7 +34,8 @@ class TransactionService(
   private val transactionViewRepository: TransactionViewRepository,
   private val lastRuleAppliedRepository: LastRuleAppliedRepository,
   private val categoryRepository: CategoryRepository,
-  private val oAuth2Service: OAuth2Service
+  private val oAuth2Service: OAuth2Service,
+  private val entityManager: EntityManager
 ) {
   @Transactional
   fun categorizeTransactions(
@@ -162,6 +164,10 @@ class TransactionService(
         val oldTransaction =
           Either.catch { transactionRepository.findByIdAndUserId(transactionId, userId) }
             .leftIfNull { BadRequestException("No transaction with ID: $transactionId") }
+            .flatMapCatch { transaction ->
+              entityManager.detach(transaction)
+              transaction
+            }
             .bind()
         val validCategoryId =
           Either.catch {
