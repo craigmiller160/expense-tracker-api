@@ -22,6 +22,7 @@ import org.springframework.web.multipart.MultipartFile
 @RequestMapping("/transaction-import")
 class TransactionImportController(private val transactionImportService: TransactionImportService) {
   @ApiResponse(
+    responseCode = "200",
     content =
       [
         Content(
@@ -35,6 +36,7 @@ class TransactionImportController(private val transactionImportService: Transact
     transactionImportService.importTransactions(type, file.inputStream)
 
   @ApiResponse(
+    responseCode = "200",
     content =
       [
         Content(
