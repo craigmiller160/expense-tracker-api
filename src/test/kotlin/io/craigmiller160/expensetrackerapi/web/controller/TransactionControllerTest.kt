@@ -3,9 +3,11 @@ package io.craigmiller160.expensetrackerapi.web.controller
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.craigmiller160.expensetrackerapi.common.data.typedid.TypedId
 import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.CategoryId
+import io.craigmiller160.expensetrackerapi.data.model.AutoCategorizeRule
 import io.craigmiller160.expensetrackerapi.data.model.Category
 import io.craigmiller160.expensetrackerapi.data.model.Transaction
 import io.craigmiller160.expensetrackerapi.data.model.TransactionCommon
+import io.craigmiller160.expensetrackerapi.data.repository.LastRuleAppliedRepository
 import io.craigmiller160.expensetrackerapi.data.repository.TransactionRepository
 import io.craigmiller160.expensetrackerapi.data.repository.TransactionViewRepository
 import io.craigmiller160.expensetrackerapi.testcore.ExpenseTrackerIntegrationTest
@@ -37,6 +39,7 @@ class TransactionControllerTest
 constructor(
   private val transactionRepository: TransactionRepository,
   private val transactionViewRepository: TransactionViewRepository,
+  private val lastRuleAppliedRepository: LastRuleAppliedRepository,
   private val dataHelper: DataHelper,
   private val mockMvc: MockMvc,
   private val objectMapper: ObjectMapper,
@@ -57,6 +60,7 @@ constructor(
   private lateinit var user1CategoriesMap: Map<TypedId<CategoryId>, Category>
   private lateinit var user1Transactions: List<Transaction>
   private lateinit var user2Transactions: List<Transaction>
+  private lateinit var rule: AutoCategorizeRule
 
   @BeforeEach
   fun setup() {
@@ -84,6 +88,7 @@ constructor(
       }
     user2Transactions = user2Txns
     user1CategoriesMap = user1Categories.associateBy { it.id }
+    rule = dataHelper.createRule(1L, user1Categories[0].id)
   }
 
   @Test
@@ -978,7 +983,25 @@ constructor(
 
   @Test
   fun `categorizeTransactions - clears last rule applied`() {
-    TODO()
+    dataHelper.createLastRuleApplied(1L, user1Transactions[0].id, rule.id)
+    val request =
+      CategorizeTransactionsRequest(
+        transactionsAndCategories =
+          setOf(TransactionAndCategory(user1Transactions[0].id, user1Categories[1].id)))
+
+    mockMvc
+      .put("/transactions/categorize") {
+        secure = true
+        header("Authorization", "Bearer $token")
+        contentType = MediaType.APPLICATION_JSON
+        content = objectMapper.writeValueAsString(request)
+      }
+      .andExpect { status { isNoContent() } }
+
+    entityManager.flush()
+
+    assertThat(lastRuleAppliedRepository.findByUserIdAndTransactionId(1L, user1Transactions[0].id))
+      .isNull()
   }
 
   @Test
