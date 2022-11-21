@@ -53,7 +53,7 @@ constructor(
           minAmount = BigDecimal("10"),
           maxAmount = BigDecimal("20")))
     val lastApplied =
-      lastRuleAppliedRepository.save(
+      lastRuleAppliedRepository.saveAndFlush(
         LastRuleApplied(userId = 1L, transactionId = transaction.id, ruleId = rule.id))
     return rule to lastApplied
   }
