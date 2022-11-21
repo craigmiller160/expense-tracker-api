@@ -38,7 +38,7 @@ interface TransactionRepository :
         t.version = t.version + 1
     WHERE t.id = :transactionId
     AND t.userId = :userId
-    AND t.categoryId <> :categoryId
+    AND (t.categoryId IS NULL OR t.categoryId <> :categoryId)
   """)
   @Modifying(flushAutomatically = true, clearAutomatically = true)
   fun setTransactionCategory(
