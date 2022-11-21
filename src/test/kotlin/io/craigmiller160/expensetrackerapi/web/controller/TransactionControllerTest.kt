@@ -1065,7 +1065,7 @@ constructor(
     assertThat(
         lastRuleAppliedRepository.findByUserIdAndTransactionId(
           1L, transactionToDoNothing.transactionId))
-      .isNotNull()
+      .isNotNull
   }
 
   @Test
