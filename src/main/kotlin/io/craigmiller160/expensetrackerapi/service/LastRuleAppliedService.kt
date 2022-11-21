@@ -10,5 +10,5 @@ import org.springframework.stereotype.Service
 class LastRuleAppliedService {
   fun getLastAppliedRuleForTransaction(
     transactionId: TypedId<TransactionId>
-  ): TryEither<LastRuleAppliedResponse> = TODO()
+  ): TryEither<LastRuleAppliedResponse?> = TODO()
 }
