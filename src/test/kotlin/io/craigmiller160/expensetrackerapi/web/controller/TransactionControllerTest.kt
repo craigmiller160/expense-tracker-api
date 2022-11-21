@@ -1075,7 +1075,20 @@ constructor(
 
   @Test
   fun `deleteTransactions - clears last rule applied`() {
-    TODO()
+    dataHelper.createLastRuleApplied(1L, user1Transactions[0].id, rule.id)
+    val request = DeleteTransactionsRequest(ids = setOf(user1Transactions[0].id))
+
+    mockMvc
+      .delete("/transactions") {
+        secure = true
+        header("Authorization", "Bearer $token")
+        contentType = MediaType.APPLICATION_JSON
+        content = objectMapper.writeValueAsString(request)
+      }
+      .andExpect { status { isNoContent() } }
+
+    assertThat(lastRuleAppliedRepository.findByUserIdAndTransactionId(1L, user1Transactions[0].id))
+      .isNull()
   }
 
   @Test
