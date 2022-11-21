@@ -71,13 +71,15 @@ class TransactionService(
     transactionsToConfirm: Set<TransactionAndConfirmUpdateItem>
   ): TryEither<Unit> {
     val userId = oAuth2Service.getAuthenticatedUser().userId
-    return transactionsToConfirm.toList().foldRight<
-      TransactionAndConfirmUpdateItem, TryEither<Unit>>(
-      Either.Right(Unit)) { txn, result ->
-        result.flatMapCatch {
-          transactionRepository.confirmTransaction(txn.transactionId, txn.confirmed, userId)
+    return transactionsToConfirm
+      .map { txnToConfirm ->
+        Either.catch {
+          transactionRepository.confirmTransaction(
+            txnToConfirm.transactionId, txnToConfirm.confirmed, userId)
         }
       }
+      .sequence()
+      .map { Unit }
   }
 
   @Transactional
