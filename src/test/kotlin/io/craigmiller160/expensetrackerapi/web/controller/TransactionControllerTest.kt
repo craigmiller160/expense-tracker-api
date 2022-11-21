@@ -977,6 +977,31 @@ constructor(
   }
 
   @Test
+  fun `categorizeTransactions - clears last rule applied`() {
+    TODO()
+  }
+
+  @Test
+  fun `confirmTransactions - clears last rule applied`() {
+    TODO()
+  }
+
+  @Test
+  fun `updateTransactions - confirming and or setting category clears last rule applied`() {
+    TODO()
+  }
+
+  @Test
+  fun `updateTransactionDetails - confirming and or setting category clears last rule applied`() {
+    TODO()
+  }
+
+  @Test
+  fun `deleteTransactions - clears last rule applied`() {
+    TODO()
+  }
+
+  @Test
   fun `markNotDuplicate - different user id`() {
     val txn1 = user2Transactions[0]
     transactionRepository.saveAndFlush(txn1.copy(id = TypedId()))
