@@ -157,22 +157,36 @@ class TransactionService(
   ): TryEither<Unit> {
     val userId = oAuth2Service.getAuthenticatedUser().userId
 
-    return Either.catch { transactionRepository.findByIdAndUserId(transactionId, userId) }
-      .leftIfNull { BadRequestException("No transaction with ID: $transactionId") }
-      .flatMapCatch { transaction ->
-        transaction.copy(
-          categoryId =
-            request.categoryId?.let { categoryRepository.findByIdAndUserId(it, userId) }?.id)
+    return either
+      .eager {
+        val oldTransaction =
+          Either.catch { transactionRepository.findByIdAndUserId(transactionId, userId) }
+            .leftIfNull { BadRequestException("No transaction with ID: $transactionId") }
+            .bind()
+        val validCategoryId =
+          Either.catch {
+              request.categoryId?.let { categoryRepository.findByIdAndUserId(it, userId) }?.id
+            }
+            .bind()
+        oldTransaction to
+          oldTransaction.copy(
+            confirmed = request.confirmed,
+            expenseDate = request.expenseDate,
+            description = request.description,
+            amount = request.amount,
+            categoryId = validCategoryId)
       }
-      .map { transaction ->
-        transaction.copy(
-          confirmed = request.confirmed,
-          expenseDate = request.expenseDate,
-          description = request.description,
-          amount = request.amount)
+      .flatMapCatch { (oldTransaction, newTransaction) ->
+        oldTransaction to transactionRepository.save(newTransaction)
       }
-      .flatMapCatch { transactionRepository.save(it) }
-      .map { Either.Right(Unit) }
+      .flatMapCatch { (oldTransaction, newTransaction) ->
+        if (oldTransaction.categoryId != newTransaction.categoryId ||
+          oldTransaction.confirmed != newTransaction.confirmed) {
+          lastRuleAppliedRepository.deleteAllByUserIdAndTransactionIdIn(
+            userId, listOf(newTransaction.id))
+        }
+      }
+      .map { Unit }
   }
 
   fun getPossibleDuplicates(
