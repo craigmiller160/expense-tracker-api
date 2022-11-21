@@ -29,10 +29,10 @@ class TransactionImportService(
     val userId = oAuth2Service.getAuthenticatedUser().userId
     return parser
       .parse(userId, stream)
+      .flatMapCatch { transactions -> transactionRepository.saveAll(transactions) }
       .flatMap { transactions ->
         applyCategoriesToTransactionsService.applyCategoriesToTransactions(userId, transactions)
       }
-      .flatMapCatch { transactions -> transactionRepository.saveAll(transactions) }
       .map { transactions -> ImportTransactionsResponse(transactions.size) }
   }
 }
