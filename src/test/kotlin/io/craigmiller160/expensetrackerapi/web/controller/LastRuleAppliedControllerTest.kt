@@ -85,6 +85,11 @@ class LastRuleAppliedControllerTest(
 
   @Test
   fun `getLastAppliedRuleForTransaction - last applied does not exist`() {
-    TODO()
+    mockMvc
+      .get("/transactions/rules/last-applied/${transaction.id}") {
+        secure = true
+        header("Authorization", "Bearer $token")
+      }
+      .andExpect { status { isNoContent() } }
   }
 }
