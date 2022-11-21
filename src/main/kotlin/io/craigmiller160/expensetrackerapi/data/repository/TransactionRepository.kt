@@ -54,7 +54,7 @@ interface TransactionRepository :
         t.version = t.version + 1
       WHERE t.id = :transactionId
       AND t.userId = :userId
-      AND t.confirmed != :confirmed
+      AND t.confirmed <> :confirmed
   """)
   @Modifying(flushAutomatically = true, clearAutomatically = true)
   fun confirmTransaction(
