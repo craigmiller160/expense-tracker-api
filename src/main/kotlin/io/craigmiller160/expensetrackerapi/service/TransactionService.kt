@@ -94,10 +94,10 @@ class TransactionService(
   @Transactional
   fun deleteTransactions(request: DeleteTransactionsRequest): TryEither<Unit> {
     val userId = oAuth2Service.getAuthenticatedUser().userId
-    return Either.catch { transactionRepository.deleteTransactions(request.ids, userId) }
-      .flatMapCatch {
+    return Either.catch {
         lastRuleAppliedRepository.deleteAllByUserIdAndTransactionIdIn(userId, request.ids)
       }
+      .flatMapCatch { transactionRepository.deleteTransactions(request.ids, userId) }
   }
 
   @Transactional
