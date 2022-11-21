@@ -5,6 +5,7 @@ import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.AutoCategoriz
 import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.CategoryId
 import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.LastRuleAppliedId
 import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.TransactionId
+import io.craigmiller160.expensetrackerapi.data.projection.LastRuleAppliedForTransaction
 import java.math.BigDecimal
 import java.time.LocalDate
 
@@ -19,4 +20,19 @@ data class LastRuleAppliedResponse(
   val endDate: LocalDate? = null,
   val minAmount: BigDecimal? = null,
   val maxAmount: BigDecimal? = null
-)
+) {
+  companion object {
+    fun from(lastRule: LastRuleAppliedForTransaction): LastRuleAppliedResponse =
+      LastRuleAppliedResponse(
+        id = lastRule.id,
+        ruleId = lastRule.ruleId,
+        transactionId = lastRule.transactionId,
+        categoryId = lastRule.categoryId,
+        ordinal = lastRule.ordinal,
+        regex = lastRule.regex,
+        startDate = lastRule.startDate,
+        endDate = lastRule.endDate,
+        minAmount = lastRule.minAmount,
+        maxAmount = lastRule.maxAmount)
+  }
+}
