@@ -1124,6 +1124,9 @@ constructor(
     // Neither
     doUpdate(user1Transactions[2].id, null, false)
 
+    entityManager.flush()
+    entityManager.clear()
+
     assertThat(lastRuleAppliedRepository.findByUserIdAndTransactionId(1L, user1Transactions[0].id))
       .isNull()
     assertThat(lastRuleAppliedRepository.findByUserIdAndTransactionId(1L, user1Transactions[1].id))
