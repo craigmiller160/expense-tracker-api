@@ -16,6 +16,6 @@ interface LastRuleAppliedRepository : JpaRepository<LastRuleApplied, TypedId<Las
   @Modifying(flushAutomatically = true, clearAutomatically = true)
   fun deleteAllByUserIdAndTransactionIdIn(
     userId: Long,
-    transactionIds: List<TypedId<TransactionId>>
+    transactionIds: Collection<TypedId<TransactionId>>
   )
 }
