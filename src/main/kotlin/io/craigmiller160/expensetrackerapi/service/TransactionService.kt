@@ -14,6 +14,7 @@ import io.craigmiller160.expensetrackerapi.data.model.Transaction
 import io.craigmiller160.expensetrackerapi.data.model.toColumnName
 import io.craigmiller160.expensetrackerapi.data.model.toSpringSortDirection
 import io.craigmiller160.expensetrackerapi.data.repository.CategoryRepository
+import io.craigmiller160.expensetrackerapi.data.repository.LastRuleAppliedRepository
 import io.craigmiller160.expensetrackerapi.data.repository.TransactionRepository
 import io.craigmiller160.expensetrackerapi.data.repository.TransactionViewRepository
 import io.craigmiller160.expensetrackerapi.function.TryEither
@@ -30,6 +31,7 @@ import org.springframework.transaction.annotation.Transactional
 class TransactionService(
   private val transactionRepository: TransactionRepository,
   private val transactionViewRepository: TransactionViewRepository,
+  private val lastRuleAppliedRepository: LastRuleAppliedRepository,
   private val categoryRepository: CategoryRepository,
   private val oAuth2Service: OAuth2Service
 ) {
@@ -53,8 +55,13 @@ class TransactionService(
       }
       .sequence()
       .map { results ->
-        results.filter { (_, modifiedCount) -> modifiedCount > 0 }
-        // TODO need to remove last rule from all of these
+        results
+          .filter { (_, modifiedCount) -> modifiedCount > 0 }
+          .map { (transactionId) -> transactionId }
+      }
+      .flatMapCatch { transactionsWithModifiedCategory ->
+        lastRuleAppliedRepository.deleteAllByUserIdAndTransactionIdIn(
+          userId, transactionsWithModifiedCategory)
       }
       .map { Unit }
   }
