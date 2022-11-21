@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController
 @RequestMapping("/needs-attention")
 class NeedsAttentionController(private val needsAttentionService: NeedsAttentionService) {
   @ApiResponse(
+    responseCode = "200",
     content =
       [
         Content(

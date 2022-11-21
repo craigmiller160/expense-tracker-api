@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController
 @RequestMapping("/reports")
 class ReportController(private val reportService: ReportService) {
   @ApiResponse(
+    responseCode = "200",
     content =
       [
         Content(

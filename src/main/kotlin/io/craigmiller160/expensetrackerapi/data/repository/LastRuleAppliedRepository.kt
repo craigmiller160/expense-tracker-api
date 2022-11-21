@@ -7,7 +7,8 @@ import io.craigmiller160.expensetrackerapi.data.model.LastRuleApplied
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Modifying
 
-interface LastRuleAppliedRepository : JpaRepository<LastRuleApplied, TypedId<LastRuleAppliedId>> {
+interface LastRuleAppliedRepository :
+  JpaRepository<LastRuleApplied, TypedId<LastRuleAppliedId>>, LastRuleAppliedRepositoryCustom {
   fun findByUserIdAndTransactionId(
     userId: Long,
     transactionId: TypedId<TransactionId>

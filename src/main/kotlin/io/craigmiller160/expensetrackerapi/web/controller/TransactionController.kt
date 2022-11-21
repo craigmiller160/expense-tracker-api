@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.RestController
 @RequestMapping("/transactions")
 class TransactionController(private val transactionService: TransactionService) {
   @ApiResponse(
+    responseCode = "200",
     content =
       [
         Content(
@@ -35,6 +36,7 @@ class TransactionController(private val transactionService: TransactionService) 
     transactionService.search(request)
 
   @ApiResponse(
+    responseCode = "200",
     content =
       [
         Content(
@@ -46,40 +48,40 @@ class TransactionController(private val transactionService: TransactionService) 
   ): TryEither<TransactionResponse> = transactionService.createTransaction(request)
 
   @ApiResponse(
-    content =
-      [Content(mediaType = "application/json", schema = Schema(implementation = Unit::class))])
+    responseCode = "204",
+    content = [Content(mediaType = "application/json", schema = Schema(hidden = true))])
   @DeleteMapping
   @ResponseStatus(HttpStatus.NO_CONTENT)
   fun deleteTransactions(@RequestBody request: DeleteTransactionsRequest): TryEither<Unit> =
     transactionService.deleteTransactions(request)
 
   @ApiResponse(
-    content =
-      [Content(mediaType = "application/json", schema = Schema(implementation = Unit::class))])
+    responseCode = "204",
+    content = [Content(mediaType = "application/json", schema = Schema(hidden = true))])
   @PutMapping("/categorize")
   @ResponseStatus(HttpStatus.NO_CONTENT)
   fun categorizeTransactions(@RequestBody request: CategorizeTransactionsRequest): TryEither<Unit> =
     transactionService.categorizeTransactions(request.transactionsAndCategories)
 
   @ApiResponse(
-    content =
-      [Content(mediaType = "application/json", schema = Schema(implementation = Unit::class))])
+    responseCode = "204",
+    content = [Content(mediaType = "application/json", schema = Schema(hidden = true))])
   @PutMapping("/confirm")
   @ResponseStatus(HttpStatus.NO_CONTENT)
   fun confirmTransactions(@RequestBody request: ConfirmTransactionsRequest): TryEither<Unit> =
     transactionService.confirmTransactions(request.transactionsToConfirm)
 
   @ApiResponse(
-    content =
-      [Content(mediaType = "application/json", schema = Schema(implementation = Unit::class))])
+    responseCode = "204",
+    content = [Content(mediaType = "application/json", schema = Schema(hidden = true))])
   @PutMapping
   @ResponseStatus(HttpStatus.NO_CONTENT)
   fun updateTransactions(@RequestBody request: UpdateTransactionsRequest): TryEither<Unit> =
     transactionService.updateTransactions(request)
 
   @ApiResponse(
-    content =
-      [Content(mediaType = "application/json", schema = Schema(implementation = Unit::class))])
+    responseCode = "204",
+    content = [Content(mediaType = "application/json", schema = Schema(hidden = true))])
   @PutMapping("/{transactionId}/details")
   @ResponseStatus(HttpStatus.NO_CONTENT)
   fun updateTransactionDetails(
@@ -88,6 +90,7 @@ class TransactionController(private val transactionService: TransactionService) 
   ): TryEither<Unit> = transactionService.updateTransactionDetails(transactionId, request)
 
   @ApiResponse(
+    responseCode = "200",
     content =
       [
         Content(
@@ -101,14 +104,15 @@ class TransactionController(private val transactionService: TransactionService) 
     transactionService.getPossibleDuplicates(transactionId, request)
 
   @ApiResponse(
-    content =
-      [Content(mediaType = "application/json", schema = Schema(implementation = Unit::class))])
+    responseCode = "204",
+    content = [Content(mediaType = "application/json", schema = Schema(hidden = true))])
   @PutMapping("/{transactionId}/notDuplicate")
   @ResponseStatus(HttpStatus.NO_CONTENT)
   fun markNotDuplicate(@PathVariable transactionId: TypedId<TransactionId>): TryEither<Unit> =
     transactionService.markNotDuplicate(transactionId)
 
   @ApiResponse(
+    responseCode = "200",
     content =
       [
         Content(
