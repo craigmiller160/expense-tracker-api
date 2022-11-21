@@ -25,8 +25,6 @@ class ApplyCategoriesToTransactionsService(
   private val transactionRepository: TransactionRepository,
   private val lastRuleAppliedRepository: LastRuleAppliedRepository
 ) {
-  // TODO look into persistent collections option for this
-  // TODO major refactor here is needed to clean this up
   companion object {
     private const val PAGE_SIZE = 25
   }
