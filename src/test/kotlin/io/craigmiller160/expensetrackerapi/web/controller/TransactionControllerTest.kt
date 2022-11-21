@@ -586,6 +586,9 @@ constructor(
             TransactionAndCategory(user2Transactions.first().id, user1Categories.first().id),
             TransactionAndCategory(user1Transactions[2].id, user2Category.id)))
 
+    entityManager.flush()
+    entityManager.clear()
+
     mockMvc
       .put("/transactions/categorize") {
         secure = true
@@ -596,6 +599,7 @@ constructor(
       .andExpect { status { isNoContent() } }
 
     entityManager.flush()
+    entityManager.clear()
 
     assertThat(transactionRepository.findById(uncategorizedTransaction.id))
       .isPresent
