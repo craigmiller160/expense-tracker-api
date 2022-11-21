@@ -11,6 +11,7 @@ import io.craigmiller160.expensetrackerapi.data.model.TransactionCommon
 import io.craigmiller160.expensetrackerapi.data.repository.LastRuleAppliedRepository
 import io.craigmiller160.expensetrackerapi.data.repository.TransactionRepository
 import io.craigmiller160.expensetrackerapi.data.repository.TransactionViewRepository
+import io.craigmiller160.expensetrackerapi.extension.flushAndClear
 import io.craigmiller160.expensetrackerapi.testcore.ExpenseTrackerIntegrationTest
 import io.craigmiller160.expensetrackerapi.testcore.OAuth2Extension
 import io.craigmiller160.expensetrackerapi.testutils.DataHelper
@@ -258,8 +259,7 @@ constructor(
   fun `search - only duplicates`() {
     val txn1 = user1Transactions[0]
     val txn2 = transactionRepository.saveAndFlush(txn1.copy(id = TypedId()))
-    entityManager.flush()
-    entityManager.clear()
+    entityManager.flushAndClear()
 
     val request =
       SearchTransactionsRequest(
@@ -509,7 +509,7 @@ constructor(
       }
       .andExpect { status { isNoContent() } }
 
-    entityManager.flush()
+    entityManager.flushAndClear()
 
     assertThat(transactionRepository.findById(user1Transactions.first().id)).isEmpty
     assertThat(transactionRepository.findById(user2Transactions.first().id)).isPresent
@@ -531,7 +531,7 @@ constructor(
       }
       .andExpect { status { isNoContent() } }
 
-    entityManager.flush()
+    entityManager.flushAndClear()
 
     assertThat(transactionRepository.findById(user1Transactions[0].id))
       .isPresent
@@ -586,8 +586,7 @@ constructor(
             TransactionAndCategory(user2Transactions.first().id, user1Categories.first().id),
             TransactionAndCategory(user1Transactions[2].id, user2Category.id)))
 
-    entityManager.flush()
-    entityManager.clear()
+    entityManager.flushAndClear()
 
     mockMvc
       .put("/transactions/categorize") {
@@ -598,8 +597,7 @@ constructor(
       }
       .andExpect { status { isNoContent() } }
 
-    entityManager.flush()
-    entityManager.clear()
+    entityManager.flushAndClear()
 
     assertThat(transactionRepository.findById(uncategorizedTransaction.id))
       .isPresent
@@ -887,8 +885,7 @@ constructor(
       }
       .andExpect { status { isNoContent() } }
 
-    entityManager.flush()
-    entityManager.clear()
+    entityManager.flushAndClear()
 
     val transaction = transactionViewRepository.findById(request.transactionId).orElseThrow()
     assertThat(transaction).hasFieldOrPropertyWithValue("duplicate", true)
@@ -899,8 +896,7 @@ constructor(
     val txn1 = user2Transactions[0]
     transactionRepository.saveAndFlush(txn1.copy(id = TypedId()))
     transactionRepository.saveAndFlush(txn1.copy(id = TypedId()))
-    entityManager.flush()
-    entityManager.clear()
+    entityManager.flushAndClear()
 
     val response =
       TransactionDuplicatePageResponse(transactions = listOf(), totalItems = 0, pageNumber = 0)
@@ -921,8 +917,7 @@ constructor(
     val txn1 = user1Transactions[0]
     val txn2 = transactionRepository.saveAndFlush(txn1.copy(id = TypedId()))
     val txn3 = transactionRepository.saveAndFlush(txn1.copy(id = TypedId()))
-    entityManager.flush()
-    entityManager.clear()
+    entityManager.flushAndClear()
 
     val expectedTransactions =
       transactionViewRepository.findAllByIdInAndUserId(listOf(txn3.id, txn2.id), 1L).map {
@@ -966,8 +961,7 @@ constructor(
     val txn1 = user1Transactions[0]
     val txn2 = transactionRepository.saveAndFlush(txn1.copy(id = TypedId()))
     val txn3 = transactionRepository.saveAndFlush(txn1.copy(id = TypedId()))
-    entityManager.flush()
-    entityManager.clear()
+    entityManager.flushAndClear()
 
     mockMvc
       .put("/transactions/${txn1.id}/notDuplicate") {
@@ -976,8 +970,7 @@ constructor(
       }
       .andExpect { status { isNoContent() } }
 
-    entityManager.flush()
-    entityManager.clear()
+    entityManager.flushAndClear()
 
     val txn1Duplicates =
       transactionViewRepository.findAllDuplicates(txn1.id, 1L, PageRequest.of(0, 25))
@@ -1009,7 +1002,7 @@ constructor(
       }
       .andExpect { status { isNoContent() } }
 
-    entityManager.flush()
+    entityManager.flushAndClear()
 
     assertThat(lastRuleAppliedRepository.findByUserIdAndTransactionId(1L, user1Transactions[0].id))
       .isNull()
@@ -1130,8 +1123,7 @@ constructor(
     // Neither
     doUpdate(user1Transactions[2].id, null, false)
 
-    entityManager.flush()
-    entityManager.clear()
+    entityManager.flushAndClear()
 
     assertThat(lastRuleAppliedRepository.findByUserIdAndTransactionId(1L, user1Transactions[0].id))
       .isNull()
@@ -1164,8 +1156,7 @@ constructor(
     val txn1 = user2Transactions[0]
     transactionRepository.saveAndFlush(txn1.copy(id = TypedId()))
     transactionRepository.saveAndFlush(txn1.copy(id = TypedId()))
-    entityManager.flush()
-    entityManager.clear()
+    entityManager.flushAndClear()
 
     mockMvc
       .put("/transactions/${txn1.id}/notDuplicate") {
@@ -1174,8 +1165,7 @@ constructor(
       }
       .andExpect { status { isNoContent() } }
 
-    entityManager.flush()
-    entityManager.clear()
+    entityManager.flushAndClear()
 
     val txn1Duplicates =
       transactionViewRepository.findAllDuplicates(txn1.id, 2L, PageRequest.of(0, 25))

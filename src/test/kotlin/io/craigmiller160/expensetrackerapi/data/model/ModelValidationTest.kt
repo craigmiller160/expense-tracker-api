@@ -1,5 +1,6 @@
 package io.craigmiller160.expensetrackerapi.data.model
 
+import io.craigmiller160.expensetrackerapi.extension.flushAndClear
 import io.craigmiller160.expensetrackerapi.testcore.ExpenseTrackerIntegrationTest
 import java.time.ZonedDateTime
 import javax.persistence.EntityManager
@@ -24,7 +25,7 @@ constructor(
     val country = Country("USA")
     countryRepository.save(country)
 
-    entityManager.flush()
+    entityManager.flushAndClear()
 
     assertThat(country.created).isAfterOrEqualTo(NOW)
 
@@ -58,7 +59,7 @@ constructor(
     val newResident = dbResident.copy(name = "Sally")
     residentRepository.save(newResident)
 
-    entityManager.flush()
+    entityManager.flushAndClear()
 
     val dbResident2 = residentRepository.findById(resident.id).orElseThrow()
     assertThat(dbResident2.name).isEqualTo(newResident.name)

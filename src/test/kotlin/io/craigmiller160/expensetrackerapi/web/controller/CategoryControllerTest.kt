@@ -5,6 +5,7 @@ import io.craigmiller160.expensetrackerapi.common.data.typedid.TypedId
 import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.CategoryId
 import io.craigmiller160.expensetrackerapi.data.repository.CategoryRepository
 import io.craigmiller160.expensetrackerapi.data.repository.TransactionRepository
+import io.craigmiller160.expensetrackerapi.extension.flushAndClear
 import io.craigmiller160.expensetrackerapi.testcore.ExpenseTrackerIntegrationTest
 import io.craigmiller160.expensetrackerapi.testcore.OAuth2Extension
 import io.craigmiller160.expensetrackerapi.testutils.DataHelper
@@ -47,7 +48,7 @@ constructor(
     val cat2 = dataHelper.createCategory(1L, "Category 2")
     dataHelper.createCategory(2L, "Category 3")
 
-    entityManager.flush()
+    entityManager.flushAndClear()
 
     val expected = listOf(CategoryResponse.from(cat1), CategoryResponse.from(cat2))
 

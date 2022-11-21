@@ -3,6 +3,7 @@ package io.craigmiller160.expensetrackerapi.web.controller
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.craigmiller160.expensetrackerapi.data.repository.ReportRepository
 import io.craigmiller160.expensetrackerapi.data.repository.TransactionRepository
+import io.craigmiller160.expensetrackerapi.extension.flushAndClear
 import io.craigmiller160.expensetrackerapi.testcore.ExpenseTrackerIntegrationTest
 import io.craigmiller160.expensetrackerapi.testcore.OAuth2Extension
 import io.craigmiller160.expensetrackerapi.testutils.DataHelper
@@ -75,7 +76,7 @@ constructor(
         transactionRepository.save(it.copy(expenseDate = month1.plusDays(8)))
       }
 
-    entityManager.flush()
+    entityManager.flushAndClear()
 
     val month1Total = txn1.amount + txn2.amount + txn6.amount + txn7.amount + txn8.amount
     val month2Total = txn3.amount + txn4.amount
@@ -163,7 +164,7 @@ constructor(
   @Test
   fun getReports_noTransactions() {
     transactionRepository.deleteAll()
-    entityManager.flush()
+    entityManager.flushAndClear()
 
     val response = ReportPageResponse(reports = listOf(), pageNumber = 0, totalItems = 0)
 

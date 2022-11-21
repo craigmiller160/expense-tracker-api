@@ -8,6 +8,7 @@ import io.craigmiller160.expensetrackerapi.data.model.Category
 import io.craigmiller160.expensetrackerapi.data.model.Transaction
 import io.craigmiller160.expensetrackerapi.data.repository.AutoCategorizeRuleRepository
 import io.craigmiller160.expensetrackerapi.data.repository.TransactionRepository
+import io.craigmiller160.expensetrackerapi.extension.flushAndClear
 import io.craigmiller160.expensetrackerapi.testcore.ExpenseTrackerIntegrationTest
 import io.craigmiller160.expensetrackerapi.testcore.OAuth2Extension
 import io.craigmiller160.expensetrackerapi.testutils.DataHelper
@@ -111,7 +112,7 @@ constructor(
         autoCategorizeRuleRepository.save(it.copy(regex = "Hello World"))
       }
     dataHelper.createRule(1L, cat1.id)
-    entityManager.flush()
+    entityManager.flushAndClear()
 
     val expectedResponse =
       AutoCategorizeRulePageResponse(
@@ -150,8 +151,7 @@ constructor(
         .contentAsString
     val response = objectMapper.readValue(responseString, AutoCategorizeRuleResponse::class.java)
 
-    entityManager.flush()
-    entityManager.clear()
+    entityManager.flushAndClear()
 
     val expectedOrdinals =
       listOf(
@@ -335,8 +335,7 @@ constructor(
       }
       .andExpect { status { isOk() } }
 
-    entityManager.flush()
-    entityManager.clear()
+    entityManager.flushAndClear()
 
     val expectedOrdinals =
       listOf(
@@ -565,8 +564,7 @@ constructor(
       }
       .andExpect { status { isNoContent() } }
 
-    entityManager.flush()
-    entityManager.clear()
+    entityManager.flushAndClear()
 
     assertThat(autoCategorizeRuleRepository.findById(rules[2].id)).isEmpty
 
@@ -590,8 +588,7 @@ constructor(
       }
       .andExpect { status { isNoContent() } }
 
-    entityManager.flush()
-    entityManager.clear()
+    entityManager.flushAndClear()
 
     val expectedOrdinals =
       listOf(
@@ -614,8 +611,7 @@ constructor(
       }
       .andExpect { status { isNoContent() } }
 
-    entityManager.flush()
-    entityManager.clear()
+    entityManager.flushAndClear()
 
     val expectedOrdinals =
       listOf(
@@ -689,7 +685,7 @@ constructor(
       }
       .andExpect { status { isNoContent() } }
 
-    entityManager.flush()
+    entityManager.flushAndClear()
 
     assertThat(transactionRepository.findById(transaction.id))
       .isPresent
