@@ -1,4 +1,4 @@
-package io.craigmiller160.expensetrackerapi.web.types.rules
+package io.craigmiller160.expensetrackerapi.data.projection
 
 import io.craigmiller160.expensetrackerapi.common.data.typedid.TypedId
 import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.AutoCategorizeRuleId
@@ -8,10 +8,11 @@ import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.TransactionId
 import java.math.BigDecimal
 import java.time.LocalDate
 
-data class LastRuleAppliedResponse(
+data class LastRuleAppliedForTransaction(
   val id: TypedId<LastRuleAppliedId>,
   val ruleId: TypedId<AutoCategorizeRuleId>,
   val transactionId: TypedId<TransactionId>,
+  val userId: Long,
   val categoryId: TypedId<CategoryId>,
   val ordinal: Int,
   val regex: String,
