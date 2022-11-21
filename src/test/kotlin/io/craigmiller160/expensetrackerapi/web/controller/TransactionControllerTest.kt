@@ -1027,7 +1027,45 @@ constructor(
 
   @Test
   fun `updateTransactions - confirming and or setting category clears last rule applied`() {
-    TODO()
+    val transactionToCategorize =
+      TransactionToUpdate(
+        transactionId = user1Transactions[0].id,
+        categoryId = user1Categories.first().id,
+        confirmed = false)
+    val transactionToConfirm =
+      TransactionToUpdate(
+        transactionId = user1Transactions[1].id, categoryId = null, confirmed = true)
+    val transactionToDoNothing =
+      TransactionToUpdate(
+        transactionId = user1Transactions[2].id, categoryId = null, confirmed = false)
+    dataHelper.createLastRuleApplied(1L, transactionToCategorize.transactionId, rule.id)
+    dataHelper.createLastRuleApplied(1L, transactionToConfirm.transactionId, rule.id)
+    dataHelper.createLastRuleApplied(1L, transactionToDoNothing.transactionId, rule.id)
+    val request =
+      UpdateTransactionsRequest(
+        transactions = setOf(transactionToCategorize, transactionToConfirm, transactionToDoNothing))
+
+    mockMvc
+      .put("/transactions") {
+        secure = true
+        header("Authorization", "Bearer $token")
+        contentType = MediaType.APPLICATION_JSON
+        content = objectMapper.writeValueAsString(request)
+      }
+      .andExpect { status { isNoContent() } }
+
+    assertThat(
+        lastRuleAppliedRepository.findByUserIdAndTransactionId(
+          1L, transactionToCategorize.transactionId))
+      .isNull()
+    assertThat(
+        lastRuleAppliedRepository.findByUserIdAndTransactionId(
+          1L, transactionToConfirm.transactionId))
+      .isNull()
+    assertThat(
+        lastRuleAppliedRepository.findByUserIdAndTransactionId(
+          1L, transactionToDoNothing.transactionId))
+      .isNotNull()
   }
 
   @Test
