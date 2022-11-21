@@ -3,7 +3,7 @@ package io.craigmiller160.expensetrackerapi.service
 import arrow.core.Either
 import arrow.core.continuations.either
 import arrow.core.flatMap
-import arrow.core.flatten
+import arrow.core.leftIfNull
 import io.craigmiller160.expensetrackerapi.common.data.typedid.TypedId
 import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.CategoryId
 import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.TransactionId
@@ -126,22 +126,22 @@ class TransactionService(
   ): TryEither<Unit> {
     val userId = oAuth2Service.getAuthenticatedUser().userId
 
-    return Either.catch {
-        val validCategoryId =
-          request.categoryId?.let { categoryRepository.findByIdAndUserId(it, userId) }?.id
-        transactionRepository
-          .findByIdAndUserId(transactionId, userId)
-          ?.copy(
-            confirmed = request.confirmed,
-            expenseDate = request.expenseDate,
-            description = request.description,
-            amount = request.amount,
-            categoryId = validCategoryId)
-          ?.let { transactionRepository.save(it) }
-          ?.let { Either.Right(Unit) }
-          ?: Either.Left(BadRequestException("No transaction with ID: $transactionId"))
+    return Either.catch { transactionRepository.findByIdAndUserId(transactionId, userId) }
+      .leftIfNull { BadRequestException("No transaction with ID: $transactionId") }
+      .flatMapCatch { transaction ->
+        transaction.copy(
+          categoryId =
+            request.categoryId?.let { categoryRepository.findByIdAndUserId(it, userId) }?.id)
       }
-      .flatten()
+      .map { transaction ->
+        transaction.copy(
+          confirmed = request.confirmed,
+          expenseDate = request.expenseDate,
+          description = request.description,
+          amount = request.amount)
+      }
+      .flatMapCatch { transactionRepository.save(it) }
+      .map { Either.Right(Unit) }
   }
 
   fun getPossibleDuplicates(
