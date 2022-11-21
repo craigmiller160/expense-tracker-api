@@ -44,7 +44,7 @@ interface TransactionRepository :
     @Param("transactionId") transactionId: TypedId<TransactionId>,
     @Param("categoryId") categoryId: TypedId<CategoryId>,
     @Param("userId") userId: Long
-  )
+  ): Int
 
   @Query(
     """
@@ -103,7 +103,7 @@ interface TransactionRepository :
   fun removeTransactionCategory(
     @Param("transactionId") transactionId: TypedId<TransactionId>,
     @Param("userId") userId: Long
-  )
+  ): Int
 
   @Query(
     """

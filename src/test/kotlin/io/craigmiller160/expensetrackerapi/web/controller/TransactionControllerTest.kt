@@ -986,10 +986,15 @@ constructor(
   @Test
   fun `categorizeTransactions - clears last rule applied`() {
     dataHelper.createLastRuleApplied(1L, user1Transactions[0].id, rule.id)
+    dataHelper.createLastRuleApplied(1L, user1Transactions[1].id, rule.id)
+    dataHelper.createLastRuleApplied(1L, user1Transactions[2].id, rule.id)
     val request =
       CategorizeTransactionsRequest(
         transactionsAndCategories =
-          setOf(TransactionAndCategory(user1Transactions[0].id, user1Categories[1].id)))
+          setOf(
+            TransactionAndCategory(user1Transactions[0].id, user1Categories[1].id),
+            TransactionAndCategory(user1Transactions[1].id, null),
+            TransactionAndCategory(user1Transactions[2].id, user1Transactions[2].categoryId)))
 
     mockMvc
       .put("/transactions/categorize") {
@@ -1004,6 +1009,10 @@ constructor(
 
     assertThat(lastRuleAppliedRepository.findByUserIdAndTransactionId(1L, user1Transactions[0].id))
       .isNull()
+    assertThat(lastRuleAppliedRepository.findByUserIdAndTransactionId(1L, user1Transactions[1].id))
+      .isNotNull
+    assertThat(lastRuleAppliedRepository.findByUserIdAndTransactionId(1L, user1Transactions[2].id))
+      .isNotNull
   }
 
   @Test

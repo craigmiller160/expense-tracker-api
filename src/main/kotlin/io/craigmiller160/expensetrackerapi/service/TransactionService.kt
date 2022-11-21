@@ -42,12 +42,20 @@ class TransactionService(
       .map { txnAndCat ->
         Either.catch {
           txnAndCat.categoryId?.let {
-            transactionRepository.setTransactionCategory(txnAndCat.transactionId, it, userId)
+            txnAndCat.transactionId to
+              transactionRepository.setTransactionCategory(txnAndCat.transactionId, it, userId)
           }
-            ?: transactionRepository.removeTransactionCategory(txnAndCat.transactionId, userId)
+            ?: run {
+              txnAndCat.transactionId to
+                transactionRepository.removeTransactionCategory(txnAndCat.transactionId, userId)
+            }
         }
       }
       .sequence()
+      .map { results ->
+        results.filter { (_, modifiedCount) -> modifiedCount > 0 }
+        // TODO need to remove last rule from all of these
+      }
       .map { Unit }
   }
 
