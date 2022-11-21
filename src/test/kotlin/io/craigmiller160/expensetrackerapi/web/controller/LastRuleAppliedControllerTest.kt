@@ -15,11 +15,14 @@ import java.math.BigDecimal
 import java.time.LocalDate
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.get
 
 @ExpenseTrackerIntegrationTest
-class LastRuleAppliedControllerTest(
+class LastRuleAppliedControllerTest
+@Autowired
+constructor(
   private val dataHelper: DataHelper,
   private val mockMvc: MockMvc,
   private val lastRuleAppliedRepository: LastRuleAppliedRepository,
