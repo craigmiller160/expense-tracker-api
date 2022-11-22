@@ -10,6 +10,7 @@ import java.time.LocalDate
 data class AutoCategorizeRuleResponse(
   val id: TypedId<AutoCategorizeRuleId>,
   val categoryId: TypedId<CategoryId>,
+  val categoryName: String,
   val ordinal: Int,
   val regex: String,
   val startDate: LocalDate? = null,
