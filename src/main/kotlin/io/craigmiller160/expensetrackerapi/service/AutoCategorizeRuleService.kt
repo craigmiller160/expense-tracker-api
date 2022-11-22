@@ -9,6 +9,7 @@ import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.AutoCategoriz
 import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.CategoryId
 import io.craigmiller160.expensetrackerapi.common.error.BadRequestException
 import io.craigmiller160.expensetrackerapi.data.model.AutoCategorizeRule
+import io.craigmiller160.expensetrackerapi.data.model.AutoCategorizeRuleView
 import io.craigmiller160.expensetrackerapi.data.repository.AutoCategorizeRuleRepository
 import io.craigmiller160.expensetrackerapi.data.repository.AutoCategorizeRuleViewRepository
 import io.craigmiller160.expensetrackerapi.data.repository.CategoryRepository
@@ -87,6 +88,7 @@ class AutoCategorizeRuleService(
           rule
         }
       }
+      .flatMap { getRuleViewIfValid(it.id, userId) }
       .map { AutoCategorizeRuleResponse.from(it) }
   }
 
@@ -100,6 +102,13 @@ class AutoCategorizeRuleService(
     userId: Long
   ): TryEither<AutoCategorizeRule> =
     Either.catch { autoCategorizeRuleRepository.findByIdAndUserId(ruleId, userId) }
+      .leftIfNull { BadRequestException("Invalid Rule: $ruleId") }
+
+  private fun getRuleViewIfValid(
+    ruleId: TypedId<AutoCategorizeRuleId>,
+    userId: Long
+  ): TryEither<AutoCategorizeRuleView> =
+    Either.catch { autoCategorizeRuleViewRepository.findByIdAndUserId(ruleId, userId) }
       .leftIfNull { BadRequestException("Invalid Rule: $ruleId") }
 
   @Transactional
