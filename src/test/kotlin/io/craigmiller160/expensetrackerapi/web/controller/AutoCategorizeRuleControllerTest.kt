@@ -7,6 +7,7 @@ import io.craigmiller160.expensetrackerapi.data.model.AutoCategorizeRule
 import io.craigmiller160.expensetrackerapi.data.model.Category
 import io.craigmiller160.expensetrackerapi.data.model.Transaction
 import io.craigmiller160.expensetrackerapi.data.repository.AutoCategorizeRuleRepository
+import io.craigmiller160.expensetrackerapi.data.repository.AutoCategorizeRuleViewRepository
 import io.craigmiller160.expensetrackerapi.data.repository.TransactionRepository
 import io.craigmiller160.expensetrackerapi.extension.flushAndClear
 import io.craigmiller160.expensetrackerapi.testcore.ExpenseTrackerIntegrationTest
@@ -35,7 +36,8 @@ constructor(
   private val objectMapper: ObjectMapper,
   private val autoCategorizeRuleRepository: AutoCategorizeRuleRepository,
   private val entityManager: EntityManager,
-  private val transactionRepository: TransactionRepository
+  private val transactionRepository: TransactionRepository,
+  private val autoCategorizeRuleViewRepository: AutoCategorizeRuleViewRepository
 ) {
 
   private lateinit var token: String
@@ -63,7 +65,11 @@ constructor(
         pageNumber = 0,
         totalItems = 2,
         rules =
-          listOf(AutoCategorizeRuleResponse.from(rule1), AutoCategorizeRuleResponse.from(rule2)))
+          listOf(
+            AutoCategorizeRuleResponse.from(
+              autoCategorizeRuleViewRepository.findById(rule1.id).orElseThrow()),
+            AutoCategorizeRuleResponse.from(
+              autoCategorizeRuleViewRepository.findById(rule2.id).orElseThrow())))
 
     mockMvc
       .get("/categories/rules?pageNumber=0&pageSize=25") {
@@ -88,7 +94,11 @@ constructor(
         pageNumber = 0,
         totalItems = 2,
         rules =
-          listOf(AutoCategorizeRuleResponse.from(rule1), AutoCategorizeRuleResponse.from(rule2)))
+          listOf(
+            AutoCategorizeRuleResponse.from(
+              autoCategorizeRuleViewRepository.findById(rule1.id).orElseThrow()),
+            AutoCategorizeRuleResponse.from(
+              autoCategorizeRuleViewRepository.findById(rule2.id).orElseThrow())))
 
     mockMvc
       .get("/categories/rules?pageNumber=0&pageSize=25&categoryId=${cat1.id}") {
@@ -119,7 +129,11 @@ constructor(
         pageNumber = 0,
         totalItems = 2,
         rules =
-          listOf(AutoCategorizeRuleResponse.from(rule1), AutoCategorizeRuleResponse.from(rule2)))
+          listOf(
+            AutoCategorizeRuleResponse.from(
+              autoCategorizeRuleViewRepository.findById(rule1.id).orElseThrow()),
+            AutoCategorizeRuleResponse.from(
+              autoCategorizeRuleViewRepository.findById(rule2.id).orElseThrow())))
 
     mockMvc
       .get("/categories/rules?pageNumber=0&pageSize=25&regex=hello") {
@@ -216,7 +230,7 @@ constructor(
       .hasFieldOrPropertyWithValue("minAmount", request.minAmount)
       .hasFieldOrPropertyWithValue("maxAmount", request.maxAmount)
 
-    val dbRecord = autoCategorizeRuleRepository.findById(response.id).orElseThrow()
+    val dbRecord = autoCategorizeRuleViewRepository.findById(response.id).orElseThrow()
     assertThat(AutoCategorizeRuleResponse.from(dbRecord)).isEqualTo(response)
   }
 
@@ -369,7 +383,8 @@ constructor(
         startDate = request.startDate,
         endDate = request.endDate,
         minAmount = request.minAmount,
-        maxAmount = request.maxAmount)
+        maxAmount = request.maxAmount,
+        categoryName = cat3.name)
 
     mockMvc
       .put("/categories/rules/${rule.id}") {
@@ -383,7 +398,7 @@ constructor(
         content { json(objectMapper.writeValueAsString(expectedResponse), true) }
       }
 
-    val dbRule = autoCategorizeRuleRepository.findById(rule.id).orElseThrow()
+    val dbRule = autoCategorizeRuleViewRepository.findById(rule.id).orElseThrow()
     assertThat(AutoCategorizeRuleResponse.from(dbRule)).isEqualTo(expectedResponse)
   }
 
@@ -485,7 +500,9 @@ constructor(
   @Test
   fun getRule() {
     val rule = dataHelper.createRule(1L, cat1.id)
-    val expectedResponse = AutoCategorizeRuleResponse.from(rule)
+    val expectedResponse =
+      AutoCategorizeRuleResponse.from(
+        autoCategorizeRuleViewRepository.findById(rule.id).orElseThrow())
 
     mockMvc
       .get("/categories/rules/${rule.id}") {
