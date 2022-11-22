@@ -38,7 +38,7 @@
         <arrow.kt.version>1.1.2</arrow.kt.version>
         <kotest.arrow.version>1.2.5</kotest.arrow.version>
         <spring.arrow.kt.version>1.0.3</spring.arrow.kt.version>
-        <spring.oauth2.utils.version>1.10.0</spring.oauth2.utils.version>
+        <spring.oauth2.utils.version>1.11.0-SNAPSHOT</spring.oauth2.utils.version>
         <spring.web.utils.version>1.2.0</spring.web.utils.version>
         <mockito.kotlin.version>4.0.0</mockito.kotlin.version>
         <opencsv.version>5.6</opencsv.version>
