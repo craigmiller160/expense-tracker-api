@@ -7,4 +7,6 @@ import org.springframework.data.jpa.repository.JpaRepository
 
 interface AutoCategorizeRuleViewRepository :
   JpaRepository<AutoCategorizeRuleView, TypedId<AutoCategorizeRuleId>>,
-  AutoCategorizeRuleViewRepositoryCustom
+  AutoCategorizeRuleViewRepositoryCustom {
+  fun findByIdAndUserId(id: TypedId<AutoCategorizeRuleId>, userId: Long): AutoCategorizeRuleView?
+}
