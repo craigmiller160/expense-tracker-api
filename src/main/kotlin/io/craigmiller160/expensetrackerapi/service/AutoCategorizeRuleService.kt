@@ -36,7 +36,7 @@ class AutoCategorizeRuleService(
     request: AutoCategorizeRulePageRequest
   ): TryEither<AutoCategorizeRulePageResponse> {
     val userId = oAuth2Service.getAuthenticatedUser().userId
-    return Either.catch { autoCategorizeRuleRepository.searchForRules(request, userId) }
+    return Either.catch { autoCategorizeRuleViewRepository.searchForRules(request, userId) }
       .map { AutoCategorizeRulePageResponse.from(it) }
   }
 
