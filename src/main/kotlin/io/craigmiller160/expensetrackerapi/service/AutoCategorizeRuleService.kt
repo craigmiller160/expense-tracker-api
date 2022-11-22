@@ -147,12 +147,13 @@ class AutoCategorizeRuleService(
           rule
         }
       }
+      .flatMap { getRuleViewIfValid(it.id, userId) }
       .map { AutoCategorizeRuleResponse.from(it) }
   }
 
   fun getRule(ruleId: TypedId<AutoCategorizeRuleId>): TryEither<AutoCategorizeRuleResponse> {
     val userId = oAuth2Service.getAuthenticatedUser().userId
-    return getRuleIfValid(ruleId, userId).map { AutoCategorizeRuleResponse.from(it) }
+    return getRuleViewIfValid(ruleId, userId).map { AutoCategorizeRuleResponse.from(it) }
   }
 
   @Transactional
