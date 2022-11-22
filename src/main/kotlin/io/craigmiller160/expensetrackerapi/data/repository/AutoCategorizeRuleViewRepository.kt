@@ -6,4 +6,5 @@ import io.craigmiller160.expensetrackerapi.data.model.AutoCategorizeRuleView
 import org.springframework.data.jpa.repository.JpaRepository
 
 interface AutoCategorizeRuleViewRepository :
-  JpaRepository<AutoCategorizeRuleView, TypedId<AutoCategorizeRuleId>>
+  JpaRepository<AutoCategorizeRuleView, TypedId<AutoCategorizeRuleId>>,
+  AutoCategorizeRuleViewRepositoryCustom

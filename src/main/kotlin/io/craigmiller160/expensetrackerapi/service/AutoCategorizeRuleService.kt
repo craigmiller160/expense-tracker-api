@@ -10,6 +10,7 @@ import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.CategoryId
 import io.craigmiller160.expensetrackerapi.common.error.BadRequestException
 import io.craigmiller160.expensetrackerapi.data.model.AutoCategorizeRule
 import io.craigmiller160.expensetrackerapi.data.repository.AutoCategorizeRuleRepository
+import io.craigmiller160.expensetrackerapi.data.repository.AutoCategorizeRuleViewRepository
 import io.craigmiller160.expensetrackerapi.data.repository.CategoryRepository
 import io.craigmiller160.expensetrackerapi.function.TryEither
 import io.craigmiller160.expensetrackerapi.function.flatMapCatch
@@ -26,6 +27,7 @@ import org.springframework.stereotype.Service
 @Service
 class AutoCategorizeRuleService(
   private val autoCategorizeRuleRepository: AutoCategorizeRuleRepository,
+  private val autoCategorizeRuleViewRepository: AutoCategorizeRuleViewRepository,
   private val categoryRepository: CategoryRepository,
   private val oAuth2Service: OAuth2Service,
   private val applyCategoriesToTransactionsService: ApplyCategoriesToTransactionsService
