@@ -284,6 +284,7 @@
                         <argument>--spring.datasource.db_name=postgres</argument>
                         <argument>--spring.datasource.username=postgres</argument>
                         <argument>--spring.datasource.password=password</argument>
+                        <argument>--spring.profiles.active=dev,airplane</argument>
                     </arguments>
                 </configuration>
             </plugin>
