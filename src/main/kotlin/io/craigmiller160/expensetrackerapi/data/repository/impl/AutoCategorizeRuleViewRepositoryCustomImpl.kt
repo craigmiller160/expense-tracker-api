@@ -2,9 +2,8 @@ package io.craigmiller160.expensetrackerapi.data.repository.impl
 
 import com.querydsl.core.BooleanBuilder
 import com.querydsl.jpa.JPQLQueryFactory
-import io.craigmiller160.expensetrackerapi.data.model.AutoCategorizeRule
 import io.craigmiller160.expensetrackerapi.data.model.AutoCategorizeRuleView
-import io.craigmiller160.expensetrackerapi.data.model.QAutoCategorizeRule
+import io.craigmiller160.expensetrackerapi.data.model.QAutoCategorizeRuleView
 import io.craigmiller160.expensetrackerapi.data.querydsl.QueryDSLSupport
 import io.craigmiller160.expensetrackerapi.data.repository.AutoCategorizeRuleViewRepositoryCustom
 import io.craigmiller160.expensetrackerapi.web.types.rules.AutoCategorizeRulePageRequest
@@ -27,24 +26,27 @@ class AutoCategorizeRuleViewRepositoryCustomImpl(
     val pageable = PageRequest.of(request.pageNumber, request.pageSize, sort)
 
     val whereClause =
-      BooleanBuilder(QAutoCategorizeRule.autoCategorizeRule.userId.eq(userId))
+      BooleanBuilder(QAutoCategorizeRuleView.autoCategorizeRuleView.userId.eq(userId))
         .let(
           QueryDSLSupport.andIfNotNull(request.categoryId) {
-            QAutoCategorizeRule.autoCategorizeRule.categoryId.eq(it)
+            QAutoCategorizeRuleView.autoCategorizeRuleView.categoryId.eq(it)
           })
         .let(
           QueryDSLSupport.andIfNotNull(request.regex) {
-            QAutoCategorizeRule.autoCategorizeRule.regex.toLowerCase().like("%${it.lowercase()}%")
+            QAutoCategorizeRuleView.autoCategorizeRuleView.regex
+              .toLowerCase()
+              .like("%${it.lowercase()}%")
           })
 
     val baseQuery =
-      queryFactory.query().from(QAutoCategorizeRule.autoCategorizeRule).where(whereClause)
+      queryFactory.query().from(QAutoCategorizeRuleView.autoCategorizeRuleView).where(whereClause)
 
-    val count = baseQuery.select(QAutoCategorizeRule.autoCategorizeRule.count()).fetchFirst()
+    val count =
+      baseQuery.select(QAutoCategorizeRuleView.autoCategorizeRuleView.count()).fetchFirst()
     val results =
       baseQuery
-        .select(QAutoCategorizeRule.autoCategorizeRule)
-        .let(queryDslSupport.applyPagination(pageable, AutoCategorizeRule::class.java))
+        .select(QAutoCategorizeRuleView.autoCategorizeRuleView)
+        .let(queryDslSupport.applyPagination(pageable, AutoCategorizeRuleView::class.java))
         .fetch()
 
     return PageImpl(results, pageable, count)
