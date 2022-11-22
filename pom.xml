@@ -278,13 +278,6 @@
                     <mainClass>io.craigmiller160.expensetrackerapi.ExpenseTrackerApiApplicationKt</mainClass>
                     <arguments>
                         <argument>--spring.flyway.locations=classpath:db/migration,classpath:db/dev/migration</argument>
-                        <!-- TODO delete below here -->
-                        <argument>--spring.datasource.host=localhost</argument>
-                        <argument>--spring.datasource.port=5432</argument>
-                        <argument>--spring.datasource.db_name=postgres</argument>
-                        <argument>--spring.datasource.username=postgres</argument>
-                        <argument>--spring.datasource.password=password</argument>
-                        <argument>--spring.profiles.active=dev,airplane</argument>
                     </arguments>
                 </configuration>
             </plugin>
