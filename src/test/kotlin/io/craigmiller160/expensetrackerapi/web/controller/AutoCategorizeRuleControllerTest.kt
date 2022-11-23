@@ -340,11 +340,15 @@ constructor(
 
   @Test
   fun updateRule_verifyApplyingRules() {
+    val cat3 = dataHelper.createCategory(1L, "Universe")
+    val cat4 = dataHelper.createCategory(1L, "Time")
     val rule = dataHelper.createRule(1L, cat1.id)
-    val request = AutoCategorizeRuleRequest(categoryId = cat1.id, regex = ".*")
+    val rule2 = dataHelper.createRule(1L, cat3.id)
+    dataHelper.createLastRuleApplied(1L, transaction.id, rule.id)
+    val request = AutoCategorizeRuleRequest(categoryId = cat4.id, regex = ".*")
 
     mockMvc
-      .put("/categories/rules/${rule.id}") {
+      .put("/categories/rules/${rule2.id}") {
         secure = true
         header("Authorization", "Bearer $token")
         contentType = MediaType.APPLICATION_JSON
@@ -355,7 +359,7 @@ constructor(
     assertThat(transactionRepository.findById(transaction.id))
       .isPresent
       .get()
-      .hasFieldOrPropertyWithValue("categoryId", cat1.id)
+      .hasFieldOrPropertyWithValue("categoryId", cat4.id)
   }
 
   @Test
