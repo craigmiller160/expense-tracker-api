@@ -205,5 +205,9 @@ class AutoCategorizeRuleService(
       }
     }
 
-  fun getMaxOrdinal(): TryEither<MaxOrdinalResponse> = TODO()
+  fun getMaxOrdinal(): TryEither<MaxOrdinalResponse> {
+    val userId = oAuth2Service.getAuthenticatedUser().userId
+    return Either.catch { autoCategorizeRuleRepository.getMaxOrdinal(userId) }
+      .map { MaxOrdinalResponse(it) }
+  }
 }

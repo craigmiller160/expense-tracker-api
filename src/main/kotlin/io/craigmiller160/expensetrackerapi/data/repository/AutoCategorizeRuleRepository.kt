@@ -5,6 +5,8 @@ import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.AutoCategoriz
 import io.craigmiller160.expensetrackerapi.data.model.AutoCategorizeRule
 import java.util.stream.Stream
 import org.springframework.data.jpa.repository.JpaRepository
+import org.springframework.data.jpa.repository.Query
+import org.springframework.data.repository.query.Param
 
 interface AutoCategorizeRuleRepository :
   JpaRepository<AutoCategorizeRule, TypedId<AutoCategorizeRuleId>>,
@@ -16,4 +18,12 @@ interface AutoCategorizeRuleRepository :
   fun deleteByIdAndUserId(id: TypedId<AutoCategorizeRuleId>, userId: Long)
 
   fun streamAllByUserIdOrderByOrdinal(userId: Long): Stream<AutoCategorizeRule>
+
+  @Query(
+    """
+    SELECT MAX(r.ordinal)
+    FROM AutoCategorizeRule r
+    WHERE r.userId = :userId
+  """)
+  fun getMaxOrdinal(@Param("userId") userId: Long): Int
 }
