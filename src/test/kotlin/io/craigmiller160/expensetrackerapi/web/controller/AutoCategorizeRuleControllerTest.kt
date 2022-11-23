@@ -148,6 +148,38 @@ constructor(
   }
 
   @Test
+  fun `createRule - with max ordinal`() {
+    val rules = createRulesForOrdinalValidation()
+    val request = AutoCategorizeRuleRequest(categoryId = cat1.id, regex = ".*", ordinal = 6)
+
+    val responseString =
+      mockMvc
+        .post("/categories/rules") {
+          secure = true
+          header("Authorization", "Bearer $token")
+          contentType = MediaType.APPLICATION_JSON
+          content = objectMapper.writeValueAsString(request)
+        }
+        .andExpect { status { isOk() } }
+        .andReturn()
+        .response
+        .contentAsString
+    val response = objectMapper.readValue(responseString, AutoCategorizeRuleResponse::class.java)
+
+    entityManager.flushAndClear()
+
+    val expectedOrdinals =
+      listOf(
+        RuleIdAndOrdinal(rules[0].id, 1),
+        RuleIdAndOrdinal(rules[1].id, 2),
+        RuleIdAndOrdinal(rules[2].id, 3),
+        RuleIdAndOrdinal(rules[3].id, 4),
+        RuleIdAndOrdinal(rules[4].id, 5),
+        RuleIdAndOrdinal(response.id, 6))
+    validateOrdinalsById(expectedOrdinals)
+  }
+
+  @Test
   fun createRule_withOrdinal() {
     val rules = createRulesForOrdinalValidation()
     val request = AutoCategorizeRuleRequest(categoryId = cat1.id, regex = ".*", ordinal = 2)
