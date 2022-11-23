@@ -102,5 +102,5 @@ class AutoCategorizeRuleController(
           mediaType = "application/json",
           array = ArraySchema(schema = Schema(implementation = MaxOrdinalResponse::class)))])
   @GetMapping("/maxOrdinal")
-  fun getMaxOrdinal(): TryEither<MaxOrdinalResponse> = TODO()
+  fun getMaxOrdinal(): TryEither<MaxOrdinalResponse> = autoCategorizeRuleService.getMaxOrdinal()
 }

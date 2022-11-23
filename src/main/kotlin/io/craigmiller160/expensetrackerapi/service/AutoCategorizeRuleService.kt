@@ -15,10 +15,7 @@ import io.craigmiller160.expensetrackerapi.data.repository.AutoCategorizeRuleVie
 import io.craigmiller160.expensetrackerapi.data.repository.CategoryRepository
 import io.craigmiller160.expensetrackerapi.function.TryEither
 import io.craigmiller160.expensetrackerapi.function.flatMapCatch
-import io.craigmiller160.expensetrackerapi.web.types.rules.AutoCategorizeRulePageRequest
-import io.craigmiller160.expensetrackerapi.web.types.rules.AutoCategorizeRulePageResponse
-import io.craigmiller160.expensetrackerapi.web.types.rules.AutoCategorizeRuleRequest
-import io.craigmiller160.expensetrackerapi.web.types.rules.AutoCategorizeRuleResponse
+import io.craigmiller160.expensetrackerapi.web.types.rules.*
 import io.craigmiller160.oauth2.service.OAuth2Service
 import java.math.BigDecimal
 import java.time.LocalDate
@@ -207,4 +204,6 @@ class AutoCategorizeRuleService(
           userId, newOrdinal, oldOrdinal - 1, excludeId)
       }
     }
+
+  fun getMaxOrdinal(): TryEither<MaxOrdinalResponse> = TODO()
 }
