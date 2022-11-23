@@ -347,6 +347,8 @@ constructor(
     dataHelper.createLastRuleApplied(1L, transaction.id, rule.id)
     val request = AutoCategorizeRuleRequest(categoryId = cat4.id, regex = ".*")
 
+    entityManager.flushAndClear()
+
     mockMvc
       .put("/categories/rules/${rule2.id}") {
         secure = true
