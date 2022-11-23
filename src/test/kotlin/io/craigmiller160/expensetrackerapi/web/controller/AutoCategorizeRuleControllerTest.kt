@@ -16,6 +16,7 @@ import io.craigmiller160.expensetrackerapi.testutils.DataHelper
 import io.craigmiller160.expensetrackerapi.web.types.rules.AutoCategorizeRulePageResponse
 import io.craigmiller160.expensetrackerapi.web.types.rules.AutoCategorizeRuleRequest
 import io.craigmiller160.expensetrackerapi.web.types.rules.AutoCategorizeRuleResponse
+import io.craigmiller160.expensetrackerapi.web.types.rules.MaxOrdinalResponse
 import java.math.BigDecimal
 import java.time.LocalDate
 import javax.persistence.EntityManager
@@ -712,12 +713,34 @@ constructor(
 
   @Test
   fun `getMaxOrdinal - with rules`() {
-    TODO()
+    repeat(3) { dataHelper.createRule(1L, cat1.id) }
+
+    val expectedResponse = MaxOrdinalResponse(maxOrdinal = 3)
+
+    mockMvc
+      .get("/categories/rules/maxOrdinal") {
+        secure = true
+        header("Authorization", "Bearer $token")
+      }
+      .andExpect {
+        status { isOk() }
+        content { json(objectMapper.writeValueAsString(expectedResponse), true) }
+      }
   }
 
   @Test
   fun `getMaxOrdinal - with no rules`() {
-    TODO()
+    val expectedResponse = MaxOrdinalResponse(maxOrdinal = 0)
+
+    mockMvc
+      .get("/categories/rules/maxOrdinal") {
+        secure = true
+        header("Authorization", "Bearer $token")
+      }
+      .andExpect {
+        status { isOk() }
+        content { json(objectMapper.writeValueAsString(expectedResponse), true) }
+      }
   }
 
   private fun createRulesForOrdinalValidation(): List<AutoCategorizeRule> {
