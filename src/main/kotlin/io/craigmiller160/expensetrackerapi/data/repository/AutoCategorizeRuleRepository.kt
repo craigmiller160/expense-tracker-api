@@ -21,7 +21,7 @@ interface AutoCategorizeRuleRepository :
 
   @Query(
     """
-    SELECT MAX(r.ordinal)
+    SELECT COALESCE(MAX(r.ordinal), 0)
     FROM AutoCategorizeRule r
     WHERE r.userId = :userId
   """)
