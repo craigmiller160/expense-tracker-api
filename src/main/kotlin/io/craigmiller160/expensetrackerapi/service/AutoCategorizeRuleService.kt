@@ -61,7 +61,7 @@ class AutoCategorizeRuleService(
     val userId = oAuth2Service.getAuthenticatedUser().userId
     return validateCategory(request.categoryId, userId)
       .flatMap {
-        request.ordinal?.let { ordinal -> validateOrdinal(userId, ordinal) }
+        request.ordinal?.let { ordinal -> validateOrdinal(userId, ordinal, true) }
           ?: Either.catch { autoCategorizeRuleRepository.countAllByUserId(userId).toInt() + 1 }
       }
       .map { ordinal ->
@@ -167,9 +167,16 @@ class AutoCategorizeRuleService(
       }
   }
 
-  private fun validateOrdinal(userId: Long, ordinal: Int): TryEither<Int> =
-    Either.catch { autoCategorizeRuleRepository.countAllByUserId(userId) }
-      .filterOrElse({ it >= ordinal }) { BadRequestException("Invalid Ordinal: $ordinal") }
+  private fun validateOrdinal(
+    userId: Long,
+    ordinal: Int,
+    isCreate: Boolean = false
+  ): TryEither<Int> =
+    Either.catch { autoCategorizeRuleRepository.getMaxOrdinal(userId) }
+      .map { maxOrdinal -> if (isCreate) maxOrdinal + 1 else maxOrdinal }
+      .filterOrElse({ maxOrdinal -> maxOrdinal >= ordinal }) {
+        BadRequestException("Invalid Ordinal: $ordinal")
+      }
       .map { ordinal }
 
   @Transactional
