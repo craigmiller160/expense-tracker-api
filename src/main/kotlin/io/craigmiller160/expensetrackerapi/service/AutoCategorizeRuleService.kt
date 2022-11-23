@@ -9,7 +9,9 @@ import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.AutoCategoriz
 import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.CategoryId
 import io.craigmiller160.expensetrackerapi.common.error.BadRequestException
 import io.craigmiller160.expensetrackerapi.data.model.AutoCategorizeRule
+import io.craigmiller160.expensetrackerapi.data.model.AutoCategorizeRuleView
 import io.craigmiller160.expensetrackerapi.data.repository.AutoCategorizeRuleRepository
+import io.craigmiller160.expensetrackerapi.data.repository.AutoCategorizeRuleViewRepository
 import io.craigmiller160.expensetrackerapi.data.repository.CategoryRepository
 import io.craigmiller160.expensetrackerapi.function.TryEither
 import io.craigmiller160.expensetrackerapi.function.flatMapCatch
@@ -26,6 +28,7 @@ import org.springframework.stereotype.Service
 @Service
 class AutoCategorizeRuleService(
   private val autoCategorizeRuleRepository: AutoCategorizeRuleRepository,
+  private val autoCategorizeRuleViewRepository: AutoCategorizeRuleViewRepository,
   private val categoryRepository: CategoryRepository,
   private val oAuth2Service: OAuth2Service,
   private val applyCategoriesToTransactionsService: ApplyCategoriesToTransactionsService
@@ -34,7 +37,7 @@ class AutoCategorizeRuleService(
     request: AutoCategorizeRulePageRequest
   ): TryEither<AutoCategorizeRulePageResponse> {
     val userId = oAuth2Service.getAuthenticatedUser().userId
-    return Either.catch { autoCategorizeRuleRepository.searchForRules(request, userId) }
+    return Either.catch { autoCategorizeRuleViewRepository.searchForRules(request, userId) }
       .map { AutoCategorizeRulePageResponse.from(it) }
   }
 
@@ -85,6 +88,7 @@ class AutoCategorizeRuleService(
           rule
         }
       }
+      .flatMap { getRuleViewIfValid(it.id, userId) }
       .map { AutoCategorizeRuleResponse.from(it) }
   }
 
@@ -98,6 +102,13 @@ class AutoCategorizeRuleService(
     userId: Long
   ): TryEither<AutoCategorizeRule> =
     Either.catch { autoCategorizeRuleRepository.findByIdAndUserId(ruleId, userId) }
+      .leftIfNull { BadRequestException("Invalid Rule: $ruleId") }
+
+  private fun getRuleViewIfValid(
+    ruleId: TypedId<AutoCategorizeRuleId>,
+    userId: Long
+  ): TryEither<AutoCategorizeRuleView> =
+    Either.catch { autoCategorizeRuleViewRepository.findByIdAndUserId(ruleId, userId) }
       .leftIfNull { BadRequestException("Invalid Rule: $ruleId") }
 
   @Transactional
@@ -136,12 +147,13 @@ class AutoCategorizeRuleService(
           rule
         }
       }
+      .flatMap { getRuleViewIfValid(it.id, userId) }
       .map { AutoCategorizeRuleResponse.from(it) }
   }
 
   fun getRule(ruleId: TypedId<AutoCategorizeRuleId>): TryEither<AutoCategorizeRuleResponse> {
     val userId = oAuth2Service.getAuthenticatedUser().userId
-    return getRuleIfValid(ruleId, userId).map { AutoCategorizeRuleResponse.from(it) }
+    return getRuleViewIfValid(ruleId, userId).map { AutoCategorizeRuleResponse.from(it) }
   }
 
   @Transactional
