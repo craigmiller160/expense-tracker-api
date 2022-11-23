@@ -710,6 +710,16 @@ constructor(
       .hasFieldOrPropertyWithValue("categoryId", cat1.id)
   }
 
+  @Test
+  fun `getMaxOrdinal - with rules`() {
+    TODO()
+  }
+
+  @Test
+  fun `getMaxOrdinal - with no rules`() {
+    TODO()
+  }
+
   private fun createRulesForOrdinalValidation(): List<AutoCategorizeRule> {
     val rules =
       (1..5).map { ordinal ->
