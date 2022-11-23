@@ -6,6 +6,8 @@ import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.TransactionId
 import io.craigmiller160.expensetrackerapi.data.model.LastRuleApplied
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Modifying
+import org.springframework.data.jpa.repository.Query
+import org.springframework.data.repository.query.Param
 
 interface LastRuleAppliedRepository :
   JpaRepository<LastRuleApplied, TypedId<LastRuleAppliedId>>, LastRuleAppliedRepositoryCustom {
@@ -14,9 +16,15 @@ interface LastRuleAppliedRepository :
     transactionId: TypedId<TransactionId>
   ): LastRuleApplied?
 
+  @Query(
+    """
+    DELETE FROM LastRuleApplied lra
+    WHERE lra.userId = :userId
+    AND lra.transactionId IN (:transactionIds)
+  """)
   @Modifying(flushAutomatically = true, clearAutomatically = true)
   fun deleteAllByUserIdAndTransactionIdIn(
-    userId: Long,
-    transactionIds: Collection<TypedId<TransactionId>>
+    @Param("userId") userId: Long,
+    @Param("transactionIds") transactionIds: Collection<TypedId<TransactionId>>
   )
 }

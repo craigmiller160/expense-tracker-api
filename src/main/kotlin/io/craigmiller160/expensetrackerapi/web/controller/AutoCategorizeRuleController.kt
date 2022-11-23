@@ -4,10 +4,7 @@ import io.craigmiller160.expensetrackerapi.common.data.typedid.TypedId
 import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.AutoCategorizeRuleId
 import io.craigmiller160.expensetrackerapi.function.TryEither
 import io.craigmiller160.expensetrackerapi.service.AutoCategorizeRuleService
-import io.craigmiller160.expensetrackerapi.web.types.rules.AutoCategorizeRulePageRequest
-import io.craigmiller160.expensetrackerapi.web.types.rules.AutoCategorizeRulePageResponse
-import io.craigmiller160.expensetrackerapi.web.types.rules.AutoCategorizeRuleRequest
-import io.craigmiller160.expensetrackerapi.web.types.rules.AutoCategorizeRuleResponse
+import io.craigmiller160.expensetrackerapi.web.types.rules.*
 import io.swagger.v3.oas.annotations.media.ArraySchema
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.Schema
@@ -96,4 +93,14 @@ class AutoCategorizeRuleController(
     @PathVariable ruleId: TypedId<AutoCategorizeRuleId>,
     @PathVariable ordinal: Int
   ): TryEither<Unit> = autoCategorizeRuleService.reOrderRule(ruleId, ordinal)
+
+  @ApiResponse(
+    responseCode = "200",
+    content =
+      [
+        Content(
+          mediaType = "application/json",
+          array = ArraySchema(schema = Schema(implementation = MaxOrdinalResponse::class)))])
+  @GetMapping("/maxOrdinal")
+  fun getMaxOrdinal(): TryEither<MaxOrdinalResponse> = autoCategorizeRuleService.getMaxOrdinal()
 }

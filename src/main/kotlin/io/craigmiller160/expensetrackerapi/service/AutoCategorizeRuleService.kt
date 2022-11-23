@@ -15,10 +15,7 @@ import io.craigmiller160.expensetrackerapi.data.repository.AutoCategorizeRuleVie
 import io.craigmiller160.expensetrackerapi.data.repository.CategoryRepository
 import io.craigmiller160.expensetrackerapi.function.TryEither
 import io.craigmiller160.expensetrackerapi.function.flatMapCatch
-import io.craigmiller160.expensetrackerapi.web.types.rules.AutoCategorizeRulePageRequest
-import io.craigmiller160.expensetrackerapi.web.types.rules.AutoCategorizeRulePageResponse
-import io.craigmiller160.expensetrackerapi.web.types.rules.AutoCategorizeRuleRequest
-import io.craigmiller160.expensetrackerapi.web.types.rules.AutoCategorizeRuleResponse
+import io.craigmiller160.expensetrackerapi.web.types.rules.*
 import io.craigmiller160.oauth2.service.OAuth2Service
 import java.math.BigDecimal
 import java.time.LocalDate
@@ -64,7 +61,7 @@ class AutoCategorizeRuleService(
     val userId = oAuth2Service.getAuthenticatedUser().userId
     return validateCategory(request.categoryId, userId)
       .flatMap {
-        request.ordinal?.let { ordinal -> validateOrdinal(userId, ordinal) }
+        request.ordinal?.let { ordinal -> validateOrdinal(userId, ordinal, true) }
           ?: Either.catch { autoCategorizeRuleRepository.countAllByUserId(userId).toInt() + 1 }
       }
       .map { ordinal ->
@@ -170,9 +167,16 @@ class AutoCategorizeRuleService(
       }
   }
 
-  private fun validateOrdinal(userId: Long, ordinal: Int): TryEither<Int> =
-    Either.catch { autoCategorizeRuleRepository.countAllByUserId(userId) }
-      .filterOrElse({ it >= ordinal }) { BadRequestException("Invalid Ordinal: $ordinal") }
+  private fun validateOrdinal(
+    userId: Long,
+    ordinal: Int,
+    isCreate: Boolean = false
+  ): TryEither<Int> =
+    Either.catch { autoCategorizeRuleRepository.getMaxOrdinal(userId) }
+      .map { maxOrdinal -> if (isCreate) maxOrdinal + 1 else maxOrdinal }
+      .filterOrElse({ maxOrdinal -> maxOrdinal >= ordinal }) {
+        BadRequestException("Invalid Ordinal: $ordinal")
+      }
       .map { ordinal }
 
   @Transactional
@@ -207,4 +211,10 @@ class AutoCategorizeRuleService(
           userId, newOrdinal, oldOrdinal - 1, excludeId)
       }
     }
+
+  fun getMaxOrdinal(): TryEither<MaxOrdinalResponse> {
+    val userId = oAuth2Service.getAuthenticatedUser().userId
+    return Either.catch { autoCategorizeRuleRepository.getMaxOrdinal(userId) }
+      .map { MaxOrdinalResponse(it) }
+  }
 }

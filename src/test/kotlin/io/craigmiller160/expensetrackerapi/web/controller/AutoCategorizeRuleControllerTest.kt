@@ -16,6 +16,7 @@ import io.craigmiller160.expensetrackerapi.testutils.DataHelper
 import io.craigmiller160.expensetrackerapi.web.types.rules.AutoCategorizeRulePageResponse
 import io.craigmiller160.expensetrackerapi.web.types.rules.AutoCategorizeRuleRequest
 import io.craigmiller160.expensetrackerapi.web.types.rules.AutoCategorizeRuleResponse
+import io.craigmiller160.expensetrackerapi.web.types.rules.MaxOrdinalResponse
 import java.math.BigDecimal
 import java.time.LocalDate
 import javax.persistence.EntityManager
@@ -144,6 +145,38 @@ constructor(
         status { isOk() }
         content { json(objectMapper.writeValueAsString(expectedResponse), true) }
       }
+  }
+
+  @Test
+  fun `createRule - with max ordinal`() {
+    val rules = createRulesForOrdinalValidation()
+    val request = AutoCategorizeRuleRequest(categoryId = cat1.id, regex = ".*", ordinal = 6)
+
+    val responseString =
+      mockMvc
+        .post("/categories/rules") {
+          secure = true
+          header("Authorization", "Bearer $token")
+          contentType = MediaType.APPLICATION_JSON
+          content = objectMapper.writeValueAsString(request)
+        }
+        .andExpect { status { isOk() } }
+        .andReturn()
+        .response
+        .contentAsString
+    val response = objectMapper.readValue(responseString, AutoCategorizeRuleResponse::class.java)
+
+    entityManager.flushAndClear()
+
+    val expectedOrdinals =
+      listOf(
+        RuleIdAndOrdinal(rules[0].id, 1),
+        RuleIdAndOrdinal(rules[1].id, 2),
+        RuleIdAndOrdinal(rules[2].id, 3),
+        RuleIdAndOrdinal(rules[3].id, 4),
+        RuleIdAndOrdinal(rules[4].id, 5),
+        RuleIdAndOrdinal(response.id, 6))
+    validateOrdinalsById(expectedOrdinals)
   }
 
   @Test
@@ -307,11 +340,17 @@ constructor(
 
   @Test
   fun updateRule_verifyApplyingRules() {
+    val cat3 = dataHelper.createCategory(1L, "Universe")
+    val cat4 = dataHelper.createCategory(1L, "Time")
     val rule = dataHelper.createRule(1L, cat1.id)
-    val request = AutoCategorizeRuleRequest(categoryId = cat1.id, regex = ".*")
+    val rule2 = dataHelper.createRule(1L, cat3.id)
+    dataHelper.createLastRuleApplied(1L, transaction.id, rule.id)
+    val request = AutoCategorizeRuleRequest(categoryId = cat4.id, regex = ".*")
+
+    entityManager.flushAndClear()
 
     mockMvc
-      .put("/categories/rules/${rule.id}") {
+      .put("/categories/rules/${rule2.id}") {
         secure = true
         header("Authorization", "Bearer $token")
         contentType = MediaType.APPLICATION_JSON
@@ -322,7 +361,7 @@ constructor(
     assertThat(transactionRepository.findById(transaction.id))
       .isPresent
       .get()
-      .hasFieldOrPropertyWithValue("categoryId", cat1.id)
+      .hasFieldOrPropertyWithValue("categoryId", cat4.id)
   }
 
   @Test
@@ -708,6 +747,38 @@ constructor(
       .isPresent
       .get()
       .hasFieldOrPropertyWithValue("categoryId", cat1.id)
+  }
+
+  @Test
+  fun `getMaxOrdinal - with rules`() {
+    repeat(3) { dataHelper.createRule(1L, cat1.id) }
+
+    val expectedResponse = MaxOrdinalResponse(maxOrdinal = 3)
+
+    mockMvc
+      .get("/categories/rules/maxOrdinal") {
+        secure = true
+        header("Authorization", "Bearer $token")
+      }
+      .andExpect {
+        status { isOk() }
+        content { json(objectMapper.writeValueAsString(expectedResponse), true) }
+      }
+  }
+
+  @Test
+  fun `getMaxOrdinal - with no rules`() {
+    val expectedResponse = MaxOrdinalResponse(maxOrdinal = 0)
+
+    mockMvc
+      .get("/categories/rules/maxOrdinal") {
+        secure = true
+        header("Authorization", "Bearer $token")
+      }
+      .andExpect {
+        status { isOk() }
+        content { json(objectMapper.writeValueAsString(expectedResponse), true) }
+      }
   }
 
   private fun createRulesForOrdinalValidation(): List<AutoCategorizeRule> {

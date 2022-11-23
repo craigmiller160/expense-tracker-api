@@ -83,11 +83,11 @@ class ApplyCategoriesToTransactionsService(
     context: TransactionRuleContext
   ): TryEither<List<Transaction>> =
     Either.catch {
-      lastRuleAppliedRepository.saveAll(
+      lastRuleAppliedRepository.saveAllAndFlush(
         context.lastRulesApplied.map {
           LastRuleApplied(userId = userId, transactionId = it.key, ruleId = it.value)
         })
-      transactionRepository.saveAll(context.allTransactions)
+      transactionRepository.saveAllAndFlush(context.allTransactions)
     }
 
   /** This returns the transactions in a different order from the method. */
