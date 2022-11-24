@@ -5,7 +5,7 @@ import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.AutoCategoriz
 import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.LastRuleAppliedId
 import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.TransactionId
 import io.craigmiller160.expensetrackerapi.common.data.typedid.jpatype.TypedIdJpaType
-import io.craigmiller160.expensetrackerapi.data.model.core.ImmutableEntity
+import io.craigmiller160.expensetrackerapi.data.model.core.ImmutableLegacyEntity
 import java.time.ZonedDateTime
 import javax.persistence.Entity
 import javax.persistence.Id
@@ -21,4 +21,4 @@ data class LastRuleApplied(
   val transactionId: TypedId<TransactionId>,
   @Id override val id: TypedId<LastRuleAppliedId> = TypedId(),
   override val created: ZonedDateTime = ZonedDateTime.now()
-) : ImmutableEntity<LastRuleAppliedId>
+) : ImmutableLegacyEntity<LastRuleAppliedId>

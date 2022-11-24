@@ -2,7 +2,7 @@ package io.craigmiller160.expensetrackerapi.data.model
 
 import io.craigmiller160.expensetrackerapi.common.data.typedid.TypedId
 import io.craigmiller160.expensetrackerapi.common.data.typedid.jpatype.TypedIdJpaType
-import io.craigmiller160.expensetrackerapi.data.model.core.ImmutableEntity
+import io.craigmiller160.expensetrackerapi.data.model.core.ImmutableLegacyEntity
 import java.time.ZonedDateTime
 import javax.persistence.Entity
 import javax.persistence.Id
@@ -16,4 +16,4 @@ data class Country(
   val name: String,
   @Id override val id: TypedId<CountryId> = TypedId(),
   override val created: ZonedDateTime = ZonedDateTime.now()
-) : ImmutableEntity<CountryId>
+) : ImmutableLegacyEntity<CountryId>

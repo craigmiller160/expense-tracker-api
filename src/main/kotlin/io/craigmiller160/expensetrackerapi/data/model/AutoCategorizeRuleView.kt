@@ -11,6 +11,7 @@ import javax.persistence.Id
 import javax.persistence.Table
 import org.hibernate.annotations.TypeDef
 
+// TODO does this need a parent?
 @Entity
 @Table(name = "auto_categorize_rules_view")
 @TypeDef(defaultForType = TypedId::class, typeClass = TypedIdJpaType::class)
