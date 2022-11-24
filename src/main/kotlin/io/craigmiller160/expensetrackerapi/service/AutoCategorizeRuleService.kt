@@ -117,20 +117,21 @@ class AutoCategorizeRuleService(
     return validateCategory(request.categoryId, userId)
       .flatMap { getRuleIfValid(ruleId, userId) }
       .map { rule ->
-        rule.copy(
-          categoryId = request.categoryId,
-          regex = request.regex,
-          startDate = request.startDate,
-          endDate = request.endDate,
-          minAmount = request.minAmount,
-          maxAmount = request.maxAmount)
+        rule.apply {
+          categoryId = request.categoryId
+          regex = request.regex
+          startDate = request.startDate
+          endDate = request.endDate
+          minAmount = request.minAmount
+          maxAmount = request.maxAmount
+        }
       }
       .flatMap { validateRule(it) }
       .flatMap { rule ->
         request.ordinal?.let { rawOrdinal ->
           validateOrdinal(userId, rawOrdinal).map { ordinal ->
             val oldOrdinal = rule.ordinal
-            rule.copy(ordinal = ordinal) to oldOrdinal
+            rule.apply { this.ordinal = ordinal } to oldOrdinal
           }
         }
           ?: Either.Right(rule to rule.ordinal)
@@ -186,7 +187,7 @@ class AutoCategorizeRuleService(
       .flatMap { getRuleIfValid(ruleId, userId) }
       .flatMap { rule ->
         changeOtherRuleOrdinals(userId, rule.ordinal, ordinal).flatMapCatch {
-          autoCategorizeRuleRepository.save(rule.copy(ordinal = ordinal))
+          autoCategorizeRuleRepository.save(rule.apply { this.ordinal = ordinal })
         }
       }
       .flatMap {

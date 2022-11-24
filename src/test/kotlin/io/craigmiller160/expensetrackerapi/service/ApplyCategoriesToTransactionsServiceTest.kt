@@ -61,7 +61,7 @@ constructor(
     val txn5 = createTransaction("Target", LocalDate.of(2022, 1, 1), BigDecimal("20"))
     val txn6 =
       createTransaction("Universe", LocalDate.now(), BigDecimal("10")).let {
-        transactionRepository.save(it.copy(categoryId = cat6.id))
+        transactionRepository.save(it.apply { categoryId = cat6.id })
       }
 
     transactions = listOf(txn0, txn1, txn2, txn3, txn4, txn5, txn6)

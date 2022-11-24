@@ -57,7 +57,10 @@ constructor(
       user1Txns.mapIndexed { index, transaction ->
         if (index % 2 == 0) {
           transactionRepository.saveAndFlush(
-            transaction.copy(categoryId = user1Categories[index % 3].id, confirmed = true))
+            transaction.apply {
+              categoryId = user1Categories[index % 3].id
+              confirmed = true
+            })
         } else {
           transaction
         }
@@ -69,12 +72,11 @@ constructor(
   @Test
   fun `get data on what records need attention, when all types need attention`() {
     val oldestUnconfirmed =
-      transactionRepository.saveAndFlush(user1Transactions[0].copy(confirmed = false))
-    val oldestDuplicate =
-      transactionRepository.saveAndFlush(user1Transactions[2].copy(id = TypedId()))
+      transactionRepository.saveAndFlush(user1Transactions[0].apply { confirmed = false })
+    val oldestDuplicate = transactionRepository.saveAndFlush(Transaction(user1Transactions[2]))
     val oldestPossibleRefund =
       transactionRepository.saveAndFlush(
-        user1Transactions[3].copy(amount = user1Transactions[3].amount * BigDecimal("-1")))
+        user1Transactions[3].apply { amount = user1Transactions[3].amount * BigDecimal("-1") })
     val response =
       NeedsAttentionResponse(
         unconfirmed = CountAndOldest(count = 4, oldest = oldestUnconfirmed.expenseDate),
@@ -96,7 +98,10 @@ constructor(
   fun `get data on what records need attention, when no types need attention`() {
     user1Transactions.forEach { txn ->
       transactionRepository.saveAndFlush(
-        txn.copy(confirmed = true, categoryId = user1Categories[0].id))
+        txn.apply {
+          confirmed = true
+          categoryId = user1Categories[0].id
+        })
     }
     val response =
       NeedsAttentionResponse(

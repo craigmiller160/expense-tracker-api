@@ -45,7 +45,10 @@ class CategoryService(
       .flatMapCatch { nullableCategory ->
         nullableCategory?.let { category ->
           categoryRepository.save(
-            category.copy(name = request.name, color = StringToColor.get(request.name)))
+            category.apply {
+              name = request.name
+              color = StringToColor.get(request.name)
+            })
         }
       }
   }

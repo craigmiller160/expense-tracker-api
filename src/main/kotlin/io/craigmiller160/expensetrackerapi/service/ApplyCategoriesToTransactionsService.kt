@@ -81,7 +81,7 @@ class ApplyCategoriesToTransactionsService(
   ): TransactionRuleContext {
     val (_, _, rule) = singleRuleContext
     val (matches, noMatches) = fullContext.allTransactions.partition { doesRuleApply(it, rule) }
-    val matchesWithCategories = matches.map { it.copy(categoryId = rule.categoryId) }
+    val matchesWithCategories = matches.map { it.apply { categoryId = rule.categoryId } }
     val lastMatchingRules = matches.associate { it.id to rule.id }
     return fullContext.copy(
       allTransactions = matchesWithCategories + noMatches,
@@ -107,7 +107,7 @@ class ApplyCategoriesToTransactionsService(
   ): TryEither<List<Transaction>> {
     log.debug("Starting to apply categories to batch of transactions for user $userId")
     val start = System.nanoTime()
-    val categoryLessTransactions = transactions.map { it.copy(categoryId = null) }
+    val categoryLessTransactions = transactions.map { it.apply { categoryId = null } }
     return deleteLastRuleAppliedForTransactions(userId, categoryLessTransactions.map { it.id })
       .flatMapCatch {
         autoCategorizeRuleRepository.streamAllByUserIdOrderByOrdinal(userId).use { ruleStream ->

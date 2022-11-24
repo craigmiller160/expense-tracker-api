@@ -7,11 +7,11 @@ import java.math.BigDecimal
 import java.time.LocalDate
 
 interface TransactionCommon {
-  val id: TypedId<TransactionId>
-  val userId: Long
-  val expenseDate: LocalDate
-  val description: String
-  val amount: BigDecimal
-  val confirmed: Boolean
-  val categoryId: TypedId<CategoryId>?
+  var id: TypedId<TransactionId>
+  var userId: Long
+  var expenseDate: LocalDate
+  var description: String
+  var amount: BigDecimal
+  var confirmed: Boolean
+  var categoryId: TypedId<CategoryId>?
 }

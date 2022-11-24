@@ -172,26 +172,35 @@ class TransactionService(
               request.categoryId?.let { categoryRepository.findByIdAndUserId(it, userId) }?.id
             }
             .bind()
-        oldTransaction to
-          oldTransaction.copy(
-            confirmed = request.confirmed,
-            expenseDate = request.expenseDate,
-            description = request.description,
-            amount = request.amount,
-            categoryId = validCategoryId)
+        val oldValues =
+          OldConfirmedAndCategory(
+            confirmed = oldTransaction.confirmed, categoryId = oldTransaction.categoryId)
+        oldValues to
+          oldTransaction.apply {
+            confirmed = request.confirmed
+            expenseDate = request.expenseDate
+            description = request.description
+            amount = request.amount
+            categoryId = validCategoryId
+          }
       }
-      .flatMapCatch { (oldTransaction, newTransaction) ->
-        oldTransaction to transactionRepository.save(newTransaction)
+      .flatMapCatch { (oldValues, newTransaction) ->
+        oldValues to transactionRepository.save(newTransaction)
       }
-      .flatMapCatch { (oldTransaction, newTransaction) ->
-        if (oldTransaction.categoryId != newTransaction.categoryId ||
-          oldTransaction.confirmed != newTransaction.confirmed) {
+      .flatMapCatch { (oldValues, newTransaction) ->
+        if (oldValues.categoryId != newTransaction.categoryId ||
+          oldValues.confirmed != newTransaction.confirmed) {
           lastRuleAppliedRepository.deleteAllByUserIdAndTransactionIdIn(
             userId, listOf(newTransaction.id))
         }
       }
       .map { Unit }
   }
+
+  private data class OldConfirmedAndCategory(
+    val confirmed: Boolean,
+    val categoryId: TypedId<CategoryId>?
+  )
 
   fun getPossibleDuplicates(
     transactionId: TypedId<TransactionId>,
