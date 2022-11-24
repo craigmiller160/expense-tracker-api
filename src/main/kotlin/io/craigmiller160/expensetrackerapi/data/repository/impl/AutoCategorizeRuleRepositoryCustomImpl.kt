@@ -45,7 +45,7 @@ class AutoCategorizeRuleRepositoryCustomImpl(
       .and(QAutoCategorizeRule.autoCategorizeRule.ordinal.goe(minOrdinal))
       .let(
         QueryDSLSupport.andIfNotNull(excludeId) { id ->
-          QAutoCategorizeRule.autoCategorizeRule.id.ne(id)
+          QAutoCategorizeRule.autoCategorizeRule.recordId.ne(id)
         })
 
   override fun incrementOrdinals(
