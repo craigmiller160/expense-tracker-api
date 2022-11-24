@@ -3,7 +3,7 @@ package io.craigmiller160.expensetrackerapi.data.model
 import io.craigmiller160.expensetrackerapi.common.data.typedid.TypedId
 import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.AutoCategorizeRuleId
 import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.CategoryId
-import io.craigmiller160.expensetrackerapi.data.model.core.MutableEntity
+import io.craigmiller160.expensetrackerapi.data.model.core.MutableTableEntity
 import java.math.BigDecimal
 import java.time.LocalDate
 import javax.persistence.Entity
@@ -20,4 +20,4 @@ class AutoCategorizeRule(
   var endDate: LocalDate? = null,
   var minAmount: BigDecimal? = null,
   var maxAmount: BigDecimal? = null,
-) : MutableEntity<AutoCategorizeRuleId>()
+) : MutableTableEntity<AutoCategorizeRuleId>()

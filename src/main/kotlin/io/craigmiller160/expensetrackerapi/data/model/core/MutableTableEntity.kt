@@ -6,7 +6,7 @@ import javax.persistence.PreUpdate
 import javax.persistence.Version
 
 @MappedSuperclass
-abstract class MutableEntity<T> : Entity<T>() {
+abstract class MutableTableEntity<T> : TableEntity<T>() {
   var updated: ZonedDateTime = ZonedDateTime.now()
   @Version var version: Long = 1
 

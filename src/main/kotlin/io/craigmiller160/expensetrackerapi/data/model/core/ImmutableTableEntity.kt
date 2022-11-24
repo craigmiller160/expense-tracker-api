@@ -4,7 +4,7 @@ import javax.persistence.MappedSuperclass
 import javax.persistence.PreUpdate
 
 @MappedSuperclass
-abstract class ImmutableEntity<T> : Entity<T>() {
+abstract class ImmutableTableEntity<T> : TableEntity<T>() {
   @PreUpdate
   fun onPreUpdate() {
     throw IllegalStateException("Cannot update an immutable entity")
