@@ -84,7 +84,10 @@ constructor(
       user1Txns.mapIndexed { index, transaction ->
         if (index % 2 == 0) {
           transactionRepository.saveAndFlush(
-            transaction.copy(categoryId = user1Categories[index % 3].id, confirmed = true))
+            transaction.apply {
+              categoryId = user1Categories[index % 3].id
+              confirmed = true
+            })
         } else {
           transaction
         }
@@ -222,10 +225,10 @@ constructor(
   fun `search - possible refunds`() {
     val txn1 =
       transactionRepository.saveAndFlush(
-        user1Transactions[0].copy(amount = user1Transactions[0].amount * BigDecimal("-1")))
+        user1Transactions[0].apply { amount = user1Transactions[0].amount * BigDecimal("-1") })
     val txn2 =
       transactionRepository.saveAndFlush(
-        user1Transactions[2].copy(amount = user1Transactions[2].amount * BigDecimal("-1")))
+        user1Transactions[2].apply { amount = user1Transactions[2].amount * BigDecimal("-1") })
 
     val request =
       SearchTransactionsRequest(
@@ -258,7 +261,9 @@ constructor(
   @Test
   fun `search - only duplicates`() {
     val txn1 = user1Transactions[0]
-    val txn2 = transactionRepository.saveAndFlush(txn1.copy(id = TypedId()))
+    val txn2 =
+      transactionRepository.saveAndFlush(
+        txn1.apply { id = TypedId() }) // TODO not sure if it's an insert
     entityManager.flushAndClear()
 
     val request =
@@ -311,7 +316,7 @@ constructor(
   @Test
   fun `search - only non-duplicates`() {
     val txn1 = user1Transactions[0]
-    transactionRepository.saveAndFlush(txn1.copy(id = TypedId()))
+    transactionRepository.saveAndFlush(txn1.apply { id = TypedId() })
     val request =
       SearchTransactionsRequest(
         isDuplicate = false,
@@ -347,11 +352,12 @@ constructor(
   fun `search - confirmed transactions only`() {
     user1Transactions =
       user1Transactions.map { txn ->
-        transactionRepository.saveAndFlush(txn.copy(confirmed = false))
+        transactionRepository.saveAndFlush(txn.apply { confirmed = false })
       }
-    val txn1 = transactionRepository.saveAndFlush(user1Transactions.first().copy(confirmed = true))
-    val txn2 = transactionRepository.saveAndFlush(user1Transactions[1].copy(confirmed = true))
-    transactionRepository.saveAndFlush(user2Transactions.first().copy(confirmed = true))
+    val txn1 =
+      transactionRepository.saveAndFlush(user1Transactions.first().apply { confirmed = true })
+    val txn2 = transactionRepository.saveAndFlush(user1Transactions[1].apply { confirmed = true })
+    transactionRepository.saveAndFlush(user2Transactions.first().apply { confirmed = true })
     val request =
       SearchTransactionsRequest(
         isConfirmed = true,
@@ -384,10 +390,10 @@ constructor(
   fun `search - unconfirmed transactions only`() {
     user1Transactions =
       user1Transactions.map { txn ->
-        transactionRepository.saveAndFlush(txn.copy(confirmed = false))
+        transactionRepository.saveAndFlush(txn.apply { confirmed = false })
       }
-    transactionRepository.saveAndFlush(user1Transactions.first().copy(confirmed = true))
-    transactionRepository.saveAndFlush(user1Transactions[1].copy(confirmed = true))
+    transactionRepository.saveAndFlush(user1Transactions.first().apply { confirmed = true })
+    transactionRepository.saveAndFlush(user1Transactions[1].apply { confirmed = true })
     val request =
       SearchTransactionsRequest(
         isConfirmed = false,
@@ -425,7 +431,7 @@ constructor(
       user1Transactions
         .mapIndexed { index, txn ->
           transactionRepository.saveAndFlush(
-            txn.copy(expenseDate = LocalDate.now().minusDays(index.toLong())))
+            txn.apply { expenseDate = LocalDate.now().minusDays(index.toLong()) })
         }
         .filter { it.expenseDate.isAfter(LocalDate.now().minusDays(3)) }
         .sortedWith(transactionComparator)
@@ -462,7 +468,7 @@ constructor(
   @Test
   fun `search - categories`() {
     val user2Cat = dataHelper.createCategory(2L, "User2 Cat")
-    transactionRepository.saveAndFlush(user2Transactions.first().copy(categoryId = user2Cat.id))
+    transactionRepository.saveAndFlush(user2Transactions.first().apply { categoryId = user2Cat.id })
 
     val categories = setOf(user1Categories.first().id, user2Cat.id)
 
@@ -894,8 +900,8 @@ constructor(
   @Test
   fun `getPossibleDuplicates - wrong user id`() {
     val txn1 = user2Transactions[0]
-    transactionRepository.saveAndFlush(txn1.copy(id = TypedId()))
-    transactionRepository.saveAndFlush(txn1.copy(id = TypedId()))
+    transactionRepository.saveAndFlush(txn1.apply { id = TypedId() }) // TODO not sure if insert
+    transactionRepository.saveAndFlush(txn1.apply { id = TypedId() }) // TODO not sure if insert
     entityManager.flushAndClear()
 
     val response =
@@ -915,8 +921,10 @@ constructor(
   @Test
   fun `getPossibleDuplicates - has duplicates`() {
     val txn1 = user1Transactions[0]
-    val txn2 = transactionRepository.saveAndFlush(txn1.copy(id = TypedId()))
-    val txn3 = transactionRepository.saveAndFlush(txn1.copy(id = TypedId()))
+    val txn2 =
+      transactionRepository.saveAndFlush(txn1.apply { id = TypedId() }) // TODO not sure if insert
+    val txn3 =
+      transactionRepository.saveAndFlush(txn1.apply { id = TypedId() }) // TODO not sure if insert
     entityManager.flushAndClear()
 
     val expectedTransactions =
@@ -959,8 +967,10 @@ constructor(
   @Test
   fun markNotDuplicate() {
     val txn1 = user1Transactions[0]
-    val txn2 = transactionRepository.saveAndFlush(txn1.copy(id = TypedId()))
-    val txn3 = transactionRepository.saveAndFlush(txn1.copy(id = TypedId()))
+    val txn2 =
+      transactionRepository.saveAndFlush(txn1.apply { id = TypedId() }) // TODO not sure if insert
+    val txn3 =
+      transactionRepository.saveAndFlush(txn1.apply { id = TypedId() }) // TODO not sure if insert
     entityManager.flushAndClear()
 
     mockMvc
@@ -1014,8 +1024,8 @@ constructor(
 
   @Test
   fun `confirmTransactions - clears last rule applied`() {
-    transactionRepository.saveAndFlush(user1Transactions[0].copy(confirmed = false))
-    transactionRepository.saveAndFlush(user1Transactions[1].copy(confirmed = false))
+    transactionRepository.saveAndFlush(user1Transactions[0].apply { confirmed = false })
+    transactionRepository.saveAndFlush(user1Transactions[1].apply { confirmed = false })
     dataHelper.createLastRuleApplied(1L, user1Transactions[0].id, rule.id)
     dataHelper.createLastRuleApplied(1L, user1Transactions[1].id, rule.id)
     val request =
@@ -1086,11 +1096,20 @@ constructor(
   @Test
   fun `updateTransactionDetails - confirming and or setting category clears last rule applied`() {
     transactionRepository.saveAndFlush(
-      user1Transactions[0].copy(categoryId = null, confirmed = false))
+      user1Transactions[0].apply {
+        categoryId = null
+        confirmed = false
+      })
     transactionRepository.saveAndFlush(
-      user1Transactions[1].copy(categoryId = null, confirmed = false))
+      user1Transactions[1].apply {
+        categoryId = null
+        confirmed = false
+      })
     transactionRepository.saveAndFlush(
-      user1Transactions[2].copy(categoryId = null, confirmed = false))
+      user1Transactions[2].apply {
+        categoryId = null
+        confirmed = false
+      })
     dataHelper.createLastRuleApplied(1L, user1Transactions[0].id, rule.id)
     dataHelper.createLastRuleApplied(1L, user1Transactions[1].id, rule.id)
     dataHelper.createLastRuleApplied(1L, user1Transactions[2].id, rule.id)
@@ -1154,8 +1173,8 @@ constructor(
   @Test
   fun `markNotDuplicate - different user id`() {
     val txn1 = user2Transactions[0]
-    transactionRepository.saveAndFlush(txn1.copy(id = TypedId()))
-    transactionRepository.saveAndFlush(txn1.copy(id = TypedId()))
+    transactionRepository.saveAndFlush(txn1.apply { id = TypedId() }) // TODO not sure if insert
+    transactionRepository.saveAndFlush(txn1.apply { id = TypedId() }) // TODO not sure if insert
     entityManager.flushAndClear()
 
     mockMvc
