@@ -26,7 +26,6 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.mockito.kotlin.isNotNull
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.PageRequest
 import org.springframework.http.MediaType
@@ -326,7 +325,7 @@ constructor(
     val nonDuplicateIds = user1Transactions.subList(1, user1Transactions.size).map { it.id }
     val nonDuplicateTransactions =
       transactionViewRepository
-        .findAllByIdInAndUserId(nonDuplicateIds, 1L)
+        .findAllByRecordIdInAndUserId(nonDuplicateIds, 1L)
         .sortedWith(transactionComparator)
 
     val response =
@@ -924,7 +923,7 @@ constructor(
     entityManager.flushAndClear()
 
     val expectedTransactions =
-      transactionViewRepository.findAllByIdInAndUserId(listOf(txn3.id, txn2.id), 1L).map {
+      transactionViewRepository.findAllByRecordIdInAndUserId(listOf(txn3.id, txn2.id), 1L).map {
         TransactionDuplicateResponse.from(it)
       }
 

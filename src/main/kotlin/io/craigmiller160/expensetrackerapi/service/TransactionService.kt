@@ -228,7 +228,7 @@ class TransactionService(
     transactionId: TypedId<TransactionId>
   ): TryEither<TransactionDetailsResponse> {
     val userId = oAuth2Service.getAuthenticatedUser().userId
-    return Either.catch { transactionViewRepository.findByIdAndUserId(transactionId, userId) }
+    return Either.catch { transactionViewRepository.findByRecordIdAndUserId(transactionId, userId) }
       .flatMap { txn ->
         txn?.let { Either.Right(it) }
           ?: Either.Left(BadRequestException("No transaction for ID: $transactionId"))
