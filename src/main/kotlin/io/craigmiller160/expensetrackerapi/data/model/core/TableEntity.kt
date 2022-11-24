@@ -9,7 +9,7 @@ abstract class TableEntity<T> : DatabaseRecord<T>() {
   var created: ZonedDateTime = ZonedDateTime.now()
 
   @PrePersist
-  fun onPrePersist() {
+  open fun onPrePersist() {
     created = ZonedDateTime.now()
   }
 }
