@@ -15,6 +15,7 @@ import javax.persistence.Table
 import javax.persistence.Version
 import org.hibernate.annotations.TypeDef
 
+// TODO refactor
 @Entity
 @Table(name = "transactions")
 @TypeDef(defaultForType = TypedId::class, typeClass = TypedIdJpaType::class)

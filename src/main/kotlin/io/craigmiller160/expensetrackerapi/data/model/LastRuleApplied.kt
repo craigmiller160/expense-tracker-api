@@ -12,6 +12,7 @@ import javax.persistence.Id
 import javax.persistence.Table
 import org.hibernate.annotations.TypeDef
 
+// TODO refactor
 @Entity
 @Table(name = "last_rule_applied")
 @TypeDef(defaultForType = TypedId::class, typeClass = TypedIdJpaType::class)

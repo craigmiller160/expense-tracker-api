@@ -13,6 +13,7 @@ import javax.persistence.Table
 import org.hibernate.annotations.TypeDef
 
 // TODO does this need a parent?
+// TODO refactor
 @Entity
 @Table(name = "transactions_view")
 @TypeDef(defaultForType = TypedId::class, typeClass = TypedIdJpaType::class)

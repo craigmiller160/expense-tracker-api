@@ -7,5 +7,4 @@ import javax.persistence.Table
 
 @Entity
 @Table(name = "categories")
-class Category(var name: String = "", var userId: Long = 0, var color: String = "") :
-  MutableEntity<CategoryId>()
+class Category(var name: String, var userId: Long, var color: String) : MutableEntity<CategoryId>()

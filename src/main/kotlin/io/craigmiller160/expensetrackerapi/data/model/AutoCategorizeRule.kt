@@ -14,6 +14,7 @@ import javax.persistence.Table
 import javax.persistence.Version
 import org.hibernate.annotations.TypeDef
 
+// TODO refactor
 @Entity
 @Table(name = "auto_categorize_rules")
 @TypeDef(defaultForType = TypedId::class, typeClass = TypedIdJpaType::class)
