@@ -16,7 +16,7 @@ import org.springframework.data.domain.Persistable
 abstract class DatabaseRecord<T> : Persistable<TypedId<T>> {
   // TODO rename this, then rename the DB columns to match
   @Id @Column(name = "id") var recordId: TypedId<T> = TypedId()
-  private var isPersisted: Boolean = false
+  @Transient var isPersisted: Boolean = false
 
   override fun getId(): TypedId<T> = recordId
   override fun isNew(): Boolean = !isPersisted
