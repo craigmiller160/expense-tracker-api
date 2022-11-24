@@ -18,15 +18,15 @@ import org.hibernate.annotations.TypeDef
 @Table(name = "transactions_view")
 @TypeDef(defaultForType = TypedId::class, typeClass = TypedIdJpaType::class)
 data class TransactionView(
-  @Id override val id: TypedId<TransactionId>,
-  override val userId: Long,
-  override val expenseDate: LocalDate,
-  override val description: String,
-  override val amount: BigDecimal,
+  @Id override var id: TypedId<TransactionId>,
+  override var userId: Long,
+  override var expenseDate: LocalDate,
+  override var description: String,
+  override var amount: BigDecimal,
   val contentHash: String,
-  override val categoryId: TypedId<CategoryId>?,
+  override var categoryId: TypedId<CategoryId>?,
   val categoryName: String?,
-  override val confirmed: Boolean,
+  override var confirmed: Boolean,
   val duplicate: Boolean,
   val created: ZonedDateTime,
   val updated: ZonedDateTime
