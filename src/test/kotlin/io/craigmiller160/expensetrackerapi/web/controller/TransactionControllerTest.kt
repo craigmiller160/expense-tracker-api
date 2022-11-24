@@ -261,9 +261,7 @@ constructor(
   @Test
   fun `search - only duplicates`() {
     val txn1 = user1Transactions[0]
-    val txn2 =
-      transactionRepository.saveAndFlush(
-        txn1.apply { id = TypedId() }) // TODO not sure if it's an insert
+    val txn2 = transactionRepository.saveAndFlush(Transaction(txn1))
     entityManager.flushAndClear()
 
     val request =
@@ -316,7 +314,7 @@ constructor(
   @Test
   fun `search - only non-duplicates`() {
     val txn1 = user1Transactions[0]
-    transactionRepository.saveAndFlush(txn1.apply { id = TypedId() })
+    transactionRepository.saveAndFlush(Transaction(txn1))
     val request =
       SearchTransactionsRequest(
         isDuplicate = false,
@@ -900,8 +898,8 @@ constructor(
   @Test
   fun `getPossibleDuplicates - wrong user id`() {
     val txn1 = user2Transactions[0]
-    transactionRepository.saveAndFlush(txn1.apply { id = TypedId() }) // TODO not sure if insert
-    transactionRepository.saveAndFlush(txn1.apply { id = TypedId() }) // TODO not sure if insert
+    transactionRepository.saveAndFlush(Transaction(txn1))
+    transactionRepository.saveAndFlush(Transaction(txn1))
     entityManager.flushAndClear()
 
     val response =
@@ -921,10 +919,8 @@ constructor(
   @Test
   fun `getPossibleDuplicates - has duplicates`() {
     val txn1 = user1Transactions[0]
-    val txn2 =
-      transactionRepository.saveAndFlush(txn1.apply { id = TypedId() }) // TODO not sure if insert
-    val txn3 =
-      transactionRepository.saveAndFlush(txn1.apply { id = TypedId() }) // TODO not sure if insert
+    val txn2 = transactionRepository.saveAndFlush(Transaction(txn1))
+    val txn3 = transactionRepository.saveAndFlush(Transaction(txn1))
     entityManager.flushAndClear()
 
     val expectedTransactions =
@@ -967,10 +963,8 @@ constructor(
   @Test
   fun markNotDuplicate() {
     val txn1 = user1Transactions[0]
-    val txn2 =
-      transactionRepository.saveAndFlush(txn1.apply { id = TypedId() }) // TODO not sure if insert
-    val txn3 =
-      transactionRepository.saveAndFlush(txn1.apply { id = TypedId() }) // TODO not sure if insert
+    val txn2 = transactionRepository.saveAndFlush(Transaction(txn1))
+    val txn3 = transactionRepository.saveAndFlush(Transaction(txn1))
     entityManager.flushAndClear()
 
     mockMvc
@@ -1173,8 +1167,8 @@ constructor(
   @Test
   fun `markNotDuplicate - different user id`() {
     val txn1 = user2Transactions[0]
-    transactionRepository.saveAndFlush(txn1.apply { id = TypedId() }) // TODO not sure if insert
-    transactionRepository.saveAndFlush(txn1.apply { id = TypedId() }) // TODO not sure if insert
+    transactionRepository.saveAndFlush(Transaction(txn1))
+    transactionRepository.saveAndFlush(Transaction(txn1))
     entityManager.flushAndClear()
 
     mockMvc
