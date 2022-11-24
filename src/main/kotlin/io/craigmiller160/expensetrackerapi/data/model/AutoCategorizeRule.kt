@@ -12,12 +12,12 @@ import javax.persistence.Table
 @Entity
 @Table(name = "auto_categorize_rules")
 class AutoCategorizeRule(
-  val userId: Long,
-  val categoryId: TypedId<CategoryId>,
-  val ordinal: Int,
-  val regex: String,
-  val startDate: LocalDate? = null,
-  val endDate: LocalDate? = null,
-  val minAmount: BigDecimal? = null,
-  val maxAmount: BigDecimal? = null,
+  var userId: Long,
+  var categoryId: TypedId<CategoryId>,
+  var ordinal: Int,
+  var regex: String,
+  var startDate: LocalDate? = null,
+  var endDate: LocalDate? = null,
+  var minAmount: BigDecimal? = null,
+  var maxAmount: BigDecimal? = null,
 ) : MutableEntity<AutoCategorizeRuleId>()
