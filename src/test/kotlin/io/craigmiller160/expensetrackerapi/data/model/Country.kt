@@ -6,6 +6,4 @@ import javax.persistence.Table
 
 @Entity
 @Table(name = "countries")
-class Country : ImmutableEntity<CountryId>() {
-  var name: String = ""
-}
+class Country(var name: String = "") : ImmutableEntity<CountryId>()

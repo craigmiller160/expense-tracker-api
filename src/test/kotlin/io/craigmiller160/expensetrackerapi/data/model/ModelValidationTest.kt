@@ -32,8 +32,9 @@ constructor(
     val dbCountry = countryRepository.findById(country.id).orElseThrow()
     assertThat(dbCountry).isEqualTo(country)
 
-    val newCountry = dbCountry.copy(name = "CAN")
+    val newCountry = dbCountry.apply { name = "CAN" }
     assertThat(newCountry.id).isEqualTo(country.id)
+    assertThat(newCountry.name).isEqualTo(country.name) // TODO is it?
 
     val ex =
       assertThrows<InvalidDataAccessApiUsageException> {
@@ -56,7 +57,7 @@ constructor(
 
     Thread.sleep(100)
 
-    val newResident = dbResident.copy(name = "Sally")
+    val newResident = dbResident.apply { name = "Sally" }
     residentRepository.save(newResident)
 
     entityManager.flushAndClear()

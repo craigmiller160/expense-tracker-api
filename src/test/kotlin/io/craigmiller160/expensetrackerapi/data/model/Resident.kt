@@ -6,6 +6,4 @@ import javax.persistence.Table
 
 @Entity
 @Table(name = "residents")
-class Resident : MutableEntity<ResidentId>() {
-  var name: String = ""
-}
+class Resident(var name: String = "") : MutableEntity<ResidentId>()
