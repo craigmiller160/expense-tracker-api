@@ -9,7 +9,7 @@ import org.hibernate.annotations.TypeDef
 @MappedSuperclass
 @TypeDef(defaultForType = TypedId::class, typeClass = TypedIdJpaType::class)
 abstract class DatabaseRecord<T> {
-  @Id var id: TypedId<T> = TypedId()
+  @Id var id: TypedId<T>? = TypedId()
 
   override fun equals(other: Any?): Boolean {
     if (other !is TableEntity<*>) return false
