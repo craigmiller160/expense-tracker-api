@@ -73,9 +73,7 @@ constructor(
   fun `get data on what records need attention, when all types need attention`() {
     val oldestUnconfirmed =
       transactionRepository.saveAndFlush(user1Transactions[0].apply { confirmed = false })
-    val oldestDuplicate =
-      transactionRepository.saveAndFlush(
-        user1Transactions[2].apply { id = TypedId() }) // TODO does this do an insert?
+    val oldestDuplicate = transactionRepository.saveAndFlush(Transaction(user1Transactions[2]))
     val oldestPossibleRefund =
       transactionRepository.saveAndFlush(
         user1Transactions[3].apply { amount = user1Transactions[3].amount * BigDecimal("-1") })
