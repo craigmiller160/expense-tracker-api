@@ -116,11 +116,11 @@ constructor(
   fun getAllRules_byRegex() {
     val rule1 =
       dataHelper.createRule(1L, cat1.id).let {
-        autoCategorizeRuleRepository.save(it.copy(regex = "hello.*"))
+        autoCategorizeRuleRepository.save(it.apply { regex = "hello.*" })
       }
     val rule2 =
       dataHelper.createRule(1L, cat1.id).let {
-        autoCategorizeRuleRepository.save(it.copy(regex = "Hello World"))
+        autoCategorizeRuleRepository.save(it.apply { regex = "Hello World" })
       }
     dataHelper.createRule(1L, cat1.id)
     entityManager.flushAndClear()
