@@ -34,7 +34,8 @@ constructor(
 
     val newCountry = dbCountry.apply { name = "CAN" }
     assertThat(newCountry.id).isEqualTo(country.id)
-    assertThat(newCountry.name).isEqualTo(country.name) // TODO is it?
+    // Just confirming the apply does a mutation
+    assertThat(newCountry.name).isEqualTo(dbCountry.name)
 
     val ex =
       assertThrows<InvalidDataAccessApiUsageException> {

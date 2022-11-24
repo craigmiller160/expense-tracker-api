@@ -18,4 +18,10 @@ abstract class Entity<T> {
   fun onPrePersist() {
     created = ZonedDateTime.now()
   }
+
+  override fun equals(other: Any?): Boolean {
+    if (other !is Entity<*>) return false
+    return other.id == this.id
+  }
+  override fun hashCode(): Int = this.id.hashCode()
 }
