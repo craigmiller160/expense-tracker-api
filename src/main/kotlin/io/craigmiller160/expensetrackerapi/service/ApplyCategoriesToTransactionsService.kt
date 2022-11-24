@@ -15,6 +15,7 @@ import io.craigmiller160.expensetrackerapi.function.TryEither
 import io.craigmiller160.expensetrackerapi.function.flatMapCatch
 import java.time.LocalDate
 import javax.transaction.Transactional
+import org.slf4j.LoggerFactory
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
 import org.springframework.stereotype.Service
@@ -29,9 +30,18 @@ class ApplyCategoriesToTransactionsService(
     private const val PAGE_SIZE = 25
   }
 
+  private val log = LoggerFactory.getLogger(javaClass)
+
   @Transactional
-  fun applyCategoriesToUnconfirmedTransactions(userId: Long): TryEither<Unit> =
-    applyCategoriesToUnconfirmedTransactions(userId, 0)
+  fun applyCategoriesToUnconfirmedTransactions(userId: Long): TryEither<Unit> {
+    log.debug("Starting to apply categories to all unconfirmed transactions for user $userId")
+    val start = System.nanoTime()
+    return applyCategoriesToUnconfirmedTransactions(userId, 0).map {
+      val end = System.nanoTime()
+      log.debug(
+        "Finished applying categories to all unconfirmed transactions for user $userId. Time: ${end - start}")
+    }
+  }
 
   private fun applyCategoriesToUnconfirmedTransactions(
     userId: Long,
@@ -95,6 +105,8 @@ class ApplyCategoriesToTransactionsService(
     userId: Long,
     transactions: List<Transaction>
   ): TryEither<List<Transaction>> {
+    log.debug("Starting to apply categories to batch of transactions for user $userId")
+    val start = System.nanoTime()
     val categoryLessTransactions = transactions.map { it.copy(categoryId = null) }
     return deleteLastRuleAppliedForTransactions(userId, categoryLessTransactions.map { it.id })
       .flatMapCatch {
@@ -107,6 +119,12 @@ class ApplyCategoriesToTransactionsService(
         }
       }
       .flatMap { saveCategorizedTransactions(userId, it) }
+      .map { resultTransactions ->
+        val end = System.nanoTime()
+        log.debug(
+          "Finished applying categories to batch of transactions for user $userId. Time: ${end - start}")
+        resultTransactions
+      }
   }
 
   private fun doesRuleApply(transaction: Transaction, rule: AutoCategorizeRule): Boolean =
