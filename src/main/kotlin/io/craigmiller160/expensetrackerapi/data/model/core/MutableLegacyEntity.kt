@@ -3,6 +3,7 @@ package io.craigmiller160.expensetrackerapi.data.model.core
 import java.time.ZonedDateTime
 import javax.persistence.PreUpdate
 
+// TODO delete this
 interface MutableLegacyEntity<T> : LegacyEntity<T> {
   var updated: ZonedDateTime
   val version: Long
