@@ -17,7 +17,7 @@ abstract class DatabaseRecord<T> : Persistable<TypedId<T>> {
   @Id @Column(name = "id") @set:JvmName("setId") var _id: TypedId<T> = TypedId()
   private var isPersisted: Boolean = false
 
-  override fun getId(): TypedId<T>? = _id
+  override fun getId(): TypedId<T> = _id
   override fun isNew(): Boolean = !isPersisted
 
   @PostPersist
