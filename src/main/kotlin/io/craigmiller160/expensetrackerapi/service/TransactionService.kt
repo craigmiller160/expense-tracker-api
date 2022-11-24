@@ -20,7 +20,6 @@ import io.craigmiller160.expensetrackerapi.data.repository.TransactionViewReposi
 import io.craigmiller160.expensetrackerapi.extension.detachAndReturn
 import io.craigmiller160.expensetrackerapi.function.TryEither
 import io.craigmiller160.expensetrackerapi.function.flatMapCatch
-import io.craigmiller160.expensetrackerapi.web.types.*
 import io.craigmiller160.expensetrackerapi.web.types.transaction.*
 import io.craigmiller160.oauth2.service.OAuth2Service
 import javax.persistence.EntityManager
@@ -127,7 +126,7 @@ class TransactionService(
 
     return Either.catch {
       val validCategory =
-        request.categoryId?.let { categoryRepository.findByIdAndUserId(it, userId) }
+        request.categoryId?.let { categoryRepository.findByRecordIdAndUserId(it, userId) }
       val transaction =
         Transaction(
           userId = userId,
@@ -163,13 +162,13 @@ class TransactionService(
     return either
       .eager {
         val oldTransaction =
-          Either.catch { transactionRepository.findByIdAndUserId(transactionId, userId) }
+          Either.catch { transactionRepository.findByRecordIdAndUserId(transactionId, userId) }
             .leftIfNull { BadRequestException("No transaction with ID: $transactionId") }
             .flatMapCatch { entityManager.detachAndReturn(it) }
             .bind()
         val validCategoryId =
           Either.catch {
-              request.categoryId?.let { categoryRepository.findByIdAndUserId(it, userId) }?.id
+              request.categoryId?.let { categoryRepository.findByRecordIdAndUserId(it, userId) }?.id
             }
             .bind()
         val oldValues =

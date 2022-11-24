@@ -9,10 +9,10 @@ import org.springframework.data.jpa.repository.Modifying
 interface CategoryRepository : JpaRepository<Category, TypedId<CategoryId>> {
   fun findAllByUserIdOrderByName(userId: Long): List<Category>
 
-  fun findByIdAndUserId(id: TypedId<CategoryId>, userId: Long): Category?
+  fun findByRecordIdAndUserId(id: TypedId<CategoryId>, userId: Long): Category?
 
   @Modifying(flushAutomatically = true, clearAutomatically = true)
-  fun deleteByIdAndUserId(id: TypedId<CategoryId>, userId: Long)
+  fun deleteByRecordIdAndUserId(id: TypedId<CategoryId>, userId: Long)
 
-  fun existsByIdAndUserId(id: TypedId<CategoryId>, userId: Long): Boolean
+  fun existsByRecordIdAndUserId(id: TypedId<CategoryId>, userId: Long): Boolean
 }

@@ -90,7 +90,7 @@ class AutoCategorizeRuleService(
   }
 
   private fun validateCategory(categoryId: TypedId<CategoryId>, userId: Long): TryEither<Unit> =
-    Either.catch { categoryRepository.existsByIdAndUserId(categoryId, userId) }
+    Either.catch { categoryRepository.existsByRecordIdAndUserId(categoryId, userId) }
       .filterOrElse({ it }) { BadRequestException("Invalid Category: $categoryId") }
       .map { Unit }
 
@@ -98,14 +98,14 @@ class AutoCategorizeRuleService(
     ruleId: TypedId<AutoCategorizeRuleId>,
     userId: Long
   ): TryEither<AutoCategorizeRule> =
-    Either.catch { autoCategorizeRuleRepository.findByIdAndUserId(ruleId, userId) }
+    Either.catch { autoCategorizeRuleRepository.findByRecordIdAndUserId(ruleId, userId) }
       .leftIfNull { BadRequestException("Invalid Rule: $ruleId") }
 
   private fun getRuleViewIfValid(
     ruleId: TypedId<AutoCategorizeRuleId>,
     userId: Long
   ): TryEither<AutoCategorizeRuleView> =
-    Either.catch { autoCategorizeRuleViewRepository.findByIdAndUserId(ruleId, userId) }
+    Either.catch { autoCategorizeRuleViewRepository.findByRecordIdAndUserId(ruleId, userId) }
       .leftIfNull { BadRequestException("Invalid Rule: $ruleId") }
 
   @Transactional

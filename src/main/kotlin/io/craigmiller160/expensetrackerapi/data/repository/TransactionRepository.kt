@@ -23,20 +23,20 @@ interface TransactionRepository :
     contentHash: Collection<String>
   ): List<Transaction>
 
-  fun findByIdAndUserId(id: TypedId<TransactionId>, userId: Long): Transaction?
+  fun findByRecordIdAndUserId(id: TypedId<TransactionId>, userId: Long): Transaction?
 
   @Query(
     """
     UPDATE Transaction t
     SET t.categoryId = (
-        SELECT c.id
+        SELECT c.recordId
         FROM Category c
-        WHERE c.id = :categoryId 
+        WHERE c.recordId = :categoryId 
         AND c.userId = :userId
     ), 
         t.updated = current_timestamp,
         t.version = t.version + 1
-    WHERE t.id = :transactionId
+    WHERE t.recordId = :transactionId
     AND t.userId = :userId
     AND (t.categoryId IS NULL OR t.categoryId <> :categoryId)
   """)
@@ -52,7 +52,7 @@ interface TransactionRepository :
       UPDATE Transaction t
       SET t.confirmed = :confirmed, 
         t.version = t.version + 1
-      WHERE t.id = :transactionId
+      WHERE t.recordId = :transactionId
       AND t.userId = :userId
       AND t.confirmed <> :confirmed
   """)
@@ -66,7 +66,7 @@ interface TransactionRepository :
   @Query(
     """
       DELETE FROM Transaction t
-      WHERE t.id IN (:transactionIds)
+      WHERE t.recordId IN (:transactionIds)
       AND t.userId = :userId
   """)
   @Modifying(flushAutomatically = true, clearAutomatically = true)
@@ -81,9 +81,9 @@ interface TransactionRepository :
       SET t.categoryId = null, 
         t.version = t.version + 1
       WHERE t.categoryId = (
-        SELECT c.id
+        SELECT c.recordId
         FROM Category c
-        WHERE c.id = :categoryId
+        WHERE c.recordId = :categoryId
         AND c.userId = :userId
       )
       AND t.userId = :userId
@@ -98,7 +98,7 @@ interface TransactionRepository :
     """
       UPDATE Transaction t
       SET t.categoryId = null
-      WHERE t.id = :transactionId
+      WHERE t.recordId = :transactionId
       AND t.userId = :userId
       AND t.categoryId IS NOT NULL
   """)
@@ -112,7 +112,7 @@ interface TransactionRepository :
     """
     UPDATE Transaction t
     SET t.markNotDuplicateNano = :nano
-    WHERE t.id = :transactionId
+    WHERE t.recordId = :transactionId
     AND t.userId = :userId
   """)
   @Modifying(flushAutomatically = true, clearAutomatically = true)
