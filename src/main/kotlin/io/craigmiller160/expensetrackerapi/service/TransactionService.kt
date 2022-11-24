@@ -172,13 +172,15 @@ class TransactionService(
               request.categoryId?.let { categoryRepository.findByIdAndUserId(it, userId) }?.id
             }
             .bind()
+        // TODO detecting a change in transaction will fail here, figure out a new solution
         oldTransaction to
-          oldTransaction.copy(
-            confirmed = request.confirmed,
-            expenseDate = request.expenseDate,
-            description = request.description,
-            amount = request.amount,
-            categoryId = validCategoryId)
+          oldTransaction.apply {
+            confirmed = request.confirmed
+            expenseDate = request.expenseDate
+            description = request.description
+            amount = request.amount
+            categoryId = validCategoryId
+          }
       }
       .flatMapCatch { (oldTransaction, newTransaction) ->
         oldTransaction to transactionRepository.save(newTransaction)
