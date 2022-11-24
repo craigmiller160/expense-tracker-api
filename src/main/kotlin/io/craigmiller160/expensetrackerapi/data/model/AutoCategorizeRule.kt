@@ -20,8 +20,4 @@ class AutoCategorizeRule(
   var endDate: LocalDate? = null,
   var minAmount: BigDecimal? = null,
   var maxAmount: BigDecimal? = null,
-) : MutableTableEntity<AutoCategorizeRuleId>() {
-  override fun isNew(): Boolean {
-    TODO("Not yet implemented")
-  }
-}
+) : MutableTableEntity<AutoCategorizeRuleId>()
