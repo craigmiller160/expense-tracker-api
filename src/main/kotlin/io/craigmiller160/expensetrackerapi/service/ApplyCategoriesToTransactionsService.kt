@@ -14,8 +14,10 @@ import io.craigmiller160.expensetrackerapi.data.repository.TransactionRepository
 import io.craigmiller160.expensetrackerapi.function.TryEither
 import io.craigmiller160.expensetrackerapi.function.flatMapCatch
 import java.time.LocalDate
+import javax.persistence.EntityManager
 import javax.transaction.Transactional
 import org.slf4j.LoggerFactory
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
 import org.springframework.stereotype.Service
@@ -29,6 +31,9 @@ class ApplyCategoriesToTransactionsService(
   companion object {
     private const val PAGE_SIZE = 25
   }
+
+  // TODO delete this
+  @Autowired private lateinit var entityManager: EntityManager
 
   private val log = LoggerFactory.getLogger(javaClass)
 
