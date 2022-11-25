@@ -325,7 +325,7 @@ constructor(
     val nonDuplicateIds = user1Transactions.subList(1, user1Transactions.size).map { it.uid }
     val nonDuplicateTransactions =
       transactionViewRepository
-        .findAllByRecordIdInAndUserId(nonDuplicateIds, 1L)
+        .findAllByUidInAndUserId(nonDuplicateIds, 1L)
         .sortedWith(transactionComparator)
 
     val response =
@@ -926,7 +926,7 @@ constructor(
     entityManager.flushAndClear()
 
     val expectedTransactions =
-      transactionViewRepository.findAllByRecordIdInAndUserId(listOf(txn3.uid, txn2.uid), 1L).map {
+      transactionViewRepository.findAllByUidInAndUserId(listOf(txn3.uid, txn2.uid), 1L).map {
         TransactionDuplicateResponse.from(it)
       }
 

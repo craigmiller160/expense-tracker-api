@@ -125,7 +125,7 @@ class TransactionService(
 
     return Either.catch {
       val validCategory =
-        request.categoryId?.let { categoryRepository.findByRecordIdAndUserId(it, userId) }
+        request.categoryId?.let { categoryRepository.findByUidAndUserId(it, userId) }
       val transaction =
         Transaction(
           userId = userId,
@@ -161,14 +161,12 @@ class TransactionService(
     return either
       .eager {
         val oldTransaction =
-          Either.catch { transactionRepository.findByRecordIdAndUserId(transactionId, userId) }
+          Either.catch { transactionRepository.findByUidAndUserId(transactionId, userId) }
             .leftIfNull { BadRequestException("No transaction with ID: $transactionId") }
             .bind()
         val validCategoryId =
           Either.catch {
-              request.categoryId
-                ?.let { categoryRepository.findByRecordIdAndUserId(it, userId) }
-                ?.uid
+              request.categoryId?.let { categoryRepository.findByUidAndUserId(it, userId) }?.uid
             }
             .bind()
         val oldValues =
@@ -228,7 +226,7 @@ class TransactionService(
     transactionId: TypedId<TransactionId>
   ): TryEither<TransactionDetailsResponse> {
     val userId = oAuth2Service.getAuthenticatedUser().userId
-    return Either.catch { transactionViewRepository.findByRecordIdAndUserId(transactionId, userId) }
+    return Either.catch { transactionViewRepository.findByUidAndUserId(transactionId, userId) }
       .flatMap { txn ->
         txn?.let { Either.Right(it) }
           ?: Either.Left(BadRequestException("No transaction for ID: $transactionId"))

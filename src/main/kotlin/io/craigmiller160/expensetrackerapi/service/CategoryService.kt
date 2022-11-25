@@ -41,7 +41,7 @@ class CategoryService(
   @Transactional
   fun updateCategory(categoryId: TypedId<CategoryId>, request: CategoryRequest): TryEither<Unit> {
     val userId = oAuth2Service.getAuthenticatedUser().userId
-    return Either.catch { categoryRepository.findByRecordIdAndUserId(categoryId, userId) }
+    return Either.catch { categoryRepository.findByUidAndUserId(categoryId, userId) }
       .flatMapCatch { nullableCategory ->
         nullableCategory?.let { category ->
           categoryRepository.save(
@@ -59,6 +59,6 @@ class CategoryService(
     return Either.catch {
         transactionRepository.removeCategoryFromAllTransactions(userId, categoryId)
       }
-      .flatMapCatch { categoryRepository.deleteByRecordIdAndUserId(categoryId, userId) }
+      .flatMapCatch { categoryRepository.deleteByUidAndUserId(categoryId, userId) }
   }
 }

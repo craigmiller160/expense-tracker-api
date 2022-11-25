@@ -23,7 +23,7 @@ interface TransactionRepository :
     contentHash: Collection<String>
   ): List<Transaction>
 
-  fun findByRecordIdAndUserId(id: TypedId<TransactionId>, userId: Long): Transaction?
+  fun findByUidAndUserId(id: TypedId<TransactionId>, userId: Long): Transaction?
 
   @Query(
     """

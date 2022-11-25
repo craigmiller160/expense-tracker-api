@@ -12,9 +12,9 @@ import org.springframework.stereotype.Repository
 
 @Repository
 interface TransactionViewRepository : JpaRepository<TransactionView, TypedId<TransactionId>> {
-  fun findByRecordIdAndUserId(id: TypedId<TransactionId>, userId: Long): TransactionView?
+  fun findByUidAndUserId(id: TypedId<TransactionId>, userId: Long): TransactionView?
 
-  fun findAllByRecordIdInAndUserId(
+  fun findAllByUidInAndUserId(
     transactionIds: List<TypedId<TransactionId>>,
     userId: Long
   ): List<TransactionView>
