@@ -9,4 +9,4 @@ fun ResultSet.getUUID(columnName: String): UUID = UUID.fromString(getString(colu
 
 fun <T> ResultSet.getTypedId(columnName: String): TypedId<T> = TypedId(getUUID(columnName))
 
-fun ResultSet.getLocalDate(columnName: String): LocalDate = getDate(columnName).toLocalDate()
+fun ResultSet.getLocalDate(columnName: String): LocalDate? = getDate(columnName)?.toLocalDate()
