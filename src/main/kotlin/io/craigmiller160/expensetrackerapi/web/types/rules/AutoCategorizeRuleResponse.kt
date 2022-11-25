@@ -21,7 +21,7 @@ data class AutoCategorizeRuleResponse(
   companion object {
     fun from(rule: AutoCategorizeRuleView): AutoCategorizeRuleResponse =
       AutoCategorizeRuleResponse(
-        id = rule.id,
+        id = rule.uid,
         categoryId = rule.categoryId,
         categoryName = rule.categoryName,
         ordinal = rule.ordinal,

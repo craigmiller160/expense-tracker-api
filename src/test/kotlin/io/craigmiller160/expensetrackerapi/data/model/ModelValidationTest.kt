@@ -29,11 +29,11 @@ constructor(
 
     assertThat(country.created).isAfterOrEqualTo(NOW)
 
-    val dbCountry = countryRepository.findById(country.id).orElseThrow()
+    val dbCountry = countryRepository.findById(country.uid).orElseThrow()
     assertThat(dbCountry).isEqualTo(country)
 
     val newCountry = dbCountry.apply { name = "CAN" }
-    assertThat(newCountry.id).isEqualTo(country.id)
+    assertThat(newCountry.uid).isEqualTo(country.uid)
     // Just confirming the apply does a mutation
     assertThat(newCountry.name).isEqualTo(dbCountry.name)
 
@@ -51,8 +51,9 @@ constructor(
 
     assertThat(resident.created).isAfterOrEqualTo(NOW)
     assertThat(resident.updated).isAfterOrEqualTo(resident.created)
+    val originalUpdated = resident.updated
 
-    val dbResident = residentRepository.findById(resident.id).orElseThrow()
+    val dbResident = residentRepository.findById(resident.uid).orElseThrow()
     assertThat(dbResident).isEqualTo(resident)
     assertThat(dbResident.version).isEqualTo(1)
 
@@ -63,9 +64,9 @@ constructor(
 
     entityManager.flushAndClear()
 
-    val dbResident2 = residentRepository.findById(resident.id).orElseThrow()
+    val dbResident2 = residentRepository.findById(resident.uid).orElseThrow()
     assertThat(dbResident2.name).isEqualTo(newResident.name)
-    assertThat(dbResident2.updated).isAfter(resident.updated)
+    assertThat(dbResident2.updated).isAfter(originalUpdated)
     assertThat(dbResident2.version).isEqualTo(2)
   }
 }

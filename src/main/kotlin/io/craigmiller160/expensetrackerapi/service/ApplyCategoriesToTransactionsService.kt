@@ -82,7 +82,7 @@ class ApplyCategoriesToTransactionsService(
     val (_, _, rule) = singleRuleContext
     val (matches, noMatches) = fullContext.allTransactions.partition { doesRuleApply(it, rule) }
     val matchesWithCategories = matches.map { it.apply { categoryId = rule.categoryId } }
-    val lastMatchingRules = matches.associate { it.id to rule.id }
+    val lastMatchingRules = matches.associate { it.uid to rule.uid }
     return fullContext.copy(
       allTransactions = matchesWithCategories + noMatches,
       lastRulesApplied = fullContext.lastRulesApplied + lastMatchingRules)
@@ -92,13 +92,19 @@ class ApplyCategoriesToTransactionsService(
     userId: Long,
     context: TransactionRuleContext
   ): TryEither<List<Transaction>> =
-    Either.catch {
-      lastRuleAppliedRepository.saveAllAndFlush(
-        context.lastRulesApplied.map {
-          LastRuleApplied(userId = userId, transactionId = it.key, ruleId = it.value)
-        })
-      transactionRepository.saveAllAndFlush(context.allTransactions)
-    }
+    Either.catch { transactionRepository.saveAllAndFlush(context.allTransactions) }
+      .flatMap { transactions ->
+        deleteLastRuleAppliedForTransactions(userId, transactions.map { it.uid }).map {
+          transactions
+        }
+      }
+      .flatMapCatch { transactions ->
+        lastRuleAppliedRepository.saveAllAndFlush(
+          context.lastRulesApplied.map {
+            LastRuleApplied(userId = userId, transactionId = it.key, ruleId = it.value)
+          })
+        transactions
+      }
 
   /** This returns the transactions in a different order from the method. */
   fun applyCategoriesToTransactions(
@@ -108,8 +114,7 @@ class ApplyCategoriesToTransactionsService(
     log.debug("Starting to apply categories to batch of transactions for user $userId")
     val start = System.nanoTime()
     val categoryLessTransactions = transactions.map { it.apply { categoryId = null } }
-    return deleteLastRuleAppliedForTransactions(userId, categoryLessTransactions.map { it.id })
-      .flatMapCatch {
+    return Either.catch {
         autoCategorizeRuleRepository.streamAllByUserIdOrderByOrdinal(userId).use { ruleStream ->
           ruleStream
             .map { TransactionRuleContext.forCurrentRule(it) }

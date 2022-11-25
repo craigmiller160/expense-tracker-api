@@ -7,7 +7,7 @@ import java.math.BigDecimal
 import java.time.LocalDate
 
 interface TransactionCommon {
-  var id: TypedId<TransactionId>
+  var uid: TypedId<TransactionId>
   var userId: Long
   var expenseDate: LocalDate
   var description: String

@@ -17,10 +17,8 @@ import io.craigmiller160.expensetrackerapi.data.repository.CategoryRepository
 import io.craigmiller160.expensetrackerapi.data.repository.LastRuleAppliedRepository
 import io.craigmiller160.expensetrackerapi.data.repository.TransactionRepository
 import io.craigmiller160.expensetrackerapi.data.repository.TransactionViewRepository
-import io.craigmiller160.expensetrackerapi.extension.detachAndReturn
 import io.craigmiller160.expensetrackerapi.function.TryEither
 import io.craigmiller160.expensetrackerapi.function.flatMapCatch
-import io.craigmiller160.expensetrackerapi.web.types.*
 import io.craigmiller160.expensetrackerapi.web.types.transaction.*
 import io.craigmiller160.oauth2.service.OAuth2Service
 import javax.persistence.EntityManager
@@ -127,7 +125,7 @@ class TransactionService(
 
     return Either.catch {
       val validCategory =
-        request.categoryId?.let { categoryRepository.findByIdAndUserId(it, userId) }
+        request.categoryId?.let { categoryRepository.findByUidAndUserId(it, userId) }
       val transaction =
         Transaction(
           userId = userId,
@@ -135,13 +133,13 @@ class TransactionService(
           description = request.description,
           amount = request.amount,
           confirmed = true,
-          categoryId = validCategory?.id)
+          categoryId = validCategory?.uid)
       val dbTransaction = transactionRepository.saveAndFlush(transaction)
       transactionViewRepository
-        .findById(dbTransaction.id)
+        .findById(dbTransaction.uid)
         .map { TransactionResponse.from(it) }
         .orElseThrow {
-          IllegalStateException("Cannot find created transaction in database: ${dbTransaction.id}")
+          IllegalStateException("Cannot find created transaction in database: ${dbTransaction.uid}")
         }
     }
   }
@@ -163,13 +161,12 @@ class TransactionService(
     return either
       .eager {
         val oldTransaction =
-          Either.catch { transactionRepository.findByIdAndUserId(transactionId, userId) }
+          Either.catch { transactionRepository.findByUidAndUserId(transactionId, userId) }
             .leftIfNull { BadRequestException("No transaction with ID: $transactionId") }
-            .flatMapCatch { entityManager.detachAndReturn(it) }
             .bind()
         val validCategoryId =
           Either.catch {
-              request.categoryId?.let { categoryRepository.findByIdAndUserId(it, userId) }?.id
+              request.categoryId?.let { categoryRepository.findByUidAndUserId(it, userId) }?.uid
             }
             .bind()
         val oldValues =
@@ -191,7 +188,7 @@ class TransactionService(
         if (oldValues.categoryId != newTransaction.categoryId ||
           oldValues.confirmed != newTransaction.confirmed) {
           lastRuleAppliedRepository.deleteAllByUserIdAndTransactionIdIn(
-            userId, listOf(newTransaction.id))
+            userId, listOf(newTransaction.uid))
         }
       }
       .map { Unit }
@@ -223,13 +220,13 @@ class TransactionService(
   }
 
   private fun getCategoryMap(userId: Long): TryEither<Map<TypedId<CategoryId>, Category>> =
-    Either.catch { categoryRepository.findAllByUserIdOrderByName(userId).associateBy { it.id } }
+    Either.catch { categoryRepository.findAllByUserIdOrderByName(userId).associateBy { it.uid } }
 
   fun getTransactionDetails(
     transactionId: TypedId<TransactionId>
   ): TryEither<TransactionDetailsResponse> {
     val userId = oAuth2Service.getAuthenticatedUser().userId
-    return Either.catch { transactionViewRepository.findByIdAndUserId(transactionId, userId) }
+    return Either.catch { transactionViewRepository.findByUidAndUserId(transactionId, userId) }
       .flatMap { txn ->
         txn?.let { Either.Right(it) }
           ?: Either.Left(BadRequestException("No transaction for ID: $transactionId"))

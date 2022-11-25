@@ -22,18 +22,18 @@ data class TransactionResponse(
   companion object {
     fun from(transaction: Transaction, category: Category? = null): TransactionResponse =
       TransactionResponse(
-        id = transaction.id,
+        id = transaction.uid,
         expenseDate = transaction.expenseDate,
         description = transaction.description,
         amount = transaction.amount,
         confirmed = transaction.confirmed,
         duplicate = false,
-        categoryId = category?.id,
+        categoryId = category?.uid,
         categoryName = category?.name)
 
     fun from(transaction: TransactionView): TransactionResponse =
       TransactionResponse(
-        id = transaction.id,
+        id = transaction.uid,
         expenseDate = transaction.expenseDate,
         description = transaction.description,
         amount = transaction.amount,

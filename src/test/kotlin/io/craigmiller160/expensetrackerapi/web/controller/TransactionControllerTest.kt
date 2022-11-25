@@ -26,7 +26,6 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.mockito.kotlin.isNotNull
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.PageRequest
 import org.springframework.http.MediaType
@@ -85,7 +84,7 @@ constructor(
         if (index % 2 == 0) {
           transactionRepository.saveAndFlush(
             transaction.apply {
-              categoryId = user1Categories[index % 3].id
+              categoryId = user1Categories[index % 3].uid
               confirmed = true
             })
         } else {
@@ -93,8 +92,8 @@ constructor(
         }
       }
     user2Transactions = user2Txns
-    user1CategoriesMap = user1Categories.associateBy { it.id }
-    rule = dataHelper.createRule(1L, user1Categories[0].id)
+    user1CategoriesMap = user1Categories.associateBy { it.uid }
+    rule = dataHelper.createRule(1L, user1Categories[0].uid)
   }
 
   @Test
@@ -297,7 +296,7 @@ constructor(
     val request =
       SearchTransactionsRequest(
         isCategorized = false,
-        categoryIds = setOf(user1Categories[0].id),
+        categoryIds = setOf(user1Categories[0].uid),
         pageNumber = 0,
         pageSize = 100,
         sortKey = TransactionSortKey.EXPENSE_DATE,
@@ -323,10 +322,10 @@ constructor(
         sortKey = TransactionSortKey.EXPENSE_DATE,
         sortDirection = SortDirection.ASC)
 
-    val nonDuplicateIds = user1Transactions.subList(1, user1Transactions.size).map { it.id }
+    val nonDuplicateIds = user1Transactions.subList(1, user1Transactions.size).map { it.uid }
     val nonDuplicateTransactions =
       transactionViewRepository
-        .findAllByIdInAndUserId(nonDuplicateIds, 1L)
+        .findAllByUidInAndUserId(nonDuplicateIds, 1L)
         .sortedWith(transactionComparator)
 
     val response =
@@ -466,9 +465,10 @@ constructor(
   @Test
   fun `search - categories`() {
     val user2Cat = dataHelper.createCategory(2L, "User2 Cat")
-    transactionRepository.saveAndFlush(user2Transactions.first().apply { categoryId = user2Cat.id })
+    transactionRepository.saveAndFlush(
+      user2Transactions.first().apply { categoryId = user2Cat.uid })
 
-    val categories = setOf(user1Categories.first().id, user2Cat.id)
+    val categories = setOf(user1Categories.first().uid, user2Cat.uid)
 
     val response =
       TransactionsPageResponse(
@@ -502,7 +502,7 @@ constructor(
   fun deleteTransactions() {
     val request =
       DeleteTransactionsRequest(
-        ids = setOf(user1Transactions.first().id, user2Transactions.first().id))
+        ids = setOf(user1Transactions.first().uid, user2Transactions.first().uid))
 
     mockMvc
       .delete("/transactions") {
@@ -515,8 +515,8 @@ constructor(
 
     entityManager.flushAndClear()
 
-    assertThat(transactionRepository.findById(user1Transactions.first().id)).isEmpty
-    assertThat(transactionRepository.findById(user2Transactions.first().id)).isPresent
+    assertThat(transactionRepository.findById(user1Transactions.first().uid)).isEmpty
+    assertThat(transactionRepository.findById(user2Transactions.first().uid)).isPresent
   }
 
   @Test
@@ -524,7 +524,7 @@ constructor(
     assertThat(user1Transactions[0].categoryId).isNotNull
     val request =
       CategorizeTransactionsRequest(
-        transactionsAndCategories = setOf(TransactionAndCategory(user1Transactions[0].id, null)))
+        transactionsAndCategories = setOf(TransactionAndCategory(user1Transactions[0].uid, null)))
 
     mockMvc
       .put("/transactions/categorize") {
@@ -537,7 +537,7 @@ constructor(
 
     entityManager.flushAndClear()
 
-    assertThat(transactionRepository.findById(user1Transactions[0].id))
+    assertThat(transactionRepository.findById(user1Transactions[0].uid))
       .isPresent
       .get()
       .hasFieldOrPropertyWithValue("categoryId", null)
@@ -550,8 +550,8 @@ constructor(
       ConfirmTransactionsRequest(
         transactionsToConfirm =
           setOf(
-            TransactionToConfirm(transactionId = user1Transactions[0].id, confirmed = true),
-            TransactionToConfirm(transactionId = user2Transactions[0].id, confirmed = true)))
+            TransactionToConfirm(transactionId = user1Transactions[0].uid, confirmed = true),
+            TransactionToConfirm(transactionId = user2Transactions[0].uid, confirmed = true)))
 
     mockMvc
       .put("/transactions/confirm") {
@@ -562,11 +562,11 @@ constructor(
       }
       .andExpect { status { isNoContent() } }
 
-    assertThat(transactionRepository.findById(user1Transactions[0].id))
+    assertThat(transactionRepository.findById(user1Transactions[0].uid))
       .isPresent
       .get()
       .hasFieldOrPropertyWithValue("confirmed", true)
-    assertThat(transactionRepository.findById(user2Transactions[0].id))
+    assertThat(transactionRepository.findById(user2Transactions[0].uid))
       .isPresent
       .get()
       .hasFieldOrPropertyWithValue("confirmed", false)
@@ -579,16 +579,18 @@ constructor(
     assertThat(uncategorizedTransaction.categoryId).isNull()
 
     val categorizedTransaction = user1Transactions[4]
-    assertThat(categorizedTransaction.categoryId).isNotNull.isNotEqualTo(user1Categories.first().id)
+    assertThat(categorizedTransaction.categoryId)
+      .isNotNull
+      .isNotEqualTo(user1Categories.first().uid)
 
     val request =
       CategorizeTransactionsRequest(
         transactionsAndCategories =
           setOf(
-            TransactionAndCategory(uncategorizedTransaction.id, user1Categories.first().id),
-            TransactionAndCategory(categorizedTransaction.id, user1Categories.first().id),
-            TransactionAndCategory(user2Transactions.first().id, user1Categories.first().id),
-            TransactionAndCategory(user1Transactions[2].id, user2Category.id)))
+            TransactionAndCategory(uncategorizedTransaction.uid, user1Categories.first().uid),
+            TransactionAndCategory(categorizedTransaction.uid, user1Categories.first().uid),
+            TransactionAndCategory(user2Transactions.first().uid, user1Categories.first().uid),
+            TransactionAndCategory(user1Transactions[2].uid, user2Category.uid)))
 
     entityManager.flushAndClear()
 
@@ -603,22 +605,22 @@ constructor(
 
     entityManager.flushAndClear()
 
-    assertThat(transactionRepository.findById(uncategorizedTransaction.id))
+    assertThat(transactionRepository.findById(uncategorizedTransaction.uid))
       .isPresent
       .get()
-      .hasFieldOrPropertyWithValue("categoryId", user1Categories.first().id)
+      .hasFieldOrPropertyWithValue("categoryId", user1Categories.first().uid)
       .hasFieldOrPropertyWithValue("confirmed", false)
-    assertThat(transactionRepository.findById(categorizedTransaction.id))
+    assertThat(transactionRepository.findById(categorizedTransaction.uid))
       .isPresent
       .get()
-      .hasFieldOrPropertyWithValue("categoryId", user1Categories.first().id)
+      .hasFieldOrPropertyWithValue("categoryId", user1Categories.first().uid)
       .hasFieldOrPropertyWithValue("confirmed", true)
-    assertThat(transactionRepository.findById(user2Transactions.first().id))
+    assertThat(transactionRepository.findById(user2Transactions.first().uid))
       .isPresent
       .get()
       .hasFieldOrPropertyWithValue("categoryId", null)
       .hasFieldOrPropertyWithValue("confirmed", false)
-    assertThat(transactionRepository.findById(user1Transactions[2].id))
+    assertThat(transactionRepository.findById(user1Transactions[2].uid))
       .isPresent
       .get()
       .hasFieldOrPropertyWithValue("categoryId", null)
@@ -632,7 +634,7 @@ constructor(
         expenseDate = LocalDate.of(2022, 1, 1),
         description = "Another Transaction",
         amount = BigDecimal("-120"),
-        categoryId = user1Categories[0].id)
+        categoryId = user1Categories[0].uid)
 
     val responseString =
       mockMvc
@@ -674,7 +676,7 @@ constructor(
         expenseDate = LocalDate.of(2022, 1, 1),
         description = "Another Transaction",
         amount = BigDecimal("-120"),
-        categoryId = user2Category.id)
+        categoryId = user2Category.uid)
 
     val responseString =
       mockMvc
@@ -710,7 +712,7 @@ constructor(
 
   @Test
   fun updateTransactionDetails() {
-    val transactionId = user1Transactions[0].id
+    val transactionId = user1Transactions[0].uid
     val request =
       UpdateTransactionDetailsRequest(
         transactionId = transactionId,
@@ -718,7 +720,7 @@ constructor(
         expenseDate = LocalDate.of(1990, 1, 1),
         description = "New Description",
         amount = BigDecimal("-112.57"),
-        categoryId = user1Categories[0].id)
+        categoryId = user1Categories[0].uid)
 
     mockMvc
       .put("/transactions/$transactionId/details") {
@@ -741,7 +743,7 @@ constructor(
   @Test
   fun updateTransactionDetails_invalidCategoryId() {
     val user2Category = dataHelper.createCategory(2L, "Other")
-    val transactionId = user1Transactions[0].id
+    val transactionId = user1Transactions[0].uid
     val request =
       UpdateTransactionDetailsRequest(
         transactionId = transactionId,
@@ -749,7 +751,7 @@ constructor(
         expenseDate = LocalDate.of(1990, 1, 1),
         description = "New Description",
         amount = BigDecimal("-112.57"),
-        categoryId = user2Category.id)
+        categoryId = user2Category.uid)
 
     mockMvc
       .put("/transactions/$transactionId/details") {
@@ -785,23 +787,23 @@ constructor(
         transactions =
           setOf(
             TransactionToUpdate(
-              transactionId = uncategorizedTransaction.id,
-              categoryId = user1Categories.first().id,
+              transactionId = uncategorizedTransaction.uid,
+              categoryId = user1Categories.first().uid,
               confirmed = false),
             TransactionToUpdate(
-              transactionId = categorizedTransaction.id,
-              categoryId = user1Categories.first().id,
+              transactionId = categorizedTransaction.uid,
+              categoryId = user1Categories.first().uid,
               confirmed = false),
             TransactionToUpdate(
-              transactionId = user2Transactions.first().id,
-              categoryId = user1Categories.first().id,
+              transactionId = user2Transactions.first().uid,
+              categoryId = user1Categories.first().uid,
               confirmed = false),
             TransactionToUpdate(
-              transactionId = user1Transactions[2].id,
-              categoryId = user2Category.id,
+              transactionId = user1Transactions[2].uid,
+              categoryId = user2Category.uid,
               confirmed = false),
-            TransactionToUpdate(transactionId = user1Transactions[6].id, confirmed = true),
-            TransactionToUpdate(transactionId = user2Transactions[0].id, confirmed = true)))
+            TransactionToUpdate(transactionId = user1Transactions[6].uid, confirmed = true),
+            TransactionToUpdate(transactionId = user2Transactions[0].uid, confirmed = true)))
 
     mockMvc
       .put("/transactions") {
@@ -812,28 +814,28 @@ constructor(
       }
       .andExpect { status { isNoContent() } }
 
-    assertThat(transactionRepository.findById(uncategorizedTransaction.id))
+    assertThat(transactionRepository.findById(uncategorizedTransaction.uid))
       .isPresent
       .get()
-      .hasFieldOrPropertyWithValue("categoryId", user1Categories.first().id)
+      .hasFieldOrPropertyWithValue("categoryId", user1Categories.first().uid)
       .hasFieldOrPropertyWithValue("confirmed", false)
-    assertThat(transactionRepository.findById(categorizedTransaction.id))
+    assertThat(transactionRepository.findById(categorizedTransaction.uid))
       .isPresent
       .get()
-      .hasFieldOrPropertyWithValue("categoryId", user1Categories.first().id)
+      .hasFieldOrPropertyWithValue("categoryId", user1Categories.first().uid)
       .hasFieldOrPropertyWithValue("confirmed", false)
-    assertThat(transactionRepository.findById(user2Transactions.first().id))
+    assertThat(transactionRepository.findById(user2Transactions.first().uid))
       .isPresent
       .get()
       .hasFieldOrPropertyWithValue("categoryId", null)
       .hasFieldOrPropertyWithValue("confirmed", false)
-    assertThat(transactionRepository.findById(user1Transactions[2].id))
+    assertThat(transactionRepository.findById(user1Transactions[2].uid))
       .isPresent
       .get()
       .hasFieldOrPropertyWithValue("categoryId", null)
       .hasFieldOrPropertyWithValue("confirmed", false)
 
-    assertThat(transactionRepository.findById(user1Transactions[6].id))
+    assertThat(transactionRepository.findById(user1Transactions[6].uid))
       .isPresent
       .get()
       .hasFieldOrPropertyWithValue("confirmed", true)
@@ -873,7 +875,7 @@ constructor(
   fun `updateTransactionDetails is duplicate`() {
     val request =
       UpdateTransactionDetailsRequest(
-        transactionId = user1Transactions[1].id,
+        transactionId = user1Transactions[1].uid,
         confirmed = user1Transactions[0].confirmed,
         expenseDate = user1Transactions[0].expenseDate,
         description = user1Transactions[0].description,
@@ -906,7 +908,7 @@ constructor(
       TransactionDuplicatePageResponse(transactions = listOf(), totalItems = 0, pageNumber = 0)
 
     mockMvc
-      .get("/transactions/${txn1.id}/duplicates?pageNumber=0&pageSize=25") {
+      .get("/transactions/${txn1.uid}/duplicates?pageNumber=0&pageSize=25") {
         secure = true
         header("Authorization", "Bearer $token")
       }
@@ -924,7 +926,7 @@ constructor(
     entityManager.flushAndClear()
 
     val expectedTransactions =
-      transactionViewRepository.findAllByIdInAndUserId(listOf(txn3.id, txn2.id), 1L).map {
+      transactionViewRepository.findAllByUidInAndUserId(listOf(txn3.uid, txn2.uid), 1L).map {
         TransactionDuplicateResponse.from(it)
       }
 
@@ -935,7 +937,7 @@ constructor(
         pageNumber = 0)
 
     mockMvc
-      .get("/transactions/${txn1.id}/duplicates?pageNumber=0&pageSize=25") {
+      .get("/transactions/${txn1.uid}/duplicates?pageNumber=0&pageSize=25") {
         secure = true
         header("Authorization", "Bearer $token")
       }
@@ -950,7 +952,7 @@ constructor(
     val response =
       TransactionDuplicatePageResponse(transactions = listOf(), pageNumber = 0, totalItems = 0)
     mockMvc
-      .get("/transactions/${user1Transactions[0].id}/duplicates?pageNumber=0&pageSize=25") {
+      .get("/transactions/${user1Transactions[0].uid}/duplicates?pageNumber=0&pageSize=25") {
         secure = true
         header("Authorization", "Bearer $token")
       }
@@ -968,7 +970,7 @@ constructor(
     entityManager.flushAndClear()
 
     mockMvc
-      .put("/transactions/${txn1.id}/notDuplicate") {
+      .put("/transactions/${txn1.uid}/notDuplicate") {
         secure = true
         header("Authorization", "Bearer $token")
       }
@@ -977,25 +979,25 @@ constructor(
     entityManager.flushAndClear()
 
     val txn1Duplicates =
-      transactionViewRepository.findAllDuplicates(txn1.id, 1L, PageRequest.of(0, 25))
+      transactionViewRepository.findAllDuplicates(txn1.uid, 1L, PageRequest.of(0, 25))
     assertThat(txn1Duplicates).isEmpty()
     val txn2Duplicates =
-      transactionViewRepository.findAllDuplicates(txn2.id, 1L, PageRequest.of(0, 25))
-    assertThat(txn2Duplicates).hasSize(1).extracting("id").contains(txn3.id)
+      transactionViewRepository.findAllDuplicates(txn2.uid, 1L, PageRequest.of(0, 25))
+    assertThat(txn2Duplicates).hasSize(1).extracting("uid").contains(txn3.uid)
   }
 
   @Test
   fun `categorizeTransactions - clears last rule applied`() {
-    dataHelper.createLastRuleApplied(1L, user1Transactions[0].id, rule.id)
-    dataHelper.createLastRuleApplied(1L, user1Transactions[1].id, rule.id)
-    dataHelper.createLastRuleApplied(1L, user1Transactions[2].id, rule.id)
+    dataHelper.createLastRuleApplied(1L, user1Transactions[0].uid, rule.uid)
+    dataHelper.createLastRuleApplied(1L, user1Transactions[1].uid, rule.uid)
+    dataHelper.createLastRuleApplied(1L, user1Transactions[2].uid, rule.uid)
     val request =
       CategorizeTransactionsRequest(
         transactionsAndCategories =
           setOf(
-            TransactionAndCategory(user1Transactions[0].id, user1Categories[1].id),
-            TransactionAndCategory(user1Transactions[1].id, null),
-            TransactionAndCategory(user1Transactions[2].id, user1Transactions[2].categoryId)))
+            TransactionAndCategory(user1Transactions[0].uid, user1Categories[1].uid),
+            TransactionAndCategory(user1Transactions[1].uid, null),
+            TransactionAndCategory(user1Transactions[2].uid, user1Transactions[2].categoryId)))
 
     mockMvc
       .put("/transactions/categorize") {
@@ -1008,11 +1010,11 @@ constructor(
 
     entityManager.flushAndClear()
 
-    assertThat(lastRuleAppliedRepository.findByUserIdAndTransactionId(1L, user1Transactions[0].id))
+    assertThat(lastRuleAppliedRepository.findByUserIdAndTransactionId(1L, user1Transactions[0].uid))
       .isNull()
-    assertThat(lastRuleAppliedRepository.findByUserIdAndTransactionId(1L, user1Transactions[1].id))
+    assertThat(lastRuleAppliedRepository.findByUserIdAndTransactionId(1L, user1Transactions[1].uid))
       .isNotNull
-    assertThat(lastRuleAppliedRepository.findByUserIdAndTransactionId(1L, user1Transactions[2].id))
+    assertThat(lastRuleAppliedRepository.findByUserIdAndTransactionId(1L, user1Transactions[2].uid))
       .isNotNull
   }
 
@@ -1020,14 +1022,14 @@ constructor(
   fun `confirmTransactions - clears last rule applied`() {
     transactionRepository.saveAndFlush(user1Transactions[0].apply { confirmed = false })
     transactionRepository.saveAndFlush(user1Transactions[1].apply { confirmed = false })
-    dataHelper.createLastRuleApplied(1L, user1Transactions[0].id, rule.id)
-    dataHelper.createLastRuleApplied(1L, user1Transactions[1].id, rule.id)
+    dataHelper.createLastRuleApplied(1L, user1Transactions[0].uid, rule.uid)
+    dataHelper.createLastRuleApplied(1L, user1Transactions[1].uid, rule.uid)
     val request =
       ConfirmTransactionsRequest(
         transactionsToConfirm =
           setOf(
-            TransactionToConfirm(transactionId = user1Transactions[0].id, confirmed = true),
-            TransactionToConfirm(transactionId = user1Transactions[1].id, confirmed = false)))
+            TransactionToConfirm(transactionId = user1Transactions[0].uid, confirmed = true),
+            TransactionToConfirm(transactionId = user1Transactions[1].uid, confirmed = false)))
 
     mockMvc
       .put("/transactions/confirm") {
@@ -1038,9 +1040,9 @@ constructor(
       }
       .andExpect { status { isNoContent() } }
 
-    assertThat(lastRuleAppliedRepository.findByUserIdAndTransactionId(1L, user1Transactions[0].id))
+    assertThat(lastRuleAppliedRepository.findByUserIdAndTransactionId(1L, user1Transactions[0].uid))
       .isNull()
-    assertThat(lastRuleAppliedRepository.findByUserIdAndTransactionId(1L, user1Transactions[1].id))
+    assertThat(lastRuleAppliedRepository.findByUserIdAndTransactionId(1L, user1Transactions[1].uid))
       .isNotNull
   }
 
@@ -1048,18 +1050,18 @@ constructor(
   fun `updateTransactions - confirming and or setting category clears last rule applied`() {
     val transactionToCategorize =
       TransactionToUpdate(
-        transactionId = user1Transactions[0].id,
-        categoryId = user1Categories.first().id,
+        transactionId = user1Transactions[0].uid,
+        categoryId = user1Categories.first().uid,
         confirmed = false)
     val transactionToConfirm =
       TransactionToUpdate(
-        transactionId = user1Transactions[1].id, categoryId = null, confirmed = true)
+        transactionId = user1Transactions[1].uid, categoryId = null, confirmed = true)
     val transactionToDoNothing =
       TransactionToUpdate(
-        transactionId = user1Transactions[3].id, categoryId = null, confirmed = false)
-    dataHelper.createLastRuleApplied(1L, transactionToCategorize.transactionId, rule.id)
-    dataHelper.createLastRuleApplied(1L, transactionToConfirm.transactionId, rule.id)
-    dataHelper.createLastRuleApplied(1L, transactionToDoNothing.transactionId, rule.id)
+        transactionId = user1Transactions[3].uid, categoryId = null, confirmed = false)
+    dataHelper.createLastRuleApplied(1L, transactionToCategorize.transactionId, rule.uid)
+    dataHelper.createLastRuleApplied(1L, transactionToConfirm.transactionId, rule.uid)
+    dataHelper.createLastRuleApplied(1L, transactionToDoNothing.transactionId, rule.uid)
     val request =
       UpdateTransactionsRequest(
         transactions = setOf(transactionToCategorize, transactionToConfirm, transactionToDoNothing))
@@ -1104,9 +1106,9 @@ constructor(
         categoryId = null
         confirmed = false
       })
-    dataHelper.createLastRuleApplied(1L, user1Transactions[0].id, rule.id)
-    dataHelper.createLastRuleApplied(1L, user1Transactions[1].id, rule.id)
-    dataHelper.createLastRuleApplied(1L, user1Transactions[2].id, rule.id)
+    dataHelper.createLastRuleApplied(1L, user1Transactions[0].uid, rule.uid)
+    dataHelper.createLastRuleApplied(1L, user1Transactions[1].uid, rule.uid)
+    dataHelper.createLastRuleApplied(1L, user1Transactions[2].uid, rule.uid)
 
     val doUpdate: (TypedId<TransactionId>, TypedId<CategoryId>?, Boolean) -> Unit =
       { transactionId, categoryId, confirmed ->
@@ -1130,26 +1132,26 @@ constructor(
       }
 
     // Categorize
-    doUpdate(user1Transactions[0].id, user1Categories[0].id, false)
+    doUpdate(user1Transactions[0].uid, user1Categories[0].uid, false)
     // Confirm
-    doUpdate(user1Transactions[1].id, null, true)
+    doUpdate(user1Transactions[1].uid, null, true)
     // Neither
-    doUpdate(user1Transactions[2].id, null, false)
+    doUpdate(user1Transactions[2].uid, null, false)
 
     entityManager.flushAndClear()
 
-    assertThat(lastRuleAppliedRepository.findByUserIdAndTransactionId(1L, user1Transactions[0].id))
+    assertThat(lastRuleAppliedRepository.findByUserIdAndTransactionId(1L, user1Transactions[0].uid))
       .isNull()
-    assertThat(lastRuleAppliedRepository.findByUserIdAndTransactionId(1L, user1Transactions[1].id))
+    assertThat(lastRuleAppliedRepository.findByUserIdAndTransactionId(1L, user1Transactions[1].uid))
       .isNull()
-    assertThat(lastRuleAppliedRepository.findByUserIdAndTransactionId(1L, user1Transactions[2].id))
+    assertThat(lastRuleAppliedRepository.findByUserIdAndTransactionId(1L, user1Transactions[2].uid))
       .isNotNull
   }
 
   @Test
   fun `deleteTransactions - clears last rule applied`() {
-    dataHelper.createLastRuleApplied(1L, user1Transactions[0].id, rule.id)
-    val request = DeleteTransactionsRequest(ids = setOf(user1Transactions[0].id))
+    dataHelper.createLastRuleApplied(1L, user1Transactions[0].uid, rule.uid)
+    val request = DeleteTransactionsRequest(ids = setOf(user1Transactions[0].uid))
 
     mockMvc
       .delete("/transactions") {
@@ -1160,7 +1162,7 @@ constructor(
       }
       .andExpect { status { isNoContent() } }
 
-    assertThat(lastRuleAppliedRepository.findByUserIdAndTransactionId(1L, user1Transactions[0].id))
+    assertThat(lastRuleAppliedRepository.findByUserIdAndTransactionId(1L, user1Transactions[0].uid))
       .isNull()
   }
 
@@ -1172,7 +1174,7 @@ constructor(
     entityManager.flushAndClear()
 
     mockMvc
-      .put("/transactions/${txn1.id}/notDuplicate") {
+      .put("/transactions/${txn1.uid}/notDuplicate") {
         secure = true
         header("Authorization", "Bearer $token")
       }
@@ -1181,7 +1183,7 @@ constructor(
     entityManager.flushAndClear()
 
     val txn1Duplicates =
-      transactionViewRepository.findAllDuplicates(txn1.id, 2L, PageRequest.of(0, 25))
+      transactionViewRepository.findAllDuplicates(txn1.uid, 2L, PageRequest.of(0, 25))
     assertThat(txn1Duplicates).hasSize(2)
   }
 
@@ -1190,7 +1192,7 @@ constructor(
     val txn = user1Transactions[0]
     val responseString =
       mockMvc
-        .get("/transactions/${txn.id}/details") {
+        .get("/transactions/${txn.uid}/details") {
           secure = true
           header("Authorization", "Bearer $token")
         }
@@ -1200,7 +1202,7 @@ constructor(
         .contentAsString
     val response = objectMapper.readValue(responseString, TransactionDetailsResponse::class.java)
     val expected =
-      transactionViewRepository.findById(txn.id).orElseThrow().let {
+      transactionViewRepository.findById(txn.uid).orElseThrow().let {
         TransactionDetailsResponse.from(it)
       }
     assertEquals(expected, response)
@@ -1210,7 +1212,7 @@ constructor(
   fun `getTransactionDetails - user does not have access`() {
     val txn = user2Transactions[0]
     mockMvc
-      .get("/transactions/${txn.id}/details") {
+      .get("/transactions/${txn.uid}/details") {
         secure = true
         header("Authorization", "Bearer $token")
       }

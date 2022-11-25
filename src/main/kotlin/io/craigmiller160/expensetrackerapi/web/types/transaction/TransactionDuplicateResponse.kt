@@ -15,7 +15,7 @@ data class TransactionDuplicateResponse(
   companion object {
     fun from(transaction: TransactionView): TransactionDuplicateResponse =
       TransactionDuplicateResponse(
-        id = transaction.id,
+        id = transaction.uid,
         confirmed = transaction.confirmed,
         created = transaction.created,
         updated = transaction.updated,

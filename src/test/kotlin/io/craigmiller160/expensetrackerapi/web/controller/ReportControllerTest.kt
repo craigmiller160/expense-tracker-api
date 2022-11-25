@@ -45,22 +45,22 @@ constructor(
     val month2 = LocalDate.of(2022, 2, 1)
 
     val txn1 =
-      dataHelper.createTransaction(1L, cat1.id).let {
+      dataHelper.createTransaction(1L, cat1.uid).let {
         transactionRepository.save(it.apply { expenseDate = month1.plusDays(1) })
       }
     val txn2 =
-      dataHelper.createTransaction(1L, cat2.id).let {
+      dataHelper.createTransaction(1L, cat2.uid).let {
         transactionRepository.save(it.apply { expenseDate = month1.plusDays(2) })
       }
     val txn3 =
-      dataHelper.createTransaction(1L, cat1.id).let {
+      dataHelper.createTransaction(1L, cat1.uid).let {
         transactionRepository.save(it.apply { expenseDate = month2.plusDays(3) })
       }
     val txn4 =
-      dataHelper.createTransaction(1L, cat2.id).let {
+      dataHelper.createTransaction(1L, cat2.uid).let {
         transactionRepository.save(it.apply { expenseDate = month2.plusDays(4) })
       }
-    dataHelper.createTransaction(2L, cat3.id).let {
+    dataHelper.createTransaction(2L, cat3.uid).let {
       transactionRepository.save(it.apply { expenseDate = month1.plusDays(5) })
     }
     val txn6 =
@@ -68,11 +68,11 @@ constructor(
         transactionRepository.save(it.apply { expenseDate = month1.plusDays(6) })
       }
     val txn7 =
-      dataHelper.createTransaction(1L, cat5.id).let {
+      dataHelper.createTransaction(1L, cat5.uid).let {
         transactionRepository.save(it.apply { expenseDate = month1.plusDays(7) })
       }
     val txn8 =
-      dataHelper.createTransaction(1L, cat4.id).let {
+      dataHelper.createTransaction(1L, cat4.uid).let {
         transactionRepository.save(it.apply { expenseDate = month1.plusDays(8) })
       }
 

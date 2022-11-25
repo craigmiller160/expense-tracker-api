@@ -45,7 +45,7 @@ constructor(
       autoCategorizeRuleRepository.saveAndFlush(
         AutoCategorizeRule(
           userId = 1L,
-          categoryId = category.id,
+          categoryId = category.uid,
           ordinal = 1,
           regex = ".*",
           startDate = LocalDate.of(2022, 1, 1),
@@ -54,7 +54,7 @@ constructor(
           maxAmount = BigDecimal("20")))
     val lastApplied =
       lastRuleAppliedRepository.saveAndFlush(
-        LastRuleApplied(userId = 1L, transactionId = transaction.id, ruleId = rule.id))
+        LastRuleApplied(userId = 1L, transactionId = transaction.uid, ruleId = rule.uid))
     return rule to lastApplied
   }
 
@@ -64,9 +64,9 @@ constructor(
 
     val response =
       LastRuleAppliedResponse(
-        id = lastApplied.id,
-        ruleId = rule.id,
-        transactionId = transaction.id,
+        id = lastApplied.uid,
+        ruleId = rule.uid,
+        transactionId = transaction.uid,
         categoryId = rule.categoryId,
         ordinal = rule.ordinal,
         regex = rule.regex,
@@ -76,7 +76,7 @@ constructor(
         maxAmount = rule.maxAmount)
 
     mockMvc
-      .get("/transactions/rules/last-applied/${transaction.id}") {
+      .get("/transactions/rules/last-applied/${transaction.uid}") {
         secure = true
         header("Authorization", "Bearer $token")
       }
@@ -89,7 +89,7 @@ constructor(
   @Test
   fun `getLastAppliedRuleForTransaction - last applied does not exist`() {
     mockMvc
-      .get("/transactions/rules/last-applied/${transaction.id}") {
+      .get("/transactions/rules/last-applied/${transaction.uid}") {
         secure = true
         header("Authorization", "Bearer $token")
       }

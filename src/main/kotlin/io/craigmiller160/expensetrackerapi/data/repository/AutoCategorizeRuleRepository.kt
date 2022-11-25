@@ -13,9 +13,9 @@ interface AutoCategorizeRuleRepository :
   AutoCategorizeRuleRepositoryCustom {
   fun countAllByUserId(userId: Long): Long
 
-  fun findByIdAndUserId(id: TypedId<AutoCategorizeRuleId>, userId: Long): AutoCategorizeRule?
+  fun findByUidAndUserId(id: TypedId<AutoCategorizeRuleId>, userId: Long): AutoCategorizeRule?
 
-  fun deleteByIdAndUserId(id: TypedId<AutoCategorizeRuleId>, userId: Long)
+  fun deleteByUidAndUserId(id: TypedId<AutoCategorizeRuleId>, userId: Long)
 
   fun streamAllByUserIdOrderByOrdinal(userId: Long): Stream<AutoCategorizeRule>
 
