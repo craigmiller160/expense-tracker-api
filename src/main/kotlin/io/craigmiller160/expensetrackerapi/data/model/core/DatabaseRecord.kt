@@ -12,7 +12,9 @@ import org.springframework.data.domain.Persistable
 
 @MappedSuperclass
 @TypeDef(defaultForType = TypedId::class, typeClass = TypedIdJpaType::class)
-abstract class DatabaseRecord<T> : Persistable<TypedId<T>> {
+abstract class DatabaseRecord<T> :
+  Persistable<
+    TypedId<T>> { // TODO try removing Persistable and then renaming ID column if that still works
   // TODO rename this, then rename the DB columns to match
   @Id @Column(name = "id") var recordId: TypedId<T> = TypedId()
   @Transient var _isNew: Boolean = true
