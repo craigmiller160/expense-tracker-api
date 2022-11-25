@@ -2,7 +2,6 @@ package io.craigmiller160.expensetrackerapi.data.model.core
 
 import java.time.ZonedDateTime
 import javax.persistence.MappedSuperclass
-import javax.persistence.PreUpdate
 import javax.persistence.Version
 
 @MappedSuperclass
@@ -15,8 +14,8 @@ abstract class MutableTableEntity<T> : TableEntity<T>() {
     updated = ZonedDateTime.now()
   }
 
-  @PreUpdate
-  open fun onPreUpdate() {
+  override fun onPreUpdate() {
+    super.onPreUpdate()
     updated = ZonedDateTime.now()
   }
 }

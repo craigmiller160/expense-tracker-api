@@ -16,11 +16,21 @@ abstract class DatabaseRecord<T> : Persistable<TypedId<T>> {
 
   override fun isNew(): Boolean = innerIsNew
 
-  @PrePersist
-  @PostLoad
-  fun handleIsNew() {
+  private fun handleIsNew() {
     innerIsNew = false
   }
+
+  @PrePersist
+  open fun onPrePersist() {
+    handleIsNew()
+  }
+
+  @PostLoad
+  open fun onPostLoad() {
+    handleIsNew()
+  }
+
+  @PreUpdate open fun onPreUpdate() {}
 
   override fun equals(other: Any?): Boolean {
     if (other !is TableEntity<*>) return false
