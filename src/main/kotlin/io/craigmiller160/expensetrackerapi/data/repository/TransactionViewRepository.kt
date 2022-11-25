@@ -26,10 +26,10 @@ interface TransactionViewRepository : JpaRepository<TransactionView, TypedId<Tra
     WHERE t1.contentHash IN (
         SELECT t2.contentHash
         FROM TransactionView t2
-        WHERE t2.recordId = :transactionId
+        WHERE t2.uid = :transactionId
         AND t2.userId = :userId
     )
-    AND t1.recordId <> :transactionId
+    AND t1.uid <> :transactionId
     AND t1.userId = :userId
   """)
   fun findAllDuplicates(

@@ -109,15 +109,15 @@ constructor(
         .andExpect { status { isNoContent() } }
     }
 
-    action(cat1.recordId)
-    action(cat2.recordId)
+    action(cat1.uid)
+    action(cat2.uid)
 
-    val dbCat1 = categoryRepository.findById(cat1.recordId).orElseThrow()
+    val dbCat1 = categoryRepository.findById(cat1.uid).orElseThrow()
     assertThat(dbCat1)
       .hasFieldOrPropertyWithValue("name", "Category B")
       .hasFieldOrPropertyWithValue("color", StringToColor.get(request.name))
 
-    val dbCat2 = categoryRepository.findById(cat2.recordId).orElseThrow()
+    val dbCat2 = categoryRepository.findById(cat2.uid).orElseThrow()
     assertThat(dbCat2)
       .hasFieldOrPropertyWithValue("name", "Category 2")
       .hasFieldOrPropertyWithValue("color", StringToColor.get(cat2.name))
@@ -128,8 +128,8 @@ constructor(
     val cat1 = dataHelper.createCategory(1L, "Category 1")
     val cat2 = dataHelper.createCategory(2L, "Category 2")
     val cat3 = dataHelper.createCategory(3L, "Category 3")
-    val txn1 = dataHelper.createTransaction(1L, cat1.recordId)
-    val txn2 = dataHelper.createTransaction(1L, cat3.recordId)
+    val txn1 = dataHelper.createTransaction(1L, cat1.uid)
+    val txn2 = dataHelper.createTransaction(1L, cat3.uid)
 
     val action: (TypedId<CategoryId>) -> Unit = { id ->
       mockMvc
@@ -140,18 +140,18 @@ constructor(
         .andExpect { status { isNoContent() } }
     }
 
-    action(cat1.recordId)
-    action(cat2.recordId)
+    action(cat1.uid)
+    action(cat2.uid)
 
-    assertThat(categoryRepository.findById(cat1.recordId)).isEmpty
-    assertThat(categoryRepository.findById(cat2.recordId)).isPresent
-    assertThat(transactionRepository.findById(txn1.recordId))
+    assertThat(categoryRepository.findById(cat1.uid)).isEmpty
+    assertThat(categoryRepository.findById(cat2.uid)).isPresent
+    assertThat(transactionRepository.findById(txn1.uid))
       .isPresent
       .get()
       .hasFieldOrPropertyWithValue("categoryId", null)
-    assertThat(transactionRepository.findById(txn2.recordId))
+    assertThat(transactionRepository.findById(txn2.uid))
       .isPresent
       .get()
-      .hasFieldOrPropertyWithValue("categoryId", cat3.recordId)
+      .hasFieldOrPropertyWithValue("categoryId", cat3.uid)
   }
 }

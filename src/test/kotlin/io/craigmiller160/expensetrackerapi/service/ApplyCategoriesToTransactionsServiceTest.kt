@@ -61,21 +61,19 @@ constructor(
     val txn5 = createTransaction("Target", LocalDate.of(2022, 1, 1), BigDecimal("20"))
     val txn6 =
       createTransaction("Universe", LocalDate.now(), BigDecimal("10")).let {
-        transactionRepository.save(it.apply { categoryId = cat6.recordId })
+        transactionRepository.save(it.apply { categoryId = cat6.uid })
       }
 
     transactions = listOf(txn0, txn1, txn2, txn3, txn4, txn5, txn6)
 
-    val rule0 = createRule(categoryId = cat2.recordId, regex = "Target")
-    val rule1 =
-      createRule(categoryId = cat0.recordId, regex = "Target", minAmount = BigDecimal("90"))
-    val rule2 =
-      createRule(categoryId = cat1.recordId, regex = "Target", maxAmount = BigDecimal("15"))
-    val rule3 = createRule(categoryId = cat5.recordId, regex = "AMC.*")
+    val rule0 = createRule(categoryId = cat2.uid, regex = "Target")
+    val rule1 = createRule(categoryId = cat0.uid, regex = "Target", minAmount = BigDecimal("90"))
+    val rule2 = createRule(categoryId = cat1.uid, regex = "Target", maxAmount = BigDecimal("15"))
+    val rule3 = createRule(categoryId = cat5.uid, regex = "AMC.*")
     val rule4 =
-      createRule(categoryId = cat3.recordId, regex = "AMC.*", startDate = LocalDate.of(2022, 11, 1))
+      createRule(categoryId = cat3.uid, regex = "AMC.*", startDate = LocalDate.of(2022, 11, 1))
     val rule5 =
-      createRule(categoryId = cat4.recordId, regex = "AMC.*", endDate = LocalDate.of(2022, 4, 1))
+      createRule(categoryId = cat4.uid, regex = "AMC.*", endDate = LocalDate.of(2022, 4, 1))
     rules = listOf(rule0, rule1, rule2, rule3, rule4, rule5)
   }
 
@@ -110,8 +108,7 @@ constructor(
   @Test
   fun applyCategoriesToTransactions() {
     lastRuleAppliedRepository.saveAndFlush(
-      LastRuleApplied(
-        userId = 1L, ruleId = rules[0].recordId, transactionId = transactions[6].recordId))
+      LastRuleApplied(userId = 1L, ruleId = rules[0].uid, transactionId = transactions[6].uid))
     val result =
       applyCategoriesToTransactionsService
         .applyCategoriesToTransactions(1L, transactions)
@@ -119,12 +116,12 @@ constructor(
 
     entityManager.flushAndClear()
 
-    validateCategoryApplied(transactions[1], categories[0].recordId, rules[1].recordId)
-    validateCategoryApplied(transactions[0], categories[1].recordId, rules[2].recordId)
-    validateCategoryApplied(transactions[5], categories[2].recordId, rules[0].recordId)
-    validateCategoryApplied(transactions[4], categories[3].recordId, rules[4].recordId)
-    validateCategoryApplied(transactions[2], categories[4].recordId, rules[5].recordId)
-    validateCategoryApplied(transactions[3], categories[5].recordId, rules[3].recordId)
+    validateCategoryApplied(transactions[1], categories[0].uid, rules[1].uid)
+    validateCategoryApplied(transactions[0], categories[1].uid, rules[2].uid)
+    validateCategoryApplied(transactions[5], categories[2].uid, rules[0].uid)
+    validateCategoryApplied(transactions[4], categories[3].uid, rules[4].uid)
+    validateCategoryApplied(transactions[2], categories[4].uid, rules[5].uid)
+    validateCategoryApplied(transactions[3], categories[5].uid, rules[3].uid)
     validateCategoryApplied(transactions[6], null, null)
   }
 
@@ -133,16 +130,15 @@ constructor(
     categoryId: TypedId<CategoryId>?,
     ruleId: TypedId<AutoCategorizeRuleId>?
   ) {
-    assertThat(transactionRepository.findById(txn.recordId))
+    assertThat(transactionRepository.findById(txn.uid))
       .isPresent
       .get()
       .hasFieldOrPropertyWithValue("categoryId", categoryId)
     ruleId?.let { nonNullRuleId ->
-      assertThat(lastRuleAppliedRepository.findByUserIdAndTransactionId(1L, txn.recordId))
+      assertThat(lastRuleAppliedRepository.findByUserIdAndTransactionId(1L, txn.uid))
         .isNotNull
         .hasFieldOrPropertyWithValue("ruleId", nonNullRuleId)
     }
-      ?: assertThat(lastRuleAppliedRepository.findByUserIdAndTransactionId(1L, txn.recordId))
-        .isNull()
+      ?: assertThat(lastRuleAppliedRepository.findByUserIdAndTransactionId(1L, txn.uid)).isNull()
   }
 }
