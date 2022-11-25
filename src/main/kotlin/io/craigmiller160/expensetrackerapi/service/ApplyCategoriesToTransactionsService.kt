@@ -97,13 +97,19 @@ class ApplyCategoriesToTransactionsService(
     userId: Long,
     context: TransactionRuleContext
   ): TryEither<List<Transaction>> =
-    Either.catch {
-      lastRuleAppliedRepository.saveAllAndFlush(
-        context.lastRulesApplied.map {
-          LastRuleApplied(userId = userId, transactionId = it.key, ruleId = it.value)
-        })
-      transactionRepository.saveAllAndFlush(context.allTransactions)
-    }
+    Either.catch { transactionRepository.saveAllAndFlush(context.allTransactions) }
+      .flatMap { transactions ->
+        deleteLastRuleAppliedForTransactions(userId, transactions.map { it.id }).map {
+          transactions
+        }
+      }
+      .flatMapCatch { transactions ->
+        lastRuleAppliedRepository.saveAllAndFlush(
+          context.lastRulesApplied.map {
+            LastRuleApplied(userId = userId, transactionId = it.key, ruleId = it.value)
+          })
+        transactions
+      }
 
   /** This returns the transactions in a different order from the method. */
   fun applyCategoriesToTransactions(
@@ -113,8 +119,7 @@ class ApplyCategoriesToTransactionsService(
     log.debug("Starting to apply categories to batch of transactions for user $userId")
     val start = System.nanoTime()
     val categoryLessTransactions = transactions.map { it.apply { categoryId = null } }
-    return deleteLastRuleAppliedForTransactions(userId, categoryLessTransactions.map { it.id })
-      .flatMapCatch {
+    return Either.catch {
         autoCategorizeRuleRepository.streamAllByUserIdOrderByOrdinal(userId).use { ruleStream ->
           ruleStream
             .map { TransactionRuleContext.forCurrentRule(it) }
