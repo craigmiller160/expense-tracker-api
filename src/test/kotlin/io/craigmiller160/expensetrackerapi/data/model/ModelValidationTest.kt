@@ -51,6 +51,7 @@ constructor(
 
     assertThat(resident.created).isAfterOrEqualTo(NOW)
     assertThat(resident.updated).isAfterOrEqualTo(resident.created)
+    val originalUpdated = resident.updated
 
     val dbResident = residentRepository.findById(resident.recordId).orElseThrow()
     assertThat(dbResident).isEqualTo(resident)
@@ -65,7 +66,7 @@ constructor(
 
     val dbResident2 = residentRepository.findById(resident.recordId).orElseThrow()
     assertThat(dbResident2.name).isEqualTo(newResident.name)
-    assertThat(dbResident2.updated).isAfter(resident.updated)
+    assertThat(dbResident2.updated).isAfter(originalUpdated)
     assertThat(dbResident2.version).isEqualTo(2)
   }
 }
