@@ -17,7 +17,6 @@ import io.craigmiller160.expensetrackerapi.data.repository.CategoryRepository
 import io.craigmiller160.expensetrackerapi.data.repository.LastRuleAppliedRepository
 import io.craigmiller160.expensetrackerapi.data.repository.TransactionRepository
 import io.craigmiller160.expensetrackerapi.data.repository.TransactionViewRepository
-import io.craigmiller160.expensetrackerapi.extension.detachAndReturn
 import io.craigmiller160.expensetrackerapi.function.TryEither
 import io.craigmiller160.expensetrackerapi.function.flatMapCatch
 import io.craigmiller160.expensetrackerapi.web.types.transaction.*
@@ -164,7 +163,6 @@ class TransactionService(
         val oldTransaction =
           Either.catch { transactionRepository.findByRecordIdAndUserId(transactionId, userId) }
             .leftIfNull { BadRequestException("No transaction with ID: $transactionId") }
-            .flatMapCatch { entityManager.detachAndReturn(it) }
             .bind()
         val validCategoryId =
           Either.catch {
