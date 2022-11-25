@@ -6,8 +6,7 @@ import javax.persistence.Column
 import javax.persistence.Id
 import javax.persistence.MappedSuperclass
 import javax.persistence.PostLoad
-import javax.persistence.PostPersist
-import javax.persistence.PostUpdate
+import javax.persistence.PrePersist
 import org.hibernate.annotations.TypeDef
 import org.springframework.data.domain.Persistable
 
@@ -16,16 +15,15 @@ import org.springframework.data.domain.Persistable
 abstract class DatabaseRecord<T> : Persistable<TypedId<T>> {
   // TODO rename this, then rename the DB columns to match
   @Id @Column(name = "id") var recordId: TypedId<T> = TypedId()
-  @Transient var isPersisted: Boolean = false
+  @Transient var _isNew: Boolean = true
 
   override fun getId(): TypedId<T> = recordId
-  override fun isNew(): Boolean = !isPersisted
+  override fun isNew(): Boolean = _isNew
 
-  @PostPersist
+  @PrePersist
   @PostLoad
-  @PostUpdate
   fun handleIsPersisted() {
-    isPersisted = true
+    _isNew = false
   }
 
   override fun equals(other: Any?): Boolean {
