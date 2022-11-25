@@ -24,7 +24,7 @@ data class LastRuleAppliedResponse(
   companion object {
     fun from(lastRule: LastRuleAppliedForTransaction): LastRuleAppliedResponse =
       LastRuleAppliedResponse(
-        id = lastRule.id,
+        id = lastRule.uid,
         ruleId = lastRule.ruleId,
         transactionId = lastRule.transactionId,
         categoryId = lastRule.categoryId,

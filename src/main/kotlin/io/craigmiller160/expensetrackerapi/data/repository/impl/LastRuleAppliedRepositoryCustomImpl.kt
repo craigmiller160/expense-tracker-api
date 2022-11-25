@@ -28,7 +28,7 @@ class LastRuleAppliedRepositoryCustomImpl(
     val results =
       jdbcTemplate.query(sql, params) { rs, _ ->
         LastRuleAppliedForTransaction(
-          id = rs.getTypedId("id"),
+          uid = rs.getTypedId("uid"),
           ruleId = rs.getTypedId("rule_id"),
           transactionId = rs.getTypedId("transaction_id"),
           userId = rs.getLong("user_id"),

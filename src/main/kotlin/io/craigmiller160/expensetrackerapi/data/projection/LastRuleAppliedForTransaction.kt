@@ -9,7 +9,7 @@ import java.math.BigDecimal
 import java.time.LocalDate
 
 data class LastRuleAppliedForTransaction(
-  val id: TypedId<LastRuleAppliedId>,
+  val uid: TypedId<LastRuleAppliedId>,
   val ruleId: TypedId<AutoCategorizeRuleId>,
   val transactionId: TypedId<TransactionId>,
   val userId: Long,
