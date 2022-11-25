@@ -87,7 +87,7 @@ class ApplyCategoriesToTransactionsService(
     val (_, _, rule) = singleRuleContext
     val (matches, noMatches) = fullContext.allTransactions.partition { doesRuleApply(it, rule) }
     val matchesWithCategories = matches.map { it.apply { categoryId = rule.categoryId } }
-    val lastMatchingRules = matches.associate { it.id to rule.id }
+    val lastMatchingRules = matches.associate { it.recordId to rule.recordId }
     return fullContext.copy(
       allTransactions = matchesWithCategories + noMatches,
       lastRulesApplied = fullContext.lastRulesApplied + lastMatchingRules)
@@ -99,7 +99,7 @@ class ApplyCategoriesToTransactionsService(
   ): TryEither<List<Transaction>> =
     Either.catch { transactionRepository.saveAllAndFlush(context.allTransactions) }
       .flatMap { transactions ->
-        deleteLastRuleAppliedForTransactions(userId, transactions.map { it.id }).map {
+        deleteLastRuleAppliedForTransactions(userId, transactions.map { it.recordId }).map {
           transactions
         }
       }

@@ -133,13 +133,14 @@ class TransactionService(
           description = request.description,
           amount = request.amount,
           confirmed = true,
-          categoryId = validCategory?.id)
+          categoryId = validCategory?.recordId)
       val dbTransaction = transactionRepository.saveAndFlush(transaction)
       transactionViewRepository
-        .findById(dbTransaction.id)
+        .findById(dbTransaction.recordId)
         .map { TransactionResponse.from(it) }
         .orElseThrow {
-          IllegalStateException("Cannot find created transaction in database: ${dbTransaction.id}")
+          IllegalStateException(
+            "Cannot find created transaction in database: ${dbTransaction.recordId}")
         }
     }
   }
@@ -166,7 +167,9 @@ class TransactionService(
             .bind()
         val validCategoryId =
           Either.catch {
-              request.categoryId?.let { categoryRepository.findByRecordIdAndUserId(it, userId) }?.id
+              request.categoryId
+                ?.let { categoryRepository.findByRecordIdAndUserId(it, userId) }
+                ?.recordId
             }
             .bind()
         val oldValues =
@@ -188,7 +191,7 @@ class TransactionService(
         if (oldValues.categoryId != newTransaction.categoryId ||
           oldValues.confirmed != newTransaction.confirmed) {
           lastRuleAppliedRepository.deleteAllByUserIdAndTransactionIdIn(
-            userId, listOf(newTransaction.id))
+            userId, listOf(newTransaction.recordId))
         }
       }
       .map { Unit }
@@ -220,7 +223,9 @@ class TransactionService(
   }
 
   private fun getCategoryMap(userId: Long): TryEither<Map<TypedId<CategoryId>, Category>> =
-    Either.catch { categoryRepository.findAllByUserIdOrderByName(userId).associateBy { it.id } }
+    Either.catch {
+      categoryRepository.findAllByUserIdOrderByName(userId).associateBy { it.recordId }
+    }
 
   fun getTransactionDetails(
     transactionId: TypedId<TransactionId>

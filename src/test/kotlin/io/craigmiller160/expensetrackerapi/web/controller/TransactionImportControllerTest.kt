@@ -182,7 +182,7 @@ constructor(
   @Test
   fun `importTransactions - DISCOVER_CSV, with auto-categorization rules`() {
     val category = dataHelper.createCategory(1L, "Hello")
-    dataHelper.createRule(1L, category.id)
+    dataHelper.createRule(1L, category.recordId)
 
     ResourceUtils.getResourceBytes("data/discover1.csv")
       .flatMap { bytes ->
@@ -206,7 +206,7 @@ constructor(
 
     val transactions = transactionRepository.findAllByUserIdOrderByExpenseDateAscDescriptionAsc(1L)
     val expectedSize = 57
-    val expectedCategoryIds = (1..expectedSize).map { category.id }
+    val expectedCategoryIds = (1..expectedSize).map { category.recordId }
     assertThat(transactions)
       .hasSize(expectedSize)
       .extracting("categoryId")

@@ -85,7 +85,7 @@ class AutoCategorizeRuleService(
           rule
         }
       }
-      .flatMap { getRuleViewIfValid(it.id, userId) }
+      .flatMap { getRuleViewIfValid(it.recordId, userId) }
       .map { AutoCategorizeRuleResponse.from(it) }
   }
 
@@ -137,7 +137,7 @@ class AutoCategorizeRuleService(
           ?: Either.Right(rule to rule.ordinal)
       }
       .flatMap { (rule, oldOrdinal) ->
-        changeOtherRuleOrdinals(userId, oldOrdinal, rule.ordinal, rule.id).map { rule }
+        changeOtherRuleOrdinals(userId, oldOrdinal, rule.ordinal, rule.recordId).map { rule }
       }
       .flatMapCatch { autoCategorizeRuleRepository.save(it) }
       .flatMap { rule ->
@@ -145,7 +145,7 @@ class AutoCategorizeRuleService(
           rule
         }
       }
-      .flatMap { getRuleViewIfValid(it.id, userId) }
+      .flatMap { getRuleViewIfValid(it.recordId, userId) }
       .map { AutoCategorizeRuleResponse.from(it) }
   }
 

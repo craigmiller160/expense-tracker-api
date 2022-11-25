@@ -23,7 +23,7 @@ data class TransactionDetailsResponse(
   companion object {
     fun from(transaction: TransactionView): TransactionDetailsResponse =
       TransactionDetailsResponse(
-        id = transaction.id,
+        id = transaction.recordId,
         expenseDate = transaction.expenseDate,
         description = transaction.description,
         amount = transaction.amount,

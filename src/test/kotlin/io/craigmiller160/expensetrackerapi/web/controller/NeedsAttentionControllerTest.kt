@@ -58,7 +58,7 @@ constructor(
         if (index % 2 == 0) {
           transactionRepository.saveAndFlush(
             transaction.apply {
-              categoryId = user1Categories[index % 3].id
+              categoryId = user1Categories[index % 3].recordId
               confirmed = true
             })
         } else {
@@ -66,7 +66,7 @@ constructor(
         }
       }
     user2Transactions = user2Txns
-    user1CategoriesMap = user1Categories.associateBy { it.id }
+    user1CategoriesMap = user1Categories.associateBy { it.recordId }
   }
 
   @Test
@@ -100,7 +100,7 @@ constructor(
       transactionRepository.saveAndFlush(
         txn.apply {
           confirmed = true
-          categoryId = user1Categories[0].id
+          categoryId = user1Categories[0].recordId
         })
     }
     val response =
