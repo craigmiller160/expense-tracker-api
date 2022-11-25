@@ -983,7 +983,7 @@ constructor(
     assertThat(txn1Duplicates).isEmpty()
     val txn2Duplicates =
       transactionViewRepository.findAllDuplicates(txn2.uid, 1L, PageRequest.of(0, 25))
-    assertThat(txn2Duplicates).hasSize(1).extracting("recordId").contains(txn3.uid)
+    assertThat(txn2Duplicates).hasSize(1).extracting("uid").contains(txn3.uid)
   }
 
   @Test
