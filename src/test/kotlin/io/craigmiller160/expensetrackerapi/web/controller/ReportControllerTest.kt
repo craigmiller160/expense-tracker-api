@@ -188,6 +188,11 @@ constructor(
   }
 
   @Test
+  fun getReports_excludeCategory_noRecordsForMonth() {
+    TODO()
+  }
+
+  @Test
   fun getReports_excludeCategory() {
     val response =
       expectedResponse.copy(
