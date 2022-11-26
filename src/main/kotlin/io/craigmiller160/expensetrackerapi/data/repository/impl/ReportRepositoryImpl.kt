@@ -70,7 +70,9 @@ class ReportRepositoryImpl(
     excludeCategoryIds: List<UUID>
   ): List<SpendingByCategory> {
     val getSpendingByCategoryForMonthSql =
-      sqlLoader.loadSql("reports/get_spending_by_category_for_month.sql")
+      sqlLoader
+        .loadSqlMustacheTemplate("reports/get_spending_by_category_for_month.sql")
+        .let(executeMustacheTemplate(excludeCategoryIds))
     val finalWrapper =
       months
         .mapIndexed { index, month ->
@@ -109,7 +111,9 @@ class ReportRepositoryImpl(
 
   private fun getSpendingByMonthCount(userId: Long, excludeCategoryIds: List<UUID>): Long {
     val getSpendingByMonthCountSql =
-      sqlLoader.loadSql("reports/get_total_spending_by_month_count.sql")
+      sqlLoader
+        .loadSqlMustacheTemplate("reports/get_total_spending_by_month_count.sql")
+        .let(executeMustacheTemplate(excludeCategoryIds))
     val params =
       MapSqlParameterSource()
         .addValue("userId", userId)
