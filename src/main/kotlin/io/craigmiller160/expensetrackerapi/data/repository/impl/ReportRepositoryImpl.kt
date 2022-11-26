@@ -83,7 +83,7 @@ class ReportRepositoryImpl(
       MapSqlParameterSource()
         .addValues(finalWrapper.params)
         .addValue("userId", userId)
-        .addValue("excludeCategoryIds", excludeCategoryIds)
+        .addValue("excludeCategoryIds", excludeCategoryIds.map { it.uuid })
     return jdbcTemplate.query(finalWrapper.sql, params) { rs, _ ->
       SpendingByCategory(
         month = rs.getDate("month").toLocalDate(),
