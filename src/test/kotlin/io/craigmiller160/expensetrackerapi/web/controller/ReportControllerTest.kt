@@ -178,4 +178,9 @@ constructor(
         content { json(objectMapper.writeValueAsString(response), true) }
       }
   }
+
+  @Test
+  fun getReports_excludeCategory() {
+    TODO()
+  }
 }
