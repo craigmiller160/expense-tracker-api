@@ -1,13 +1,12 @@
 package io.craigmiller160.expensetrackerapi.data.repository.impl
 
-import io.craigmiller160.expensetrackerapi.common.data.typedid.TypedId
-import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.CategoryId
 import io.craigmiller160.expensetrackerapi.data.SqlLoader
 import io.craigmiller160.expensetrackerapi.data.projection.SpendingByCategory
 import io.craigmiller160.expensetrackerapi.data.projection.SpendingByMonth
 import io.craigmiller160.expensetrackerapi.data.repository.ReportRepository
 import io.craigmiller160.expensetrackerapi.web.types.report.ReportRequest
 import java.time.LocalDate
+import java.util.UUID
 import javax.transaction.Transactional
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageImpl
@@ -26,14 +25,14 @@ class ReportRepositoryImpl(
     userId: Long,
     request: ReportRequest
   ): Page<SpendingByMonth> {
-    val spendingByMonth = getSpendingByMonth(userId, request)
+    val categoryUUIDs = request.excludeCategoryIds.map { it.uuid }
+    val spendingByMonth = getSpendingByMonth(userId, request, categoryUUIDs)
     val spendingByMonthCount = getSpendingByMonthCount(userId)
     val months = spendingByMonth.map { it.month }
 
     val fullResults =
       if (months.isNotEmpty()) {
-        val spendingByCategory =
-          getSpendingByCategoryForMonths(userId, months, request.excludeCategoryIds)
+        val spendingByCategory = getSpendingByCategoryForMonths(userId, months, categoryUUIDs)
         spendingByMonth.map { monthRecord ->
           monthRecord.copy(
             categories =
@@ -53,7 +52,7 @@ class ReportRepositoryImpl(
   private fun getSpendingByCategoryForMonths(
     userId: Long,
     months: List<LocalDate>,
-    excludeCategoryIds: List<TypedId<CategoryId>>
+    excludeCategoryIds: List<UUID>
   ): List<SpendingByCategory> {
     val getSpendingByCategoryForMonthSql =
       sqlLoader.loadSql("reports/get_spending_by_category_for_month.sql")
@@ -83,7 +82,7 @@ class ReportRepositoryImpl(
       MapSqlParameterSource()
         .addValues(finalWrapper.params)
         .addValue("userId", userId)
-        .addValue("excludeCategoryIds", excludeCategoryIds.map { it.uuid })
+        .addValue("excludeCategoryIds", excludeCategoryIds)
     return jdbcTemplate.query(finalWrapper.sql, params) { rs, _ ->
       SpendingByCategory(
         month = rs.getDate("month").toLocalDate(),
@@ -102,11 +101,16 @@ class ReportRepositoryImpl(
 
   private data class SpendingByCategoryQueryWrapper(val params: Map<String, Any>, val sql: String)
 
-  private fun getSpendingByMonth(userId: Long, request: ReportRequest): List<SpendingByMonth> {
+  private fun getSpendingByMonth(
+    userId: Long,
+    request: ReportRequest,
+    excludeCategoryIds: List<UUID>
+  ): List<SpendingByMonth> {
     val getTotalSpendingByMonthSql = sqlLoader.loadSql("reports/get_total_spending_by_month.sql")
     val totalSpendingByMonthParams =
       MapSqlParameterSource()
         .addValue("userId", userId)
+        .addValue("excludedCategoryIds", excludeCategoryIds)
         .addValue("offset", request.pageNumber * request.pageSize)
         .addValue("limit", request.pageSize)
     return jdbcTemplate.query(getTotalSpendingByMonthSql, totalSpendingByMonthParams) { rs, _ ->
