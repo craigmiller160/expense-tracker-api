@@ -15,6 +15,13 @@ import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.stereotype.Repository
 
+private fun addExcludeCategoryIdsParam(
+  excludeCategoryIds: List<UUID>
+): (MapSqlParameterSource) -> MapSqlParameterSource = { params ->
+  val paramValue = excludeCategoryIds.ifEmpty { "" }
+  params.addValue("excludeCategoryIds", paramValue)
+}
+
 @Repository
 class ReportRepositoryImpl(
   private val jdbcTemplate: NamedParameterJdbcTemplate,
@@ -82,7 +89,7 @@ class ReportRepositoryImpl(
       MapSqlParameterSource()
         .addValues(finalWrapper.params)
         .addValue("userId", userId)
-        .addValue("excludeCategoryIds", excludeCategoryIds)
+        .let(addExcludeCategoryIdsParam(excludeCategoryIds))
     return jdbcTemplate.query(finalWrapper.sql, params) { rs, _ ->
       SpendingByCategory(
         month = rs.getDate("month").toLocalDate(),
@@ -98,7 +105,7 @@ class ReportRepositoryImpl(
     val params =
       MapSqlParameterSource()
         .addValue("userId", userId)
-        .addValue("excludeCategoryIds", excludeCategoryIds)
+        .let(addExcludeCategoryIdsParam(excludeCategoryIds))
     return jdbcTemplate.queryForObject(getSpendingByMonthCountSql, params, Long::class.java)!!
   }
 
@@ -113,9 +120,9 @@ class ReportRepositoryImpl(
     val totalSpendingByMonthParams =
       MapSqlParameterSource()
         .addValue("userId", userId)
-        .addValue("excludedCategoryIds", excludeCategoryIds)
         .addValue("offset", request.pageNumber * request.pageSize)
         .addValue("limit", request.pageSize)
+        .let(addExcludeCategoryIdsParam(excludeCategoryIds))
     return jdbcTemplate.query(getTotalSpendingByMonthSql, totalSpendingByMonthParams) { rs, _ ->
       SpendingByMonth(
         month = rs.getDate("month").toLocalDate(),
