@@ -2,6 +2,7 @@ package io.craigmiller160.expensetrackerapi.web.controller
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.craigmiller160.expensetrackerapi.data.model.Category
+import io.craigmiller160.expensetrackerapi.data.model.Transaction
 import io.craigmiller160.expensetrackerapi.data.repository.ReportRepository
 import io.craigmiller160.expensetrackerapi.data.repository.TransactionRepository
 import io.craigmiller160.expensetrackerapi.extension.flushAndClear
@@ -33,6 +34,7 @@ constructor(
 
   private lateinit var expectedResponse: ReportPageResponse
   private lateinit var categories: List<Category>
+  private lateinit var transactions: List<Transaction>
 
   @BeforeEach
   fun setup() {
@@ -63,9 +65,10 @@ constructor(
       dataHelper.createTransaction(1L, cat2.uid).let {
         transactionRepository.save(it.apply { expenseDate = month2.plusDays(4) })
       }
-    dataHelper.createTransaction(2L, cat3.uid).let {
-      transactionRepository.save(it.apply { expenseDate = month1.plusDays(5) })
-    }
+    val txn5 =
+      dataHelper.createTransaction(2L, cat3.uid).let {
+        transactionRepository.save(it.apply { expenseDate = month1.plusDays(5) })
+      }
     val txn6 =
       dataHelper.createTransaction(1L).let {
         transactionRepository.save(it.apply { expenseDate = month1.plusDays(6) })
@@ -78,6 +81,7 @@ constructor(
       dataHelper.createTransaction(1L, cat4.uid).let {
         transactionRepository.save(it.apply { expenseDate = month1.plusDays(8) })
       }
+    transactions = listOf(txn1, txn2, txn3, txn4, txn5, txn6, txn7, txn8)
 
     entityManager.flushAndClear()
 
@@ -188,7 +192,13 @@ constructor(
       expectedResponse.copy(
         reports =
           expectedResponse.reports.map { report ->
-            report.copy(categories = report.categories.filter { it.name != categories[1].name })
+            val newTotal = report.total - transactions[3].amount
+            report.copy(
+              categories =
+                report.categories
+                  .filter { it.name != categories[1].name }
+                  .map { it.copy(percent = it.amount / newTotal) },
+              total = newTotal)
           })
 
     mockMvc
