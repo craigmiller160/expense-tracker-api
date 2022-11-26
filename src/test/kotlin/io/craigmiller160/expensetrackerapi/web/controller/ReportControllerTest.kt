@@ -1,6 +1,7 @@
 package io.craigmiller160.expensetrackerapi.web.controller
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import io.craigmiller160.expensetrackerapi.data.model.Category
 import io.craigmiller160.expensetrackerapi.data.repository.ReportRepository
 import io.craigmiller160.expensetrackerapi.data.repository.TransactionRepository
 import io.craigmiller160.expensetrackerapi.extension.flushAndClear
@@ -31,6 +32,7 @@ constructor(
   private lateinit var token: String
 
   private lateinit var expectedResponse: ReportPageResponse
+  private lateinit var categories: List<Category>
 
   @BeforeEach
   fun setup() {
@@ -40,6 +42,7 @@ constructor(
     val cat3 = dataHelper.createCategory(2L, "Food")
     val cat4 = dataHelper.createCategory(1L, "Restaurants")
     val cat5 = dataHelper.createCategory(1L, "Travel")
+    categories = listOf(cat1, cat2, cat3, cat4, cat5)
 
     val month1 = LocalDate.of(2022, 1, 1)
     val month2 = LocalDate.of(2022, 2, 1)
@@ -181,6 +184,21 @@ constructor(
 
   @Test
   fun getReports_excludeCategory() {
-    TODO()
+    val response =
+      expectedResponse.copy(
+        reports =
+          expectedResponse.reports.map { report ->
+            report.copy(categories = report.categories.filter { it.name != categories[1].name })
+          })
+
+    mockMvc
+      .get("/reports?pageNumber=0&pageSize=100&excludeCategoryIds=${categories[1].id}") {
+        secure = true
+        header("Authorization", "Bearer $token")
+      }
+      .andExpect {
+        status { isOk() }
+        content { json(objectMapper.writeValueAsString(response), true) }
+      }
   }
 }
