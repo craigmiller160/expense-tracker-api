@@ -27,7 +27,7 @@ class ReportRepositoryImpl(
   ): Page<SpendingByMonth> {
     val categoryUUIDs = request.excludeCategoryIds.map { it.uuid }
     val spendingByMonth = getSpendingByMonth(userId, request, categoryUUIDs)
-    val spendingByMonthCount = getSpendingByMonthCount(userId)
+    val spendingByMonthCount = getSpendingByMonthCount(userId, categoryUUIDs)
     val months = spendingByMonth.map { it.month }
 
     val fullResults =
@@ -92,10 +92,13 @@ class ReportRepositoryImpl(
     }
   }
 
-  private fun getSpendingByMonthCount(userId: Long): Long {
+  private fun getSpendingByMonthCount(userId: Long, excludeCategoryIds: List<UUID>): Long {
     val getSpendingByMonthCountSql =
       sqlLoader.loadSql("reports/get_total_spending_by_month_count.sql")
-    val params = MapSqlParameterSource().addValue("userId", userId)
+    val params =
+      MapSqlParameterSource()
+        .addValue("userId", userId)
+        .addValue("excludeCategoryIds", excludeCategoryIds)
     return jdbcTemplate.queryForObject(getSpendingByMonthCountSql, params, Long::class.java)!!
   }
 
