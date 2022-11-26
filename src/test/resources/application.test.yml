@@ -4,4 +4,5 @@ spring:
 logging:
   level:
     org.hibernate.SQL: DEBUG
-    org.hibernate.type.descriptor.sql.BasicBinder: ERROR
+    org.hibernate.type.descriptor.sql.BasicBinder: DEBUG
+    org.springframework.jdbc.core: TRACE

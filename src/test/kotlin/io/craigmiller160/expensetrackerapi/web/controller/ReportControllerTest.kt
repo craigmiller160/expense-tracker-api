@@ -1,6 +1,8 @@
 package io.craigmiller160.expensetrackerapi.web.controller
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import io.craigmiller160.expensetrackerapi.data.model.Category
+import io.craigmiller160.expensetrackerapi.data.model.Transaction
 import io.craigmiller160.expensetrackerapi.data.repository.ReportRepository
 import io.craigmiller160.expensetrackerapi.data.repository.TransactionRepository
 import io.craigmiller160.expensetrackerapi.extension.flushAndClear
@@ -31,6 +33,8 @@ constructor(
   private lateinit var token: String
 
   private lateinit var expectedResponse: ReportPageResponse
+  private lateinit var categories: List<Category>
+  private lateinit var transactions: List<Transaction>
 
   @BeforeEach
   fun setup() {
@@ -40,6 +44,7 @@ constructor(
     val cat3 = dataHelper.createCategory(2L, "Food")
     val cat4 = dataHelper.createCategory(1L, "Restaurants")
     val cat5 = dataHelper.createCategory(1L, "Travel")
+    categories = listOf(cat1, cat2, cat3, cat4, cat5)
 
     val month1 = LocalDate.of(2022, 1, 1)
     val month2 = LocalDate.of(2022, 2, 1)
@@ -60,9 +65,10 @@ constructor(
       dataHelper.createTransaction(1L, cat2.uid).let {
         transactionRepository.save(it.apply { expenseDate = month2.plusDays(4) })
       }
-    dataHelper.createTransaction(2L, cat3.uid).let {
-      transactionRepository.save(it.apply { expenseDate = month1.plusDays(5) })
-    }
+    val txn5 =
+      dataHelper.createTransaction(2L, cat3.uid).let {
+        transactionRepository.save(it.apply { expenseDate = month1.plusDays(5) })
+      }
     val txn6 =
       dataHelper.createTransaction(1L).let {
         transactionRepository.save(it.apply { expenseDate = month1.plusDays(6) })
@@ -75,6 +81,7 @@ constructor(
       dataHelper.createTransaction(1L, cat4.uid).let {
         transactionRepository.save(it.apply { expenseDate = month1.plusDays(8) })
       }
+    transactions = listOf(txn1, txn2, txn3, txn4, txn5, txn6, txn7, txn8)
 
     entityManager.flushAndClear()
 
@@ -170,6 +177,66 @@ constructor(
 
     mockMvc
       .get("/reports?pageNumber=0&pageSize=1") {
+        secure = true
+        header("Authorization", "Bearer $token")
+      }
+      .andExpect {
+        status { isOk() }
+        content { json(objectMapper.writeValueAsString(response), true) }
+      }
+  }
+
+  @Test
+  fun getReports_excludeCategory_noRecordsForMonth() {
+    val response =
+      expectedResponse.copy(
+        totalItems = 1,
+        reports =
+          expectedResponse.reports
+            .filterIndexed { index, _ -> index == 1 }
+            .map { report ->
+              val newTotal = report.total - transactions[1].amount - transactions[0].amount
+              report.copy(
+                total = newTotal,
+                categories =
+                  report.categories
+                    .filter { it.name != categories[1].name && it.name != categories[0].name }
+                    .map { it.copy(percent = it.amount / newTotal) })
+            })
+    mockMvc
+      .get(
+        "/reports?pageNumber=0&pageSize=100&excludeCategoryIds=${categories[0].id},${categories[1].id}") {
+          secure = true
+          header("Authorization", "Bearer $token")
+        }
+      .andExpect {
+        status { isOk() }
+        content { json(objectMapper.writeValueAsString(response), true) }
+      }
+  }
+
+  @Test
+  fun getReports_excludeCategory() {
+    val response =
+      expectedResponse.copy(
+        reports =
+          expectedResponse.reports.mapIndexed { index, report ->
+            val newTotal =
+              report.total -
+                when (index) {
+                  0 -> transactions[3].amount
+                  else -> transactions[1].amount
+                }
+            report.copy(
+              categories =
+                report.categories
+                  .filter { it.name != categories[1].name }
+                  .map { it.copy(percent = it.amount / newTotal) },
+              total = newTotal)
+          })
+
+    mockMvc
+      .get("/reports?pageNumber=0&pageSize=100&excludeCategoryIds=${categories[1].id}") {
         secure = true
         header("Authorization", "Bearer $token")
       }
