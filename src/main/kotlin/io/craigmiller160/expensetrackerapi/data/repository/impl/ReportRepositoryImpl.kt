@@ -18,8 +18,8 @@ import org.springframework.stereotype.Repository
 private fun addExcludeCategoryIdsParam(
   excludeCategoryIds: List<UUID>
 ): (MapSqlParameterSource) -> MapSqlParameterSource = { params ->
-  val paramValue = excludeCategoryIds.ifEmpty { "" }
-  params.addValue("excludeCategoryIds", paramValue)
+  if (excludeCategoryIds.isNotEmpty()) params.addValue("excludeCategoryIds", excludeCategoryIds)
+  else params
 }
 
 @Repository
@@ -116,7 +116,8 @@ class ReportRepositoryImpl(
     request: ReportRequest,
     excludeCategoryIds: List<UUID>
   ): List<SpendingByMonth> {
-    val getTotalSpendingByMonthSql = sqlLoader.loadSql("reports/get_total_spending_by_month.sql")
+    val getTotalSpendingByMonthSql =
+      sqlLoader.loadSqlMustacheTemplate("reports/get_total_spending_by_month.sql")
     val totalSpendingByMonthParams =
       MapSqlParameterSource()
         .addValue("userId", userId)
