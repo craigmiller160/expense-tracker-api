@@ -195,8 +195,8 @@ constructor(
             val newTotal =
               report.total -
                 when (index) {
-                  0 -> transactions[3].amount
-                  else -> transactions[1].amount
+                  0 -> (transactions[3].amount + transactions[2].amount)
+                  else -> (transactions[1].amount + transactions[0].amount)
                 }
             report.copy(
               categories =
