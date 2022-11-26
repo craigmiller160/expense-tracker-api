@@ -1,6 +1,7 @@
 package io.craigmiller160.expensetrackerapi.data.repository.impl
 
 import io.craigmiller160.expensetrackerapi.data.SqlLoader
+import io.craigmiller160.expensetrackerapi.data.mustache.MustacheSqlTemplate
 import io.craigmiller160.expensetrackerapi.data.projection.SpendingByCategory
 import io.craigmiller160.expensetrackerapi.data.projection.SpendingByMonth
 import io.craigmiller160.expensetrackerapi.data.repository.ReportRepository
@@ -20,6 +21,13 @@ private fun addExcludeCategoryIdsParam(
 ): (MapSqlParameterSource) -> MapSqlParameterSource = { params ->
   if (excludeCategoryIds.isNotEmpty()) params.addValue("excludeCategoryIds", excludeCategoryIds)
   else params
+}
+
+private fun executeMustacheTemplate(
+  excludeCategoryIds: List<UUID>
+): (MustacheSqlTemplate) -> String = { template ->
+  if (excludeCategoryIds.isNotEmpty()) template.executeWithParams("excludeCategoryIds")
+  else template.executeWithParams()
 }
 
 @Repository
@@ -117,7 +125,13 @@ class ReportRepositoryImpl(
     excludeCategoryIds: List<UUID>
   ): List<SpendingByMonth> {
     val getTotalSpendingByMonthSql =
-      sqlLoader.loadSqlMustacheTemplate("reports/get_total_spending_by_month.sql")
+      sqlLoader.loadSqlMustacheTemplate("reports/get_total_spending_by_month.sql").let { template ->
+        if (excludeCategoryIds.isNotEmpty()) {
+          template.executeWithParams("excludeCategoryIds")
+        } else {
+          template.executeWithParams()
+        }
+      }
     val totalSpendingByMonthParams =
       MapSqlParameterSource()
         .addValue("userId", userId)
