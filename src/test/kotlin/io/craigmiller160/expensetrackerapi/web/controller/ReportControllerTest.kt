@@ -188,7 +188,17 @@ constructor(
 
   @Test
   fun getReports_excludeCategory_noRecordsForMonth() {
-    TODO()
+    val response = expectedResponse
+    mockMvc
+      .get(
+        "/reports?pageNumber=0&pageSize=100&excludeCategoryIds=${categories[0].id},${categories[1].id}") {
+          secure = true
+          header("Authorization", "Bearer $token")
+        }
+      .andExpect {
+        status { isOk() }
+        content { json(objectMapper.writeValueAsString(response), true) }
+      }
   }
 
   @Test
