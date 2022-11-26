@@ -4,6 +4,6 @@ LEFT JOIN categories c ON tv.category_id = c.uid AND c.user_id = :userId
 WHERE tv.expense_date >= DATE_TRUNC('month', :theDate::date)
 AND tv.expense_date <= (DATE_TRUNC('month', :theDate::date) + interval '1 month - 1 day')
 AND tv.user_id = :userId
-AND tv.category_id NOT IN (:excludeCategoryIds)
+AND (tv.category_id IS NULL OR tv.category_id NOT IN (:excludeCategoryIds))
 GROUP BY tv.category_name, c.color
 ORDER BY tv.category_name ASC;
