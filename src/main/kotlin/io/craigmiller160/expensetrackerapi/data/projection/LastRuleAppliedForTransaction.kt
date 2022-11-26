@@ -14,6 +14,7 @@ data class LastRuleAppliedForTransaction(
   val transactionId: TypedId<TransactionId>,
   val userId: Long,
   val categoryId: TypedId<CategoryId>,
+  val categoryName: String,
   val ordinal: Int,
   val regex: String,
   val startDate: LocalDate? = null,

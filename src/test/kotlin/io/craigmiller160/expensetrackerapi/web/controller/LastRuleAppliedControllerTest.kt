@@ -68,6 +68,7 @@ constructor(
         ruleId = rule.uid,
         transactionId = transaction.uid,
         categoryId = rule.categoryId,
+        categoryName = category.name,
         ordinal = rule.ordinal,
         regex = rule.regex,
         startDate = rule.startDate,

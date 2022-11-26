@@ -33,6 +33,7 @@ class LastRuleAppliedRepositoryCustomImpl(
           transactionId = rs.getTypedId("transaction_id"),
           userId = rs.getLong("user_id"),
           categoryId = rs.getTypedId("category_id"),
+          categoryName = rs.getString("category_name"),
           ordinal = rs.getInt("ordinal"),
           regex = rs.getString("regex"),
           startDate = rs.getLocalDate("start_date"),
