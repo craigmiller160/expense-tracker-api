@@ -125,13 +125,9 @@ class ReportRepositoryImpl(
     excludeCategoryIds: List<UUID>
   ): List<SpendingByMonth> {
     val getTotalSpendingByMonthSql =
-      sqlLoader.loadSqlMustacheTemplate("reports/get_total_spending_by_month.sql").let { template ->
-        if (excludeCategoryIds.isNotEmpty()) {
-          template.executeWithParams("excludeCategoryIds")
-        } else {
-          template.executeWithParams()
-        }
-      }
+      sqlLoader
+        .loadSqlMustacheTemplate("reports/get_total_spending_by_month.sql")
+        .let(executeMustacheTemplate(excludeCategoryIds))
     val totalSpendingByMonthParams =
       MapSqlParameterSource()
         .addValue("userId", userId)
