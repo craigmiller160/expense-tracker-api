@@ -9,6 +9,7 @@ import io.craigmiller160.expensetrackerapi.web.types.importing.ImportTransaction
 import io.craigmiller160.expensetrackerapi.web.types.importing.ImportTypeResponse
 import io.craigmiller160.oauth2.service.OAuth2Service
 import java.io.InputStream
+import javax.transaction.Transactional
 import org.springframework.stereotype.Service
 
 @Service
@@ -21,6 +22,7 @@ class TransactionImportService(
   fun getImportTypes(): List<ImportTypeResponse> =
     TransactionImportType.values().map { ImportTypeResponse(it.name, it.displayName) }
 
+  @Transactional
   fun importTransactions(
     type: TransactionImportType,
     stream: InputStream
