@@ -93,6 +93,34 @@ constructor(
   }
 
   @Test
+  fun `createCategory - cannot use name Unknown`() {
+    val request = CategoryRequest("Unknown")
+
+    mockMvc
+      .post("/categories") {
+        secure = true
+        header("Authorization", "Bearer $token")
+        contentType = MediaType.APPLICATION_JSON
+        content = objectMapper.writeValueAsString(request)
+      }
+      .andExpect { status { isBadRequest() } }
+  }
+
+  @Test
+  fun `updateCategory - cannot use name Unknown`() {
+    val cat1 = dataHelper.createCategory(1L, "Category 1")
+    val request = CategoryRequest("Unknown")
+    mockMvc
+      .put("/categories/${cat1.id}") {
+        secure = true
+        header("Authorization", "Bearer $token")
+        contentType = MediaType.APPLICATION_JSON
+        content = objectMapper.writeValueAsString(request)
+      }
+      .andExpect { status { isBadRequest() } }
+  }
+
+  @Test
   fun updateCategory() {
     val cat1 = dataHelper.createCategory(1L, "Category 1")
     val cat2 = dataHelper.createCategory(2L, "Category 2")

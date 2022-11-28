@@ -1,6 +1,7 @@
 package io.craigmiller160.expensetrackerapi.data.repository.impl
 
 import io.craigmiller160.expensetrackerapi.data.SqlLoader
+import io.craigmiller160.expensetrackerapi.data.constants.CategoryConstants
 import io.craigmiller160.expensetrackerapi.data.mustache.MustacheSqlTemplate
 import io.craigmiller160.expensetrackerapi.data.projection.SpendingByCategory
 import io.craigmiller160.expensetrackerapi.data.projection.SpendingByMonth
@@ -103,9 +104,9 @@ class ReportRepositoryImpl(
     return jdbcTemplate.query(finalWrapper.sql, params) { rs, _ ->
       SpendingByCategory(
         month = rs.getDate("month").toLocalDate(),
-        categoryName = rs.getString("category_name") ?: ReportRepository.UNKNOWN_CATEGORY_NAME,
+        categoryName = rs.getString("category_name") ?: CategoryConstants.UNKNOWN_CATEGORY_NAME,
         amount = rs.getBigDecimal("amount"),
-        color = rs.getString("color") ?: ReportRepository.UNKNOWN_CATEGORY_COLOR)
+        color = rs.getString("color") ?: CategoryConstants.UNKNOWN_CATEGORY_COLOR)
     }
   }
 

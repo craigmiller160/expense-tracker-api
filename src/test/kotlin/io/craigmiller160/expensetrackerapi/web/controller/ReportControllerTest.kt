@@ -1,9 +1,9 @@
 package io.craigmiller160.expensetrackerapi.web.controller
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import io.craigmiller160.expensetrackerapi.data.constants.CategoryConstants
 import io.craigmiller160.expensetrackerapi.data.model.Category
 import io.craigmiller160.expensetrackerapi.data.model.Transaction
-import io.craigmiller160.expensetrackerapi.data.repository.ReportRepository
 import io.craigmiller160.expensetrackerapi.data.repository.TransactionRepository
 import io.craigmiller160.expensetrackerapi.extension.flushAndClear
 import io.craigmiller160.expensetrackerapi.testcore.ExpenseTrackerIntegrationTest
@@ -134,8 +134,8 @@ constructor(
                     amount = txn7.amount,
                     percent = txn7.amount / month1Total),
                   ReportCategoryResponse(
-                    name = ReportRepository.UNKNOWN_CATEGORY_NAME,
-                    color = ReportRepository.UNKNOWN_CATEGORY_COLOR,
+                    name = CategoryConstants.UNKNOWN_CATEGORY_NAME,
+                    color = CategoryConstants.UNKNOWN_CATEGORY_COLOR,
                     amount = txn6.amount,
                     percent = txn6.amount / month1Total)))))
   }
