@@ -6,8 +6,4 @@ import java.io.InputStream
 
 interface TransactionParser {
   fun parse(userId: Long, stream: InputStream): TryEither<List<Transaction>>
-
-  fun parseRecord(userId: Long, row: Array<String>): TryEither<Transaction>
-
-  fun validateImportType(headerRow: Array<String>): TryEither<Unit>
 }

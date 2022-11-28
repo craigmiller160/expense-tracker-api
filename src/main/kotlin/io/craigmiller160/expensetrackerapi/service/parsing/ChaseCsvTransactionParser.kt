@@ -1,24 +1,19 @@
 package io.craigmiller160.expensetrackerapi.service.parsing
 
 import arrow.core.Either
-import arrow.core.flatMap
 import arrow.core.sequence
 import io.craigmiller160.expensetrackerapi.data.model.Transaction
 import io.craigmiller160.expensetrackerapi.function.TryEither
-import java.io.InputStream
 import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import org.springframework.stereotype.Component
 
 @Component
-class ChaseCsvTransactionParser : TransactionParser {
+class ChaseCsvTransactionParser : AbstractCsvTransactionParser() {
   companion object {
     private val DATE_FORMAT = DateTimeFormatter.ofPattern("MM/dd/yyyy")
   }
-
-  override fun parse(userId: Long, stream: InputStream): TryEither<List<Transaction>> =
-    CsvParser.parse2(stream).flatMap(parseRows(userId))
 
   override fun parseRecord(userId: Long, row: Array<String>): TryEither<Transaction> {
     TODO("Not yet implemented")
