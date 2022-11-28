@@ -265,11 +265,27 @@ constructor(
 
   @Test
   fun `importTransactions - DISCOVER_CSV, but wrong file`() {
-    TODO()
+    val bytes = ResourceUtils.getResourceBytes("data/chase1.csv").shouldBeRight()
+    mockMvc
+      .multipart("/transaction-import?type=${TransactionImportType.DISCOVER_CSV.name}") {
+        secure = true
+        header("Authorization", "Bearer $token")
+        header("Content-Type", MediaType.MULTIPART_FORM_DATA_VALUE)
+        file("file", bytes)
+      }
+      .andExpect { status { isBadRequest() } }
   }
 
   @Test
   fun `importTransactions - CHASE_CSV, but wrong file`() {
-    TODO()
+    val bytes = ResourceUtils.getResourceBytes("data/discover1.csv").shouldBeRight()
+    mockMvc
+      .multipart("/transaction-import?type=${TransactionImportType.CHASE_CSV.name}") {
+        secure = true
+        header("Authorization", "Bearer $token")
+        header("Content-Type", MediaType.MULTIPART_FORM_DATA_VALUE)
+        file("file", bytes)
+      }
+      .andExpect { status { isBadRequest() } }
   }
 }
