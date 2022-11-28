@@ -1,7 +1,6 @@
 package io.craigmiller160.expensetrackerapi.service.parsing
 
 import arrow.core.Either
-import arrow.core.sequence
 import io.craigmiller160.expensetrackerapi.data.model.Transaction
 import io.craigmiller160.expensetrackerapi.function.TryEither
 import java.math.BigDecimal
@@ -15,20 +14,7 @@ class ChaseCsvTransactionParser : AbstractCsvTransactionParser() {
     private val DATE_FORMAT = DateTimeFormatter.ofPattern("MM/dd/yyyy")
   }
 
-  override fun parseRecord(userId: Long, row: Array<String>): TryEither<Transaction> {
-    TODO("Not yet implemented")
-  }
-
-  override fun validateImportType(headerRow: Array<String>): TryEither<Unit> {
-    TODO("Not yet implemented")
-  }
-
-  private fun parseRows(userId: Long): (Sequence<Array<String>>) -> TryEither<List<Transaction>> =
-    { rows ->
-      rows.map(rowToTransaction(userId)).sequence()
-    }
-
-  private fun rowToTransaction(userId: Long): (Array<String>) -> TryEither<Transaction> = { row ->
+  override fun parseRecord(userId: Long, row: Array<String>): TryEither<Transaction> =
     Either.catch {
       val rawDate = row[1]
       val expenseDate = LocalDate.parse(rawDate, DATE_FORMAT)
@@ -38,5 +24,8 @@ class ChaseCsvTransactionParser : AbstractCsvTransactionParser() {
       Transaction(
         userId = userId, expenseDate = expenseDate, description = description, amount = amount)
     }
+
+  override fun validateImportType(headerRow: Array<String>): TryEither<Unit> {
+    TODO("Not yet implemented")
   }
 }
