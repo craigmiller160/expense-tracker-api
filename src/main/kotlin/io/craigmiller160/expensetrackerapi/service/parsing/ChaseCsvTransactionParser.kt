@@ -15,14 +15,7 @@ class ChaseCsvTransactionParser : AbstractCsvTransactionParser() {
     private val DATE_FORMAT = DateTimeFormatter.ofPattern("MM/dd/yyyy")
     private val HEADER_VALUES =
       listOf(
-        "Details",
-        "Posting Date",
-        "Description",
-        "Amount",
-        "Type",
-        "Balance",
-        "Check or Slip #",
-        "")
+        "Details", "Posting Date", "Description", "Amount", "Type", "Balance", "Check or Slip #")
   }
 
   override fun parseRecord(userId: Long, row: Array<String>): TryEither<Transaction> =
