@@ -10,7 +10,5 @@ object CsvParser {
 
   fun parse(stream: InputStream): TryEither<CsvData> =
     Either.catch { CSVReader(InputStreamReader(stream)).readAll() }
-      .map { allRows ->
-        CsvData(header = allRows.first(), records = allRows.subList(0, allRows.size))
-      }
+      .map { allRows -> CsvData(header = allRows.first(), records = allRows.drop(1)) }
 }
