@@ -111,7 +111,7 @@ constructor(
     val cat1 = dataHelper.createCategory(1L, "Category 1")
     val request = CategoryRequest("Unknown")
     mockMvc
-      .put("/categories/$${cat1.id}") {
+      .put("/categories/${cat1.id}") {
         secure = true
         header("Authorization", "Bearer $token")
         contentType = MediaType.APPLICATION_JSON
