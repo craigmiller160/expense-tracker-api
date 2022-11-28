@@ -29,9 +29,11 @@ class DiscoverCsvTransactionParser : AbstractCsvTransactionParser() {
     }
 
   override fun validateImportType(headerRow: Array<String>): TryEither<Unit> {
-    val noMatches = HEADER_VALUES.filterIndexed { index, item -> headerRow[index] != item }
-    if (noMatches.isEmpty()) {
-      return Either.Right(Unit)
+    if (headerRow.size == HEADER_VALUES.size) {
+      val noMatches = HEADER_VALUES.filterIndexed { index, item -> headerRow[index] != item }
+      if (noMatches.isEmpty()) {
+        return Either.Right(Unit)
+      }
     }
     return Either.Left(BadRequestException("Data does not match import type"))
   }
