@@ -262,4 +262,14 @@ constructor(
       .hasFieldOrPropertyWithValue("amount", BigDecimal("-64.99"))
       .hasFieldOrPropertyWithValue("categoryId", null)
   }
+
+  @Test
+  fun `importTransactions - DISCOVER_CSV, but wrong file`() {
+    TODO()
+  }
+
+  @Test
+  fun `importTransactions - CHASE_CSV, but wrong file`() {
+    TODO()
+  }
 }
