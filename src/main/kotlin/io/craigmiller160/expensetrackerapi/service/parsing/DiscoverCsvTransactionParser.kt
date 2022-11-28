@@ -18,7 +18,7 @@ class DiscoverCsvTransactionParser : TransactionParser {
   }
 
   override fun parse(userId: Long, stream: InputStream): TryEither<List<Transaction>> =
-    CsvParser.parse(stream).flatMap(parseRows(userId))
+    CsvParser.parse2(stream).flatMap(parseRows(userId))
 
   override fun parseRecord(userId: Long, row: Array<String>): TryEither<Transaction> {
     TODO("Not yet implemented")
