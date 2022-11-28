@@ -1,31 +1,24 @@
 package io.craigmiller160.expensetrackerapi.service.parsing
 
 import arrow.core.Either
-import arrow.core.flatMap
-import arrow.core.sequence
+import io.craigmiller160.expensetrackerapi.common.error.BadRequestException
 import io.craigmiller160.expensetrackerapi.data.model.Transaction
 import io.craigmiller160.expensetrackerapi.function.TryEither
-import java.io.InputStream
 import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import org.springframework.stereotype.Component
 
 @Component
-class ChaseCsvTransactionParser : TransactionParser {
+class ChaseCsvTransactionParser : AbstractCsvTransactionParser() {
   companion object {
     private val DATE_FORMAT = DateTimeFormatter.ofPattern("MM/dd/yyyy")
+    private val HEADER_VALUES =
+      listOf(
+        "Details", "Posting Date", "Description", "Amount", "Type", "Balance", "Check or Slip #")
   }
 
-  override fun parse(userId: Long, stream: InputStream): TryEither<List<Transaction>> =
-    CsvParser.parse(stream).flatMap(parseRows(userId))
-
-  private fun parseRows(userId: Long): (Sequence<Array<String>>) -> TryEither<List<Transaction>> =
-    { rows ->
-      rows.map(rowToTransaction(userId)).sequence()
-    }
-
-  private fun rowToTransaction(userId: Long): (Array<String>) -> TryEither<Transaction> = { row ->
+  override fun parseRecord(userId: Long, row: Array<String>): TryEither<Transaction> =
     Either.catch {
       val rawDate = row[1]
       val expenseDate = LocalDate.parse(rawDate, DATE_FORMAT)
@@ -35,5 +28,14 @@ class ChaseCsvTransactionParser : TransactionParser {
       Transaction(
         userId = userId, expenseDate = expenseDate, description = description, amount = amount)
     }
+
+  override fun validateImportType(headerRow: Array<String>): TryEither<Unit> {
+    if (headerRow.size == HEADER_VALUES.size) {
+      val noMatches = HEADER_VALUES.filterIndexed { index, item -> headerRow[index] != item }
+      if (noMatches.isEmpty()) {
+        return Either.Right(Unit)
+      }
+    }
+    return Either.Left(BadRequestException("Data does not match import type"))
   }
 }
