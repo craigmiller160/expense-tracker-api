@@ -20,6 +20,14 @@ class DiscoverCsvTransactionParser : TransactionParser {
   override fun parse(userId: Long, stream: InputStream): TryEither<List<Transaction>> =
     CsvParser.parse(stream).flatMap(parseRows(userId))
 
+  override fun parseRecord(userId: Long, row: Array<String>): TryEither<Transaction> {
+    TODO("Not yet implemented")
+  }
+
+  override fun validateImportType(headerRow: Array<String>): TryEither<Unit> {
+    TODO("Not yet implemented")
+  }
+
   private fun parseRows(userId: Long): (Sequence<Array<String>>) -> TryEither<List<Transaction>> =
     { rows ->
       rows.map(rowToTransaction(userId)).sequence()
