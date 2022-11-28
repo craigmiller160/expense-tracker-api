@@ -1,6 +1,7 @@
 package io.craigmiller160.expensetrackerapi.service.parsing
 
 import arrow.core.Either
+import io.craigmiller160.expensetrackerapi.common.error.BadRequestException
 import io.craigmiller160.expensetrackerapi.data.model.Transaction
 import io.craigmiller160.expensetrackerapi.function.TryEither
 import java.math.BigDecimal
@@ -12,6 +13,16 @@ import org.springframework.stereotype.Component
 class ChaseCsvTransactionParser : AbstractCsvTransactionParser() {
   companion object {
     private val DATE_FORMAT = DateTimeFormatter.ofPattern("MM/dd/yyyy")
+    private val HEADER_VALUES =
+      listOf(
+        "Details",
+        "Posting Date",
+        "Description",
+        "Amount",
+        "Type",
+        "Balance",
+        "Check or Slip #",
+        "")
   }
 
   override fun parseRecord(userId: Long, row: Array<String>): TryEither<Transaction> =
@@ -26,6 +37,10 @@ class ChaseCsvTransactionParser : AbstractCsvTransactionParser() {
     }
 
   override fun validateImportType(headerRow: Array<String>): TryEither<Unit> {
-    TODO("Not yet implemented")
+    val noMatches = HEADER_VALUES.filterIndexed { index, item -> headerRow[index] != item }
+    if (noMatches.isEmpty()) {
+      return Either.Right(Unit)
+    }
+    return Either.Left(BadRequestException("Data does not match import type"))
   }
 }
