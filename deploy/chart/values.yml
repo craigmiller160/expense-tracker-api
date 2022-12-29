@@ -1,8 +1,16 @@
-app-deployment:
+app_deployment:
   appName: expense-tracker-api
   image: nexus-docker-craigmiller160.ddns.net/expense-tracker-api:latest
-  configMaps:
-    - expense-tracker-api-config
+  configMap:
+    spring.profiles.active: prod
+    spring.datasource.host: postgres.infra-prod
+    spring.datasource.port: "5432"
+    oauth2.auth-server-host: https://sso-oauth2-server:8443
+    oauth2.client-name: expense-tracker-api
+    spring.datasource.db_name: expense_tracker_prod
+  onepassworditems:
+    - name: expense-tracker-api-oauth2-keys
+      itemPath: vaults/Home Server (Prod)/items/Expense Tracker API OAuth2 Keys
   ports:
     - containerPort: 8080
   secrets:
