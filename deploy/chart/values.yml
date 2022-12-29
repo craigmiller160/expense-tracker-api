@@ -1,4 +1,4 @@
-app-deployment:
+app_deployment:
   appName: expense-tracker-api
   image: nexus-docker-craigmiller160.ddns.net/expense-tracker-api:latest
   configMaps:
