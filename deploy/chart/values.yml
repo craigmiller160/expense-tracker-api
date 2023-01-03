@@ -11,14 +11,16 @@ app_deployment:
   onepassworditems:
     - name: expense-tracker-api-oauth2-keys
       itemPath: vaults/Home Server (Prod)/items/Expense Tracker API OAuth2 Keys
+    - name: expense-tracker-postgres
+      itemPath: vaults/Home Server (Prod)/items/Postgres Root Account
   ports:
     - containerPort: 8080
   secrets:
     - envVariable: spring.datasource.username
-      secretName: postgres-root-account
+      secretName: expense-tracker-postgres
       secretKey: username
     - envVariable: spring.datasource.password
-      secretName: postgres-root-account
+      secretName: expense-tracker-postgres
       secretKey: password
     - envVariable: oauth2.client-key
       secretName: expense-tracker-api-oauth2-keys
