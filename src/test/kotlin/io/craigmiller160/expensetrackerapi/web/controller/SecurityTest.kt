@@ -7,7 +7,7 @@ import org.springframework.util.LinkedMultiValueMap
 import org.springframework.web.client.RestTemplate
 
 @ExpenseTrackerIntegrationTest
-class SecurityTest(@Value("\${keycloak.authServerUrl}") private val authServerUrl: String) {
+class SecurityTest(@Value("\${keycloak.auth-server-url}") private val authServerUrl: String) {
   private val restTemplate: RestTemplate = RestTemplate()
 
   private fun login(): String {
@@ -18,8 +18,12 @@ class SecurityTest(@Value("\${keycloak.authServerUrl}") private val authServerUr
           "client_id" to listOf("expense-tracker-api"),
           "username" to listOf("craig"),
           "password" to listOf("password")))
-    return restTemplate.postForEntity(
-      "$authServerUrl/realms/apps-dev/protocol/openid-connect/token", formData, String::class.java)
+    return restTemplate
+      .postForEntity(
+        "$authServerUrl/realms/apps-dev/protocol/openid-connect/token",
+        formData,
+        String::class.java)
+      .body!!
   }
   @Test
   fun `allows valid token with access role`() {
