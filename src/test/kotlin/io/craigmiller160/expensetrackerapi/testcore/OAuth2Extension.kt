@@ -17,11 +17,11 @@ class OAuth2Extension : BeforeEachCallback {
       JwtUtils.createJwt(keyPair, configure)
   }
   override fun beforeEach(ctx: ExtensionContext) {
+    // TODO clean this up, if necessary
     val springContext = SpringExtension.getApplicationContext(ctx)
     //    val oAuth2Config = springContext.getBean(OAuth2Config::class.java)
     //    whenever(oAuth2Config.jwkSet).thenReturn(jwkSet)
     //    whenever(oAuth2Config.clientKey).thenReturn(JwtUtils.CLIENT_KEY)
     //    whenever(oAuth2Config.clientName).thenReturn(JwtUtils.CLIENT_NAME)
-    TODO()
   }
 }
