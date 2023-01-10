@@ -19,3 +19,12 @@ NOTE: When in airplane mode, all security is disabled.
 ## Swagger
 
 The swagger can be accessed locally via `https://localhost:8080/swagger-ui/index.html`
+
+## Terraform
+
+For the Terraform script to run, the following environment variables must be present on the machine. 
+
+```
+# The operator access token for communicating with 1Password
+ONEPASSWORD_TOKEN=XXXXXXX
+```
