@@ -481,12 +481,6 @@
       "emailVerified": false,
       "serviceAccountClientId": "expense-tracker-api",
       "disableableCredentialTypes": [],
-      "requiredActions": [
-        "VERIFY_EMAIL",
-        "VERIFY_PROFILE",
-        "UPDATE_PASSWORD",
-        "UPDATE_PROFILE"
-      ],
       "realmRoles": [
         "default-roles-apps-dev"
       ],
@@ -500,12 +494,6 @@
       "lastName": "Miller",
       "enabled": true,
       "emailVerified": true,
-      "requiredActions": [
-        "VERIFY_EMAIL",
-        "VERIFY_PROFILE",
-        "UPDATE_PASSWORD",
-        "UPDATE_PROFILE"
-      ],
       "credentials": [
         {
           "type": "password",
