@@ -59,6 +59,7 @@
         <java.version>18</java.version>
         <springdoc.openapi.version>1.6.11</springdoc.openapi.version>
         <mustache.version>0.9.10</mustache.version>
+        <keycloak.testcontainer.version>2.4.0</keycloak.testcontainer.version>
     </properties>
 
     <distributionManagement>
@@ -75,6 +76,12 @@
     </distributionManagement>
 
     <dependencies>
+        <dependency>
+            <groupId>com.github.dasniko</groupId>
+            <artifactId>testcontainers-keycloak</artifactId>
+            <version>${keycloak.testcontainer.version}</version>
+            <scope>test</scope>
+        </dependency>
         <dependency>
             <groupId>com.github.spullara.mustache.java</groupId>
             <artifactId>compiler</artifactId>
