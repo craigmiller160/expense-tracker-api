@@ -31,6 +31,8 @@ class WebSecurityConfig : KeycloakWebSecurityConfigurerAdapter() {
       .requiresSecure()
       .and()
       .authorizeRequests()
+      .antMatchers("/actuator/health", "/v3/api-docs", "/v3/api-docs/*", "/swagger-ui/*")
+      .permitAll()
       .antMatchers("/**")
       .hasAnyRole("access")
   }
