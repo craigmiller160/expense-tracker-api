@@ -11,7 +11,7 @@ locals {
     client_id = "expense-tracker-api"
     name = "expense-tracker-api"
     enabled = true
-    access_type = "BEARER-ONLY"
+    access_type = "CONFIDENTIAL"
   }
 }
 
