@@ -492,6 +492,28 @@
       ],
       "notBefore": 0,
       "groups": []
+    },
+    {
+      "username": "craig",
+      "email": "craig@gmail.com",
+      "firstName": "Craig",
+      "lastName": "Miller",
+      "enabled": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "s3cr3t"
+        }
+      ],
+      "clientRoles": {
+        "account": [
+          "view-profile",
+          "manage-account"
+        ],
+        "expense-tracker-api": [
+          "access"
+        ]
+      }
     }
   ],
   "scopeMappings": [
