@@ -14,6 +14,10 @@ locals {
     access_type = "CONFIDENTIAL"
     service_accounts_enabled = true
   }
+
+  access_role_common = {
+    name = "access"
+  }
 }
 
 resource "keycloak_openid_client" "expense_tracker_api_dev" {
@@ -32,4 +36,16 @@ resource "keycloak_openid_client" "expense_tracker_api_prod" {
   enabled = local.client_common.enabled
   access_type = local.client_common.access_type
   service_accounts_enabled = local.client_common.service_accounts_enabled
+}
+
+resource "keycloak_role" "expense_tracker_api_access_role_dev" {
+  realm_id = data.keycloak_realm.apps_dev.id
+  client_id = keycloak_openid_client.expense_tracker_api_dev.id
+  name = local.access_role_common.name
+}
+
+resource "keycloak_role" "expense_tracker_api_access_role_prod" {
+  realm_id = data.keycloak_realm.apps_prod.id
+  client_id = keycloak_openid_client.expense_tracker_api_prod.id
+  name = local.access_role_common.name
 }
