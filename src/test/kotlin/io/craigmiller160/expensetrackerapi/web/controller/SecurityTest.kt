@@ -1,7 +1,9 @@
 package io.craigmiller160.expensetrackerapi.web.controller
 
+import io.craigmiller160.expensetrackerapi.testcore.ExpenseTrackerIntegrationTest
 import org.junit.jupiter.api.Test
 
+@ExpenseTrackerIntegrationTest
 class SecurityTest {
   @Test
   fun `allows valid token with access role`() {
