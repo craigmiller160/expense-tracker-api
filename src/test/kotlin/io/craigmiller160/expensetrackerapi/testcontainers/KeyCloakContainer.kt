@@ -12,5 +12,6 @@ class KeyCloakContainer : KeycloakContainer("quay.io/keycloak/keycloak:20.0.2") 
 
   override fun start() {
     super.start()
+    System.setProperty("keycloak.auth-server-url", authServerUrl)
   }
 }

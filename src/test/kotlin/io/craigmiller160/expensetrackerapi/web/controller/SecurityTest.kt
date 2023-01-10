@@ -2,11 +2,12 @@ package io.craigmiller160.expensetrackerapi.web.controller
 
 import io.craigmiller160.expensetrackerapi.testcore.ExpenseTrackerIntegrationTest
 import org.junit.jupiter.api.Test
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.util.LinkedMultiValueMap
 import org.springframework.web.client.RestTemplate
 
 @ExpenseTrackerIntegrationTest
-class SecurityTest {
+class SecurityTest(@Value("\${keycloak.authServerUrl}") private val authServerUrl: String) {
   private val restTemplate: RestTemplate = RestTemplate()
 
   private fun login(): String {
@@ -17,11 +18,13 @@ class SecurityTest {
           "client_id" to listOf("expense-tracker-api"),
           "username" to listOf("craig"),
           "password" to listOf("password")))
-    restTemplate.postForEntity("", formData, String::class.java)
+    return restTemplate.postForEntity(
+      "$authServerUrl/realms/apps-dev/protocol/openid-connect/token", formData, String::class.java)
   }
   @Test
   fun `allows valid token with access role`() {
-    TODO()
+    val response = login()
+    println(response)
   }
 
   @Test
