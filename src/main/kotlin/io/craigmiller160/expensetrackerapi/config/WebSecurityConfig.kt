@@ -18,6 +18,7 @@ class WebSecurityConfig : KeycloakWebSecurityConfigurerAdapter() {
   @Bean
   override fun sessionAuthenticationStrategy(): SessionAuthenticationStrategy =
     RegisterSessionAuthenticationStrategy(SessionRegistryImpl())
+  // TODO replace above with NullAuthenticatedSessionStrategy()
   override fun configure(http: HttpSecurity) {
     super.configure(http)
     http
