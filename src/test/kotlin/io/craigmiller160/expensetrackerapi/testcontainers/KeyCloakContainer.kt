@@ -9,4 +9,8 @@ class KeyCloakContainer : KeycloakContainer("quay.io/keycloak/keycloak:20.0.2") 
   init {
     withRealmImportFile("keycloak-realm.json")
   }
+
+  override fun start() {
+    super.start()
+  }
 }
