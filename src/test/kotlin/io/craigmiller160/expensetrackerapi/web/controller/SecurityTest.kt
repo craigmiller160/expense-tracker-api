@@ -32,8 +32,10 @@ class SecurityTest(
     val entity = HttpEntity(formData, headers)
     return restTemplate
       .postForEntity(
-        "$authServerUrl/realms/apps-dev/protocol/openid-connect/token", entity, String::class.java)
-      .body!!
+        "$authServerUrl/realms/apps-dev/protocol/openid-connect/token", entity, Map::class.java)
+      .body
+      ?.get("access_token")!!
+      as String
   }
   @Test
   fun `allows valid token with access role`() {
