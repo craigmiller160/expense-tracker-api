@@ -11,7 +11,8 @@ class KeycloakSetupExtension : BeforeEachCallback {
     private val keyPair: KeyPair = KeyUtils.createKeyPair()
     init {
       val encodedPublicKey = Base64.getEncoder().encodeToString(keyPair.public.encoded)
-      System.setProperty("keycloak.realm-public-key", encodedPublicKey)
+      // TODO restore this
+      //      System.setProperty("keycloak.realm-public-key", encodedPublicKey)
     }
 
     fun createKeycloakJwt(): String = TODO()
