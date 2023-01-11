@@ -6,7 +6,10 @@ import java.util.concurrent.TimeUnit
 import org.junit.jupiter.api.Test
 
 class Temp {
-  @Test fun experiment() {}
+  @Test
+  fun experiment() {
+    "docker ps".runCommand().also { println(it) }
+  }
 }
 
 fun String.runCommand(

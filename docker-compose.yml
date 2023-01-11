@@ -8,6 +8,8 @@ services:
       - '5432:5432'
     environment:
       - POSTGRES_PASSWORD=password
+    volumes:
+      - ./docker/postgres:/docker-entrypoint-initdb.d
   keycloak:
     image: quay.io/keycloak/keycloak:20.0.2
     container_name: expense_tracker_keycloak
