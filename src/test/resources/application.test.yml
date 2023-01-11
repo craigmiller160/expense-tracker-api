@@ -9,4 +9,5 @@ logging:
     org.springframework.web.client.RestTemplate: DEBUG
 
 keycloak:
-  auth-server-url: http://localhost:8080
+  # TODO restore this
+#  auth-server-url: http://localhost:8080

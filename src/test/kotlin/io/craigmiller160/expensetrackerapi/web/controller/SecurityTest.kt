@@ -3,6 +3,7 @@ package io.craigmiller160.expensetrackerapi.web.controller
 import io.craigmiller160.expensetrackerapi.testcore.ExpenseTrackerIntegrationTest
 import java.util.Base64
 import org.junit.jupiter.api.Test
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpHeaders
@@ -12,7 +13,9 @@ import org.springframework.util.LinkedMultiValueMap
 import org.springframework.web.client.RestTemplate
 
 @ExpenseTrackerIntegrationTest
-class SecurityTest(
+class SecurityTest
+@Autowired
+constructor(
   @Value("\${keycloak.auth-server-url}") private val authServerUrl: String,
   @Value("\${keycloak.resource}") private val clientId: String,
   @Value("\${keycloak.credentials.secret}") private val clientSecret: String,
