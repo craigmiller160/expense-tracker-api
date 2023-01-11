@@ -10,7 +10,10 @@ object KeycloakJwtUtils {
     config.init()
     val token =
       AccessToken()
-        .apply { addAccess("expense-tracker-api").roles(setOf("access")) }
+        .apply {
+          addAccess("expense-tracker-api").roles(setOf("access"))
+          name = "Test User"
+        }
         .iat(ZonedDateTime.now().toEpochSecond())
         .exp(config.expiration.toEpochSecond())
         .id(UUID.randomUUID().toString())
