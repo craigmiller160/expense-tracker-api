@@ -6,6 +6,8 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpHeaders
+import org.springframework.test.web.servlet.MockMvc
+import org.springframework.test.web.servlet.get
 import org.springframework.util.LinkedMultiValueMap
 import org.springframework.web.client.RestTemplate
 
@@ -13,7 +15,8 @@ import org.springframework.web.client.RestTemplate
 class SecurityTest(
   @Value("\${keycloak.auth-server-url}") private val authServerUrl: String,
   @Value("\${keycloak.resource}") private val clientId: String,
-  @Value("\${keycloak.credentials.secret}") private val clientSecret: String
+  @Value("\${keycloak.credentials.secret}") private val clientSecret: String,
+  private val mockMvc: MockMvc
 ) {
   private val restTemplate: RestTemplate = RestTemplate()
 
@@ -39,8 +42,13 @@ class SecurityTest(
   }
   @Test
   fun `allows valid token with access role`() {
-    val response = login()
-    println(response)
+    val token = login()
+    mockMvc
+      .get("/transaction-import/types") {
+        secure = true
+        header("Authorization", "Bearer $token")
+      }
+      .andExpect { status { isOk() } }
   }
 
   @Test
