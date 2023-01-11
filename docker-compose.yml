@@ -3,7 +3,7 @@ version: '3.5'
 services:
   postgres:
     image: postgres:14.5
-    container_name: postgres
+    container_name: expense_tracker_postgres
     ports:
       - '5432:5432'
     environment:
@@ -12,7 +12,7 @@ services:
       - ./docker/postgres:/docker-entrypoint-initdb.d
   keycloak:
     image: quay.io/keycloak/keycloak:20.0.2
-    container_name: keycloak
+    container_name: expense_tracker_keycloak
     ports:
       - '8080:8080'
     environment:
@@ -21,7 +21,7 @@ services:
       - KC_DB=postgres
       - KC_DB_PASSWORD=password
       - KC_DB_USERNAME=postgres
-      - KC_DB_URL=jdbc:postgresql://postgres:5432/keycloak
+      - KC_DB_URL=jdbc:postgresql://expense_tracker_postgres:5432/keycloak
     command:
       - start-dev
     depends_on:
