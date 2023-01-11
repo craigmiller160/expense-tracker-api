@@ -13,6 +13,7 @@ import java.util.UUID
 import org.keycloak.representations.AccessToken
 
 object KeycloakJwtUtils {
+  // TODO delete this if ultimately unused
   private val objectMapper = jacksonObjectMapper()
   fun createJwt(keyPair: KeyPair, init: KeycloakJwtConfig.() -> Unit = {}): String {
     val config = KeycloakJwtConfig()
