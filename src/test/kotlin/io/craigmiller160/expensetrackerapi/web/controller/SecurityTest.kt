@@ -1,7 +1,6 @@
 package io.craigmiller160.expensetrackerapi.web.controller
 
 import io.craigmiller160.expensetrackerapi.testcore.ExpenseTrackerIntegrationTest
-import io.craigmiller160.expensetrackerapi.testcore.KeycloakSetupExtension
 import java.util.Base64
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -46,8 +45,7 @@ constructor(
   }
   @Test
   fun `allows valid token with access role`() {
-    //    val token = login()
-    val token = KeycloakSetupExtension.createKeycloakJwt()
+    val token = login()
     mockMvc
       .get("/transaction-import/types") {
         secure = true

@@ -7,7 +7,3 @@ logging:
     org.hibernate.type.descriptor.sql.BasicBinder: DEBUG
     org.springframework.jdbc.core: TRACE
     org.springframework.web.client.RestTemplate: DEBUG
-
-keycloak:
-  # TODO restore this
-  auth-server-url: http://localhost:8080
