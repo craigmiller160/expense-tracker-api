@@ -10,4 +10,4 @@ logging:
 
 keycloak:
   # TODO restore this
-#  auth-server-url: http://localhost:8080
+  auth-server-url: http://localhost:8080

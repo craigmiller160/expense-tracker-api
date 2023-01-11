@@ -1,6 +1,7 @@
 package io.craigmiller160.expensetrackerapi.testcore
 
 import io.craigmiller160.expensetrackerapi.testutils.KeyUtils
+import io.craigmiller160.expensetrackerapi.testutils.KeycloakJwtUtils
 import java.security.KeyPair
 import java.util.Base64
 import org.junit.jupiter.api.extension.BeforeEachCallback
@@ -11,11 +12,11 @@ class KeycloakSetupExtension : BeforeEachCallback {
     private val keyPair: KeyPair = KeyUtils.createKeyPair()
     init {
       val encodedPublicKey = Base64.getEncoder().encodeToString(keyPair.public.encoded)
-      // TODO restore this
-      //      System.setProperty("keycloak.realm-public-key", encodedPublicKey)
+      System.setProperty("keycloak.realm-public-key", encodedPublicKey)
     }
 
-    fun createKeycloakJwt(): String = TODO()
+    fun createKeycloakJwt(init: KeycloakJwtUtils.KeycloakJwtConfig.() -> Unit = {}): String =
+      KeycloakJwtUtils.createJwt(keyPair, init)
   }
   override fun beforeEach(ctx: ExtensionContext) {}
 }
