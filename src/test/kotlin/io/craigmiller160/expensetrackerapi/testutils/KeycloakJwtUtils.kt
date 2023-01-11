@@ -5,19 +5,19 @@ import java.util.UUID
 import org.keycloak.representations.AccessToken
 
 object KeycloakJwtUtils {
-  fun createJwt(init: KeycloakJwtConfig.() -> Unit = {}) {
+  fun createJwt(init: KeycloakJwtConfig.() -> Unit = {}): String {
     val config = KeycloakJwtConfig()
     config.init()
     val token =
       AccessToken()
+        .apply { addAccess("expense-tracker-api").roles(setOf("access")) }
         .iat(ZonedDateTime.now().toEpochSecond())
         .exp(config.expiration.toEpochSecond())
         .id(UUID.randomUUID().toString())
         .issuer("apps-dev")
         .audience("")
         .subject(config.userId.toString())
-    // TODO finish this
-    println(token)
+    TODO()
   }
 
   private fun zdtToLong(zdt: ZonedDateTime): Long = zdt.toEpochSecond()
