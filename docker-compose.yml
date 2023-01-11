@@ -10,7 +10,7 @@ services:
       - POSTGRES_PASSWORD=password
   keycloak:
     image: quay.io/keycloak/keycloak:20.0.2
-    container_name: keycloak
+    container_name: expense_tracker_keycloak
     ports:
       - '8080:8080'
     environment:
