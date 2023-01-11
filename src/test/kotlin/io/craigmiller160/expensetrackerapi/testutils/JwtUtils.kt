@@ -12,6 +12,7 @@ import java.util.Date
 import java.util.UUID
 
 object JwtUtils {
+  // TODO delete if unused
   const val ROLES_CLAIM = "roles"
   const val CLIENT_KEY_CLAIM = "clientKey"
   const val FIRST_NAME_CLAIM = "firstName"

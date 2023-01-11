@@ -1,6 +1,7 @@
 package io.craigmiller160.expensetrackerapi
 
 import io.craigmiller160.expensetrackerapi.function.TryEither
+import io.craigmiller160.expensetrackerapi.testutils.KeycloakJwtUtils
 import java.io.File
 import java.util.concurrent.TimeUnit
 import org.junit.jupiter.api.Test
@@ -10,6 +11,11 @@ class Temp {
   @Test
   fun experiment() {
     "docker ps".runCommand().also { println(it) }
+  }
+
+  @Test
+  fun foo() {
+    KeycloakJwtUtils.createJwt()
   }
 }
 
