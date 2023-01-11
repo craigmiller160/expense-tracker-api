@@ -6,3 +6,5 @@ logging:
   level:
     org.hibernate.SQL: DEBUG
     org.hibernate.type.descriptor.sql.BasicBinder: ERROR
+    # TODO restore old log setting
+    org.keycloak: TRACE
