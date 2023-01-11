@@ -76,12 +76,17 @@
     </distributionManagement>
 
     <dependencies>
-<!--        <dependency>-->
-<!--            <groupId>com.github.dasniko</groupId>-->
-<!--            <artifactId>testcontainers-keycloak</artifactId>-->
-<!--            <version>${keycloak.testcontainer.version}</version>-->
-<!--            <scope>test</scope>-->
-<!--        </dependency>-->
+        <dependency>
+            <groupId>org.keycloak</groupId>
+            <artifactId>keycloak-admin-client</artifactId>
+            <version>${keycloak.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.dasniko</groupId>
+            <artifactId>testcontainers-keycloak</artifactId>
+            <version>${keycloak.testcontainer.version}</version>
+            <scope>test</scope>
+        </dependency>
         <dependency>
             <groupId>com.github.spullara.mustache.java</groupId>
             <artifactId>compiler</artifactId>
