@@ -2,14 +2,19 @@ package io.craigmiller160.expensetrackerapi.testutils
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.jacksonTypeRef
+import com.nimbusds.jose.JWSAlgorithm
+import com.nimbusds.jose.JWSHeader
+import com.nimbusds.jose.crypto.RSASSASigner
 import com.nimbusds.jwt.JWTClaimsSet
+import com.nimbusds.jwt.SignedJWT
+import java.security.KeyPair
 import java.time.ZonedDateTime
 import java.util.UUID
 import org.keycloak.representations.AccessToken
 
 object KeycloakJwtUtils {
   private val objectMapper = jacksonObjectMapper()
-  fun createJwt(init: KeycloakJwtConfig.() -> Unit = {}): String {
+  fun createJwt(keyPair: KeyPair, init: KeycloakJwtConfig.() -> Unit = {}): String {
     val config = KeycloakJwtConfig()
     config.init()
     val token =
@@ -25,13 +30,19 @@ object KeycloakJwtUtils {
         .audience("")
         .subject(config.userId.toString())
 
-    val claims =
-      objectMapper
-        .writeValueAsBytes(token)
-        .let { objectMapper.readValue(it, jacksonTypeRef<Map<String, Any>>()) }
-        .let { JWTClaimsSet.parse(it) }
-
-    TODO()
+    return objectMapper
+      .writeValueAsBytes(token)
+      .let { objectMapper.readValue(it, jacksonTypeRef<Map<String, Any>>()) }
+      .let { JWTClaimsSet.parse(it) }
+      .let {
+        val header = JWSHeader.Builder(JWSAlgorithm.RS256).build()
+        SignedJWT(header, it)
+      }
+      .let {
+        val signer = RSASSASigner(keyPair.private)
+        it.sign(signer)
+        it.serialize()
+      }
   }
 
   class KeycloakJwtConfig {
