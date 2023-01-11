@@ -9,6 +9,7 @@ import org.junit.jupiter.api.extension.ExtensionContext
 import org.springframework.test.context.junit.jupiter.SpringExtension
 
 class OAuth2Extension : BeforeEachCallback {
+  // TODO delete this
   companion object {
     private val keyPair: KeyPair = KeyUtils.createKeyPair()
     private val jwkSet: JWKSet = KeyUtils.createJwkSet(keyPair)

@@ -13,6 +13,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 @ExtendWith(
   value =
     [
+      KeycloakSetupExtension::class,
       TestContainerExtension::class,
       SpringExtension::class,
       MockExtension::class,
