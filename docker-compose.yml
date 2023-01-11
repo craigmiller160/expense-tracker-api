@@ -8,6 +8,8 @@ services:
       - '5432:5432'
     environment:
       - POSTGRES_PASSWORD=password
+    networks:
+      - myNetwork
     volumes:
       - ./docker/postgres:/docker-entrypoint-initdb.d
   keycloak:
@@ -15,6 +17,8 @@ services:
     container_name: expense_tracker_keycloak
     ports:
       - '8080:8080'
+    networks:
+      - myNetwork
     environment:
       - KEYCLOAK_ADMIN=admin
       - KEYCLOAK_ADMIN_PASSWORD=admin
@@ -26,3 +30,6 @@ services:
       - start-dev
     depends_on:
       - postgres
+
+networks:
+  myNetwork:
