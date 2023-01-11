@@ -1,10 +1,14 @@
 package io.craigmiller160.expensetrackerapi.testutils
 
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import com.fasterxml.jackson.module.kotlin.jacksonTypeRef
+import com.nimbusds.jwt.JWTClaimsSet
 import java.time.ZonedDateTime
 import java.util.UUID
 import org.keycloak.representations.AccessToken
 
 object KeycloakJwtUtils {
+  private val objectMapper = jacksonObjectMapper()
   fun createJwt(init: KeycloakJwtConfig.() -> Unit = {}): String {
     val config = KeycloakJwtConfig()
     config.init()
@@ -20,10 +24,15 @@ object KeycloakJwtUtils {
         .issuer("apps-dev")
         .audience("")
         .subject(config.userId.toString())
+
+    val claims =
+      objectMapper
+        .writeValueAsBytes(token)
+        .let { objectMapper.readValue(it, jacksonTypeRef<Map<String, Any>>()) }
+        .let { JWTClaimsSet.parse(it) }
+
     TODO()
   }
-
-  private fun zdtToLong(zdt: ZonedDateTime): Long = zdt.toEpochSecond()
 
   class KeycloakJwtConfig {
     var userId: UUID = UUID.randomUUID()
