@@ -28,6 +28,7 @@ object KeycloakJwtUtils {
         .id(UUID.randomUUID().toString())
         .issuer("apps-dev")
         .audience("")
+        .nbf(ZonedDateTime.now().minusMinutes(1).toEpochSecond())
         .subject(config.userId.toString())
 
     return objectMapper
