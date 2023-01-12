@@ -7,13 +7,14 @@ import io.craigmiller160.expensetrackerapi.data.model.core.ViewEntity
 import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.ZonedDateTime
+import java.util.UUID
 import javax.persistence.Entity
 import javax.persistence.Table
 
 @Entity
 @Table(name = "transactions_view")
 class TransactionView(
-  override var userId: Long,
+  override var userId: UUID,
   override var expenseDate: LocalDate,
   override var description: String,
   override var amount: BigDecimal,

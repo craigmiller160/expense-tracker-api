@@ -5,10 +5,11 @@ import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.CategoryId
 import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.TransactionId
 import java.math.BigDecimal
 import java.time.LocalDate
+import java.util.UUID
 
 interface TransactionCommon {
   var uid: TypedId<TransactionId>
-  var userId: Long
+  var userId: UUID
   var expenseDate: LocalDate
   var description: String
   var amount: BigDecimal

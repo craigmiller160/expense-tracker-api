@@ -6,13 +6,14 @@ import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.CategoryId
 import io.craigmiller160.expensetrackerapi.data.model.core.MutableTableEntity
 import java.math.BigDecimal
 import java.time.LocalDate
+import java.util.UUID
 import javax.persistence.Entity
 import javax.persistence.Table
 
 @Entity
 @Table(name = "auto_categorize_rules")
 class AutoCategorizeRule(
-  var userId: Long,
+  var userId: UUID,
   var categoryId: TypedId<CategoryId>,
   var ordinal: Int,
   var regex: String,

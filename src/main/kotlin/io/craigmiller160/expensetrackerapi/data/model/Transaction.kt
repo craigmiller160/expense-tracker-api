@@ -6,6 +6,7 @@ import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.TransactionId
 import io.craigmiller160.expensetrackerapi.data.model.core.MutableTableEntity
 import java.math.BigDecimal
 import java.time.LocalDate
+import java.util.UUID
 import javax.persistence.Column
 import javax.persistence.Entity
 import javax.persistence.Table
@@ -13,7 +14,7 @@ import javax.persistence.Table
 @Entity
 @Table(name = "transactions")
 class Transaction(
-  override var userId: Long,
+  override var userId: UUID,
   override var expenseDate: LocalDate,
   override var description: String,
   override var amount: BigDecimal,

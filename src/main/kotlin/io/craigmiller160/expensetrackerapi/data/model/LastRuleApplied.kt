@@ -5,13 +5,14 @@ import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.AutoCategoriz
 import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.LastRuleAppliedId
 import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.TransactionId
 import io.craigmiller160.expensetrackerapi.data.model.core.ImmutableTableEntity
+import java.util.UUID
 import javax.persistence.Entity
 import javax.persistence.Table
 
 @Entity
 @Table(name = "last_rule_applied")
 class LastRuleApplied(
-  var userId: Long,
+  var userId: UUID,
   var ruleId: TypedId<AutoCategorizeRuleId>,
   var transactionId: TypedId<TransactionId>
 ) : ImmutableTableEntity<LastRuleAppliedId>()
