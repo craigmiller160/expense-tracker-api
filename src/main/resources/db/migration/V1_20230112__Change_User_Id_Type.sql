@@ -1,4 +1,4 @@
--- AutoCategorizeRuleView, TransactionView
+-- TODO do I need to migrate these? AutoCategorizeRuleView, TransactionView
 
 ALTER TABLE transactions
 RENAME COLUMN user_id TO legacy_user_id;
