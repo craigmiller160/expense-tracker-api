@@ -90,7 +90,10 @@ class AutoCategorizeRuleService(
     TODO()
   }
 
-  private fun validateCategory(categoryId: TypedId<CategoryId>, userId: Long): TryEither<Unit> =
+  private fun validateCategory(
+    categoryId: TypedId<CategoryId>,
+    userId: TypedId<UserId>
+  ): TryEither<Unit> =
     Either.catch { categoryRepository.existsByUidAndUserId(categoryId, userId) }
       .filterOrElse({ it }) { BadRequestException("Invalid Category: $categoryId") }
       .map { Unit }

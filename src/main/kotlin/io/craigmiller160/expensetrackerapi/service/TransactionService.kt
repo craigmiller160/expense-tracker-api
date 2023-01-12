@@ -5,6 +5,7 @@ import arrow.core.continuations.either
 import io.craigmiller160.expensetrackerapi.common.data.typedid.TypedId
 import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.CategoryId
 import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.TransactionId
+import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.UserId
 import io.craigmiller160.expensetrackerapi.data.model.Category
 import io.craigmiller160.expensetrackerapi.data.repository.CategoryRepository
 import io.craigmiller160.expensetrackerapi.data.repository.LastRuleAppliedRepository
@@ -219,7 +220,9 @@ class TransactionService(
     TODO()
   }
 
-  private fun getCategoryMap(userId: Long): TryEither<Map<TypedId<CategoryId>, Category>> =
+  private fun getCategoryMap(
+    userId: TypedId<UserId>
+  ): TryEither<Map<TypedId<CategoryId>, Category>> =
     Either.catch { categoryRepository.findAllByUserIdOrderByName(userId).associateBy { it.uid } }
 
   fun getTransactionDetails(
