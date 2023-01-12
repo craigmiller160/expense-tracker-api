@@ -90,7 +90,7 @@ constructor(
 
   @Test
   fun `createCategory - cannot use name Unknown`() {
-    val token = ""
+    val token = authHelper.primaryUser.token
     val request = CategoryRequest("Unknown")
 
     mockMvc
