@@ -39,38 +39,43 @@ constructor(
   @BeforeEach
   fun setup() {
     ruleCounter = 0
-    val cat0 = dataHelper.createCategory(1L, "Entertainment")
-    val cat1 = dataHelper.createCategory(1L, "Food")
-    val cat2 = dataHelper.createCategory(1L, "Bills")
-    val cat3 = dataHelper.createCategory(1L, "Other")
-    val cat4 = dataHelper.createCategory(1L, "Something")
-    val cat5 = dataHelper.createCategory(1L, "Foo")
-    val cat6 = dataHelper.createCategory(1L, "To Somewhere")
-
-    categories = listOf(cat0, cat1, cat2, cat3, cat4, cat5, cat6)
-
-    val txn0 = createTransaction("Target", LocalDate.of(2022, 1, 1), BigDecimal("10"))
-    val txn1 = createTransaction("Target", LocalDate.of(2022, 1, 1), BigDecimal("100"))
-    val txn2 = createTransaction("AMC Theaters", LocalDate.of(2022, 3, 10), BigDecimal("22"))
-    val txn3 = createTransaction("AMC Theaters", LocalDate.of(2022, 6, 1), BigDecimal("10"))
-    val txn4 = createTransaction("AMC Theaters 2", LocalDate.of(2022, 12, 10), BigDecimal("22"))
-    val txn5 = createTransaction("Target", LocalDate.of(2022, 1, 1), BigDecimal("20"))
-    val txn6 =
-      createTransaction("Universe", LocalDate.now(), BigDecimal("10")).let {
-        transactionRepository.save(it.apply { categoryId = cat6.uid })
-      }
-
-    transactions = listOf(txn0, txn1, txn2, txn3, txn4, txn5, txn6)
-
-    val rule0 = createRule(categoryId = cat2.uid, regex = "Target")
-    val rule1 = createRule(categoryId = cat0.uid, regex = "Target", minAmount = BigDecimal("90"))
-    val rule2 = createRule(categoryId = cat1.uid, regex = "Target", maxAmount = BigDecimal("15"))
-    val rule3 = createRule(categoryId = cat5.uid, regex = "AMC.*")
-    val rule4 =
-      createRule(categoryId = cat3.uid, regex = "AMC.*", startDate = LocalDate.of(2022, 11, 1))
-    val rule5 =
-      createRule(categoryId = cat4.uid, regex = "AMC.*", endDate = LocalDate.of(2022, 4, 1))
-    rules = listOf(rule0, rule1, rule2, rule3, rule4, rule5)
+    //    val cat0 = dataHelper.createCategory(1L, "Entertainment")
+    //    val cat1 = dataHelper.createCategory(1L, "Food")
+    //    val cat2 = dataHelper.createCategory(1L, "Bills")
+    //    val cat3 = dataHelper.createCategory(1L, "Other")
+    //    val cat4 = dataHelper.createCategory(1L, "Something")
+    //    val cat5 = dataHelper.createCategory(1L, "Foo")
+    //    val cat6 = dataHelper.createCategory(1L, "To Somewhere")
+    //
+    //    categories = listOf(cat0, cat1, cat2, cat3, cat4, cat5, cat6)
+    //
+    //    val txn0 = createTransaction("Target", LocalDate.of(2022, 1, 1), BigDecimal("10"))
+    //    val txn1 = createTransaction("Target", LocalDate.of(2022, 1, 1), BigDecimal("100"))
+    //    val txn2 = createTransaction("AMC Theaters", LocalDate.of(2022, 3, 10), BigDecimal("22"))
+    //    val txn3 = createTransaction("AMC Theaters", LocalDate.of(2022, 6, 1), BigDecimal("10"))
+    //    val txn4 = createTransaction("AMC Theaters 2", LocalDate.of(2022, 12, 10),
+    // BigDecimal("22"))
+    //    val txn5 = createTransaction("Target", LocalDate.of(2022, 1, 1), BigDecimal("20"))
+    //    val txn6 =
+    //      createTransaction("Universe", LocalDate.now(), BigDecimal("10")).let {
+    //        transactionRepository.save(it.apply { categoryId = cat6.uid })
+    //      }
+    //
+    //    transactions = listOf(txn0, txn1, txn2, txn3, txn4, txn5, txn6)
+    //
+    //    val rule0 = createRule(categoryId = cat2.uid, regex = "Target")
+    //    val rule1 = createRule(categoryId = cat0.uid, regex = "Target", minAmount =
+    // BigDecimal("90"))
+    //    val rule2 = createRule(categoryId = cat1.uid, regex = "Target", maxAmount =
+    // BigDecimal("15"))
+    //    val rule3 = createRule(categoryId = cat5.uid, regex = "AMC.*")
+    //    val rule4 =
+    //      createRule(categoryId = cat3.uid, regex = "AMC.*", startDate = LocalDate.of(2022, 11,
+    // 1))
+    //    val rule5 =
+    //      createRule(categoryId = cat4.uid, regex = "AMC.*", endDate = LocalDate.of(2022, 4, 1))
+    //    rules = listOf(rule0, rule1, rule2, rule3, rule4, rule5)
+    TODO()
   }
 
   private fun createTransaction(
