@@ -35,7 +35,7 @@ class AuthenticationHelper(configResolver: KeycloakConfigResolver) {
 
   private val defaultUsers = ConcurrentHashMap<String, String>()
 
-  fun createUser(userName: String, roles: List<String> = listOf(ROLE_ACCESS)) {
+  fun createUser(userName: String, roles: List<String> = listOf(ROLE_ACCESS)): TestUser {
     val user =
       UserRepresentation().apply {
         username = userName
@@ -57,6 +57,8 @@ class AuthenticationHelper(configResolver: KeycloakConfigResolver) {
       }
 
     keycloak.realm(keycloakDeployment.realm).users().get(userId).resetPassword(passwordCred)
+    val token = login(userName, "password")
+    return TestUser(userId = userId, userName = userName, roles = roles, token = token)
   }
 
   fun login(userName: String, password: String): String {
@@ -89,4 +91,11 @@ class AuthenticationHelper(configResolver: KeycloakConfigResolver) {
     val id = UUID.randomUUID().toString()
     createUser("default_$id@gmail.com")
   }
+
+  data class TestUser(
+    val userId: String,
+    val userName: String,
+    val roles: List<String>,
+    val token: String
+  )
 }
