@@ -21,6 +21,7 @@ class AuthenticationHelper(configResolver: KeycloakConfigResolver) {
     const val ROLE_ACCESS = "access"
     const val PRIMARY_USER = "PRIMARY_USER"
     const val SECONDARY_USER = "SECONDARY_USER"
+    const val TERTIARY_USER = "TERTIARY_USER"
   }
 
   private val restTemplate: RestTemplate = RestTemplate()
@@ -40,6 +41,8 @@ class AuthenticationHelper(configResolver: KeycloakConfigResolver) {
     get() = defaultUsers[PRIMARY_USER]!!
   val secondaryUser: TestUser
     get() = defaultUsers[SECONDARY_USER]!!
+  val tertiaryUser: TestUser
+    get() = defaultUsers[TERTIARY_USER]!!
 
   fun createUser(userName: String, roles: List<String> = listOf(ROLE_ACCESS)): TestUser {
     val client =
@@ -119,8 +122,10 @@ class AuthenticationHelper(configResolver: KeycloakConfigResolver) {
     val id = UUID.randomUUID().toString()
     val primaryUser = createUser("primary_$id@gmail.com")
     val secondaryUser = createUser("secondary_$id@gmail.com")
+    val tertiaryUser = createUser("tertiary_$id@gmail.com")
     defaultUsers += PRIMARY_USER to primaryUser
     defaultUsers += SECONDARY_USER to secondaryUser
+    defaultUsers += TERTIARY_USER to tertiaryUser
   }
 
   data class TestUser(
