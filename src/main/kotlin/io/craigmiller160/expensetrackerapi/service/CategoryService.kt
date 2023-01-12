@@ -23,11 +23,10 @@ class CategoryService(
   private val authService: AuthorizationService
 ) {
   fun getAllCategories(): TryEither<List<CategoryResponse>> {
-    //    val userId = oAuth2Service.getAuthenticatedUser().userId
-    //    return Either.catch {
-    //      categoryRepository.findAllByUserIdOrderByName(userId).map { CategoryResponse.from(it) }
-    //    }
-    TODO()
+    val userId = authService.getAuthUserId()
+    return Either.catch {
+      categoryRepository.findAllByUserIdOrderByName(userId).map { CategoryResponse.from(it) }
+    }
   }
 
   private fun validateRequest(request: CategoryRequest): TryEither<CategoryRequest> {
@@ -51,28 +50,26 @@ class CategoryService(
 
   @Transactional
   fun updateCategory(categoryId: TypedId<CategoryId>, request: CategoryRequest): TryEither<Unit> {
-    //    val userId = oAuth2Service.getAuthenticatedUser().userId
-    //    return validateRequest(request)
-    //      .flatMapCatch { categoryRepository.findByUidAndUserId(categoryId, userId) }
-    //      .flatMapCatch { nullableCategory ->
-    //        nullableCategory?.let { category ->
-    //          categoryRepository.save(
-    //            category.apply {
-    //              name = request.name
-    //              color = StringToColor.get(request.name)
-    //            })
-    //        }
-    //      }
-    TODO()
+    val userId = authService.getAuthUserId()
+    return validateRequest(request)
+      .flatMapCatch { categoryRepository.findByUidAndUserId(categoryId, userId) }
+      .flatMapCatch { nullableCategory ->
+        nullableCategory?.let { category ->
+          categoryRepository.save(
+            category.apply {
+              name = request.name
+              color = StringToColor.get(request.name)
+            })
+        }
+      }
   }
 
   @Transactional
   fun deleteCategory(categoryId: TypedId<CategoryId>): TryEither<Unit> {
-    //    val userId = oAuth2Service.getAuthenticatedUser().userId
-    //    return Either.catch {
-    //        transactionRepository.removeCategoryFromAllTransactions(userId, categoryId)
-    //      }
-    //      .flatMapCatch { categoryRepository.deleteByUidAndUserId(categoryId, userId) }
-    TODO()
+    val userId = authService.getAuthUserId()
+    return Either.catch {
+        transactionRepository.removeCategoryFromAllTransactions(userId, categoryId)
+      }
+      .flatMapCatch { categoryRepository.deleteByUidAndUserId(categoryId, userId) }
   }
 }
