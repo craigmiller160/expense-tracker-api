@@ -36,11 +36,11 @@ constructor(private val mockMvc: MockMvc, private val authHelper: Authentication
 
   @Test
   fun `allows healthcheck without token`() {
-    TODO()
+    mockMvc.get("/actuator/health") { secure = true }.andExpect { status { isOk() } }
   }
 
   @Test
   fun `allows swagger without token`() {
-    TODO()
+    mockMvc.get("/v3/api-docs") { secure = true }.andExpect { status { isOk() } }
   }
 }
