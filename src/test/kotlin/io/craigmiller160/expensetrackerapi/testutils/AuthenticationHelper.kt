@@ -19,6 +19,8 @@ import org.springframework.web.client.RestTemplate
 class AuthenticationHelper(configResolver: KeycloakConfigResolver) {
   companion object {
     const val ROLE_ACCESS = "access"
+    const val PRIMARY_USER = "PRIMARY_USER"
+    const val SECONDARY_USER = "SECONDARY_USER"
   }
 
   private val restTemplate: RestTemplate = RestTemplate()
@@ -33,7 +35,11 @@ class AuthenticationHelper(configResolver: KeycloakConfigResolver) {
       .password("admin")
       .build()
 
-  private val defaultUsers = ConcurrentHashMap<String, String>()
+  private val defaultUsers = ConcurrentHashMap<String, TestUser>()
+  val primaryUser: TestUser
+    get() = defaultUsers[PRIMARY_USER]!!
+  val secondaryUser: TestUser
+    get() = defaultUsers[SECONDARY_USER]!!
 
   fun createUser(userName: String, roles: List<String> = listOf(ROLE_ACCESS)): TestUser {
     val user =
@@ -89,7 +95,10 @@ class AuthenticationHelper(configResolver: KeycloakConfigResolver) {
   @PostConstruct
   fun setup() {
     val id = UUID.randomUUID().toString()
-    createUser("default_$id@gmail.com")
+    val primaryUser = createUser("primary_$id@gmail.com")
+    val secondaryUser = createUser("secondary_$id@gmail.com")
+    defaultUsers += PRIMARY_USER to primaryUser
+    defaultUsers += SECONDARY_USER to secondaryUser
   }
 
   data class TestUser(
