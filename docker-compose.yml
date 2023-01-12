@@ -26,5 +26,6 @@ services:
       - ./src/test/resources:/opt/keycloak/data/import
     command:
       - start-dev
+      - --import-realm
     depends_on:
       - postgres
