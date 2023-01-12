@@ -9,6 +9,8 @@ spring:
     password: password
 keycloak:
   auth-server-url: http://localhost:8080
+  credentials:
+    secret: CQ60kzXcV7F31JfW8dX2MINjVIKOIxpJ
 logging:
   level:
     org.hibernate.SQL: DEBUG
