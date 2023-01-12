@@ -14,6 +14,7 @@ import io.craigmiller160.expensetrackerapi.data.repository.TransactionRepository
 import io.craigmiller160.expensetrackerapi.function.TryEither
 import io.craigmiller160.expensetrackerapi.function.flatMapCatch
 import java.time.LocalDate
+import java.util.UUID
 import javax.transaction.Transactional
 import org.slf4j.LoggerFactory
 import org.springframework.data.domain.PageRequest
@@ -33,7 +34,7 @@ class ApplyCategoriesToTransactionsService(
   private val log = LoggerFactory.getLogger(javaClass)
 
   @Transactional
-  fun applyCategoriesToUnconfirmedTransactions(userId: Long): TryEither<Unit> {
+  fun applyCategoriesToUnconfirmedTransactions(userId: UUID): TryEither<Unit> {
     log.debug("Starting to apply categories to all unconfirmed transactions for user $userId")
     val start = System.nanoTime()
     return applyCategoriesToUnconfirmedTransactions(userId, 0).map {
@@ -44,7 +45,7 @@ class ApplyCategoriesToTransactionsService(
   }
 
   private fun applyCategoriesToUnconfirmedTransactions(
-    userId: Long,
+    userId: UUID,
     pageNumber: Int
   ): TryEither<Unit> {
     val page = PageRequest.of(pageNumber, PAGE_SIZE, Sort.by(Sort.Order.asc("id")))
@@ -108,7 +109,7 @@ class ApplyCategoriesToTransactionsService(
 
   /** This returns the transactions in a different order from the method. */
   fun applyCategoriesToTransactions(
-    userId: Long,
+    userId: UUID,
     transactions: List<Transaction>
   ): TryEither<List<Transaction>> {
     log.debug("Starting to apply categories to batch of transactions for user $userId")

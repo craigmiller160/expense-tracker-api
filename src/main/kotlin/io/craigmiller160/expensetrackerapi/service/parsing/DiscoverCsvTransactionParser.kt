@@ -7,6 +7,7 @@ import io.craigmiller160.expensetrackerapi.function.TryEither
 import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
+import java.util.UUID
 import org.springframework.stereotype.Component
 
 @Component
@@ -17,7 +18,7 @@ class DiscoverCsvTransactionParser : AbstractCsvTransactionParser() {
       listOf("Trans. Date", "Post Date", "Description", "Amount", "Category")
   }
 
-  override fun parseRecord(userId: Long, row: Array<String>): TryEither<Transaction> =
+  override fun parseRecord(userId: UUID, row: Array<String>): TryEither<Transaction> =
     Either.catch {
       val transactionDate = row[0]
       val expenseDate = LocalDate.parse(transactionDate, DATE_FORMAT)
