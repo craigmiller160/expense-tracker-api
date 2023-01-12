@@ -81,7 +81,7 @@ class AuthenticationHelper(configResolver: KeycloakConfigResolver) {
       .users()
       .get(userId)
       .roles()
-      .clientLevel(keycloakDeployment.resourceName)
+      .clientLevel(client.id)
       .add(listOf(accessRole))
     val token = login(userName, "password")
     return TestUser(userId = userId, userName = userName, roles = roles, token = token)
