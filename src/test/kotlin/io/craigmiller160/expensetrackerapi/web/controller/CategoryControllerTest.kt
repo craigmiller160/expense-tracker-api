@@ -4,14 +4,13 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import io.craigmiller160.expensetrackerapi.data.repository.CategoryRepository
 import io.craigmiller160.expensetrackerapi.data.repository.TransactionRepository
 import io.craigmiller160.expensetrackerapi.testcore.ExpenseTrackerIntegrationTest
-import io.craigmiller160.expensetrackerapi.testcore.OAuth2Extension
+import io.craigmiller160.expensetrackerapi.testutils.AuthenticationHelper
 import io.craigmiller160.expensetrackerapi.testutils.DataHelper
 import io.craigmiller160.expensetrackerapi.utils.StringToColor
 import io.craigmiller160.expensetrackerapi.web.types.category.CategoryRequest
 import io.craigmiller160.expensetrackerapi.web.types.category.CategoryResponse
 import javax.persistence.EntityManager
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.MediaType
@@ -28,14 +27,9 @@ constructor(
   private val entityManager: EntityManager,
   private val dataHelper: DataHelper,
   private val mockMvc: MockMvc,
-  private val objectMapper: ObjectMapper
+  private val objectMapper: ObjectMapper,
+  private val authHelper: AuthenticationHelper
 ) {
-  private lateinit var token: String
-
-  @BeforeEach
-  fun setup() {
-    token = OAuth2Extension.createJwt()
-  }
 
   @Test
   fun getAllCategories() {
@@ -61,6 +55,7 @@ constructor(
 
   @Test
   fun createCategory() {
+    val token = authHelper.primaryUser.token
     val request = CategoryRequest("The Category")
 
     val responseString =
@@ -90,6 +85,7 @@ constructor(
 
   @Test
   fun `createCategory - cannot use name Unknown`() {
+    val token = ""
     val request = CategoryRequest("Unknown")
 
     mockMvc
