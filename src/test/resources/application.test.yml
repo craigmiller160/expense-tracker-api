@@ -8,7 +8,7 @@ spring:
     username: postgres
     password: password
 keycloak:
-  auth-server-url: http://localhost:8080
+  auth-server-url: http://localhost:8081
   credentials:
     secret: CQ60kzXcV7F31JfW8dX2MINjVIKOIxpJ
 logging:
