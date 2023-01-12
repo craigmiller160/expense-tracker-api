@@ -1,17 +1,8 @@
-package io.craigmiller160.expensetrackerapi
+package io.craigmiller160.expensetrackerapi.testutils
 
 import io.craigmiller160.expensetrackerapi.function.TryEither
 import java.io.File
 import java.util.concurrent.TimeUnit
-import org.junit.jupiter.api.Test
-
-class Temp {
-  // TODO delete if unused
-  @Test
-  fun experiment() {
-    "docker ps".runCommand().also { println(it) }
-  }
-}
 
 fun String.runCommand(
   workingDir: File = File("."),
