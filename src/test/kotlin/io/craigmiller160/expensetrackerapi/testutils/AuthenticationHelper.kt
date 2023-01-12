@@ -76,13 +76,15 @@ class AuthenticationHelper(configResolver: KeycloakConfigResolver) {
       }
 
     keycloak.realm(keycloakDeployment.realm).users().get(userId).resetPassword(passwordCred)
-    keycloak
-      .realm(keycloakDeployment.realm)
-      .users()
-      .get(userId)
-      .roles()
-      .clientLevel(client.id)
-      .add(listOf(accessRole))
+    if (roles.contains(ROLE_ACCESS)) {
+      keycloak
+        .realm(keycloakDeployment.realm)
+        .users()
+        .get(userId)
+        .roles()
+        .clientLevel(client.id)
+        .add(listOf(accessRole))
+    }
     val token = login(userName, "password")
     return TestUser(userId = userId, userName = userName, roles = roles, token = token)
   }
