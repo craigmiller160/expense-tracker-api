@@ -20,7 +20,7 @@ constructor(
 ) {
   @Test
   fun `allows valid token with access role`() {
-    val token = authHelper.login("myUser@gmail.com", "password")
+    val token = authHelper.primaryUser.token
     mockMvc
       .get("/transaction-import/types") {
         secure = true
