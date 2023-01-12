@@ -3,17 +3,17 @@ package io.craigmiller160.expensetrackerapi.data.model
 import io.craigmiller160.expensetrackerapi.common.data.typedid.TypedId
 import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.AutoCategorizeRuleId
 import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.CategoryId
+import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.UserId
 import io.craigmiller160.expensetrackerapi.data.model.core.MutableTableEntity
 import java.math.BigDecimal
 import java.time.LocalDate
-import java.util.UUID
 import javax.persistence.Entity
 import javax.persistence.Table
 
 @Entity
 @Table(name = "auto_categorize_rules")
 class AutoCategorizeRule(
-  var userId: UUID,
+  var userId: TypedId<UserId>,
   var categoryId: TypedId<CategoryId>,
   var ordinal: Int,
   var regex: String,
