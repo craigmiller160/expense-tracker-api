@@ -79,7 +79,7 @@ constructor(
       .isPresent
       .get()
       .hasFieldOrPropertyWithValue("name", request.name)
-      .hasFieldOrPropertyWithValue("userId", 1L)
+      .hasFieldOrPropertyWithValue("userId", authHelper.primaryUser.userId)
       .hasFieldOrPropertyWithValue("color", StringToColor.get(request.name))
   }
 

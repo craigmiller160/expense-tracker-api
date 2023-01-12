@@ -1,5 +1,7 @@
 package io.craigmiller160.expensetrackerapi.testutils
 
+import io.craigmiller160.expensetrackerapi.common.data.typedid.TypedId
+import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.UserId
 import java.util.Base64
 import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
@@ -89,7 +91,7 @@ class AuthenticationHelper(configResolver: KeycloakConfigResolver) {
         .add(listOf(accessRole))
     }
     val token = login(userName, "password")
-    return TestUser(userId = userId, userName = userName, roles = roles, token = token)
+    return TestUser(userId = TypedId(userId), userName = userName, roles = roles, token = token)
   }
 
   fun login(userName: String, password: String): String {
@@ -129,7 +131,7 @@ class AuthenticationHelper(configResolver: KeycloakConfigResolver) {
   }
 
   data class TestUser(
-    val userId: String,
+    val userId: TypedId<UserId>,
     val userName: String,
     val roles: List<String>,
     val token: String
