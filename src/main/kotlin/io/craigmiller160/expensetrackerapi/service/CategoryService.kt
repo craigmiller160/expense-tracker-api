@@ -16,7 +16,8 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 class CategoryService(
   private val categoryRepository: CategoryRepository,
-  private val transactionRepository: TransactionRepository
+  private val transactionRepository: TransactionRepository,
+  private val authService: AuthorizationService
 ) {
   fun getAllCategories(): TryEither<List<CategoryResponse>> {
     //    val userId = oAuth2Service.getAuthenticatedUser().userId
@@ -36,6 +37,7 @@ class CategoryService(
 
   @Transactional
   fun createCategory(request: CategoryRequest): TryEither<CategoryResponse> {
+    authService.getAuthUserId()
     //    val userId = oAuth2Service.getAuthenticatedUser().userId
     //    return validateRequest(request)
     //      .flatMapCatch {
