@@ -60,7 +60,7 @@ class AuthenticationHelper(configResolver: KeycloakConfigResolver) {
   }
 
   fun login(userName: String, password: String): String {
-    val clientId = keycloakDeployment.realm
+    val clientId = keycloakDeployment.resourceName
     val clientSecret = keycloakDeployment.resourceCredentials["secret"].toString()
     val formData =
       LinkedMultiValueMap(
