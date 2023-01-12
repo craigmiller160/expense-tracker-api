@@ -2,6 +2,8 @@ package io.craigmiller160.expensetrackerapi.data.repository.impl
 
 import com.querydsl.core.BooleanBuilder
 import com.querydsl.jpa.JPQLQueryFactory
+import io.craigmiller160.expensetrackerapi.common.data.typedid.TypedId
+import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.UserId
 import io.craigmiller160.expensetrackerapi.data.model.AutoCategorizeRuleView
 import io.craigmiller160.expensetrackerapi.data.model.QAutoCategorizeRuleView
 import io.craigmiller160.expensetrackerapi.data.querydsl.QueryDSLSupport
@@ -20,7 +22,7 @@ class AutoCategorizeRuleViewRepositoryCustomImpl(
 ) : AutoCategorizeRuleViewRepositoryCustom {
   override fun searchForRules(
     request: AutoCategorizeRulePageRequest,
-    userId: Long
+    userId: TypedId<UserId>
   ): Page<AutoCategorizeRuleView> {
     val sort = Sort.by(Sort.Order.asc("ordinal"))
     val pageable = PageRequest.of(request.pageNumber, request.pageSize, sort)

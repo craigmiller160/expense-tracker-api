@@ -146,7 +146,7 @@ class ApplyCategoriesToTransactionsService(
     val currentRule: AutoCategorizeRule
   ) {
     companion object {
-      private val EMPTY_RULE = AutoCategorizeRule(0L, TypedId(), 0, "")
+      private val EMPTY_RULE = AutoCategorizeRule(TypedId(), TypedId(), 0, "")
 
       fun forAllTransactions(allTransactions: List<Transaction>): TransactionRuleContext =
         TransactionRuleContext(allTransactions, mapOf(), EMPTY_RULE)

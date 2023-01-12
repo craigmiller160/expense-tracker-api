@@ -5,19 +5,15 @@ import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.AutoCategoriz
 import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.CategoryId
 import io.craigmiller160.expensetrackerapi.data.model.AutoCategorizeRule
 import io.craigmiller160.expensetrackerapi.data.model.Category
-import io.craigmiller160.expensetrackerapi.data.model.LastRuleApplied
 import io.craigmiller160.expensetrackerapi.data.model.Transaction
 import io.craigmiller160.expensetrackerapi.data.repository.AutoCategorizeRuleRepository
 import io.craigmiller160.expensetrackerapi.data.repository.LastRuleAppliedRepository
 import io.craigmiller160.expensetrackerapi.data.repository.TransactionRepository
-import io.craigmiller160.expensetrackerapi.extension.flushAndClear
 import io.craigmiller160.expensetrackerapi.testcore.ExpenseTrackerIntegrationTest
 import io.craigmiller160.expensetrackerapi.testutils.DataHelper
-import io.kotest.assertions.arrow.core.shouldBeRight
 import java.math.BigDecimal
 import java.time.LocalDate
 import javax.persistence.EntityManager
-import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -81,10 +77,10 @@ constructor(
     description: String,
     expenseDate: LocalDate,
     amount: BigDecimal
-  ): Transaction =
-    transactionRepository.save(
-      Transaction(
-        userId = 1L, expenseDate = expenseDate, description = description, amount = amount))
+  ): Transaction = TODO()
+  //    transactionRepository.save(
+  //      Transaction(
+  //        userId = 1L, expenseDate = expenseDate, description = description, amount = amount))
 
   private fun createRule(
     categoryId: TypedId<CategoryId>,
@@ -93,36 +89,38 @@ constructor(
     endDate: LocalDate? = null,
     minAmount: BigDecimal? = null,
     maxAmount: BigDecimal? = null
-  ): AutoCategorizeRule =
-    autoCategorizeRuleRepository.save(
-      AutoCategorizeRule(
-        userId = 1L,
-        categoryId = categoryId,
-        ordinal = ++ruleCounter,
-        regex = regex,
-        startDate = startDate,
-        endDate = endDate,
-        minAmount = minAmount,
-        maxAmount = maxAmount))
+  ): AutoCategorizeRule = TODO()
+  //    autoCategorizeRuleRepository.save(
+  //      AutoCategorizeRule(
+  //        userId = 1L,
+  //        categoryId = categoryId,
+  //        ordinal = ++ruleCounter,
+  //        regex = regex,
+  //        startDate = startDate,
+  //        endDate = endDate,
+  //        minAmount = minAmount,
+  //        maxAmount = maxAmount))
 
   @Test
   fun applyCategoriesToTransactions() {
-    lastRuleAppliedRepository.saveAndFlush(
-      LastRuleApplied(userId = 1L, ruleId = rules[0].uid, transactionId = transactions[6].uid))
-    val result =
-      applyCategoriesToTransactionsService
-        .applyCategoriesToTransactions(1L, transactions)
-        .shouldBeRight()
-
-    entityManager.flushAndClear()
-
-    validateCategoryApplied(transactions[1], categories[0].uid, rules[1].uid)
-    validateCategoryApplied(transactions[0], categories[1].uid, rules[2].uid)
-    validateCategoryApplied(transactions[5], categories[2].uid, rules[0].uid)
-    validateCategoryApplied(transactions[4], categories[3].uid, rules[4].uid)
-    validateCategoryApplied(transactions[2], categories[4].uid, rules[5].uid)
-    validateCategoryApplied(transactions[3], categories[5].uid, rules[3].uid)
-    validateCategoryApplied(transactions[6], null, null)
+    //    lastRuleAppliedRepository.saveAndFlush(
+    //      LastRuleApplied(userId = 1L, ruleId = rules[0].uid, transactionId =
+    // transactions[6].uid))
+    //    val result =
+    //      applyCategoriesToTransactionsService
+    //        .applyCategoriesToTransactions(1L, transactions)
+    //        .shouldBeRight()
+    //
+    //    entityManager.flushAndClear()
+    //
+    //    validateCategoryApplied(transactions[1], categories[0].uid, rules[1].uid)
+    //    validateCategoryApplied(transactions[0], categories[1].uid, rules[2].uid)
+    //    validateCategoryApplied(transactions[5], categories[2].uid, rules[0].uid)
+    //    validateCategoryApplied(transactions[4], categories[3].uid, rules[4].uid)
+    //    validateCategoryApplied(transactions[2], categories[4].uid, rules[5].uid)
+    //    validateCategoryApplied(transactions[3], categories[5].uid, rules[3].uid)
+    //    validateCategoryApplied(transactions[6], null, null)
+    TODO()
   }
 
   private fun validateCategoryApplied(
@@ -130,15 +128,17 @@ constructor(
     categoryId: TypedId<CategoryId>?,
     ruleId: TypedId<AutoCategorizeRuleId>?
   ) {
-    assertThat(transactionRepository.findById(txn.uid))
-      .isPresent
-      .get()
-      .hasFieldOrPropertyWithValue("categoryId", categoryId)
-    ruleId?.let { nonNullRuleId ->
-      assertThat(lastRuleAppliedRepository.findByUserIdAndTransactionId(1L, txn.uid))
-        .isNotNull
-        .hasFieldOrPropertyWithValue("ruleId", nonNullRuleId)
-    }
-      ?: assertThat(lastRuleAppliedRepository.findByUserIdAndTransactionId(1L, txn.uid)).isNull()
+    //    assertThat(transactionRepository.findById(txn.uid))
+    //      .isPresent
+    //      .get()
+    //      .hasFieldOrPropertyWithValue("categoryId", categoryId)
+    //    ruleId?.let { nonNullRuleId ->
+    //      assertThat(lastRuleAppliedRepository.findByUserIdAndTransactionId(1L, txn.uid))
+    //        .isNotNull
+    //        .hasFieldOrPropertyWithValue("ruleId", nonNullRuleId)
+    //    }
+    //      ?: assertThat(lastRuleAppliedRepository.findByUserIdAndTransactionId(1L,
+    // txn.uid)).isNull()
+    TODO()
   }
 }
