@@ -6,6 +6,7 @@ import arrow.core.leftIfNull
 import io.craigmiller160.expensetrackerapi.common.data.typedid.TypedId
 import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.AutoCategorizeRuleId
 import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.CategoryId
+import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.UserId
 import io.craigmiller160.expensetrackerapi.common.error.BadRequestException
 import io.craigmiller160.expensetrackerapi.data.model.AutoCategorizeRule
 import io.craigmiller160.expensetrackerapi.data.model.AutoCategorizeRuleView
@@ -96,7 +97,7 @@ class AutoCategorizeRuleService(
 
   private fun getRuleIfValid(
     ruleId: TypedId<AutoCategorizeRuleId>,
-    userId: Long
+    userId: TypedId<UserId>
   ): TryEither<AutoCategorizeRule> =
     Either.catch { autoCategorizeRuleRepository.findByUidAndUserId(ruleId, userId) }
       .leftIfNull { BadRequestException("Invalid Rule: $ruleId") }
@@ -173,7 +174,7 @@ class AutoCategorizeRuleService(
   }
 
   private fun validateOrdinal(
-    userId: Long,
+    userId: TypedId<UserId>,
     ordinal: Int,
     isCreate: Boolean = false
   ): TryEither<Int> =
@@ -201,7 +202,7 @@ class AutoCategorizeRuleService(
   }
 
   private fun changeOtherRuleOrdinals(
-    userId: Long,
+    userId: TypedId<UserId>,
     oldOrdinal: Int,
     newOrdinal: Int,
     excludeId: TypedId<AutoCategorizeRuleId>? = null

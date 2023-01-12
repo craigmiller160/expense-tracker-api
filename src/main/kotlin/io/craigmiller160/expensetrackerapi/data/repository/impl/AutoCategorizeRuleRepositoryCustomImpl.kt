@@ -4,6 +4,7 @@ import com.querydsl.core.BooleanBuilder
 import com.querydsl.jpa.JPQLQueryFactory
 import io.craigmiller160.expensetrackerapi.common.data.typedid.TypedId
 import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.AutoCategorizeRuleId
+import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.UserId
 import io.craigmiller160.expensetrackerapi.data.model.QAutoCategorizeRule
 import io.craigmiller160.expensetrackerapi.data.querydsl.QueryDSLSupport
 import io.craigmiller160.expensetrackerapi.data.repository.AutoCategorizeRuleRepositoryCustom
@@ -16,7 +17,7 @@ class AutoCategorizeRuleRepositoryCustomImpl(
 ) : AutoCategorizeRuleRepositoryCustom {
 
   override fun decrementOrdinals(
-    userId: Long,
+    userId: TypedId<UserId>,
     minOrdinal: Int,
     maxOrdinal: Int,
     excludeId: TypedId<AutoCategorizeRuleId>?
@@ -35,7 +36,7 @@ class AutoCategorizeRuleRepositoryCustomImpl(
   }
 
   private fun createOrdinalUpdateWhereClause(
-    userId: Long,
+    userId: TypedId<UserId>,
     minOrdinal: Int,
     maxOrdinal: Int,
     excludeId: TypedId<AutoCategorizeRuleId>?
@@ -49,7 +50,7 @@ class AutoCategorizeRuleRepositoryCustomImpl(
         })
 
   override fun incrementOrdinals(
-    userId: Long,
+    userId: TypedId<UserId>,
     minOrdinal: Int,
     maxOrdinal: Int,
     excludeId: TypedId<AutoCategorizeRuleId>?

@@ -1,13 +1,14 @@
 package io.craigmiller160.expensetrackerapi.service.parsing
 
 import arrow.core.Either
+import io.craigmiller160.expensetrackerapi.common.data.typedid.TypedId
+import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.UserId
 import io.craigmiller160.expensetrackerapi.common.error.BadRequestException
 import io.craigmiller160.expensetrackerapi.data.model.Transaction
 import io.craigmiller160.expensetrackerapi.function.TryEither
 import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
-import java.util.UUID
 import org.springframework.stereotype.Component
 
 @Component
@@ -18,7 +19,7 @@ class DiscoverCsvTransactionParser : AbstractCsvTransactionParser() {
       listOf("Trans. Date", "Post Date", "Description", "Amount", "Category")
   }
 
-  override fun parseRecord(userId: UUID, row: Array<String>): TryEither<Transaction> =
+  override fun parseRecord(userId: TypedId<UserId>, row: Array<String>): TryEither<Transaction> =
     Either.catch {
       val transactionDate = row[0]
       val expenseDate = LocalDate.parse(transactionDate, DATE_FORMAT)
