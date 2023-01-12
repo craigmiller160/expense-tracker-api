@@ -68,7 +68,7 @@ class AuthenticationHelper(configResolver: KeycloakConfigResolver) {
       LinkedMultiValueMap(
         mapOf(
           "grant_type" to listOf("password"),
-          "client_id" to listOf(keycloakDeployment.realm),
+          "client_id" to listOf(clientId),
           "username" to listOf(userName),
           "password" to listOf(password)))
     val basicAuth =
