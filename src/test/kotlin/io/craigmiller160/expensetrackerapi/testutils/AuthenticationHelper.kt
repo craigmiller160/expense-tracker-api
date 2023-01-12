@@ -42,6 +42,20 @@ class AuthenticationHelper(configResolver: KeycloakConfigResolver) {
     get() = defaultUsers[SECONDARY_USER]!!
 
   fun createUser(userName: String, roles: List<String> = listOf(ROLE_ACCESS)): TestUser {
+    val client =
+      keycloak
+        .realm(keycloakDeployment.realm)
+        .clients()
+        .findByClientId(keycloakDeployment.resourceName)
+        .first()
+    val accessRole =
+      keycloak
+        .realm(keycloakDeployment.realm)
+        .clients()
+        .get(client.id)
+        .roles()
+        .get(ROLE_ACCESS)
+        .toRepresentation()
     val user =
       UserRepresentation().apply {
         username = userName
@@ -50,7 +64,6 @@ class AuthenticationHelper(configResolver: KeycloakConfigResolver) {
         firstName = "First $userName"
         lastName = "Last $userName"
         email = userName
-        realmRoles = roles
       }
     val response = keycloak.realm(keycloakDeployment.realm).users().create(user)
     val userId = CreatedResponseUtil.getCreatedId(response)
@@ -63,6 +76,13 @@ class AuthenticationHelper(configResolver: KeycloakConfigResolver) {
       }
 
     keycloak.realm(keycloakDeployment.realm).users().get(userId).resetPassword(passwordCred)
+    keycloak
+      .realm(keycloakDeployment.realm)
+      .users()
+      .get(userId)
+      .roles()
+      .clientLevel(keycloakDeployment.resourceName)
+      .add(listOf(accessRole))
     val token = login(userName, "password")
     return TestUser(userId = userId, userName = userName, roles = roles, token = token)
   }

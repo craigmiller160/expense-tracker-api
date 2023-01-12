@@ -17,3 +17,6 @@ logging:
     org.hibernate.type.descriptor.sql.BasicBinder: DEBUG
     org.springframework.jdbc.core: TRACE
     org.springframework.web.client.RestTemplate: DEBUG
+    # TODO delete this
+    org.springframework.security: DEBUG
+    org.keycloak: DEBUG
