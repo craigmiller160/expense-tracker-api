@@ -22,6 +22,8 @@ services:
       - KC_DB_PASSWORD=password
       - KC_DB_USERNAME=postgres
       - KC_DB_URL=jdbc:postgresql://expense_tracker_postgres:5432/keycloak
+    volumes:
+      - ./src/test/resources:/opt/keycloak/data/import
     command:
       - start-dev
     depends_on:
