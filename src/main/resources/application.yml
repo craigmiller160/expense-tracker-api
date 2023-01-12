@@ -41,6 +41,7 @@ keycloak:
   use-resource-role-mappings: true
   credentials:
     secret: CQ60kzXcV7F31JfW8dX2MINjVIKOIxpJ
+  bearer-only: true
 
 logging:
   level:
