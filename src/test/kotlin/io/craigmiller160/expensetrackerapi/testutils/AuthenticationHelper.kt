@@ -1,6 +1,7 @@
 package io.craigmiller160.expensetrackerapi.testutils
 
 import java.util.Base64
+import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
 import javax.annotation.PostConstruct
 import org.keycloak.adapters.KeycloakConfigResolver
@@ -85,6 +86,7 @@ class AuthenticationHelper(configResolver: KeycloakConfigResolver) {
 
   @PostConstruct
   fun setup() {
-    createUser("myUser@gmail.com")
+    val id = UUID.randomUUID().toString()
+    createUser("default_$id@gmail.com")
   }
 }
