@@ -8,7 +8,6 @@ import io.craigmiller160.expensetrackerapi.data.model.Transaction
 import io.craigmiller160.expensetrackerapi.data.repository.TransactionRepository
 import io.craigmiller160.expensetrackerapi.data.repository.TransactionViewRepository
 import io.craigmiller160.expensetrackerapi.testcore.ExpenseTrackerIntegrationTest
-import io.craigmiller160.expensetrackerapi.testcore.OAuth2Extension
 import io.craigmiller160.expensetrackerapi.testutils.DataHelper
 import io.craigmiller160.expensetrackerapi.web.types.CountAndOldest
 import io.craigmiller160.expensetrackerapi.web.types.NeedsAttentionResponse
@@ -40,33 +39,34 @@ constructor(
 
   @BeforeEach
   fun setup() {
-    token = OAuth2Extension.createJwt()
-    user1Categories = dataHelper.createDefaultCategories(1L)
-
-    val (user1Txns, user2Txns) =
-      (0..12)
-        .map { index ->
-          if (index % 2 == 0) {
-            dataHelper.createTransaction(1L)
-          } else {
-            dataHelper.createTransaction(2L)
-          }
-        }
-        .partition { it.userId == 1L }
-    user1Transactions =
-      user1Txns.mapIndexed { index, transaction ->
-        if (index % 2 == 0) {
-          transactionRepository.saveAndFlush(
-            transaction.apply {
-              categoryId = user1Categories[index % 3].uid
-              confirmed = true
-            })
-        } else {
-          transaction
-        }
-      }
-    user2Transactions = user2Txns
-    user1CategoriesMap = user1Categories.associateBy { it.uid }
+    //    token = OAuth2Extension.createJwt()
+    //    user1Categories = dataHelper.createDefaultCategories(1L)
+    //
+    //    val (user1Txns, user2Txns) =
+    //      (0..12)
+    //        .map { index ->
+    //          if (index % 2 == 0) {
+    //            dataHelper.createTransaction(1L)
+    //          } else {
+    //            dataHelper.createTransaction(2L)
+    //          }
+    //        }
+    //        .partition { it.userId == 1L }
+    //    user1Transactions =
+    //      user1Txns.mapIndexed { index, transaction ->
+    //        if (index % 2 == 0) {
+    //          transactionRepository.saveAndFlush(
+    //            transaction.apply {
+    //              categoryId = user1Categories[index % 3].uid
+    //              confirmed = true
+    //            })
+    //        } else {
+    //          transaction
+    //        }
+    //      }
+    //    user2Transactions = user2Txns
+    //    user1CategoriesMap = user1Categories.associateBy { it.uid }
+    TODO()
   }
 
   @Test
