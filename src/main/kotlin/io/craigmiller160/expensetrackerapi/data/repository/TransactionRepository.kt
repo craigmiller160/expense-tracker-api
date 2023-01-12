@@ -3,6 +3,7 @@ package io.craigmiller160.expensetrackerapi.data.repository
 import io.craigmiller160.expensetrackerapi.common.data.typedid.TypedId
 import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.CategoryId
 import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.TransactionId
+import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.UserId
 import io.craigmiller160.expensetrackerapi.data.model.Transaction
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
@@ -16,14 +17,14 @@ interface TransactionRepository :
   JpaRepository<Transaction, TypedId<TransactionId>>,
   JpaSpecificationExecutor<Transaction>,
   TransactionRepositoryCustom {
-  fun findAllByUserIdOrderByExpenseDateAscDescriptionAsc(userId: Long): List<Transaction>
+  fun findAllByUserIdOrderByExpenseDateAscDescriptionAsc(userId: TypedId<UserId>): List<Transaction>
 
   fun findAllByUserIdAndContentHashInOrderByCreated(
-    userId: Long,
+    userId: TypedId<UserId>,
     contentHash: Collection<String>
   ): List<Transaction>
 
-  fun findByUidAndUserId(id: TypedId<TransactionId>, userId: Long): Transaction?
+  fun findByUidAndUserId(id: TypedId<TransactionId>, userId: TypedId<UserId>): Transaction?
 
   @Query(
     """
@@ -44,7 +45,7 @@ interface TransactionRepository :
   fun setTransactionCategory(
     @Param("transactionId") transactionId: TypedId<TransactionId>,
     @Param("categoryId") categoryId: TypedId<CategoryId>,
-    @Param("userId") userId: Long
+    @Param("userId") userId: TypedId<UserId>
   ): Int
 
   @Query(
@@ -60,7 +61,7 @@ interface TransactionRepository :
   fun confirmTransaction(
     @Param("transactionId") transactionId: TypedId<TransactionId>,
     @Param("confirmed") confirmed: Boolean,
-    @Param("userId") userId: Long
+    @Param("userId") userId: TypedId<UserId>
   ): Int
 
   @Query(
@@ -72,7 +73,7 @@ interface TransactionRepository :
   @Modifying(flushAutomatically = true, clearAutomatically = true)
   fun deleteTransactions(
     @Param("transactionIds") transactionIds: Set<TypedId<TransactionId>>,
-    @Param("userId") userId: Long
+    @Param("userId") userId: TypedId<UserId>
   )
 
   @Query(
@@ -90,7 +91,7 @@ interface TransactionRepository :
   """)
   @Modifying(flushAutomatically = true, clearAutomatically = true)
   fun removeCategoryFromAllTransactions(
-    @Param("userId") userId: Long,
+    @Param("userId") userId: TypedId<UserId>,
     @Param("categoryId") categoryId: TypedId<CategoryId>
   )
 
@@ -105,7 +106,7 @@ interface TransactionRepository :
   @Modifying(flushAutomatically = true, clearAutomatically = true)
   fun removeTransactionCategory(
     @Param("transactionId") transactionId: TypedId<TransactionId>,
-    @Param("userId") userId: Long
+    @Param("userId") userId: TypedId<UserId>
   ): Int
 
   @Query(
@@ -119,7 +120,7 @@ interface TransactionRepository :
   fun markNotDuplicate(
     @Param("nano") nano: Long,
     @Param("transactionId") transactionId: TypedId<TransactionId>,
-    @Param("userId") userId: Long,
+    @Param("userId") userId: TypedId<UserId>,
   )
 
   @Query(
@@ -129,5 +130,5 @@ interface TransactionRepository :
     WHERE t.userId = :userId
     AND t.confirmed = false
   """)
-  fun findAllUnconfirmed(userId: Long, page: Pageable): Page<Transaction>
+  fun findAllUnconfirmed(userId: TypedId<UserId>, page: Pageable): Page<Transaction>
 }
