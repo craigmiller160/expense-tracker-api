@@ -122,7 +122,7 @@ constructor(
   fun updateCategory() {
     val token = authHelper.primaryUser.token
     val cat1 = dataHelper.createCategory(authHelper.primaryUser.userId, "Category 1")
-    val cat2 = dataHelper.createCategory(authHelper.primaryUser.userId, "Category 2")
+    val cat2 = dataHelper.createCategory(authHelper.secondaryUser.userId, "Category 2")
 
     val request = CategoryRequest("Category B")
     val action: (TypedId<CategoryId>) -> Unit = { id ->
