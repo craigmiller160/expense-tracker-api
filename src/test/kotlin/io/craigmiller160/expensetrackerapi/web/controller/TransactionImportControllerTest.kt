@@ -18,6 +18,7 @@ import io.kotest.assertions.arrow.core.shouldBeRight
 import java.math.BigDecimal
 import java.time.LocalDate
 import javax.persistence.EntityManager
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -184,39 +185,38 @@ constructor(
 
   @Test
   fun `importTransactions - DISCOVER_CSV, with auto-categorization rules`() {
-    //    val category = dataHelper.createCategory(1L, "Hello")
-    //    dataHelper.createRule(1L, category.uid)
-    //
-    //    ResourceUtils.getResourceBytes("data/discover1.csv")
-    //      .flatMap { bytes ->
-    //        Either.catch {
-    //          mockMvc
-    //            .multipart("/transaction-import?type=${TransactionImportType.DISCOVER_CSV.name}")
-    // {
-    //              secure = true
-    //              header("Authorization", "Bearer $token")
-    //              header("Content-Type", MediaType.MULTIPART_FORM_DATA_VALUE)
-    //              file("file", bytes)
-    //            }
-    //            .andExpect {
-    //              status { isOk() }
-    //              content { json("""{"transactionsImported":57}""", true) }
-    //            }
-    //        }
-    //      }
-    //      .shouldBeRight()
-    //
-    //    entityManager.flushAndClear()
+    val category = dataHelper.createCategory(authHelper.primaryUser.userId, "Hello")
+    dataHelper.createRule(authHelper.primaryUser.userId, category.uid)
 
-    //    val transactions =
-    // transactionRepository.findAllByUserIdOrderByExpenseDateAscDescriptionAsc(1L)
-    //    val expectedSize = 57
-    //    val expectedCategoryIds = (1..expectedSize).map { category.uid }
-    //    assertThat(transactions)
-    //      .hasSize(expectedSize)
-    //      .extracting("categoryId")
-    //      .contains(*expectedCategoryIds.toTypedArray())
-    TODO()
+    ResourceUtils.getResourceBytes("data/discover1.csv")
+      .flatMap { bytes ->
+        Either.catch {
+          mockMvc
+            .multipart("/transaction-import?type=${TransactionImportType.DISCOVER_CSV.name}") {
+              secure = true
+              header("Authorization", "Bearer $token")
+              header("Content-Type", MediaType.MULTIPART_FORM_DATA_VALUE)
+              file("file", bytes)
+            }
+            .andExpect {
+              status { isOk() }
+              content { json("""{"transactionsImported":57}""", true) }
+            }
+        }
+      }
+      .shouldBeRight()
+
+    entityManager.flushAndClear()
+
+    val transactions =
+      transactionRepository.findAllByUserIdOrderByExpenseDateAscDescriptionAsc(
+        authHelper.primaryUser.userId)
+    val expectedSize = 57
+    val expectedCategoryIds = (1..expectedSize).map { category.uid }
+    assertThat(transactions)
+      .hasSize(expectedSize)
+      .extracting("categoryId")
+      .contains(*expectedCategoryIds.toTypedArray())
   }
 
   @Test
@@ -241,34 +241,34 @@ constructor(
 
     entityManager.flushAndClear()
 
-    //    val transactions =
-    // transactionRepository.findAllByUserIdOrderByExpenseDateAscDescriptionAsc(1L)
-    //    assertThat(transactions).hasSize(23)
-    //
-    //    assertThat(transactions.first())
-    //      .hasFieldOrPropertyWithValue("userId", 1L)
-    //      .hasFieldOrPropertyWithValue("expenseDate", LocalDate.of(2022, 5, 23))
-    //      .hasFieldOrPropertyWithValue(
-    //        "description", "FID BKG SVC LLC  MONEYLINE                  PPD ID: 1035141383")
-    //      .hasFieldOrPropertyWithValue("amount", BigDecimal("-250.00"))
-    //      .hasFieldOrPropertyWithValue("categoryId", null)
-    //
-    //    assertThat(transactions[20])
-    //      .hasFieldOrPropertyWithValue("userId", 1L)
-    //      .hasFieldOrPropertyWithValue("expenseDate", LocalDate.of(2022, 6, 15))
-    //      .hasFieldOrPropertyWithValue(
-    //        "description", "C89303 CLEARSPEN DIR DEP                    PPD ID: 4462283648")
-    //      .hasFieldOrPropertyWithValue("amount", BigDecimal("4097.76"))
-    //      .hasFieldOrPropertyWithValue("categoryId", null)
-    //
-    //    assertThat(transactions[21])
-    //      .hasFieldOrPropertyWithValue("userId", 1L)
-    //      .hasFieldOrPropertyWithValue("expenseDate", LocalDate.of(2022, 6, 15))
-    //      .hasFieldOrPropertyWithValue(
-    //        "description", "FRONTIER COMM CORP WE 800-921-8101 CT        06/14")
-    //      .hasFieldOrPropertyWithValue("amount", BigDecimal("-64.99"))
-    //      .hasFieldOrPropertyWithValue("categoryId", null)
-    TODO()
+    val transactions =
+      transactionRepository.findAllByUserIdOrderByExpenseDateAscDescriptionAsc(
+        authHelper.primaryUser.userId)
+    assertThat(transactions).hasSize(23)
+
+    assertThat(transactions.first())
+      .hasFieldOrPropertyWithValue("userId", 1L)
+      .hasFieldOrPropertyWithValue("expenseDate", LocalDate.of(2022, 5, 23))
+      .hasFieldOrPropertyWithValue(
+        "description", "FID BKG SVC LLC  MONEYLINE                  PPD ID: 1035141383")
+      .hasFieldOrPropertyWithValue("amount", BigDecimal("-250.00"))
+      .hasFieldOrPropertyWithValue("categoryId", null)
+
+    assertThat(transactions[20])
+      .hasFieldOrPropertyWithValue("userId", 1L)
+      .hasFieldOrPropertyWithValue("expenseDate", LocalDate.of(2022, 6, 15))
+      .hasFieldOrPropertyWithValue(
+        "description", "C89303 CLEARSPEN DIR DEP                    PPD ID: 4462283648")
+      .hasFieldOrPropertyWithValue("amount", BigDecimal("4097.76"))
+      .hasFieldOrPropertyWithValue("categoryId", null)
+
+    assertThat(transactions[21])
+      .hasFieldOrPropertyWithValue("userId", 1L)
+      .hasFieldOrPropertyWithValue("expenseDate", LocalDate.of(2022, 6, 15))
+      .hasFieldOrPropertyWithValue(
+        "description", "FRONTIER COMM CORP WE 800-921-8101 CT        06/14")
+      .hasFieldOrPropertyWithValue("amount", BigDecimal("-64.99"))
+      .hasFieldOrPropertyWithValue("categoryId", null)
   }
 
   @Test
