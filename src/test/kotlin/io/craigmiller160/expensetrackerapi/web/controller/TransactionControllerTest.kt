@@ -67,18 +67,18 @@ constructor(
   @BeforeEach
   fun setup() {
     token = authHelper.primaryUser.token
-    user1Categories = dataHelper.createDefaultCategories(1L)
+    user1Categories = dataHelper.createDefaultCategories(authHelper.primaryUser.userId)
 
     val (user1Txns, user2Txns) =
       (0..12)
         .map { index ->
           if (index % 2 == 0) {
-            dataHelper.createTransaction(1L)
+            dataHelper.createTransaction(authHelper.primaryUser.userId)
           } else {
-            dataHelper.createTransaction(2L)
+            dataHelper.createTransaction(authHelper.secondaryUser.userId)
           }
         }
-        .partition { it.userId == 1L }
+        .partition { it.userId == authHelper.primaryUser.userId }
     user1Transactions =
       user1Txns.mapIndexed { index, transaction ->
         if (index % 2 == 0) {
@@ -93,7 +93,7 @@ constructor(
       }
     user2Transactions = user2Txns
     user1CategoriesMap = user1Categories.associateBy { it.uid }
-    rule = dataHelper.createRule(1L, user1Categories[0].uid)
+    rule = dataHelper.createRule(authHelper.primaryUser.userId, user1Categories[0].uid)
   }
 
   @Test
@@ -325,7 +325,7 @@ constructor(
     val nonDuplicateIds = user1Transactions.subList(1, user1Transactions.size).map { it.uid }
     val nonDuplicateTransactions =
       transactionViewRepository
-        .findAllByUidInAndUserId(nonDuplicateIds, 1L)
+        .findAllByUidInAndUserId(nonDuplicateIds, authHelper.primaryUser.userId)
         .sortedWith(transactionComparator)
 
     val response =
@@ -464,7 +464,7 @@ constructor(
 
   @Test
   fun `search - categories`() {
-    val user2Cat = dataHelper.createCategory(2L, "User2 Cat")
+    val user2Cat = dataHelper.createCategory(authHelper.secondaryUser.userId, "User2 Cat")
     transactionRepository.saveAndFlush(
       user2Transactions.first().apply { categoryId = user2Cat.uid })
 
@@ -574,7 +574,7 @@ constructor(
 
   @Test
   fun categorizeTransactions() {
-    val user2Category = dataHelper.createCategory(2L, "Other")
+    val user2Category = dataHelper.createCategory(authHelper.secondaryUser.userId, "Other")
     val uncategorizedTransaction = user1Transactions[5]
     assertThat(uncategorizedTransaction.categoryId).isNull()
 
@@ -670,7 +670,7 @@ constructor(
 
   @Test
   fun createTransaction_invalidCategoryId() {
-    val user2Category = dataHelper.createCategory(2L, "Other")
+    val user2Category = dataHelper.createCategory(authHelper.secondaryUser.userId, "Other")
     val request =
       CreateTransactionRequest(
         expenseDate = LocalDate.of(2022, 1, 1),
@@ -742,7 +742,7 @@ constructor(
 
   @Test
   fun updateTransactionDetails_invalidCategoryId() {
-    val user2Category = dataHelper.createCategory(2L, "Other")
+    val user2Category = dataHelper.createCategory(authHelper.secondaryUser.userId, "Other")
     val transactionId = user1Transactions[0].uid
     val request =
       UpdateTransactionDetailsRequest(
@@ -774,7 +774,7 @@ constructor(
   @Test
   fun updateTransactions() {
     // This does also validate a category id that's for the wrong user
-    val user2Category = dataHelper.createCategory(2L, "Other")
+    val user2Category = dataHelper.createCategory(authHelper.secondaryUser.userId, "Other")
     val uncategorizedTransaction = user1Transactions[5]
     assertThat(uncategorizedTransaction.categoryId).isNull()
 
@@ -926,9 +926,9 @@ constructor(
     entityManager.flushAndClear()
 
     val expectedTransactions =
-      transactionViewRepository.findAllByUidInAndUserId(listOf(txn3.uid, txn2.uid), 1L).map {
-        TransactionDuplicateResponse.from(it)
-      }
+      transactionViewRepository
+        .findAllByUidInAndUserId(listOf(txn3.uid, txn2.uid), authHelper.primaryUser.userId)
+        .map { TransactionDuplicateResponse.from(it) }
 
     val response =
       TransactionDuplicatePageResponse(
@@ -979,18 +979,23 @@ constructor(
     entityManager.flushAndClear()
 
     val txn1Duplicates =
-      transactionViewRepository.findAllDuplicates(txn1.uid, 1L, PageRequest.of(0, 25))
+      transactionViewRepository.findAllDuplicates(
+        txn1.uid, authHelper.primaryUser.userId, PageRequest.of(0, 25))
     assertThat(txn1Duplicates).isEmpty()
     val txn2Duplicates =
-      transactionViewRepository.findAllDuplicates(txn2.uid, 1L, PageRequest.of(0, 25))
+      transactionViewRepository.findAllDuplicates(
+        txn2.uid, authHelper.primaryUser.userId, PageRequest.of(0, 25))
     assertThat(txn2Duplicates).hasSize(1).extracting("uid").contains(txn3.uid)
   }
 
   @Test
   fun `categorizeTransactions - clears last rule applied`() {
-    dataHelper.createLastRuleApplied(1L, user1Transactions[0].uid, rule.uid)
-    dataHelper.createLastRuleApplied(1L, user1Transactions[1].uid, rule.uid)
-    dataHelper.createLastRuleApplied(1L, user1Transactions[2].uid, rule.uid)
+    dataHelper.createLastRuleApplied(
+      authHelper.primaryUser.userId, user1Transactions[0].uid, rule.uid)
+    dataHelper.createLastRuleApplied(
+      authHelper.primaryUser.userId, user1Transactions[1].uid, rule.uid)
+    dataHelper.createLastRuleApplied(
+      authHelper.primaryUser.userId, user1Transactions[2].uid, rule.uid)
     val request =
       CategorizeTransactionsRequest(
         transactionsAndCategories =
@@ -1010,11 +1015,17 @@ constructor(
 
     entityManager.flushAndClear()
 
-    assertThat(lastRuleAppliedRepository.findByUserIdAndTransactionId(1L, user1Transactions[0].uid))
+    assertThat(
+        lastRuleAppliedRepository.findByUserIdAndTransactionId(
+          authHelper.primaryUser.userId, user1Transactions[0].uid))
       .isNull()
-    assertThat(lastRuleAppliedRepository.findByUserIdAndTransactionId(1L, user1Transactions[1].uid))
+    assertThat(
+        lastRuleAppliedRepository.findByUserIdAndTransactionId(
+          authHelper.primaryUser.userId, user1Transactions[1].uid))
       .isNotNull
-    assertThat(lastRuleAppliedRepository.findByUserIdAndTransactionId(1L, user1Transactions[2].uid))
+    assertThat(
+        lastRuleAppliedRepository.findByUserIdAndTransactionId(
+          authHelper.primaryUser.userId, user1Transactions[2].uid))
       .isNotNull
   }
 
@@ -1022,8 +1033,10 @@ constructor(
   fun `confirmTransactions - clears last rule applied`() {
     transactionRepository.saveAndFlush(user1Transactions[0].apply { confirmed = false })
     transactionRepository.saveAndFlush(user1Transactions[1].apply { confirmed = false })
-    dataHelper.createLastRuleApplied(1L, user1Transactions[0].uid, rule.uid)
-    dataHelper.createLastRuleApplied(1L, user1Transactions[1].uid, rule.uid)
+    dataHelper.createLastRuleApplied(
+      authHelper.primaryUser.userId, user1Transactions[0].uid, rule.uid)
+    dataHelper.createLastRuleApplied(
+      authHelper.primaryUser.userId, user1Transactions[1].uid, rule.uid)
     val request =
       ConfirmTransactionsRequest(
         transactionsToConfirm =
@@ -1040,9 +1053,13 @@ constructor(
       }
       .andExpect { status { isNoContent() } }
 
-    assertThat(lastRuleAppliedRepository.findByUserIdAndTransactionId(1L, user1Transactions[0].uid))
+    assertThat(
+        lastRuleAppliedRepository.findByUserIdAndTransactionId(
+          authHelper.primaryUser.userId, user1Transactions[0].uid))
       .isNull()
-    assertThat(lastRuleAppliedRepository.findByUserIdAndTransactionId(1L, user1Transactions[1].uid))
+    assertThat(
+        lastRuleAppliedRepository.findByUserIdAndTransactionId(
+          authHelper.primaryUser.userId, user1Transactions[1].uid))
       .isNotNull
   }
 
@@ -1059,9 +1076,12 @@ constructor(
     val transactionToDoNothing =
       TransactionToUpdate(
         transactionId = user1Transactions[3].uid, categoryId = null, confirmed = false)
-    dataHelper.createLastRuleApplied(1L, transactionToCategorize.transactionId, rule.uid)
-    dataHelper.createLastRuleApplied(1L, transactionToConfirm.transactionId, rule.uid)
-    dataHelper.createLastRuleApplied(1L, transactionToDoNothing.transactionId, rule.uid)
+    dataHelper.createLastRuleApplied(
+      authHelper.primaryUser.userId, transactionToCategorize.transactionId, rule.uid)
+    dataHelper.createLastRuleApplied(
+      authHelper.primaryUser.userId, transactionToConfirm.transactionId, rule.uid)
+    dataHelper.createLastRuleApplied(
+      authHelper.primaryUser.userId, transactionToDoNothing.transactionId, rule.uid)
     val request =
       UpdateTransactionsRequest(
         transactions = setOf(transactionToCategorize, transactionToConfirm, transactionToDoNothing))
@@ -1077,15 +1097,15 @@ constructor(
 
     assertThat(
         lastRuleAppliedRepository.findByUserIdAndTransactionId(
-          1L, transactionToCategorize.transactionId))
+          authHelper.primaryUser.userId, transactionToCategorize.transactionId))
       .isNull()
     assertThat(
         lastRuleAppliedRepository.findByUserIdAndTransactionId(
-          1L, transactionToConfirm.transactionId))
+          authHelper.primaryUser.userId, transactionToConfirm.transactionId))
       .isNull()
     assertThat(
         lastRuleAppliedRepository.findByUserIdAndTransactionId(
-          1L, transactionToDoNothing.transactionId))
+          authHelper.primaryUser.userId, transactionToDoNothing.transactionId))
       .isNotNull
   }
 
@@ -1106,9 +1126,12 @@ constructor(
         categoryId = null
         confirmed = false
       })
-    dataHelper.createLastRuleApplied(1L, user1Transactions[0].uid, rule.uid)
-    dataHelper.createLastRuleApplied(1L, user1Transactions[1].uid, rule.uid)
-    dataHelper.createLastRuleApplied(1L, user1Transactions[2].uid, rule.uid)
+    dataHelper.createLastRuleApplied(
+      authHelper.primaryUser.userId, user1Transactions[0].uid, rule.uid)
+    dataHelper.createLastRuleApplied(
+      authHelper.primaryUser.userId, user1Transactions[1].uid, rule.uid)
+    dataHelper.createLastRuleApplied(
+      authHelper.primaryUser.userId, user1Transactions[2].uid, rule.uid)
 
     val doUpdate: (TypedId<TransactionId>, TypedId<CategoryId>?, Boolean) -> Unit =
       { transactionId, categoryId, confirmed ->
@@ -1140,17 +1163,24 @@ constructor(
 
     entityManager.flushAndClear()
 
-    assertThat(lastRuleAppliedRepository.findByUserIdAndTransactionId(1L, user1Transactions[0].uid))
+    assertThat(
+        lastRuleAppliedRepository.findByUserIdAndTransactionId(
+          authHelper.primaryUser.userId, user1Transactions[0].uid))
       .isNull()
-    assertThat(lastRuleAppliedRepository.findByUserIdAndTransactionId(1L, user1Transactions[1].uid))
+    assertThat(
+        lastRuleAppliedRepository.findByUserIdAndTransactionId(
+          authHelper.primaryUser.userId, user1Transactions[1].uid))
       .isNull()
-    assertThat(lastRuleAppliedRepository.findByUserIdAndTransactionId(1L, user1Transactions[2].uid))
+    assertThat(
+        lastRuleAppliedRepository.findByUserIdAndTransactionId(
+          authHelper.primaryUser.userId, user1Transactions[2].uid))
       .isNotNull
   }
 
   @Test
   fun `deleteTransactions - clears last rule applied`() {
-    dataHelper.createLastRuleApplied(1L, user1Transactions[0].uid, rule.uid)
+    dataHelper.createLastRuleApplied(
+      authHelper.primaryUser.userId, user1Transactions[0].uid, rule.uid)
     val request = DeleteTransactionsRequest(ids = setOf(user1Transactions[0].uid))
 
     mockMvc
@@ -1162,7 +1192,9 @@ constructor(
       }
       .andExpect { status { isNoContent() } }
 
-    assertThat(lastRuleAppliedRepository.findByUserIdAndTransactionId(1L, user1Transactions[0].uid))
+    assertThat(
+        lastRuleAppliedRepository.findByUserIdAndTransactionId(
+          authHelper.primaryUser.userId, user1Transactions[0].uid))
       .isNull()
   }
 
@@ -1183,7 +1215,8 @@ constructor(
     entityManager.flushAndClear()
 
     val txn1Duplicates =
-      transactionViewRepository.findAllDuplicates(txn1.uid, 2L, PageRequest.of(0, 25))
+      transactionViewRepository.findAllDuplicates(
+        txn1.uid, authHelper.secondaryUser.userId, PageRequest.of(0, 25))
     assertThat(txn1Duplicates).hasSize(2)
   }
 
