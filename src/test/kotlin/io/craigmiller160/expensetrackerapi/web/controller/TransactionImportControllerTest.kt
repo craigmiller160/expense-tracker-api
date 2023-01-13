@@ -6,7 +6,6 @@ import arrow.core.getOrHandle
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.craigmiller160.expensetrackerapi.data.model.Transaction
 import io.craigmiller160.expensetrackerapi.data.repository.TransactionRepository
-import io.craigmiller160.expensetrackerapi.data.utils.TransactionContentHash
 import io.craigmiller160.expensetrackerapi.extension.flushAndClear
 import io.craigmiller160.expensetrackerapi.service.TransactionImportType
 import io.craigmiller160.expensetrackerapi.testcore.ExpenseTrackerIntegrationTest
@@ -123,15 +122,11 @@ constructor(
 
     entityManager.flushAndClear()
 
-    val contentHash =
-      TransactionContentHash.hash(
-        1L, LocalDate.of(2022, 5, 18), BigDecimal("-5.81"), "PANDA EXPRESS 1679 RIVERVIEW FL")
-
-    val allDuplicateTransactions =
-      transactionRepository.findAllByUserIdAndContentHashInOrderByCreated(
-        authHelper.primaryUser.userId, listOf(contentHash))
-    val lastTransaction = allDuplicateTransactions.last()
-    val nextToLastTransaction = allDuplicateTransactions[allDuplicateTransactions.size - 2]
+    val duplicates =
+      transactionRepository.findAll().groupBy { it.contentHash }.filter { it.value.size > 1 }
+    assertThat(duplicates).hasSize(1)
+    val lastTransaction = duplicates.values.first().last()
+    val nextToLastTransaction = duplicates.values.first()[duplicates.values.first().size - 2]
     assertEquals(lastTransaction.contentHash, nextToLastTransaction.contentHash)
   }
 
