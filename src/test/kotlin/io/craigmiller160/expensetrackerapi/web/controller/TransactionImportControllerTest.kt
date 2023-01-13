@@ -134,53 +134,52 @@ constructor(
 
   @Test
   fun `importTransactions - DISCOVER_CSV`() {
-    //    ResourceUtils.getResourceBytes("data/discover1.csv")
-    //      .flatMap { bytes ->
-    //        Either.catch {
-    //          mockMvc
-    //            .multipart("/transaction-import?type=${TransactionImportType.DISCOVER_CSV.name}")
-    // {
-    //              secure = true
-    //              header("Authorization", "Bearer $token")
-    //              header("Content-Type", MediaType.MULTIPART_FORM_DATA_VALUE)
-    //              file("file", bytes)
-    //            }
-    //            .andExpect {
-    //              status { isOk() }
-    //              content { json("""{"transactionsImported":57}""", true) }
-    //            }
-    //        }
-    //      }
-    //      .shouldBeRight()
-    //
-    //    entityManager.flushAndClear()
-    //
-    //    val transactions =
-    // transactionRepository.findAllByUserIdOrderByExpenseDateAscDescriptionAsc(1L)
-    //    assertThat(transactions).hasSize(57)
-    //
-    //    assertThat(transactions.first())
-    //      .hasFieldOrPropertyWithValue("userId", 1L)
-    //      .hasFieldOrPropertyWithValue("expenseDate", LocalDate.of(2022, 4, 18))
-    //      .hasFieldOrPropertyWithValue("description", "PARTY CITY 1084 TAMPA FL01837R")
-    //      .hasFieldOrPropertyWithValue("amount", BigDecimal("-36.87"))
-    //      .hasFieldOrPropertyWithValue("categoryId", null)
-    //
-    //    assertThat(transactions[41])
-    //      .hasFieldOrPropertyWithValue("userId", 1L)
-    //      .hasFieldOrPropertyWithValue("expenseDate", LocalDate.of(2022, 5, 9))
-    //      .hasFieldOrPropertyWithValue(
-    //        "description", "DIRECTPAY FULL BALANCESEE DETAILS OF YOUR NEXT DIRECTPAY BELOW")
-    //      .hasFieldOrPropertyWithValue("amount", BigDecimal("1928.54"))
-    //      .hasFieldOrPropertyWithValue("categoryId", null)
-    //
-    //    assertThat(transactions.last())
-    //      .hasFieldOrPropertyWithValue("userId", 1L)
-    //      .hasFieldOrPropertyWithValue("expenseDate", LocalDate.of(2022, 5, 18))
-    //      .hasFieldOrPropertyWithValue("description", "PANDA EXPRESS 1679 RIVERVIEW FL")
-    //      .hasFieldOrPropertyWithValue("amount", BigDecimal("-5.81"))
-    //      .hasFieldOrPropertyWithValue("categoryId", null)
-    TODO()
+    ResourceUtils.getResourceBytes("data/discover1.csv")
+      .flatMap { bytes ->
+        Either.catch {
+          mockMvc
+            .multipart("/transaction-import?type=${TransactionImportType.DISCOVER_CSV.name}") {
+              secure = true
+              header("Authorization", "Bearer $token")
+              header("Content-Type", MediaType.MULTIPART_FORM_DATA_VALUE)
+              file("file", bytes)
+            }
+            .andExpect {
+              status { isOk() }
+              content { json("""{"transactionsImported":57}""", true) }
+            }
+        }
+      }
+      .shouldBeRight()
+
+    entityManager.flushAndClear()
+
+    val transactions =
+      transactionRepository.findAllByUserIdOrderByExpenseDateAscDescriptionAsc(
+        authHelper.primaryUser.userId)
+    assertThat(transactions).hasSize(57)
+
+    assertThat(transactions.first())
+      .hasFieldOrPropertyWithValue("userId", authHelper.primaryUser.userId)
+      .hasFieldOrPropertyWithValue("expenseDate", LocalDate.of(2022, 4, 18))
+      .hasFieldOrPropertyWithValue("description", "PARTY CITY 1084 TAMPA FL01837R")
+      .hasFieldOrPropertyWithValue("amount", BigDecimal("-36.87"))
+      .hasFieldOrPropertyWithValue("categoryId", null)
+
+    assertThat(transactions[41])
+      .hasFieldOrPropertyWithValue("userId", authHelper.primaryUser.userId)
+      .hasFieldOrPropertyWithValue("expenseDate", LocalDate.of(2022, 5, 9))
+      .hasFieldOrPropertyWithValue(
+        "description", "DIRECTPAY FULL BALANCESEE DETAILS OF YOUR NEXT DIRECTPAY BELOW")
+      .hasFieldOrPropertyWithValue("amount", BigDecimal("1928.54"))
+      .hasFieldOrPropertyWithValue("categoryId", null)
+
+    assertThat(transactions.last())
+      .hasFieldOrPropertyWithValue("userId", authHelper.primaryUser.userId)
+      .hasFieldOrPropertyWithValue("expenseDate", LocalDate.of(2022, 5, 18))
+      .hasFieldOrPropertyWithValue("description", "PANDA EXPRESS 1679 RIVERVIEW FL")
+      .hasFieldOrPropertyWithValue("amount", BigDecimal("-5.81"))
+      .hasFieldOrPropertyWithValue("categoryId", null)
   }
 
   @Test
@@ -247,7 +246,7 @@ constructor(
     assertThat(transactions).hasSize(23)
 
     assertThat(transactions.first())
-      .hasFieldOrPropertyWithValue("userId", 1L)
+      .hasFieldOrPropertyWithValue("userId", authHelper.primaryUser.userId)
       .hasFieldOrPropertyWithValue("expenseDate", LocalDate.of(2022, 5, 23))
       .hasFieldOrPropertyWithValue(
         "description", "FID BKG SVC LLC  MONEYLINE                  PPD ID: 1035141383")
@@ -255,7 +254,7 @@ constructor(
       .hasFieldOrPropertyWithValue("categoryId", null)
 
     assertThat(transactions[20])
-      .hasFieldOrPropertyWithValue("userId", 1L)
+      .hasFieldOrPropertyWithValue("userId", authHelper.primaryUser.userId)
       .hasFieldOrPropertyWithValue("expenseDate", LocalDate.of(2022, 6, 15))
       .hasFieldOrPropertyWithValue(
         "description", "C89303 CLEARSPEN DIR DEP                    PPD ID: 4462283648")
@@ -263,7 +262,7 @@ constructor(
       .hasFieldOrPropertyWithValue("categoryId", null)
 
     assertThat(transactions[21])
-      .hasFieldOrPropertyWithValue("userId", 1L)
+      .hasFieldOrPropertyWithValue("userId", authHelper.primaryUser.userId)
       .hasFieldOrPropertyWithValue("expenseDate", LocalDate.of(2022, 6, 15))
       .hasFieldOrPropertyWithValue(
         "description", "FRONTIER COMM CORP WE 800-921-8101 CT        06/14")
