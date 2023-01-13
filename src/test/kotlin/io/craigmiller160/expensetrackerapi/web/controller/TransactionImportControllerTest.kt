@@ -75,6 +75,8 @@ constructor(
           confirmed = false))
     val csvBytes = ResourceUtils.getResourceBytes("data/discover1.csv").getOrHandle { throw it }
 
+    entityManager.flushAndClear()
+
     mockMvc
       .multipart("/transaction-import?type=${TransactionImportType.DISCOVER_CSV.name}") {
         secure = true
@@ -88,10 +90,11 @@ constructor(
       }
 
     entityManager.flushAndClear()
+    val baseContentHash = transactionRepository.findById(transaction.id).orElseThrow().contentHash
 
     val allDuplicateTransactions =
       transactionRepository.findAllByUserIdAndContentHashInOrderByCreated(
-        authHelper.primaryUser.userId, listOf(transaction.contentHash))
+        authHelper.primaryUser.userId, listOf(baseContentHash))
     val lastTransaction = allDuplicateTransactions.last()
     val nextToLastTransaction = allDuplicateTransactions[allDuplicateTransactions.size - 2]
     assertEquals(lastTransaction.contentHash, nextToLastTransaction.contentHash)
