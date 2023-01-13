@@ -19,6 +19,7 @@ import io.craigmiller160.expensetrackerapi.web.types.*
 import io.craigmiller160.expensetrackerapi.web.types.transaction.*
 import java.math.BigDecimal
 import java.time.LocalDate
+import java.time.ZoneId
 import java.util.Comparator
 import java.util.UUID
 import javax.persistence.EntityManager
@@ -1236,10 +1237,14 @@ constructor(
         .response
         .contentAsString
     val response = objectMapper.readValue(responseString, TransactionDetailsResponse::class.java)
-    val expected =
+    val baseExpected =
       transactionViewRepository.findById(txn.uid).orElseThrow().let {
         TransactionDetailsResponse.from(it)
       }
+    val expected =
+      baseExpected.copy(
+        created = baseExpected.created.withZoneSameInstant(ZoneId.of("UTC")),
+        updated = baseExpected.updated.withZoneSameInstant(ZoneId.of("UTC")))
     assertEquals(expected, response)
   }
 
