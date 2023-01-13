@@ -23,12 +23,12 @@ app_deployment:
     - envVariable: spring.datasource.password
       secretName: expense-tracker-postgres
       secretKey: password
-    - envVariable: oauth2.client-key
+    - envVariable: keycloak.resource
       secretName: expense-tracker-api-oauth2-keys
-      secretKey: clientKey
-    - envVariable: oauth2.client-secret
+      secretKey: kcClientId
+    - envVariable: keycloak.credentials.secret
       secretName: expense-tracker-api-oauth2-keys
-      secretKey: clientSecret
+      secretKey: kcClientSecret
   livenessProbe:
     httpGet:
       path: /actuator/health
