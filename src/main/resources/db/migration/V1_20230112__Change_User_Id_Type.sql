@@ -69,7 +69,7 @@ CREATE VIEW transactions_view(uid, user_id, expense_date, description, amount, c
 
 DROP TRIGGER set_content_hash_on_change ON transactions;
 DROP FUNCTION set_content_hash_on_change();
-DROP FUNCTION txn_content_hash(user_id UUID, expense_date DATE, amount NUMERIC, description VARCHAR(255));
+DROP FUNCTION txn_content_hash(user_id BIGINT, expense_date DATE, amount NUMERIC, description VARCHAR(255), mark_not_duplicate_nano BIGINT);
 
 CREATE FUNCTION txn_content_hash (user_id UUID, expense_date DATE, amount NUMERIC,
     description VARCHAR(255), mark_not_duplicate_nano BIGINT)
