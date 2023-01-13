@@ -13,6 +13,7 @@ import io.craigmiller160.expensetrackerapi.extension.flushAndClear
 import io.craigmiller160.expensetrackerapi.testcore.ExpenseTrackerIntegrationTest
 import io.craigmiller160.expensetrackerapi.testutils.AuthenticationHelper
 import io.craigmiller160.expensetrackerapi.testutils.DataHelper
+import io.craigmiller160.expensetrackerapi.web.types.rules.AutoCategorizeRulePageResponse
 import io.craigmiller160.expensetrackerapi.web.types.rules.AutoCategorizeRuleRequest
 import io.craigmiller160.expensetrackerapi.web.types.rules.AutoCategorizeRuleResponse
 import io.craigmiller160.expensetrackerapi.web.types.rules.MaxOrdinalResponse
@@ -50,16 +51,16 @@ constructor(
   @BeforeEach
   fun setup() {
     token = authHelper.primaryUser.token
-    cat1 = dataHelper.createCategory(1L, "Entertainment")
-    cat2 = dataHelper.createCategory(2L, "Food")
-    transaction = dataHelper.createTransaction(1L)
+    cat1 = dataHelper.createCategory(authHelper.primaryUser.userId, "Entertainment")
+    cat2 = dataHelper.createCategory(authHelper.secondaryUser.userId, "Food")
+    transaction = dataHelper.createTransaction(authHelper.primaryUser.userId)
   }
 
   @Test
   fun getAllRules() {
-    val rule1 = dataHelper.createRule(1L, cat1.uid)
-    val rule2 = dataHelper.createRule(1L, cat1.uid)
-    dataHelper.createRule(2L, cat2.uid)
+    val rule1 = dataHelper.createRule(authHelper.primaryUser.userId, cat1.uid)
+    val rule2 = dataHelper.createRule(authHelper.primaryUser.userId, cat1.uid)
+    dataHelper.createRule(authHelper.secondaryUser.userId, cat2.uid)
 
     val expectedResponse =
       AutoCategorizeRulePageResponse(
@@ -85,10 +86,10 @@ constructor(
 
   @Test
   fun getAllRules_byCategoryId() {
-    val cat3 = dataHelper.createCategory(1L, "Stuff")
-    val rule1 = dataHelper.createRule(1L, cat1.uid)
-    val rule2 = dataHelper.createRule(1L, cat1.uid)
-    dataHelper.createRule(1L, cat3.uid)
+    val cat3 = dataHelper.createCategory(authHelper.primaryUser.userId, "Stuff")
+    val rule1 = dataHelper.createRule(authHelper.primaryUser.userId, cat1.uid)
+    val rule2 = dataHelper.createRule(authHelper.primaryUser.userId, cat1.uid)
+    dataHelper.createRule(authHelper.primaryUser.userId, cat3.uid)
 
     val expectedResponse =
       AutoCategorizeRulePageResponse(
@@ -115,14 +116,14 @@ constructor(
   @Test
   fun getAllRules_byRegex() {
     val rule1 =
-      dataHelper.createRule(1L, cat1.uid).let {
+      dataHelper.createRule(authHelper.primaryUser.userId, cat1.uid).let {
         autoCategorizeRuleRepository.save(it.apply { regex = "hello.*" })
       }
     val rule2 =
-      dataHelper.createRule(1L, cat1.uid).let {
+      dataHelper.createRule(authHelper.primaryUser.userId, cat1.uid).let {
         autoCategorizeRuleRepository.save(it.apply { regex = "Hello World" })
       }
-    dataHelper.createRule(1L, cat1.uid)
+    dataHelper.createRule(authHelper.primaryUser.userId, cat1.uid)
     entityManager.flushAndClear()
 
     val expectedResponse =
@@ -340,11 +341,11 @@ constructor(
 
   @Test
   fun updateRule_verifyApplyingRules() {
-    val cat3 = dataHelper.createCategory(1L, "Universe")
-    val cat4 = dataHelper.createCategory(1L, "Time")
-    val rule = dataHelper.createRule(1L, cat1.uid)
-    val rule2 = dataHelper.createRule(1L, cat3.uid)
-    dataHelper.createLastRuleApplied(1L, transaction.uid, rule.uid)
+    val cat3 = dataHelper.createCategory(authHelper.primaryUser.userId, "Universe")
+    val cat4 = dataHelper.createCategory(authHelper.primaryUser.userId, "Time")
+    val rule = dataHelper.createRule(authHelper.primaryUser.userId, cat1.uid)
+    val rule2 = dataHelper.createRule(authHelper.primaryUser.userId, cat3.uid)
+    dataHelper.createLastRuleApplied(authHelper.primaryUser.userId, transaction.uid, rule.uid)
     val request = AutoCategorizeRuleRequest(categoryId = cat4.uid, regex = ".*")
 
     entityManager.flushAndClear()
@@ -367,7 +368,7 @@ constructor(
   @Test
   fun updateRule_withOrdinal() {
     val rules = createRulesForOrdinalValidation()
-    val cat3 = dataHelper.createCategory(1L, "Hello")
+    val cat3 = dataHelper.createCategory(authHelper.primaryUser.userId, "Hello")
 
     val request =
       AutoCategorizeRuleRequest(
@@ -402,8 +403,8 @@ constructor(
 
   @Test
   fun updateRule() {
-    val rule = dataHelper.createRule(1L, cat1.uid)
-    val cat3 = dataHelper.createCategory(1L, "Hello")
+    val rule = dataHelper.createRule(authHelper.primaryUser.userId, cat1.uid)
+    val cat3 = dataHelper.createCategory(authHelper.primaryUser.userId, "Hello")
     val request =
       AutoCategorizeRuleRequest(
         categoryId = cat3.uid,
@@ -443,7 +444,7 @@ constructor(
 
   @Test
   fun updateRule_invalidRuleValues() {
-    val rule = dataHelper.createRule(1L, cat1.uid)
+    val rule = dataHelper.createRule(authHelper.primaryUser.userId, cat1.uid)
     val baseRequest =
       AutoCategorizeRuleRequest(
         categoryId = cat1.uid,
@@ -477,7 +478,7 @@ constructor(
 
   @Test
   fun updateRule_invalidCategory() {
-    val rule = dataHelper.createRule(1L, cat1.uid)
+    val rule = dataHelper.createRule(authHelper.primaryUser.userId, cat1.uid)
     val baseRequest =
       AutoCategorizeRuleRequest(
         categoryId = TypedId(),
@@ -507,7 +508,7 @@ constructor(
 
   @Test
   fun updateRule_invalidRule() {
-    val rule = dataHelper.createRule(2L, cat1.uid)
+    val rule = dataHelper.createRule(authHelper.secondaryUser.userId, cat1.uid)
     val request =
       AutoCategorizeRuleRequest(
         categoryId = cat1.uid,
@@ -538,7 +539,7 @@ constructor(
 
   @Test
   fun getRule() {
-    val rule = dataHelper.createRule(1L, cat1.uid)
+    val rule = dataHelper.createRule(authHelper.primaryUser.userId, cat1.uid)
     val expectedResponse =
       AutoCategorizeRuleResponse.from(
         autoCategorizeRuleViewRepository.findById(rule.uid).orElseThrow())
@@ -556,8 +557,8 @@ constructor(
 
   @Test
   fun getRule_invalidRule() {
-    dataHelper.createRule(1L, cat1.uid)
-    val rule2 = dataHelper.createRule(2L, cat2.uid)
+    dataHelper.createRule(authHelper.primaryUser.userId, cat1.uid)
+    val rule2 = dataHelper.createRule(authHelper.secondaryUser.userId, cat2.uid)
 
     val operation: (TypedId<AutoCategorizeRuleId>, String) -> ResultActionsDsl = { id, message ->
       mockMvc
@@ -578,9 +579,9 @@ constructor(
 
   @Test
   fun deleteRule_verifyApplyingRules() {
-    val cat3 = dataHelper.createCategory(1L, "Hello")
-    dataHelper.createRule(1L, cat1.uid)
-    val rule2 = dataHelper.createRule(1L, cat3.uid)
+    val cat3 = dataHelper.createCategory(authHelper.primaryUser.userId, "Hello")
+    dataHelper.createRule(authHelper.primaryUser.userId, cat1.uid)
+    val rule2 = dataHelper.createRule(authHelper.primaryUser.userId, cat3.uid)
 
     mockMvc
       .delete("/categories/rules/${rule2.uid}") {
@@ -597,7 +598,7 @@ constructor(
 
   @Test
   fun deleteRule() {
-    val rule = dataHelper.createRule(1L, cat1.uid)
+    val rule = dataHelper.createRule(authHelper.primaryUser.userId, cat1.uid)
 
     mockMvc
       .delete("/categories/rules/${rule.uid}") {
@@ -717,7 +718,7 @@ constructor(
 
   @Test
   fun reOrderRule_invalidRule() {
-    dataHelper.createRule(1L, cat1.uid)
+    dataHelper.createRule(authHelper.primaryUser.userId, cat1.uid)
 
     val id = TypedId<AutoCategorizeRuleId>()
     mockMvc
@@ -733,7 +734,7 @@ constructor(
 
   @Test
   fun reOrderRule_verifyApplyingRules() {
-    val rule = dataHelper.createRule(1L, cat1.uid)
+    val rule = dataHelper.createRule(authHelper.primaryUser.userId, cat1.uid)
     mockMvc
       .put("/categories/rules/${rule.uid}/reOrder/1") {
         secure = true
@@ -751,7 +752,7 @@ constructor(
 
   @Test
   fun `getMaxOrdinal - with rules`() {
-    repeat(3) { dataHelper.createRule(1L, cat1.uid) }
+    repeat(3) { dataHelper.createRule(authHelper.primaryUser.userId, cat1.uid) }
 
     val expectedResponse = MaxOrdinalResponse(maxOrdinal = 3)
 
@@ -784,7 +785,8 @@ constructor(
   private fun createRulesForOrdinalValidation(): List<AutoCategorizeRule> {
     val rules =
       (1..5).map { ordinal ->
-        RuleAndOrdinal(rule = dataHelper.createRule(1L, cat1.uid), ordinal = ordinal)
+        RuleAndOrdinal(
+          rule = dataHelper.createRule(authHelper.primaryUser.userId, cat1.uid), ordinal = ordinal)
       }
     validateOrdinalsByRule(rules)
     return rules.map { it.rule }
