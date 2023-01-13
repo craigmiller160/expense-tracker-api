@@ -22,7 +22,8 @@ import org.springframework.stereotype.Repository
 private fun addExcludeCategoryIdsParam(
   excludeCategoryIds: List<TypedId<CategoryId>>
 ): (MapSqlParameterSource) -> MapSqlParameterSource = { params ->
-  if (excludeCategoryIds.isNotEmpty()) params.addValue("excludeCategoryIds", excludeCategoryIds)
+  if (excludeCategoryIds.isNotEmpty())
+    params.addValue("excludeCategoryIds", excludeCategoryIds.map { it.uuid })
   else params
 }
 
@@ -101,7 +102,7 @@ class ReportRepositoryImpl(
     val params =
       MapSqlParameterSource()
         .addValues(finalWrapper.params)
-        .addValue("userId", userId)
+        .addValue("userId", userId.uuid)
         .let(addExcludeCategoryIdsParam(excludeCategoryIds))
     return jdbcTemplate.query(finalWrapper.sql, params) { rs, _ ->
       SpendingByCategory(
@@ -122,7 +123,7 @@ class ReportRepositoryImpl(
         .let(executeMustacheTemplate(excludeCategoryIds))
     val params =
       MapSqlParameterSource()
-        .addValue("userId", userId)
+        .addValue("userId", userId.uuid)
         .let(addExcludeCategoryIdsParam(excludeCategoryIds))
     return jdbcTemplate.queryForObject(getSpendingByMonthCountSql, params, Long::class.java)!!
   }
@@ -140,7 +141,7 @@ class ReportRepositoryImpl(
         .let(executeMustacheTemplate(excludeCategoryIds))
     val totalSpendingByMonthParams =
       MapSqlParameterSource()
-        .addValue("userId", userId)
+        .addValue("userId", userId.uuid)
         .addValue("offset", request.pageNumber * request.pageSize)
         .addValue("limit", request.pageSize)
         .let(addExcludeCategoryIdsParam(excludeCategoryIds))
