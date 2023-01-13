@@ -32,7 +32,7 @@ class LastRuleAppliedRepositoryCustomImpl(
           uid = rs.getTypedId("uid"),
           ruleId = rs.getTypedId("rule_id"),
           transactionId = rs.getTypedId("transaction_id"),
-          userId = rs.getLong("user_id"),
+          userId = rs.getTypedId("user_id"),
           categoryId = rs.getTypedId("category_id"),
           categoryName = rs.getString("category_name"),
           ordinal = rs.getInt("ordinal"),

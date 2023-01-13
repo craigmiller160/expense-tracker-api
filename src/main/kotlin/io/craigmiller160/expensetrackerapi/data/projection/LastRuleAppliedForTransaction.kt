@@ -5,6 +5,7 @@ import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.AutoCategoriz
 import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.CategoryId
 import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.LastRuleAppliedId
 import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.TransactionId
+import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.UserId
 import java.math.BigDecimal
 import java.time.LocalDate
 
@@ -12,7 +13,7 @@ data class LastRuleAppliedForTransaction(
   val uid: TypedId<LastRuleAppliedId>,
   val ruleId: TypedId<AutoCategorizeRuleId>,
   val transactionId: TypedId<TransactionId>,
-  val userId: Long,
+  val userId: TypedId<UserId>,
   val categoryId: TypedId<CategoryId>,
   val categoryName: String,
   val ordinal: Int,
