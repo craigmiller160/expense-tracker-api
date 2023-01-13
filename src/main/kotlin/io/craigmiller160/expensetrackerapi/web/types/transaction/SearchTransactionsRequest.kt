@@ -25,7 +25,7 @@ data class SearchTransactionsRequest(
 ) : PageableRequest, SortableRequest<TransactionSortKey> {
 
   @AssertTrue(message = "Cannot set WITHOUT_CATEGORY and specify categoryIds")
-  private fun isCategoryPropsValid(): Boolean {
+  fun isCategoryPropsValid(): Boolean {
     if (isCategorized == false) {
       return categoryIds.isNullOrEmpty()
     }
