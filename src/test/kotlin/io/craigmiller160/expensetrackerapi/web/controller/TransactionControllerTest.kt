@@ -929,6 +929,7 @@ constructor(
     val expectedTransactions =
       transactionViewRepository
         .findAllByUidInAndUserId(listOf(txn3.uid, txn2.uid), authHelper.primaryUser.userId)
+        .sortedByDescending { it.updated }
         .map { TransactionDuplicateResponse.from(it) }
 
     val response =

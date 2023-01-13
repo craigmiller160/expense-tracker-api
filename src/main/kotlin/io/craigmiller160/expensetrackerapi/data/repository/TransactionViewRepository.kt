@@ -32,6 +32,7 @@ interface TransactionViewRepository : JpaRepository<TransactionView, TypedId<Tra
     )
     AND t1.uid <> :transactionId
     AND t1.userId = :userId
+    ORDER BY t1.updated DESC
   """)
   fun findAllDuplicates(
     @Param("transactionId") transactionId: TypedId<TransactionId>,
