@@ -1,5 +1,7 @@
 package io.craigmiller160.expensetrackerapi.data.repository.impl
 
+import io.craigmiller160.expensetrackerapi.common.data.typedid.TypedId
+import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.UserId
 import io.craigmiller160.expensetrackerapi.data.SqlLoader
 import io.craigmiller160.expensetrackerapi.data.projection.NeedsAttentionCount
 import io.craigmiller160.expensetrackerapi.data.projection.NeedsAttentionOldest
@@ -24,15 +26,15 @@ class NeedsAttentionRepositoryImpl(
   private val jdbcTemplate: NamedParameterJdbcTemplate,
   private val sqlLoader: SqlLoader
 ) : NeedsAttentionRepository {
-  override fun getAllNeedsAttentionCounts(userId: Long): List<NeedsAttentionCount> {
+  override fun getAllNeedsAttentionCounts(userId: TypedId<UserId>): List<NeedsAttentionCount> {
     val countSql = sqlLoader.loadSql("needsAttention/get_all_needs_attention_counts.sql")
-    val params = MapSqlParameterSource().addValue("userId", userId)
+    val params = MapSqlParameterSource().addValue("userId", userId.uuid)
     return jdbcTemplate.query(countSql, params, needsAttentionCountRowMapper)
   }
 
-  override fun getAllNeedsAttentionOldest(userId: Long): List<NeedsAttentionOldest> {
+  override fun getAllNeedsAttentionOldest(userId: TypedId<UserId>): List<NeedsAttentionOldest> {
     val oldestSql = sqlLoader.loadSql("needsAttention/get_all_needs_attention_oldest.sql")
-    val params = MapSqlParameterSource().addValue("userId", userId)
+    val params = MapSqlParameterSource().addValue("userId", userId.uuid)
     return jdbcTemplate.query(oldestSql, params, needsAttentionOldestRowMapper)
   }
 }
