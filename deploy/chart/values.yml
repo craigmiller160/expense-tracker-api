@@ -8,7 +8,7 @@ app_deployment:
     spring.datasource.db_name: expense_tracker_prod
     spring.flyway.locations: classpath:db/migration,classpath:db/prod/migration
     keycloak.realm: apps-prod
-    keycloak.auth-server-url: http://keycloak.infra-prod:8080
+    keycloak.auth-server-url: https://keycloak.infra-prod:8443
   onepassworditems:
     - name: expense-tracker-api-oauth2-keys
       itemPath: vaults/Home Server (Prod)/items/Expense Tracker API OAuth2 Keys
