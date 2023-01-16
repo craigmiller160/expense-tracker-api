@@ -28,7 +28,7 @@ app_deployment:
     - envVariable: keycloak.credentials.secret
       secretName: expense-tracker-api-oauth2-keys
       secretKey: kcClientSecret
-  livenessProbe:
+  commonProbe:
     httpGet:
       path: /actuator/health
       port: 8080
