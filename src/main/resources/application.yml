@@ -36,7 +36,7 @@ spring:
 keycloak:
   realm: apps-dev
   auth-server-url: https://auth-craigmiller160.ddns.net
-  ssl-required: external
+  ssl-required: all
   resource: expense-tracker-api
   use-resource-role-mappings: true
   credentials:
