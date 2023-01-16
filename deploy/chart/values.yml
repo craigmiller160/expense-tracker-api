@@ -7,7 +7,7 @@ app_deployment:
     spring.datasource.port: "5432"
     spring.datasource.db_name: expense_tracker_prod
     spring.flyway.locations: classpath:db/migration,classpath:db/prod/migration
-    keycloak.ream: apps-prod
+    keycloak.realm: apps-prod
     keycloak.auth-server-url: http://keycloak.infra-prod:8080
     keycloak.ssl-required: none
   onepassworditems:
