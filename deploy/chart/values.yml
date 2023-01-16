@@ -8,10 +8,6 @@ app_deployment:
     spring.datasource.db_name: expense_tracker_prod
     spring.flyway.locations: classpath:db/migration,classpath:db/prod/migration
     keycloak.realm: apps-prod
-    keycloak.auth-server-url: https://auth-craigmiller160.ddns.net
-    # This is safe because keycloak lives inside the cluster
-    keycloak.disable-trust-manager: "true"
-    logging.level.org.keycloak: DEBUG
   onepassworditems:
     - name: expense-tracker-api-oauth2-keys
       itemPath: vaults/Home Server (Prod)/items/Expense Tracker API OAuth2 Keys
