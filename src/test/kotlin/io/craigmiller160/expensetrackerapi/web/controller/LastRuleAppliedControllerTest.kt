@@ -8,7 +8,7 @@ import io.craigmiller160.expensetrackerapi.data.model.Transaction
 import io.craigmiller160.expensetrackerapi.data.repository.AutoCategorizeRuleRepository
 import io.craigmiller160.expensetrackerapi.data.repository.LastRuleAppliedRepository
 import io.craigmiller160.expensetrackerapi.testcore.ExpenseTrackerIntegrationTest
-import io.craigmiller160.expensetrackerapi.testcore.OAuth2Extension
+import io.craigmiller160.expensetrackerapi.testutils.AuthenticationHelper
 import io.craigmiller160.expensetrackerapi.testutils.DataHelper
 import io.craigmiller160.expensetrackerapi.web.types.rules.LastRuleAppliedResponse
 import java.math.BigDecimal
@@ -27,7 +27,8 @@ constructor(
   private val mockMvc: MockMvc,
   private val lastRuleAppliedRepository: LastRuleAppliedRepository,
   private val autoCategorizeRuleRepository: AutoCategorizeRuleRepository,
-  private val objectMapper: ObjectMapper
+  private val objectMapper: ObjectMapper,
+  private val authHelper: AuthenticationHelper
 ) {
   private lateinit var token: String
   private lateinit var transaction: Transaction
@@ -35,16 +36,16 @@ constructor(
 
   @BeforeEach
   fun setup() {
-    token = OAuth2Extension.createJwt()
-    transaction = dataHelper.createTransaction(1L)
-    category = dataHelper.createCategory(1L, "Entertainment")
+    token = authHelper.primaryUser.token
+    transaction = dataHelper.createTransaction(authHelper.primaryUser.userId)
+    category = dataHelper.createCategory(authHelper.primaryUser.userId, "Entertainment")
   }
 
   private fun createRule(): Pair<AutoCategorizeRule, LastRuleApplied> {
     val rule =
       autoCategorizeRuleRepository.saveAndFlush(
         AutoCategorizeRule(
-          userId = 1L,
+          userId = authHelper.primaryUser.userId,
           categoryId = category.uid,
           ordinal = 1,
           regex = ".*",
@@ -54,7 +55,10 @@ constructor(
           maxAmount = BigDecimal("20")))
     val lastApplied =
       lastRuleAppliedRepository.saveAndFlush(
-        LastRuleApplied(userId = 1L, transactionId = transaction.uid, ruleId = rule.uid))
+        LastRuleApplied(
+          userId = authHelper.primaryUser.userId,
+          transactionId = transaction.uid,
+          ruleId = rule.uid))
     return rule to lastApplied
   }
 

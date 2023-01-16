@@ -6,18 +6,17 @@ import io.craigmiller160.expensetrackerapi.data.repository.NeedsAttentionReposit
 import io.craigmiller160.expensetrackerapi.function.TryEither
 import io.craigmiller160.expensetrackerapi.web.types.CountAndOldest
 import io.craigmiller160.expensetrackerapi.web.types.NeedsAttentionResponse
-import io.craigmiller160.oauth2.service.OAuth2Service
 import javax.transaction.Transactional
 import org.springframework.stereotype.Service
 
 @Service
 class NeedsAttentionService(
   private val needsAttentionRepository: NeedsAttentionRepository,
-  private val oAuth2Service: OAuth2Service
+  private val authorizationService: AuthorizationService
 ) {
   @org.springframework.transaction.annotation.Transactional
   fun getNeedsAttention(): TryEither<NeedsAttentionResponse> {
-    val userId = oAuth2Service.getAuthenticatedUser().userId
+    val userId = authorizationService.getAuthUserId()
     return Either.catch {
       val needsAttentionCounts =
         needsAttentionRepository.getAllNeedsAttentionCounts(userId).associateBy { it.type }

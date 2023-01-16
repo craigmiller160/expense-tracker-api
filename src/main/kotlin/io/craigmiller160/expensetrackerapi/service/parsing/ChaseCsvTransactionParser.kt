@@ -1,6 +1,8 @@
 package io.craigmiller160.expensetrackerapi.service.parsing
 
 import arrow.core.Either
+import io.craigmiller160.expensetrackerapi.common.data.typedid.TypedId
+import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.UserId
 import io.craigmiller160.expensetrackerapi.common.error.BadRequestException
 import io.craigmiller160.expensetrackerapi.data.model.Transaction
 import io.craigmiller160.expensetrackerapi.function.TryEither
@@ -18,7 +20,7 @@ class ChaseCsvTransactionParser : AbstractCsvTransactionParser() {
         "Details", "Posting Date", "Description", "Amount", "Type", "Balance", "Check or Slip #")
   }
 
-  override fun parseRecord(userId: Long, row: Array<String>): TryEither<Transaction> =
+  override fun parseRecord(userId: TypedId<UserId>, row: Array<String>): TryEither<Transaction> =
     Either.catch {
       val rawDate = row[1]
       val expenseDate = LocalDate.parse(rawDate, DATE_FORMAT)

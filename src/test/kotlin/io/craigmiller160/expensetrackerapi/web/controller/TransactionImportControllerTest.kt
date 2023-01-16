@@ -6,11 +6,10 @@ import arrow.core.getOrHandle
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.craigmiller160.expensetrackerapi.data.model.Transaction
 import io.craigmiller160.expensetrackerapi.data.repository.TransactionRepository
-import io.craigmiller160.expensetrackerapi.data.utils.TransactionContentHash
 import io.craigmiller160.expensetrackerapi.extension.flushAndClear
 import io.craigmiller160.expensetrackerapi.service.TransactionImportType
 import io.craigmiller160.expensetrackerapi.testcore.ExpenseTrackerIntegrationTest
-import io.craigmiller160.expensetrackerapi.testcore.OAuth2Extension
+import io.craigmiller160.expensetrackerapi.testutils.AuthenticationHelper
 import io.craigmiller160.expensetrackerapi.testutils.DataHelper
 import io.craigmiller160.expensetrackerapi.testutils.ResourceUtils
 import io.craigmiller160.expensetrackerapi.web.types.importing.ImportTypeResponse
@@ -36,13 +35,14 @@ constructor(
   private val mockMvc: MockMvc,
   private val objectMapper: ObjectMapper,
   private val entityManager: EntityManager,
-  private val dataHelper: DataHelper
+  private val dataHelper: DataHelper,
+  private val authHelper: AuthenticationHelper
 ) {
   private lateinit var token: String
 
   @BeforeEach
   fun setup() {
-    token = OAuth2Extension.createJwt()
+    token = authHelper.primaryUser.token
   }
   @Test
   fun getImportTypes() {
@@ -67,13 +67,14 @@ constructor(
     val transaction =
       transactionRepository.save(
         Transaction(
-          userId = 1L,
+          userId = authHelper.primaryUser.userId,
           expenseDate = expenseDate,
           description = description,
           amount = amount,
-          confirmed = false,
-          contentHash = TransactionContentHash.hash(1L, expenseDate, amount, description)))
+          confirmed = false))
     val csvBytes = ResourceUtils.getResourceBytes("data/discover1.csv").getOrHandle { throw it }
+
+    entityManager.flushAndClear()
 
     mockMvc
       .multipart("/transaction-import?type=${TransactionImportType.DISCOVER_CSV.name}") {
@@ -88,10 +89,11 @@ constructor(
       }
 
     entityManager.flushAndClear()
+    val baseContentHash = transactionRepository.findById(transaction.id).orElseThrow().contentHash
 
     val allDuplicateTransactions =
       transactionRepository.findAllByUserIdAndContentHashInOrderByCreated(
-        1L, listOf(transaction.contentHash))
+        authHelper.primaryUser.userId, listOf(baseContentHash))
     val lastTransaction = allDuplicateTransactions.last()
     val nextToLastTransaction = allDuplicateTransactions[allDuplicateTransactions.size - 2]
     assertEquals(lastTransaction.contentHash, nextToLastTransaction.contentHash)
@@ -120,14 +122,11 @@ constructor(
 
     entityManager.flushAndClear()
 
-    val contentHash =
-      TransactionContentHash.hash(
-        1L, LocalDate.of(2022, 5, 18), BigDecimal("-5.81"), "PANDA EXPRESS 1679 RIVERVIEW FL")
-
-    val allDuplicateTransactions =
-      transactionRepository.findAllByUserIdAndContentHashInOrderByCreated(1L, listOf(contentHash))
-    val lastTransaction = allDuplicateTransactions.last()
-    val nextToLastTransaction = allDuplicateTransactions[allDuplicateTransactions.size - 2]
+    val duplicates =
+      transactionRepository.findAll().groupBy { it.contentHash }.filter { it.value.size > 1 }
+    assertThat(duplicates).hasSize(1)
+    val lastTransaction = duplicates.values.first().last()
+    val nextToLastTransaction = duplicates.values.first()[duplicates.values.first().size - 2]
     assertEquals(lastTransaction.contentHash, nextToLastTransaction.contentHash)
   }
 
@@ -153,18 +152,20 @@ constructor(
 
     entityManager.flushAndClear()
 
-    val transactions = transactionRepository.findAllByUserIdOrderByExpenseDateAscDescriptionAsc(1L)
+    val transactions =
+      transactionRepository.findAllByUserIdOrderByExpenseDateAscDescriptionAsc(
+        authHelper.primaryUser.userId)
     assertThat(transactions).hasSize(57)
 
     assertThat(transactions.first())
-      .hasFieldOrPropertyWithValue("userId", 1L)
+      .hasFieldOrPropertyWithValue("userId", authHelper.primaryUser.userId)
       .hasFieldOrPropertyWithValue("expenseDate", LocalDate.of(2022, 4, 18))
       .hasFieldOrPropertyWithValue("description", "PARTY CITY 1084 TAMPA FL01837R")
       .hasFieldOrPropertyWithValue("amount", BigDecimal("-36.87"))
       .hasFieldOrPropertyWithValue("categoryId", null)
 
     assertThat(transactions[41])
-      .hasFieldOrPropertyWithValue("userId", 1L)
+      .hasFieldOrPropertyWithValue("userId", authHelper.primaryUser.userId)
       .hasFieldOrPropertyWithValue("expenseDate", LocalDate.of(2022, 5, 9))
       .hasFieldOrPropertyWithValue(
         "description", "DIRECTPAY FULL BALANCESEE DETAILS OF YOUR NEXT DIRECTPAY BELOW")
@@ -172,7 +173,7 @@ constructor(
       .hasFieldOrPropertyWithValue("categoryId", null)
 
     assertThat(transactions.last())
-      .hasFieldOrPropertyWithValue("userId", 1L)
+      .hasFieldOrPropertyWithValue("userId", authHelper.primaryUser.userId)
       .hasFieldOrPropertyWithValue("expenseDate", LocalDate.of(2022, 5, 18))
       .hasFieldOrPropertyWithValue("description", "PANDA EXPRESS 1679 RIVERVIEW FL")
       .hasFieldOrPropertyWithValue("amount", BigDecimal("-5.81"))
@@ -181,8 +182,8 @@ constructor(
 
   @Test
   fun `importTransactions - DISCOVER_CSV, with auto-categorization rules`() {
-    val category = dataHelper.createCategory(1L, "Hello")
-    dataHelper.createRule(1L, category.uid)
+    val category = dataHelper.createCategory(authHelper.primaryUser.userId, "Hello")
+    dataHelper.createRule(authHelper.primaryUser.userId, category.uid)
 
     ResourceUtils.getResourceBytes("data/discover1.csv")
       .flatMap { bytes ->
@@ -204,7 +205,9 @@ constructor(
 
     entityManager.flushAndClear()
 
-    val transactions = transactionRepository.findAllByUserIdOrderByExpenseDateAscDescriptionAsc(1L)
+    val transactions =
+      transactionRepository.findAllByUserIdOrderByExpenseDateAscDescriptionAsc(
+        authHelper.primaryUser.userId)
     val expectedSize = 57
     val expectedCategoryIds = (1..expectedSize).map { category.uid }
     assertThat(transactions)
@@ -235,11 +238,13 @@ constructor(
 
     entityManager.flushAndClear()
 
-    val transactions = transactionRepository.findAllByUserIdOrderByExpenseDateAscDescriptionAsc(1L)
+    val transactions =
+      transactionRepository.findAllByUserIdOrderByExpenseDateAscDescriptionAsc(
+        authHelper.primaryUser.userId)
     assertThat(transactions).hasSize(23)
 
     assertThat(transactions.first())
-      .hasFieldOrPropertyWithValue("userId", 1L)
+      .hasFieldOrPropertyWithValue("userId", authHelper.primaryUser.userId)
       .hasFieldOrPropertyWithValue("expenseDate", LocalDate.of(2022, 5, 23))
       .hasFieldOrPropertyWithValue(
         "description", "FID BKG SVC LLC  MONEYLINE                  PPD ID: 1035141383")
@@ -247,7 +252,7 @@ constructor(
       .hasFieldOrPropertyWithValue("categoryId", null)
 
     assertThat(transactions[20])
-      .hasFieldOrPropertyWithValue("userId", 1L)
+      .hasFieldOrPropertyWithValue("userId", authHelper.primaryUser.userId)
       .hasFieldOrPropertyWithValue("expenseDate", LocalDate.of(2022, 6, 15))
       .hasFieldOrPropertyWithValue(
         "description", "C89303 CLEARSPEN DIR DEP                    PPD ID: 4462283648")
@@ -255,7 +260,7 @@ constructor(
       .hasFieldOrPropertyWithValue("categoryId", null)
 
     assertThat(transactions[21])
-      .hasFieldOrPropertyWithValue("userId", 1L)
+      .hasFieldOrPropertyWithValue("userId", authHelper.primaryUser.userId)
       .hasFieldOrPropertyWithValue("expenseDate", LocalDate.of(2022, 6, 15))
       .hasFieldOrPropertyWithValue(
         "description", "FRONTIER COMM CORP WE 800-921-8101 CT        06/14")

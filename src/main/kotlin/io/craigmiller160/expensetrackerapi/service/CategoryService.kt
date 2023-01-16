@@ -13,7 +13,6 @@ import io.craigmiller160.expensetrackerapi.function.flatMapCatch
 import io.craigmiller160.expensetrackerapi.utils.StringToColor
 import io.craigmiller160.expensetrackerapi.web.types.category.CategoryRequest
 import io.craigmiller160.expensetrackerapi.web.types.category.CategoryResponse
-import io.craigmiller160.oauth2.service.OAuth2Service
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -21,10 +20,10 @@ import org.springframework.transaction.annotation.Transactional
 class CategoryService(
   private val categoryRepository: CategoryRepository,
   private val transactionRepository: TransactionRepository,
-  private val oAuth2Service: OAuth2Service
+  private val authService: AuthorizationService
 ) {
   fun getAllCategories(): TryEither<List<CategoryResponse>> {
-    val userId = oAuth2Service.getAuthenticatedUser().userId
+    val userId = authService.getAuthUserId()
     return Either.catch {
       categoryRepository.findAllByUserIdOrderByName(userId).map { CategoryResponse.from(it) }
     }
@@ -40,7 +39,7 @@ class CategoryService(
 
   @Transactional
   fun createCategory(request: CategoryRequest): TryEither<CategoryResponse> {
-    val userId = oAuth2Service.getAuthenticatedUser().userId
+    val userId = authService.getAuthUserId()
     return validateRequest(request)
       .flatMapCatch {
         categoryRepository.save(
@@ -51,7 +50,7 @@ class CategoryService(
 
   @Transactional
   fun updateCategory(categoryId: TypedId<CategoryId>, request: CategoryRequest): TryEither<Unit> {
-    val userId = oAuth2Service.getAuthenticatedUser().userId
+    val userId = authService.getAuthUserId()
     return validateRequest(request)
       .flatMapCatch { categoryRepository.findByUidAndUserId(categoryId, userId) }
       .flatMapCatch { nullableCategory ->
@@ -67,7 +66,7 @@ class CategoryService(
 
   @Transactional
   fun deleteCategory(categoryId: TypedId<CategoryId>): TryEither<Unit> {
-    val userId = oAuth2Service.getAuthenticatedUser().userId
+    val userId = authService.getAuthUserId()
     return Either.catch {
         transactionRepository.removeCategoryFromAllTransactions(userId, categoryId)
       }

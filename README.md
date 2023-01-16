@@ -16,6 +16,19 @@ Then use the command `./run.sh airplane`.
 
 NOTE: When in airplane mode, all security is disabled.
 
+## How to Test (Fast Test Mode)
+
+This app uses Testcontainers for its test suite. They can be slow to start. As an alternative, using the `docker-compose.yml` file to start those containers will stop Testcontainers from being used.
+
 ## Swagger
 
 The swagger can be accessed locally via `https://localhost:8080/swagger-ui/index.html`
+
+## Terraform
+
+For the Terraform script to run, the following environment variables must be present on the machine. 
+
+```
+# The operator access token for communicating with 1Password
+ONEPASSWORD_TOKEN=XXXXXXX
+```

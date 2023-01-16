@@ -5,9 +5,10 @@ app_deployment:
     spring.profiles.active: prod
     spring.datasource.host: postgres.infra-prod
     spring.datasource.port: "5432"
-    oauth2.auth-server-host: https://sso-oauth2-server:8443
-    oauth2.client-name: expense-tracker-api
     spring.datasource.db_name: expense_tracker_prod
+    spring.flyway.locations: classpath:db/migration,classpath:db/prod/migration
+    keycloak.ream: apps-prod
+    keycloak.auth-server-url: http://keycloak.infra-prod:8080
   onepassworditems:
     - name: expense-tracker-api-oauth2-keys
       itemPath: vaults/Home Server (Prod)/items/Expense Tracker API OAuth2 Keys
@@ -22,12 +23,12 @@ app_deployment:
     - envVariable: spring.datasource.password
       secretName: expense-tracker-postgres
       secretKey: password
-    - envVariable: oauth2.client-key
+    - envVariable: keycloak.resource
       secretName: expense-tracker-api-oauth2-keys
-      secretKey: clientKey
-    - envVariable: oauth2.client-secret
+      secretKey: kcClientId
+    - envVariable: keycloak.credentials.secret
       secretName: expense-tracker-api-oauth2-keys
-      secretKey: clientSecret
+      secretKey: kcClientSecret
   livenessProbe:
     httpGet:
       path: /actuator/health

@@ -2,6 +2,8 @@ package io.craigmiller160.expensetrackerapi.data.repository.impl
 
 import com.querydsl.core.BooleanBuilder
 import com.querydsl.jpa.impl.JPAQueryFactory
+import io.craigmiller160.expensetrackerapi.common.data.typedid.TypedId
+import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.UserId
 import io.craigmiller160.expensetrackerapi.data.model.QTransactionView
 import io.craigmiller160.expensetrackerapi.data.model.TransactionView
 import io.craigmiller160.expensetrackerapi.data.querydsl.QueryDSLSupport
@@ -20,7 +22,7 @@ class TransactionRepositoryCustomImpl(
 
   override fun searchForTransactions(
     request: SearchTransactionsRequest,
-    userId: Long,
+    userId: TypedId<UserId>,
     page: Pageable
   ): Page<TransactionView> {
     val whereClause =

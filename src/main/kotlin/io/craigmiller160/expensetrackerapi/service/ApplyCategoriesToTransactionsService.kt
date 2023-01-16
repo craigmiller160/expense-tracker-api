@@ -5,6 +5,7 @@ import arrow.core.flatMap
 import io.craigmiller160.expensetrackerapi.common.data.typedid.TypedId
 import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.AutoCategorizeRuleId
 import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.TransactionId
+import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.UserId
 import io.craigmiller160.expensetrackerapi.data.model.AutoCategorizeRule
 import io.craigmiller160.expensetrackerapi.data.model.LastRuleApplied
 import io.craigmiller160.expensetrackerapi.data.model.Transaction
@@ -33,7 +34,7 @@ class ApplyCategoriesToTransactionsService(
   private val log = LoggerFactory.getLogger(javaClass)
 
   @Transactional
-  fun applyCategoriesToUnconfirmedTransactions(userId: Long): TryEither<Unit> {
+  fun applyCategoriesToUnconfirmedTransactions(userId: TypedId<UserId>): TryEither<Unit> {
     log.debug("Starting to apply categories to all unconfirmed transactions for user $userId")
     val start = System.nanoTime()
     return applyCategoriesToUnconfirmedTransactions(userId, 0).map {
@@ -44,7 +45,7 @@ class ApplyCategoriesToTransactionsService(
   }
 
   private fun applyCategoriesToUnconfirmedTransactions(
-    userId: Long,
+    userId: TypedId<UserId>,
     pageNumber: Int
   ): TryEither<Unit> {
     val page = PageRequest.of(pageNumber, PAGE_SIZE, Sort.by(Sort.Order.asc("id")))
@@ -64,7 +65,7 @@ class ApplyCategoriesToTransactionsService(
   }
 
   private fun deleteLastRuleAppliedForTransactions(
-    userId: Long,
+    userId: TypedId<UserId>,
     transactionIds: List<TypedId<TransactionId>>
   ): TryEither<Unit> =
     Either.catch {
@@ -89,7 +90,7 @@ class ApplyCategoriesToTransactionsService(
   }
 
   private fun saveCategorizedTransactions(
-    userId: Long,
+    userId: TypedId<UserId>,
     context: TransactionRuleContext
   ): TryEither<List<Transaction>> =
     Either.catch { transactionRepository.saveAllAndFlush(context.allTransactions) }
@@ -108,7 +109,7 @@ class ApplyCategoriesToTransactionsService(
 
   /** This returns the transactions in a different order from the method. */
   fun applyCategoriesToTransactions(
-    userId: Long,
+    userId: TypedId<UserId>,
     transactions: List<Transaction>
   ): TryEither<List<Transaction>> {
     log.debug("Starting to apply categories to batch of transactions for user $userId")
@@ -145,7 +146,7 @@ class ApplyCategoriesToTransactionsService(
     val currentRule: AutoCategorizeRule
   ) {
     companion object {
-      private val EMPTY_RULE = AutoCategorizeRule(0L, TypedId(), 0, "")
+      private val EMPTY_RULE = AutoCategorizeRule(TypedId(), TypedId(), 0, "")
 
       fun forAllTransactions(allTransactions: List<Transaction>): TransactionRuleContext =
         TransactionRuleContext(allTransactions, mapOf(), EMPTY_RULE)

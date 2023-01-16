@@ -8,6 +8,7 @@ import arrow.core.sequence
 import io.craigmiller160.expensetrackerapi.common.data.typedid.TypedId
 import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.CategoryId
 import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.TransactionId
+import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.UserId
 import io.craigmiller160.expensetrackerapi.common.error.BadRequestException
 import io.craigmiller160.expensetrackerapi.data.model.Category
 import io.craigmiller160.expensetrackerapi.data.model.Transaction
@@ -20,8 +21,6 @@ import io.craigmiller160.expensetrackerapi.data.repository.TransactionViewReposi
 import io.craigmiller160.expensetrackerapi.function.TryEither
 import io.craigmiller160.expensetrackerapi.function.flatMapCatch
 import io.craigmiller160.expensetrackerapi.web.types.transaction.*
-import io.craigmiller160.oauth2.service.OAuth2Service
-import javax.persistence.EntityManager
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
 import org.springframework.stereotype.Service
@@ -33,14 +32,13 @@ class TransactionService(
   private val transactionViewRepository: TransactionViewRepository,
   private val lastRuleAppliedRepository: LastRuleAppliedRepository,
   private val categoryRepository: CategoryRepository,
-  private val oAuth2Service: OAuth2Service,
-  private val entityManager: EntityManager
+  private val authService: AuthorizationService
 ) {
   @Transactional
   fun categorizeTransactions(
     transactionsAndCategories: Set<TransactionAndCategoryUpdateItem>
   ): TryEither<Unit> {
-    val userId = oAuth2Service.getAuthenticatedUser().userId
+    val userId = authService.getAuthUserId()
     return transactionsAndCategories
       .map { txnAndCat ->
         Either.catch {
@@ -74,7 +72,7 @@ class TransactionService(
   fun confirmTransactions(
     transactionsToConfirm: Set<TransactionAndConfirmUpdateItem>
   ): TryEither<Unit> {
-    val userId = oAuth2Service.getAuthenticatedUser().userId
+    val userId = authService.getAuthUserId()
     return transactionsToConfirm
       .map { txnToConfirm ->
         Either.catch {
@@ -94,7 +92,7 @@ class TransactionService(
 
   @Transactional
   fun deleteTransactions(request: DeleteTransactionsRequest): TryEither<Unit> {
-    val userId = oAuth2Service.getAuthenticatedUser().userId
+    val userId = authService.getAuthUserId()
     return Either.catch {
         lastRuleAppliedRepository.deleteAllByUserIdAndTransactionIdIn(userId, request.ids)
       }
@@ -103,7 +101,7 @@ class TransactionService(
 
   @Transactional
   fun search(request: SearchTransactionsRequest): TryEither<TransactionsPageResponse> {
-    val userId = oAuth2Service.getAuthenticatedUser().userId
+    val userId = authService.getAuthUserId()
 
     val sort =
       Sort.by(
@@ -121,7 +119,7 @@ class TransactionService(
 
   @Transactional
   fun createTransaction(request: CreateTransactionRequest): TryEither<TransactionResponse> {
-    val userId = oAuth2Service.getAuthenticatedUser().userId
+    val userId = authService.getAuthUserId()
 
     return Either.catch {
       val validCategory =
@@ -156,7 +154,7 @@ class TransactionService(
     transactionId: TypedId<TransactionId>,
     request: UpdateTransactionDetailsRequest
   ): TryEither<Unit> {
-    val userId = oAuth2Service.getAuthenticatedUser().userId
+    val userId = authService.getAuthUserId()
 
     return either
       .eager {
@@ -203,7 +201,7 @@ class TransactionService(
     transactionId: TypedId<TransactionId>,
     request: GetPossibleDuplicatesRequest
   ): TryEither<TransactionDuplicatePageResponse> {
-    val userId = oAuth2Service.getAuthenticatedUser().userId
+    val userId = authService.getAuthUserId()
     val pageable = PageRequest.of(request.pageNumber, request.pageSize)
     return Either.catch {
       val pageResult = transactionViewRepository.findAllDuplicates(transactionId, userId, pageable)
@@ -213,19 +211,21 @@ class TransactionService(
 
   @Transactional
   fun markNotDuplicate(transactionId: TypedId<TransactionId>): TryEither<Unit> {
-    val userId = oAuth2Service.getAuthenticatedUser().userId
+    val userId = authService.getAuthUserId()
     return Either.catch {
       transactionRepository.markNotDuplicate(System.nanoTime(), transactionId, userId)
     }
   }
 
-  private fun getCategoryMap(userId: Long): TryEither<Map<TypedId<CategoryId>, Category>> =
+  private fun getCategoryMap(
+    userId: TypedId<UserId>
+  ): TryEither<Map<TypedId<CategoryId>, Category>> =
     Either.catch { categoryRepository.findAllByUserIdOrderByName(userId).associateBy { it.uid } }
 
   fun getTransactionDetails(
     transactionId: TypedId<TransactionId>
   ): TryEither<TransactionDetailsResponse> {
-    val userId = oAuth2Service.getAuthenticatedUser().userId
+    val userId = authService.getAuthUserId()
     return Either.catch { transactionViewRepository.findByUidAndUserId(transactionId, userId) }
       .flatMap { txn ->
         txn?.let { Either.Right(it) }

@@ -9,7 +9,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.7.6</version>
+        <version>2.7.7</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
 
@@ -29,16 +29,23 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
+            <dependency>
+                <groupId>org.keycloak.bom</groupId>
+                <artifactId>keycloak-adapter-bom</artifactId>
+                <version>${keycloak.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
     <properties>
+        <keycloak.version>20.0.2</keycloak.version>
         <testcontainers.version>1.17.2</testcontainers.version>
         <kotlin.version>1.7.21</kotlin.version>
         <arrow.kt.version>1.1.2</arrow.kt.version>
         <kotest.arrow.version>1.2.5</kotest.arrow.version>
         <spring.arrow.kt.version>1.0.3</spring.arrow.kt.version>
-        <spring.oauth2.utils.version>1.11.0</spring.oauth2.utils.version>
         <spring.web.utils.version>1.2.0</spring.web.utils.version>
         <mockito.kotlin.version>4.0.0</mockito.kotlin.version>
         <opencsv.version>5.6</opencsv.version>
@@ -52,6 +59,7 @@
         <java.version>18</java.version>
         <springdoc.openapi.version>1.6.11</springdoc.openapi.version>
         <mustache.version>0.9.10</mustache.version>
+        <keycloak.testcontainer.version>2.4.0</keycloak.testcontainer.version>
     </properties>
 
     <distributionManagement>
@@ -68,6 +76,21 @@
     </distributionManagement>
 
     <dependencies>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-validation</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.keycloak</groupId>
+            <artifactId>keycloak-admin-client</artifactId>
+            <version>${keycloak.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.dasniko</groupId>
+            <artifactId>testcontainers-keycloak</artifactId>
+            <version>${keycloak.testcontainer.version}</version>
+            <scope>test</scope>
+        </dependency>
         <dependency>
             <groupId>com.github.spullara.mustache.java</groupId>
             <artifactId>compiler</artifactId>
@@ -107,6 +130,14 @@
                     <artifactId>snakeyaml</artifactId>
                 </exclusion>
             </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.keycloak</groupId>
+            <artifactId>keycloak-spring-boot-starter</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -164,11 +195,6 @@
             <groupId>io.github.craigmiller160</groupId>
             <artifactId>spring-arrow-kt</artifactId>
             <version>${spring.arrow.kt.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.craigmiller160</groupId>
-            <artifactId>spring-oauth2-utils</artifactId>
-            <version>${spring.oauth2.utils.version}</version>
         </dependency>
         <dependency>
             <groupId>io.craigmiller160</groupId>

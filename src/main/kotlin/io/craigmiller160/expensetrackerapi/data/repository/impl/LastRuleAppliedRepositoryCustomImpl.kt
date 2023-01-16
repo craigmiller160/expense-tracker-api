@@ -2,6 +2,7 @@ package io.craigmiller160.expensetrackerapi.data.repository.impl
 
 import io.craigmiller160.expensetrackerapi.common.data.typedid.TypedId
 import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.TransactionId
+import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.UserId
 import io.craigmiller160.expensetrackerapi.data.SqlLoader
 import io.craigmiller160.expensetrackerapi.data.projection.LastRuleAppliedForTransaction
 import io.craigmiller160.expensetrackerapi.data.repository.LastRuleAppliedRepositoryCustom
@@ -17,12 +18,12 @@ class LastRuleAppliedRepositoryCustomImpl(
   private val sqlLoader: SqlLoader
 ) : LastRuleAppliedRepositoryCustom {
   override fun getLastRuleDetailsForTransaction(
-    userId: Long,
+    userId: TypedId<UserId>,
     transactionId: TypedId<TransactionId>
   ): LastRuleAppliedForTransaction? {
     val params =
       MapSqlParameterSource()
-        .addValue("userId", userId)
+        .addValue("userId", userId.uuid)
         .addValue("transactionId", transactionId.uuid)
     val sql = sqlLoader.loadSql("lastRuleApplied/getLastRuleAppliedForTransaction.sql")
     val results =
@@ -31,7 +32,7 @@ class LastRuleAppliedRepositoryCustomImpl(
           uid = rs.getTypedId("uid"),
           ruleId = rs.getTypedId("rule_id"),
           transactionId = rs.getTypedId("transaction_id"),
-          userId = rs.getLong("user_id"),
+          userId = rs.getTypedId("user_id"),
           categoryId = rs.getTypedId("category_id"),
           categoryName = rs.getString("category_name"),
           ordinal = rs.getInt("ordinal"),

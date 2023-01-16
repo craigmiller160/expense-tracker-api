@@ -12,6 +12,7 @@ import io.craigmiller160.expensetrackerapi.data.repository.LastRuleAppliedReposi
 import io.craigmiller160.expensetrackerapi.data.repository.TransactionRepository
 import io.craigmiller160.expensetrackerapi.extension.flushAndClear
 import io.craigmiller160.expensetrackerapi.testcore.ExpenseTrackerIntegrationTest
+import io.craigmiller160.expensetrackerapi.testutils.AuthenticationHelper
 import io.craigmiller160.expensetrackerapi.testutils.DataHelper
 import io.kotest.assertions.arrow.core.shouldBeRight
 import java.math.BigDecimal
@@ -31,7 +32,8 @@ constructor(
   private val transactionRepository: TransactionRepository,
   private val applyCategoriesToTransactionsService: ApplyCategoriesToTransactionsService,
   private val lastRuleAppliedRepository: LastRuleAppliedRepository,
-  private val entityManager: EntityManager
+  private val entityManager: EntityManager,
+  private val authHelper: AuthenticationHelper
 ) {
 
   private var ruleCounter = 0
@@ -43,13 +45,13 @@ constructor(
   @BeforeEach
   fun setup() {
     ruleCounter = 0
-    val cat0 = dataHelper.createCategory(1L, "Entertainment")
-    val cat1 = dataHelper.createCategory(1L, "Food")
-    val cat2 = dataHelper.createCategory(1L, "Bills")
-    val cat3 = dataHelper.createCategory(1L, "Other")
-    val cat4 = dataHelper.createCategory(1L, "Something")
-    val cat5 = dataHelper.createCategory(1L, "Foo")
-    val cat6 = dataHelper.createCategory(1L, "To Somewhere")
+    val cat0 = dataHelper.createCategory(authHelper.primaryUser.userId, "Entertainment")
+    val cat1 = dataHelper.createCategory(authHelper.primaryUser.userId, "Food")
+    val cat2 = dataHelper.createCategory(authHelper.primaryUser.userId, "Bills")
+    val cat3 = dataHelper.createCategory(authHelper.primaryUser.userId, "Other")
+    val cat4 = dataHelper.createCategory(authHelper.primaryUser.userId, "Something")
+    val cat5 = dataHelper.createCategory(authHelper.primaryUser.userId, "Foo")
+    val cat6 = dataHelper.createCategory(authHelper.primaryUser.userId, "To Somewhere")
 
     categories = listOf(cat0, cat1, cat2, cat3, cat4, cat5, cat6)
 
@@ -84,7 +86,10 @@ constructor(
   ): Transaction =
     transactionRepository.save(
       Transaction(
-        userId = 1L, expenseDate = expenseDate, description = description, amount = amount))
+        userId = authHelper.primaryUser.userId,
+        expenseDate = expenseDate,
+        description = description,
+        amount = amount))
 
   private fun createRule(
     categoryId: TypedId<CategoryId>,
@@ -96,7 +101,7 @@ constructor(
   ): AutoCategorizeRule =
     autoCategorizeRuleRepository.save(
       AutoCategorizeRule(
-        userId = 1L,
+        userId = authHelper.primaryUser.userId,
         categoryId = categoryId,
         ordinal = ++ruleCounter,
         regex = regex,
@@ -108,10 +113,13 @@ constructor(
   @Test
   fun applyCategoriesToTransactions() {
     lastRuleAppliedRepository.saveAndFlush(
-      LastRuleApplied(userId = 1L, ruleId = rules[0].uid, transactionId = transactions[6].uid))
+      LastRuleApplied(
+        userId = authHelper.primaryUser.userId,
+        ruleId = rules[0].uid,
+        transactionId = transactions[6].uid))
     val result =
       applyCategoriesToTransactionsService
-        .applyCategoriesToTransactions(1L, transactions)
+        .applyCategoriesToTransactions(authHelper.primaryUser.userId, transactions)
         .shouldBeRight()
 
     entityManager.flushAndClear()
@@ -135,10 +143,15 @@ constructor(
       .get()
       .hasFieldOrPropertyWithValue("categoryId", categoryId)
     ruleId?.let { nonNullRuleId ->
-      assertThat(lastRuleAppliedRepository.findByUserIdAndTransactionId(1L, txn.uid))
+      assertThat(
+          lastRuleAppliedRepository.findByUserIdAndTransactionId(
+            authHelper.primaryUser.userId, txn.uid))
         .isNotNull
         .hasFieldOrPropertyWithValue("ruleId", nonNullRuleId)
     }
-      ?: assertThat(lastRuleAppliedRepository.findByUserIdAndTransactionId(1L, txn.uid)).isNull()
+      ?: assertThat(
+          lastRuleAppliedRepository.findByUserIdAndTransactionId(
+            authHelper.primaryUser.userId, txn.uid))
+        .isNull()
   }
 }

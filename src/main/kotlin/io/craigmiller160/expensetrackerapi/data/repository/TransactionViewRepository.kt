@@ -2,6 +2,7 @@ package io.craigmiller160.expensetrackerapi.data.repository
 
 import io.craigmiller160.expensetrackerapi.common.data.typedid.TypedId
 import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.TransactionId
+import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.UserId
 import io.craigmiller160.expensetrackerapi.data.model.TransactionView
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
@@ -12,11 +13,11 @@ import org.springframework.stereotype.Repository
 
 @Repository
 interface TransactionViewRepository : JpaRepository<TransactionView, TypedId<TransactionId>> {
-  fun findByUidAndUserId(id: TypedId<TransactionId>, userId: Long): TransactionView?
+  fun findByUidAndUserId(id: TypedId<TransactionId>, userId: TypedId<UserId>): TransactionView?
 
   fun findAllByUidInAndUserId(
     transactionIds: List<TypedId<TransactionId>>,
-    userId: Long
+    userId: TypedId<UserId>
   ): List<TransactionView>
 
   @Query(
@@ -31,10 +32,11 @@ interface TransactionViewRepository : JpaRepository<TransactionView, TypedId<Tra
     )
     AND t1.uid <> :transactionId
     AND t1.userId = :userId
+    ORDER BY t1.updated DESC
   """)
   fun findAllDuplicates(
     @Param("transactionId") transactionId: TypedId<TransactionId>,
-    @Param("userId") userId: Long,
+    @Param("userId") userId: TypedId<UserId>,
     page: Pageable
   ): Page<TransactionView>
 }

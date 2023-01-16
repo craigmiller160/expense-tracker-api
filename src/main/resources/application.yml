@@ -33,18 +33,15 @@ spring:
       max-file-size: 10MB
       max-request-size: 11MB
 
-oauth2:
-  auth-login-base-uri: "/expense-tracker/oauth2"
-  auth-code-redirect-uri: "/expense-tracker/api/oauth/authcode/code"
-  post-auth-redirect: "/expense-tracker"
-  client-name: "(Dev) expense-tracker-api"
-  cookie-name: expense-tracker-token
-  cookie-max-age-secs: 86400
-  cookie-path: "/expense-tracker"
-  insecure-paths: "/actuator/health,/v3/api-docs,/v3/api-docs/*,/swagger-ui/*"
-  auth-server-host: https://apps-craigmiller160.ddns.net/oauth2
-  client-key: e878451c-3ce5-490d-addc-193b8eaff035
-  client-secret: 8ac56e43-f736-4ba7-8712-1639f845554b
+keycloak:
+  realm: apps-dev
+  auth-server-url: https://auth-craigmiller160.ddns.net
+  ssl-required: external
+  resource: expense-tracker-api
+  use-resource-role-mappings: true
+  credentials:
+    secret: CQ60kzXcV7F31JfW8dX2MINjVIKOIxpJ
+  bearer-only: true
 
 logging:
   level:

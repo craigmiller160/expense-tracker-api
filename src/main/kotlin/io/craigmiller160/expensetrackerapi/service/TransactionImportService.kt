@@ -7,7 +7,6 @@ import io.craigmiller160.expensetrackerapi.function.flatMapCatch
 import io.craigmiller160.expensetrackerapi.service.parsing.TransactionParserManager
 import io.craigmiller160.expensetrackerapi.web.types.importing.ImportTransactionsResponse
 import io.craigmiller160.expensetrackerapi.web.types.importing.ImportTypeResponse
-import io.craigmiller160.oauth2.service.OAuth2Service
 import java.io.InputStream
 import javax.transaction.Transactional
 import org.springframework.stereotype.Service
@@ -16,8 +15,8 @@ import org.springframework.stereotype.Service
 class TransactionImportService(
   private val transactionRepository: TransactionRepository,
   private val transactionParserManager: TransactionParserManager,
-  private val oAuth2Service: OAuth2Service,
-  private val applyCategoriesToTransactionsService: ApplyCategoriesToTransactionsService
+  private val applyCategoriesToTransactionsService: ApplyCategoriesToTransactionsService,
+  private val authService: AuthorizationService
 ) {
   fun getImportTypes(): List<ImportTypeResponse> =
     TransactionImportType.values().map { ImportTypeResponse(it.name, it.displayName) }
@@ -28,7 +27,7 @@ class TransactionImportService(
     stream: InputStream
   ): TryEither<ImportTransactionsResponse> {
     val parser = transactionParserManager.getParserForType(type)
-    val userId = oAuth2Service.getAuthenticatedUser().userId
+    val userId = authService.getAuthUserId()
     return parser
       .parse(userId, stream)
       .flatMapCatch { transactions -> transactionRepository.saveAll(transactions) }

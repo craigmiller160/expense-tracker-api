@@ -1,36 +1,28 @@
 package io.craigmiller160.expensetrackerapi.config
 
-import io.craigmiller160.spring.oauth2.security.JwtValidationFilterConfigurer
-import io.craigmiller160.webutils.security.AuthEntryPoint
+import org.keycloak.adapters.springsecurity.config.KeycloakWebSecurityConfigurerAdapter
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import org.springframework.security.config.http.SessionCreationPolicy
-import org.springframework.security.web.SecurityFilterChain
+import org.springframework.security.core.authority.mapping.SimpleAuthorityMapper
+import org.springframework.security.web.authentication.session.NullAuthenticatedSessionStrategy
+import org.springframework.security.web.authentication.session.SessionAuthenticationStrategy
 
 @Configuration
 @EnableWebSecurity
-class WebSecurityConfig(
-  private val jwtFilterConfigurer: JwtValidationFilterConfigurer,
-  private val authEntryPoint: AuthEntryPoint
-) {
+class WebSecurityConfig : KeycloakWebSecurityConfigurerAdapter() {
   @Bean
-  fun securityFilterChain(http: HttpSecurity): SecurityFilterChain =
+  override fun sessionAuthenticationStrategy(): SessionAuthenticationStrategy =
+    NullAuthenticatedSessionStrategy()
+
+  override fun configure(http: HttpSecurity) {
+    super.configure(http)
     http
       .csrf()
       .disable()
-      .authorizeRequests()
-      .antMatchers(*jwtFilterConfigurer.getInsecurePathPatterns())
-      .permitAll()
-      .anyRequest()
-      .fullyAuthenticated()
-      .and()
-      .apply(jwtFilterConfigurer)
-      .and()
-      .exceptionHandling()
-      .authenticationEntryPoint(authEntryPoint)
-      .and()
       .sessionManagement()
       .sessionCreationPolicy(SessionCreationPolicy.ALWAYS)
       .and()
@@ -38,5 +30,16 @@ class WebSecurityConfig(
       .anyRequest()
       .requiresSecure()
       .and()
-      .build()
+      .authorizeRequests()
+      .antMatchers("/actuator/health", "/v3/api-docs", "/v3/api-docs/*", "/swagger-ui/*")
+      .permitAll()
+      .antMatchers("/**")
+      .hasAnyRole("access")
+  }
+
+  override fun configure(auth: AuthenticationManagerBuilder) {
+    val provider = keycloakAuthenticationProvider()
+    provider.setGrantedAuthoritiesMapper(SimpleAuthorityMapper())
+    auth.authenticationProvider(provider)
+  }
 }

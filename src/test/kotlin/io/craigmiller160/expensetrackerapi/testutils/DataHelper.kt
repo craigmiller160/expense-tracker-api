@@ -5,6 +5,7 @@ import io.craigmiller160.expensetrackerapi.common.data.typedid.TypedId
 import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.AutoCategorizeRuleId
 import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.CategoryId
 import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.TransactionId
+import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.UserId
 import io.craigmiller160.expensetrackerapi.data.model.AutoCategorizeRule
 import io.craigmiller160.expensetrackerapi.data.model.Category
 import io.craigmiller160.expensetrackerapi.data.model.LastRuleApplied
@@ -29,14 +30,17 @@ class DataHelper(
   private var internalDate = LocalDate.now().minusDays(100)
 
   fun createLastRuleApplied(
-    userId: Long,
+    userId: TypedId<UserId>,
     transactionId: TypedId<TransactionId>,
     ruleId: TypedId<AutoCategorizeRuleId>
   ): LastRuleApplied =
     lastRuleAppliedRepository.save(
       LastRuleApplied(userId = userId, transactionId = transactionId, ruleId = ruleId))
 
-  fun createTransaction(userId: Long, categoryId: TypedId<CategoryId>? = null): Transaction {
+  fun createTransaction(
+    userId: TypedId<UserId>,
+    categoryId: TypedId<CategoryId>? = null
+  ): Transaction {
     internalDate = internalDate.plusDays(1)
     val description = faker.company().name()
     val amount = BigDecimal(faker.commerce().price()) * BigDecimal("-1")
@@ -49,7 +53,7 @@ class DataHelper(
         categoryId = categoryId))
   }
 
-  fun createRule(userId: Long, categoryId: TypedId<CategoryId>): AutoCategorizeRule {
+  fun createRule(userId: TypedId<UserId>, categoryId: TypedId<CategoryId>): AutoCategorizeRule {
     val count = autoCategorizeRuleRepository.countAllByUserId(userId)
     val rule =
       AutoCategorizeRule(
@@ -57,11 +61,11 @@ class DataHelper(
     return autoCategorizeRuleRepository.saveAndFlush(rule)
   }
 
-  fun createCategory(userId: Long, name: String): Category =
+  fun createCategory(userId: TypedId<UserId>, name: String): Category =
     categoryRepository.saveAndFlush(
       Category(userId = userId, name = name, color = StringToColor.get(name)))
 
-  fun createDefaultCategories(userId: Long): List<Category> =
+  fun createDefaultCategories(userId: TypedId<UserId>): List<Category> =
     listOf(
       createCategory(userId, "Shopping"),
       createCategory(userId, "Restaurant"),

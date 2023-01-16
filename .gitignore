@@ -41,3 +41,4 @@ deploy/build
 deploy/chart/charts
 
 *.tgz
+.terraform
