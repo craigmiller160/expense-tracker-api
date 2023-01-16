@@ -11,6 +11,7 @@ app_deployment:
     keycloak.auth-server-url: https://keycloak.infra-prod:8443
     # This is safe because keycloak lives inside the cluster
     keycloak.disable-trust-manager: "true"
+    logging.level.org.keycloak: DEBUG
   onepassworditems:
     - name: expense-tracker-api-oauth2-keys
       itemPath: vaults/Home Server (Prod)/items/Expense Tracker API OAuth2 Keys
