@@ -22,11 +22,6 @@ spring:
     hibernate:
       ddl-auto: none
   datasource:
-    host: craigmiller160.ddns.net
-    port: "30019"
-    db_name: "expense_tracker_dev"
-    username: postgres_root
-    password: ${POSTGRES_ROOT_PASSWORD}
     url: jdbc:postgresql://${spring.datasource.host}:${spring.datasource.port}/${spring.datasource.db_name}
   http:
     multipart:

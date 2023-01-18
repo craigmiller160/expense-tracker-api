@@ -1,6 +1,12 @@
 spring:
   flyway:
     locations: classpath:db/migration,classpath:db/dev/migration
+  datasource:
+    host: localhost
+    port: 5432
+    db_name: expense_tracker_dev
+    username: postgres
+    password: password
 
 logging:
   level:
