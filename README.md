@@ -4,7 +4,7 @@ The backend for a program to help me track my expenses.
 
 ## How to Run (Dev)
 
-Create a Postgres database `expense_tracker_dev`, if it isn't already.
+Use the `docker-compose.yml` file to start up a local postgres instance.
 
 Then use the command `./run.sh`.
 
