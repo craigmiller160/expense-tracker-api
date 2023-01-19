@@ -24,7 +24,7 @@ class WebSecurityConfig : KeycloakWebSecurityConfigurerAdapter() {
       .csrf()
       .disable()
       .sessionManagement()
-      .sessionCreationPolicy(SessionCreationPolicy.ALWAYS)
+      .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
       .and()
       .requiresChannel()
       .anyRequest()
