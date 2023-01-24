@@ -9,6 +9,8 @@ import io.craigmiller160.expensetrackerapi.data.repository.TransactionRepository
 import io.craigmiller160.expensetrackerapi.data.repository.TransactionViewRepository
 import io.craigmiller160.expensetrackerapi.testcore.ExpenseTrackerIntegrationTest
 import io.craigmiller160.expensetrackerapi.testutils.DataHelper
+import io.craigmiller160.expensetrackerapi.testutils.DefaultUsers
+import io.craigmiller160.expensetrackerapi.testutils.userTypedId
 import io.craigmiller160.expensetrackerapi.web.types.CountAndOldest
 import io.craigmiller160.expensetrackerapi.web.types.NeedsAttentionResponse
 import java.math.BigDecimal
@@ -29,7 +31,7 @@ constructor(
   private val mockMvc: MockMvc,
   private val objectMapper: ObjectMapper,
   private val entityManager: EntityManager,
-  private val authHelper: AuthenticationHelper
+  private val defaultUsers: DefaultUsers
 ) {
   private lateinit var token: String
 
@@ -40,19 +42,19 @@ constructor(
 
   @BeforeEach
   fun setup() {
-    token = authHelper.primaryUser.token
-    user1Categories = dataHelper.createDefaultCategories(authHelper.primaryUser.userId)
+    token = defaultUsers.primaryUser.token
+    user1Categories = dataHelper.createDefaultCategories(defaultUsers.primaryUser.userTypedId)
 
     val (user1Txns, user2Txns) =
       (0..12)
         .map { index ->
           if (index % 2 == 0) {
-            dataHelper.createTransaction(authHelper.primaryUser.userId)
+            dataHelper.createTransaction(defaultUsers.primaryUser.userTypedId)
           } else {
-            dataHelper.createTransaction(authHelper.secondaryUser.userId)
+            dataHelper.createTransaction(defaultUsers.secondaryUser.userTypedId)
           }
         }
-        .partition { it.userId == authHelper.primaryUser.userId }
+        .partition { it.userId == defaultUsers.primaryUser.userTypedId }
     user1Transactions =
       user1Txns.mapIndexed { index, transaction ->
         if (index % 2 == 0) {

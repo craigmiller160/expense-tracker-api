@@ -9,6 +9,8 @@ import io.craigmiller160.expensetrackerapi.data.repository.AutoCategorizeRuleRep
 import io.craigmiller160.expensetrackerapi.data.repository.LastRuleAppliedRepository
 import io.craigmiller160.expensetrackerapi.testcore.ExpenseTrackerIntegrationTest
 import io.craigmiller160.expensetrackerapi.testutils.DataHelper
+import io.craigmiller160.expensetrackerapi.testutils.DefaultUsers
+import io.craigmiller160.expensetrackerapi.testutils.userTypedId
 import io.craigmiller160.expensetrackerapi.web.types.rules.LastRuleAppliedResponse
 import java.math.BigDecimal
 import java.time.LocalDate
@@ -27,7 +29,7 @@ constructor(
   private val lastRuleAppliedRepository: LastRuleAppliedRepository,
   private val autoCategorizeRuleRepository: AutoCategorizeRuleRepository,
   private val objectMapper: ObjectMapper,
-  private val authHelper: AuthenticationHelper
+  private val defaultUsers: DefaultUsers
 ) {
   private lateinit var token: String
   private lateinit var transaction: Transaction
@@ -35,16 +37,16 @@ constructor(
 
   @BeforeEach
   fun setup() {
-    token = authHelper.primaryUser.token
-    transaction = dataHelper.createTransaction(authHelper.primaryUser.userId)
-    category = dataHelper.createCategory(authHelper.primaryUser.userId, "Entertainment")
+    token = defaultUsers.primaryUser.token
+    transaction = dataHelper.createTransaction(defaultUsers.primaryUser.userTypedId)
+    category = dataHelper.createCategory(defaultUsers.primaryUser.userTypedId, "Entertainment")
   }
 
   private fun createRule(): Pair<AutoCategorizeRule, LastRuleApplied> {
     val rule =
       autoCategorizeRuleRepository.saveAndFlush(
         AutoCategorizeRule(
-          userId = authHelper.primaryUser.userId,
+          userId = defaultUsers.primaryUser.userTypedId,
           categoryId = category.uid,
           ordinal = 1,
           regex = ".*",
@@ -55,7 +57,7 @@ constructor(
     val lastApplied =
       lastRuleAppliedRepository.saveAndFlush(
         LastRuleApplied(
-          userId = authHelper.primaryUser.userId,
+          userId = defaultUsers.primaryUser.userTypedId,
           transactionId = transaction.uid,
           ruleId = rule.uid))
     return rule to lastApplied
