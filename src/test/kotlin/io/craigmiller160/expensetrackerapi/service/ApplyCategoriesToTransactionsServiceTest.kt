@@ -13,6 +13,8 @@ import io.craigmiller160.expensetrackerapi.data.repository.TransactionRepository
 import io.craigmiller160.expensetrackerapi.extension.flushAndClear
 import io.craigmiller160.expensetrackerapi.testcore.ExpenseTrackerIntegrationTest
 import io.craigmiller160.expensetrackerapi.testutils.DataHelper
+import io.craigmiller160.expensetrackerapi.testutils.DefaultUsers
+import io.craigmiller160.expensetrackerapi.testutils.userTypedId
 import io.kotest.assertions.arrow.core.shouldBeRight
 import java.math.BigDecimal
 import java.time.LocalDate
@@ -32,7 +34,7 @@ constructor(
   private val applyCategoriesToTransactionsService: ApplyCategoriesToTransactionsService,
   private val lastRuleAppliedRepository: LastRuleAppliedRepository,
   private val entityManager: EntityManager,
-  private val authHelper: AuthenticationHelper
+  private val defaultUsers: DefaultUsers
 ) {
 
   private var ruleCounter = 0
@@ -44,7 +46,7 @@ constructor(
   @BeforeEach
   fun setup() {
     ruleCounter = 0
-    val cat0 = dataHelper.createCategory(authHelper.primaryUser.userId, "Entertainment")
+    val cat0 = dataHelper.createCategory(defaultUsers.primaryUser.userTypedId, "Entertainment")
     val cat1 = dataHelper.createCategory(authHelper.primaryUser.userId, "Food")
     val cat2 = dataHelper.createCategory(authHelper.primaryUser.userId, "Bills")
     val cat3 = dataHelper.createCategory(authHelper.primaryUser.userId, "Other")
