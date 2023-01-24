@@ -13,11 +13,9 @@ import org.keycloak.representations.idm.CredentialRepresentation
 import org.keycloak.representations.idm.UserRepresentation
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpHeaders
-import org.springframework.stereotype.Component
 import org.springframework.util.LinkedMultiValueMap
 import org.springframework.web.client.RestTemplate
 
-@Component
 class AuthenticationHelper(configResolver: KeycloakConfigResolver) {
   companion object {
     const val ROLE_ACCESS = "access"
