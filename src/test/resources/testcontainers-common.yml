@@ -8,3 +8,5 @@ keycloak:
   enable: true
   propertyMappings:
     keycloak.url: keycloak.auth-server-url
+    keycloak.client.id: keycloak.resource
+    keycloak.client.secret: keycloak.credentials.secret

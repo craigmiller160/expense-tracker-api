@@ -7,10 +7,6 @@ spring:
     db_name: expense_tracker_test
     username: postgres
     password: password
-keycloak:
-  resource: test-client
-  credentials:
-    secret: CQ60kzXcV7F31JfW8dX2MINjVIKOIxpJ
 logging:
   level:
     org.hibernate.SQL: DEBUG
