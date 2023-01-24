@@ -8,6 +8,8 @@ import io.craigmiller160.expensetrackerapi.data.repository.TransactionRepository
 import io.craigmiller160.expensetrackerapi.extension.flushAndClear
 import io.craigmiller160.expensetrackerapi.testcore.ExpenseTrackerIntegrationTest
 import io.craigmiller160.expensetrackerapi.testutils.DataHelper
+import io.craigmiller160.expensetrackerapi.testutils.DefaultUsers
+import io.craigmiller160.expensetrackerapi.testutils.userTypedId
 import io.craigmiller160.expensetrackerapi.utils.StringToColor
 import io.craigmiller160.expensetrackerapi.web.types.category.CategoryRequest
 import io.craigmiller160.expensetrackerapi.web.types.category.CategoryResponse
@@ -32,15 +34,15 @@ constructor(
   private val dataHelper: DataHelper,
   private val mockMvc: MockMvc,
   private val objectMapper: ObjectMapper,
-  private val authHelper: AuthenticationHelper
+  private val defaultUsers: DefaultUsers
 ) {
 
   @Test
   fun getAllCategories() {
-    val token = authHelper.primaryUser.token
-    val cat1 = dataHelper.createCategory(authHelper.primaryUser.userId, "Category 1")
-    val cat2 = dataHelper.createCategory(authHelper.primaryUser.userId, "Category 2")
-    dataHelper.createCategory(authHelper.secondaryUser.userId, "Category 3")
+    val token = defaultUsers.primaryUser.token
+    val cat1 = dataHelper.createCategory(defaultUsers.primaryUser.userTypedId, "Category 1")
+    val cat2 = dataHelper.createCategory(defaultUsers.primaryUser.userTypedId, "Category 2")
+    dataHelper.createCategory(defaultUsers.secondaryUser.userTypedId, "Category 3")
 
     entityManager.flushAndClear()
 
@@ -59,7 +61,7 @@ constructor(
 
   @Test
   fun createCategory() {
-    val token = authHelper.primaryUser.token
+    val token = defaultUsers.primaryUser.token
     val request = CategoryRequest("The Category")
 
     val responseString =
@@ -83,13 +85,13 @@ constructor(
       .isPresent
       .get()
       .hasFieldOrPropertyWithValue("name", request.name)
-      .hasFieldOrPropertyWithValue("userId", authHelper.primaryUser.userId)
+      .hasFieldOrPropertyWithValue("userId", defaultUsers.primaryUser.userTypedId)
       .hasFieldOrPropertyWithValue("color", StringToColor.get(request.name))
   }
 
   @Test
   fun `createCategory - cannot use name Unknown`() {
-    val token = authHelper.primaryUser.token
+    val token = defaultUsers.primaryUser.token
     val request = CategoryRequest("Unknown")
 
     mockMvc
@@ -104,8 +106,8 @@ constructor(
 
   @Test
   fun `updateCategory - cannot use name Unknown`() {
-    val token = authHelper.primaryUser.token
-    val cat1 = dataHelper.createCategory(authHelper.primaryUser.userId, "Category 1")
+    val token = defaultUsers.primaryUser.token
+    val cat1 = dataHelper.createCategory(defaultUsers.primaryUser.userTypedId, "Category 1")
     val request = CategoryRequest("Unknown")
     mockMvc
       .put("/categories/${cat1.id}") {
@@ -119,9 +121,9 @@ constructor(
 
   @Test
   fun updateCategory() {
-    val token = authHelper.primaryUser.token
-    val cat1 = dataHelper.createCategory(authHelper.primaryUser.userId, "Category 1")
-    val cat2 = dataHelper.createCategory(authHelper.secondaryUser.userId, "Category 2")
+    val token = defaultUsers.primaryUser.token
+    val cat1 = dataHelper.createCategory(defaultUsers.primaryUser.userTypedId, "Category 1")
+    val cat2 = dataHelper.createCategory(defaultUsers.secondaryUser.userTypedId, "Category 2")
 
     val request = CategoryRequest("Category B")
     val action: (TypedId<CategoryId>) -> Unit = { id ->
@@ -151,12 +153,12 @@ constructor(
 
   @Test
   fun deleteCategory() {
-    val token = authHelper.primaryUser.token
-    val cat1 = dataHelper.createCategory(authHelper.primaryUser.userId, "Category 1")
-    val cat2 = dataHelper.createCategory(authHelper.secondaryUser.userId, "Category 2")
-    val cat3 = dataHelper.createCategory(authHelper.tertiaryUser.userId, "Category 3")
-    val txn1 = dataHelper.createTransaction(authHelper.primaryUser.userId, cat1.uid)
-    val txn2 = dataHelper.createTransaction(authHelper.primaryUser.userId, cat3.uid)
+    val token = defaultUsers.primaryUser.token
+    val cat1 = dataHelper.createCategory(defaultUsers.primaryUser.userTypedId, "Category 1")
+    val cat2 = dataHelper.createCategory(defaultUsers.secondaryUser.userTypedId, "Category 2")
+    val cat3 = dataHelper.createCategory(defaultUsers.tertiaryUser.userTypedId, "Category 3")
+    val txn1 = dataHelper.createTransaction(defaultUsers.primaryUser.userTypedId, cat1.uid)
+    val txn2 = dataHelper.createTransaction(defaultUsers.primaryUser.userTypedId, cat3.uid)
 
     val action: (TypedId<CategoryId>) -> Unit = { id ->
       mockMvc
