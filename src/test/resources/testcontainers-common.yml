@@ -1,0 +1,10 @@
+postgres:
+  enable: true
+  propertyMappings:
+    postgres.url: spring.datasource.url
+    postgres.username: spring.datasource.username
+    postgres.password: spring.datasource.password
+keycloak:
+  enable: true
+  propertyMappings:
+    keycloak.url: keycloak.auth-server-url
