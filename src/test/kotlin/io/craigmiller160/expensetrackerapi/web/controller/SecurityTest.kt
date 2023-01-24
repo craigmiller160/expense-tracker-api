@@ -1,7 +1,6 @@
 package io.craigmiller160.expensetrackerapi.web.controller
 
 import io.craigmiller160.expensetrackerapi.testcore.ExpenseTrackerIntegrationTest
-import io.craigmiller160.expensetrackerapi.testutils.AuthenticationHelper
 import java.util.UUID
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
