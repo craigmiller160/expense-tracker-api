@@ -4,7 +4,7 @@ spring:
   flyway:
     # TODO must be in the lib
     default-schema: expense_tracker_api
-    init-sqls: SET schema 'expense_tracker_api'
+    init-sqls: SET schema '${spring.flyway.default-schema}'
 logging:
   level:
     org.hibernate.SQL: DEBUG
