@@ -1,12 +1,6 @@
 spring:
   profiles:
     active: test
-  datasource:
-    host: localhost
-    port: 5432
-    db_name: expense_tracker_test
-    username: postgres
-    password: password
 logging:
   level:
     org.hibernate.SQL: DEBUG

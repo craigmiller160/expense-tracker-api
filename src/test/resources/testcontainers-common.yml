@@ -4,6 +4,7 @@ postgres:
     postgres.url: spring.datasource.url
     postgres.username: spring.datasource.username
     postgres.password: spring.datasource.password
+    postgres.schema: spring.jpa.properties.hibernate.default_schema
 keycloak:
   enable: true
   propertyMappings:
