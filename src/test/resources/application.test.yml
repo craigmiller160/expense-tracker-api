@@ -2,15 +2,22 @@ spring:
   profiles:
     active: test
   datasource:
-    host: localhost
-    port: 5432
-    db_name: expense_tracker_test
-    username: postgres
-    password: password
+    url: ${testcontainers.common.postgres.url}
+    username: ${testcontainers.common.postgres.user}
+    password: ${testcontainers.common.postgres.password}
+  jpa:
+    properties:
+      hibernate:
+        default_schema: ${testcontainers.common.postgres.schema}
+  flyway:
+    default-schema: ${testcontainers.common.postgres.schema}
+    init-sqls: SET schema '${testcontainers.common.postgres.schema}'
 keycloak:
-  auth-server-url: http://localhost:8081
+  auth-server-url: ${testcontainers.common.keycloak.url}
+  realm: ${testcontainers.common.keycloak.realm}
+  resource: ${testcontainers.common.keycloak.client.id}
   credentials:
-    secret: CQ60kzXcV7F31JfW8dX2MINjVIKOIxpJ
+    secret: ${testcontainers.common.keycloak.client.secret}
 logging:
   level:
     org.hibernate.SQL: DEBUG

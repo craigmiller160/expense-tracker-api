@@ -1,0 +1,4 @@
+postgres:
+  enable: true
+keycloak:
+  enable: true

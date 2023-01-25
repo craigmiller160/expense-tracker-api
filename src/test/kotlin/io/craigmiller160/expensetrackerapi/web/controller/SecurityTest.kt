@@ -1,7 +1,8 @@
 package io.craigmiller160.expensetrackerapi.web.controller
 
 import io.craigmiller160.expensetrackerapi.testcore.ExpenseTrackerIntegrationTest
-import io.craigmiller160.expensetrackerapi.testutils.AuthenticationHelper
+import io.craigmiller160.expensetrackerapi.testutils.DefaultUsers
+import io.craigmiller160.testcontainers.common.core.AuthenticationHelper
 import java.util.UUID
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -11,10 +12,14 @@ import org.springframework.test.web.servlet.get
 @ExpenseTrackerIntegrationTest
 class SecurityTest
 @Autowired
-constructor(private val mockMvc: MockMvc, private val authHelper: AuthenticationHelper) {
+constructor(
+  private val mockMvc: MockMvc,
+  private val defaultUsers: DefaultUsers,
+  private val authHelper: AuthenticationHelper
+) {
   @Test
   fun `allows valid token with access role`() {
-    val token = authHelper.primaryUser.token
+    val token = defaultUsers.primaryUser.token
     mockMvc
       .get("/transaction-import/types") {
         secure = true
@@ -26,7 +31,8 @@ constructor(private val mockMvc: MockMvc, private val authHelper: Authentication
   @Test
   fun `rejects valid token without access role`() {
     val id = UUID.randomUUID().toString()
-    val token = authHelper.createUser("norole_$id@gmail.com", listOf()).token
+    val token =
+      authHelper.createUser("norole_$id@gmail.com", listOf()).let { authHelper.login(it) }.token
     mockMvc
       .get("/transaction-import/types") {
         secure = true

@@ -12,8 +12,9 @@ import io.craigmiller160.expensetrackerapi.data.repository.LastRuleAppliedReposi
 import io.craigmiller160.expensetrackerapi.data.repository.TransactionRepository
 import io.craigmiller160.expensetrackerapi.extension.flushAndClear
 import io.craigmiller160.expensetrackerapi.testcore.ExpenseTrackerIntegrationTest
-import io.craigmiller160.expensetrackerapi.testutils.AuthenticationHelper
 import io.craigmiller160.expensetrackerapi.testutils.DataHelper
+import io.craigmiller160.expensetrackerapi.testutils.DefaultUsers
+import io.craigmiller160.expensetrackerapi.testutils.userTypedId
 import io.kotest.assertions.arrow.core.shouldBeRight
 import java.math.BigDecimal
 import java.time.LocalDate
@@ -33,7 +34,7 @@ constructor(
   private val applyCategoriesToTransactionsService: ApplyCategoriesToTransactionsService,
   private val lastRuleAppliedRepository: LastRuleAppliedRepository,
   private val entityManager: EntityManager,
-  private val authHelper: AuthenticationHelper
+  private val defaultUsers: DefaultUsers
 ) {
 
   private var ruleCounter = 0
@@ -45,13 +46,13 @@ constructor(
   @BeforeEach
   fun setup() {
     ruleCounter = 0
-    val cat0 = dataHelper.createCategory(authHelper.primaryUser.userId, "Entertainment")
-    val cat1 = dataHelper.createCategory(authHelper.primaryUser.userId, "Food")
-    val cat2 = dataHelper.createCategory(authHelper.primaryUser.userId, "Bills")
-    val cat3 = dataHelper.createCategory(authHelper.primaryUser.userId, "Other")
-    val cat4 = dataHelper.createCategory(authHelper.primaryUser.userId, "Something")
-    val cat5 = dataHelper.createCategory(authHelper.primaryUser.userId, "Foo")
-    val cat6 = dataHelper.createCategory(authHelper.primaryUser.userId, "To Somewhere")
+    val cat0 = dataHelper.createCategory(defaultUsers.primaryUser.userTypedId, "Entertainment")
+    val cat1 = dataHelper.createCategory(defaultUsers.primaryUser.userTypedId, "Food")
+    val cat2 = dataHelper.createCategory(defaultUsers.primaryUser.userTypedId, "Bills")
+    val cat3 = dataHelper.createCategory(defaultUsers.primaryUser.userTypedId, "Other")
+    val cat4 = dataHelper.createCategory(defaultUsers.primaryUser.userTypedId, "Something")
+    val cat5 = dataHelper.createCategory(defaultUsers.primaryUser.userTypedId, "Foo")
+    val cat6 = dataHelper.createCategory(defaultUsers.primaryUser.userTypedId, "To Somewhere")
 
     categories = listOf(cat0, cat1, cat2, cat3, cat4, cat5, cat6)
 
@@ -86,7 +87,7 @@ constructor(
   ): Transaction =
     transactionRepository.save(
       Transaction(
-        userId = authHelper.primaryUser.userId,
+        userId = defaultUsers.primaryUser.userTypedId,
         expenseDate = expenseDate,
         description = description,
         amount = amount))
@@ -101,7 +102,7 @@ constructor(
   ): AutoCategorizeRule =
     autoCategorizeRuleRepository.save(
       AutoCategorizeRule(
-        userId = authHelper.primaryUser.userId,
+        userId = defaultUsers.primaryUser.userTypedId,
         categoryId = categoryId,
         ordinal = ++ruleCounter,
         regex = regex,
@@ -114,12 +115,12 @@ constructor(
   fun applyCategoriesToTransactions() {
     lastRuleAppliedRepository.saveAndFlush(
       LastRuleApplied(
-        userId = authHelper.primaryUser.userId,
+        userId = defaultUsers.primaryUser.userTypedId,
         ruleId = rules[0].uid,
         transactionId = transactions[6].uid))
     val result =
       applyCategoriesToTransactionsService
-        .applyCategoriesToTransactions(authHelper.primaryUser.userId, transactions)
+        .applyCategoriesToTransactions(defaultUsers.primaryUser.userTypedId, transactions)
         .shouldBeRight()
 
     entityManager.flushAndClear()
@@ -145,13 +146,13 @@ constructor(
     ruleId?.let { nonNullRuleId ->
       assertThat(
           lastRuleAppliedRepository.findByUserIdAndTransactionId(
-            authHelper.primaryUser.userId, txn.uid))
+            defaultUsers.primaryUser.userTypedId, txn.uid))
         .isNotNull
         .hasFieldOrPropertyWithValue("ruleId", nonNullRuleId)
     }
       ?: assertThat(
           lastRuleAppliedRepository.findByUserIdAndTransactionId(
-            authHelper.primaryUser.userId, txn.uid))
+            defaultUsers.primaryUser.userTypedId, txn.uid))
         .isNull()
   }
 }

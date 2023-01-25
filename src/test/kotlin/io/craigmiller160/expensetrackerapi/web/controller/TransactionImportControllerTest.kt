@@ -9,9 +9,10 @@ import io.craigmiller160.expensetrackerapi.data.repository.TransactionRepository
 import io.craigmiller160.expensetrackerapi.extension.flushAndClear
 import io.craigmiller160.expensetrackerapi.service.TransactionImportType
 import io.craigmiller160.expensetrackerapi.testcore.ExpenseTrackerIntegrationTest
-import io.craigmiller160.expensetrackerapi.testutils.AuthenticationHelper
 import io.craigmiller160.expensetrackerapi.testutils.DataHelper
+import io.craigmiller160.expensetrackerapi.testutils.DefaultUsers
 import io.craigmiller160.expensetrackerapi.testutils.ResourceUtils
+import io.craigmiller160.expensetrackerapi.testutils.userTypedId
 import io.craigmiller160.expensetrackerapi.web.types.importing.ImportTypeResponse
 import io.kotest.assertions.arrow.core.shouldBeRight
 import java.math.BigDecimal
@@ -36,13 +37,13 @@ constructor(
   private val objectMapper: ObjectMapper,
   private val entityManager: EntityManager,
   private val dataHelper: DataHelper,
-  private val authHelper: AuthenticationHelper
+  private val defaultUsers: DefaultUsers
 ) {
   private lateinit var token: String
 
   @BeforeEach
   fun setup() {
-    token = authHelper.primaryUser.token
+    token = defaultUsers.primaryUser.token
   }
   @Test
   fun getImportTypes() {
@@ -67,7 +68,7 @@ constructor(
     val transaction =
       transactionRepository.save(
         Transaction(
-          userId = authHelper.primaryUser.userId,
+          userId = defaultUsers.primaryUser.userTypedId,
           expenseDate = expenseDate,
           description = description,
           amount = amount,
@@ -93,7 +94,7 @@ constructor(
 
     val allDuplicateTransactions =
       transactionRepository.findAllByUserIdAndContentHashInOrderByCreated(
-        authHelper.primaryUser.userId, listOf(baseContentHash))
+        defaultUsers.primaryUser.userTypedId, listOf(baseContentHash))
     val lastTransaction = allDuplicateTransactions.last()
     val nextToLastTransaction = allDuplicateTransactions[allDuplicateTransactions.size - 2]
     assertEquals(lastTransaction.contentHash, nextToLastTransaction.contentHash)
@@ -154,18 +155,18 @@ constructor(
 
     val transactions =
       transactionRepository.findAllByUserIdOrderByExpenseDateAscDescriptionAsc(
-        authHelper.primaryUser.userId)
+        defaultUsers.primaryUser.userTypedId)
     assertThat(transactions).hasSize(57)
 
     assertThat(transactions.first())
-      .hasFieldOrPropertyWithValue("userId", authHelper.primaryUser.userId)
+      .hasFieldOrPropertyWithValue("userId", defaultUsers.primaryUser.userTypedId)
       .hasFieldOrPropertyWithValue("expenseDate", LocalDate.of(2022, 4, 18))
       .hasFieldOrPropertyWithValue("description", "PARTY CITY 1084 TAMPA FL01837R")
       .hasFieldOrPropertyWithValue("amount", BigDecimal("-36.87"))
       .hasFieldOrPropertyWithValue("categoryId", null)
 
     assertThat(transactions[41])
-      .hasFieldOrPropertyWithValue("userId", authHelper.primaryUser.userId)
+      .hasFieldOrPropertyWithValue("userId", defaultUsers.primaryUser.userTypedId)
       .hasFieldOrPropertyWithValue("expenseDate", LocalDate.of(2022, 5, 9))
       .hasFieldOrPropertyWithValue(
         "description", "DIRECTPAY FULL BALANCESEE DETAILS OF YOUR NEXT DIRECTPAY BELOW")
@@ -173,7 +174,7 @@ constructor(
       .hasFieldOrPropertyWithValue("categoryId", null)
 
     assertThat(transactions.last())
-      .hasFieldOrPropertyWithValue("userId", authHelper.primaryUser.userId)
+      .hasFieldOrPropertyWithValue("userId", defaultUsers.primaryUser.userTypedId)
       .hasFieldOrPropertyWithValue("expenseDate", LocalDate.of(2022, 5, 18))
       .hasFieldOrPropertyWithValue("description", "PANDA EXPRESS 1679 RIVERVIEW FL")
       .hasFieldOrPropertyWithValue("amount", BigDecimal("-5.81"))
@@ -182,8 +183,8 @@ constructor(
 
   @Test
   fun `importTransactions - DISCOVER_CSV, with auto-categorization rules`() {
-    val category = dataHelper.createCategory(authHelper.primaryUser.userId, "Hello")
-    dataHelper.createRule(authHelper.primaryUser.userId, category.uid)
+    val category = dataHelper.createCategory(defaultUsers.primaryUser.userTypedId, "Hello")
+    dataHelper.createRule(defaultUsers.primaryUser.userTypedId, category.uid)
 
     ResourceUtils.getResourceBytes("data/discover1.csv")
       .flatMap { bytes ->
@@ -207,7 +208,7 @@ constructor(
 
     val transactions =
       transactionRepository.findAllByUserIdOrderByExpenseDateAscDescriptionAsc(
-        authHelper.primaryUser.userId)
+        defaultUsers.primaryUser.userTypedId)
     val expectedSize = 57
     val expectedCategoryIds = (1..expectedSize).map { category.uid }
     assertThat(transactions)
@@ -240,11 +241,11 @@ constructor(
 
     val transactions =
       transactionRepository.findAllByUserIdOrderByExpenseDateAscDescriptionAsc(
-        authHelper.primaryUser.userId)
+        defaultUsers.primaryUser.userTypedId)
     assertThat(transactions).hasSize(23)
 
     assertThat(transactions.first())
-      .hasFieldOrPropertyWithValue("userId", authHelper.primaryUser.userId)
+      .hasFieldOrPropertyWithValue("userId", defaultUsers.primaryUser.userTypedId)
       .hasFieldOrPropertyWithValue("expenseDate", LocalDate.of(2022, 5, 23))
       .hasFieldOrPropertyWithValue(
         "description", "FID BKG SVC LLC  MONEYLINE                  PPD ID: 1035141383")
@@ -252,7 +253,7 @@ constructor(
       .hasFieldOrPropertyWithValue("categoryId", null)
 
     assertThat(transactions[20])
-      .hasFieldOrPropertyWithValue("userId", authHelper.primaryUser.userId)
+      .hasFieldOrPropertyWithValue("userId", defaultUsers.primaryUser.userTypedId)
       .hasFieldOrPropertyWithValue("expenseDate", LocalDate.of(2022, 6, 15))
       .hasFieldOrPropertyWithValue(
         "description", "C89303 CLEARSPEN DIR DEP                    PPD ID: 4462283648")
@@ -260,7 +261,7 @@ constructor(
       .hasFieldOrPropertyWithValue("categoryId", null)
 
     assertThat(transactions[21])
-      .hasFieldOrPropertyWithValue("userId", authHelper.primaryUser.userId)
+      .hasFieldOrPropertyWithValue("userId", defaultUsers.primaryUser.userTypedId)
       .hasFieldOrPropertyWithValue("expenseDate", LocalDate.of(2022, 6, 15))
       .hasFieldOrPropertyWithValue(
         "description", "FRONTIER COMM CORP WE 800-921-8101 CT        06/14")
