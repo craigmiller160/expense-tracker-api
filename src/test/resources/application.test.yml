@@ -12,12 +12,12 @@ spring:
   flyway:
     default-schema: ${testcontainers.common.postgres.schema}
     init-sqls: SET schema '${testcontainers.common.postgres.schema}'
-  keycloak:
-    url: ${testcontainers.common.keycloak.url}
-    realm: ${testcontainers.common.keycloak.realm}
-    resource: ${testcontainers.common.keycloak.client.id}
-    credentials:
-      secret: ${testcontainers.common.keycloak.client.secret}
+keycloak:
+  auth-sever-url: ${testcontainers.common.keycloak.url}
+  realm: ${testcontainers.common.keycloak.realm}
+  resource: ${testcontainers.common.keycloak.client.id}
+  credentials:
+    secret: ${testcontainers.common.keycloak.client.secret}
 logging:
   level:
     org.hibernate.SQL: DEBUG
