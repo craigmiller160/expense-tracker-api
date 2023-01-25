@@ -23,13 +23,6 @@
                 <scope>import</scope>
             </dependency>
             <dependency>
-                <groupId>org.testcontainers</groupId>
-                <artifactId>testcontainers-bom</artifactId>
-                <version>${testcontainers.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-            <dependency>
                 <groupId>org.keycloak.bom</groupId>
                 <artifactId>keycloak-adapter-bom</artifactId>
                 <version>${keycloak.version}</version>
@@ -41,7 +34,6 @@
 
     <properties>
         <keycloak.version>20.0.2</keycloak.version>
-        <testcontainers.version>1.17.2</testcontainers.version>
         <kotlin.version>1.7.21</kotlin.version>
         <arrow.kt.version>1.1.2</arrow.kt.version>
         <kotest.arrow.version>1.2.5</kotest.arrow.version>
@@ -59,7 +51,6 @@
         <java.version>18</java.version>
         <springdoc.openapi.version>1.6.11</springdoc.openapi.version>
         <mustache.version>0.9.10</mustache.version>
-        <keycloak.testcontainer.version>2.4.0</keycloak.testcontainer.version>
     </properties>
 
     <distributionManagement>
@@ -89,12 +80,6 @@
             <groupId>org.keycloak</groupId>
             <artifactId>keycloak-admin-client</artifactId>
             <version>${keycloak.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.github.dasniko</groupId>
-            <artifactId>testcontainers-keycloak</artifactId>
-            <version>${keycloak.testcontainer.version}</version>
-            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>com.github.spullara.mustache.java</groupId>
@@ -186,10 +171,6 @@
                     <artifactId>junit-vintage-engine</artifactId>
                 </exclusion>
             </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.testcontainers</groupId>
-            <artifactId>postgresql</artifactId>
         </dependency>
         <dependency>
             <groupId>io.arrow-kt</groupId>
