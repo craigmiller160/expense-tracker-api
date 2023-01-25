@@ -13,7 +13,7 @@ spring:
     default-schema: ${testcontainers.common.postgres.schema}
     init-sqls: SET schema '${testcontainers.common.postgres.schema}'
 keycloak:
-  auth-sever-url: ${testcontainers.common.keycloak.url}
+  auth-server-url: ${testcontainers.common.keycloak.url}
   realm: ${testcontainers.common.keycloak.realm}
   resource: ${testcontainers.common.keycloak.client.id}
   credentials:
