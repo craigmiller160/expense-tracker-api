@@ -1,9 +1,23 @@
 spring:
   profiles:
     active: test
+  datasource:
+    url: ${testcontainers.common.postgres.url}
+    username: ${testcontainers.common.postgres.user}
+    password: ${testcontainers.common.postgres.password}
+  jpa:
+    properties:
+      hibernate:
+        default_schema: ${testcontainers.common.postgres.schema}
   flyway:
-    default-schema: ${spring.jpa.properties.hibernate.default_schema}
-    init-sqls: SET schema '${spring.flyway.default-schema}'
+    default-schema: ${testcontainers.common.postgres.schema}
+    init-sqls: SET schema '${testcontainers.common.postgres.schema}'
+  keycloak:
+    url: ${testcontainers.common.keycloak.url}
+    realm: ${testcontainers.common.keycloak.realm}
+    resource: ${testcontainers.common.keycloak.client.id}
+    credentials:
+      secret: ${testcontainers.common.keycloak.client.secret}
 logging:
   level:
     org.hibernate.SQL: DEBUG
