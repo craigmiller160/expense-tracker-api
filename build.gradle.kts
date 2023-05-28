@@ -61,6 +61,10 @@ dependencies {
     kapt("com.querydsl:querydsl-apt:$queryDslVersion")
 }
 
+kapt {
+    annotationProcessor("com.querydsl.apt.jpa.JPAAnnotationProcessor")
+}
+
 tasks.withType<KotlinCompile> {
     kotlinOptions {
         freeCompilerArgs = listOf("-Xjsr305=strict", "-Xcontext-receivers")
