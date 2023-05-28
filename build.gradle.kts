@@ -47,4 +47,13 @@ dependencies {
     implementation("io.kotest.extensions:kotest-assertions-arrow-jvm:1.2.5")
     implementation("org.flywaydb:flyway-core")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
+    implementation("org.postgresql:postgresql:42.6.0")
+    testImplementation("org.springframework.boot:spring-boot-starter-test") {
+        exclude("org.junit.vintage", "junit-vintage-engine")
+    }
+    implementation("io.arrow-kt:arrow-core:1.1.2")
+    implementation("io.github.craigmiller160:spring-fp-result-kt:2.0.0")
+    implementation("io.craigmiller160:spring-web-utils:1.2.0")
+    testImplementation("org.mockito.kotlin:mockito-kotlin:4.0.0")
 }
