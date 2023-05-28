@@ -22,7 +22,7 @@ dependencyManagement {
 
 group = projectGroup
 version = projectVersion
-java.sourceCompatibility = JavaVersion.VERSION_20
+java.sourceCompatibility = JavaVersion.VERSION_19
 
 dependencies {
     val springDocVersion: String by project
