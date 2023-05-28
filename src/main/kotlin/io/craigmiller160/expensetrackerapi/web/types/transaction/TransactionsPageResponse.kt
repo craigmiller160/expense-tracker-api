@@ -9,28 +9,28 @@ import io.craigmiller160.expensetrackerapi.web.types.PageableResponse
 import org.springframework.data.domain.Page
 
 data class TransactionsPageResponse(
-  val transactions: List<TransactionResponse>,
-  override val pageNumber: Int,
-  override val totalItems: Long
+    val transactions: List<TransactionResponse>,
+    override val pageNumber: Int,
+    override val totalItems: Long
 ) : PageableResponse {
   companion object {
     fun from(
-      page: Page<Transaction>,
-      categories: Map<TypedId<CategoryId>, Category>
+        page: Page<Transaction>,
+        categories: Map<TypedId<CategoryId>, Category>
     ): TransactionsPageResponse {
       val transactions =
-        page.content.map { txn ->
-          val category = txn.categoryId?.let { categories[it] }
-          TransactionResponse.from(txn, category)
-        }
+          page.content.map { txn ->
+            val category = txn.categoryId?.let { categories[it] }
+            TransactionResponse.from(txn, category)
+          }
       return TransactionsPageResponse(
-        transactions = transactions, pageNumber = page.number, totalItems = page.totalElements)
+          transactions = transactions, pageNumber = page.number, totalItems = page.totalElements)
     }
 
     fun from(page: Page<TransactionView>): TransactionsPageResponse =
-      TransactionsPageResponse(
-        transactions = page.content.map { TransactionResponse.from(it) },
-        pageNumber = page.number,
-        totalItems = page.totalElements)
+        TransactionsPageResponse(
+            transactions = page.content.map { TransactionResponse.from(it) },
+            pageNumber = page.number,
+            totalItems = page.totalElements)
   }
 }

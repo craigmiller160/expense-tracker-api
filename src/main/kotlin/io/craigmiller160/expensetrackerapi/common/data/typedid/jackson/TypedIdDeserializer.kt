@@ -9,5 +9,5 @@ import io.craigmiller160.expensetrackerapi.common.data.typedid.TypedId
 class TypedIdDeserializer : StdDeserializer<TypedId<*>>(TypedId::class.java) {
   private val delegate = UUIDDeserializer()
   override fun deserialize(p: JsonParser, ctxt: DeserializationContext): TypedId<*> =
-    TypedId<Any>(delegate.deserialize(p, ctxt))
+      TypedId<Any>(delegate.deserialize(p, ctxt))
 }

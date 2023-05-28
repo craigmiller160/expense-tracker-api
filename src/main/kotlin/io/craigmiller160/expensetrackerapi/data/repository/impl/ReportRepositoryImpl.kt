@@ -20,15 +20,15 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.stereotype.Repository
 
 private fun addExcludeCategoryIdsParam(
-  excludeCategoryIds: List<TypedId<CategoryId>>
+    excludeCategoryIds: List<TypedId<CategoryId>>
 ): (MapSqlParameterSource) -> MapSqlParameterSource = { params ->
   if (excludeCategoryIds.isNotEmpty())
-    params.addValue("excludeCategoryIds", excludeCategoryIds.map { it.uuid })
+      params.addValue("excludeCategoryIds", excludeCategoryIds.map { it.uuid })
   else params
 }
 
 private fun executeMustacheTemplate(
-  excludeCategoryIds: List<TypedId<CategoryId>>
+    excludeCategoryIds: List<TypedId<CategoryId>>
 ): (MustacheSqlTemplate) -> String = { template ->
   if (excludeCategoryIds.isNotEmpty()) template.executeWithParams("excludeCategoryIds")
   else template.executeWithParams()
@@ -36,120 +36,122 @@ private fun executeMustacheTemplate(
 
 @Repository
 class ReportRepositoryImpl(
-  private val jdbcTemplate: NamedParameterJdbcTemplate,
-  private val sqlLoader: SqlLoader
+    private val jdbcTemplate: NamedParameterJdbcTemplate,
+    private val sqlLoader: SqlLoader
 ) : ReportRepository {
   @Transactional
   override fun getSpendingByMonthAndCategory(
-    userId: TypedId<UserId>,
-    request: ReportRequest
+      userId: TypedId<UserId>,
+      request: ReportRequest
   ): Page<SpendingByMonth> {
     val spendingByMonth = getSpendingByMonth(userId, request, request.excludeCategoryIds)
     val spendingByMonthCount = getSpendingByMonthCount(userId, request.excludeCategoryIds)
     val months = spendingByMonth.map { it.month }
 
     val fullResults =
-      if (months.isNotEmpty()) {
-        val spendingByCategory =
-          getSpendingByCategoryForMonths(userId, months, request.excludeCategoryIds)
-        spendingByMonth.map { monthRecord ->
-          monthRecord.copy(
-            categories =
-              // The records should already be in the correct order
-              spendingByCategory.filter { categoryRecord ->
-                categoryRecord.month == monthRecord.month
-              })
+        if (months.isNotEmpty()) {
+          val spendingByCategory =
+              getSpendingByCategoryForMonths(userId, months, request.excludeCategoryIds)
+          spendingByMonth.map { monthRecord ->
+            monthRecord.copy(
+                categories =
+                    // The records should already be in the correct order
+                    spendingByCategory.filter { categoryRecord ->
+                      categoryRecord.month == monthRecord.month
+                    })
+          }
+        } else {
+          listOf()
         }
-      } else {
-        listOf()
-      }
 
     return PageImpl(
-      fullResults, PageRequest.of(request.pageNumber, request.pageSize), spendingByMonthCount)
+        fullResults, PageRequest.of(request.pageNumber, request.pageSize), spendingByMonthCount)
   }
 
   private fun getSpendingByCategoryForMonths(
-    userId: TypedId<UserId>,
-    months: List<LocalDate>,
-    excludeCategoryIds: List<TypedId<CategoryId>>
+      userId: TypedId<UserId>,
+      months: List<LocalDate>,
+      excludeCategoryIds: List<TypedId<CategoryId>>
   ): List<SpendingByCategory> {
     val getSpendingByCategoryForMonthSql =
-      sqlLoader
-        .loadSqlMustacheTemplate("reports/get_spending_by_category_for_month.sql")
-        .let(executeMustacheTemplate(excludeCategoryIds))
+        sqlLoader
+            .loadSqlMustacheTemplate("reports/get_spending_by_category_for_month.sql")
+            .let(executeMustacheTemplate(excludeCategoryIds))
     val finalWrapper =
-      months
-        .mapIndexed { index, month ->
-          val sql =
-            getSpendingByCategoryForMonthSql.replace(":theDate", ":theDate$index").replace(";", "")
-          val params = mapOf("theDate$index" to month)
-          SpendingByCategoryQueryWrapper(params = params, sql = sql)
-        }
-        .reduce { acc, record ->
-          SpendingByCategoryQueryWrapper(
-            params = acc.params + record.params, sql = "(${acc.sql})\nUNION\n(${record.sql})")
-        }
-        .let { wrapper ->
-          if (months.size > 1) {
-            // Order By at the end is necessary because the union breaks the ordering for each
-            // individual query
-            wrapper.copy(sql = "${wrapper.sql} ORDER BY category_name ASC")
-          } else {
-            wrapper
-          }
-        }
+        months
+            .mapIndexed { index, month ->
+              val sql =
+                  getSpendingByCategoryForMonthSql
+                      .replace(":theDate", ":theDate$index")
+                      .replace(";", "")
+              val params = mapOf("theDate$index" to month)
+              SpendingByCategoryQueryWrapper(params = params, sql = sql)
+            }
+            .reduce { acc, record ->
+              SpendingByCategoryQueryWrapper(
+                  params = acc.params + record.params, sql = "(${acc.sql})\nUNION\n(${record.sql})")
+            }
+            .let { wrapper ->
+              if (months.size > 1) {
+                // Order By at the end is necessary because the union breaks the ordering for each
+                // individual query
+                wrapper.copy(sql = "${wrapper.sql} ORDER BY category_name ASC")
+              } else {
+                wrapper
+              }
+            }
 
     val params =
-      MapSqlParameterSource()
-        .addValues(finalWrapper.params)
-        .addValue("userId", userId.uuid)
-        .let(addExcludeCategoryIdsParam(excludeCategoryIds))
+        MapSqlParameterSource()
+            .addValues(finalWrapper.params)
+            .addValue("userId", userId.uuid)
+            .let(addExcludeCategoryIdsParam(excludeCategoryIds))
     return jdbcTemplate.query(finalWrapper.sql, params) { rs, _ ->
       SpendingByCategory(
-        month = rs.getDate("month").toLocalDate(),
-        categoryName = rs.getString("category_name") ?: CategoryConstants.UNKNOWN_CATEGORY_NAME,
-        amount = rs.getBigDecimal("amount"),
-        color = rs.getString("color") ?: CategoryConstants.UNKNOWN_CATEGORY_COLOR)
+          month = rs.getDate("month").toLocalDate(),
+          categoryName = rs.getString("category_name") ?: CategoryConstants.UNKNOWN_CATEGORY_NAME,
+          amount = rs.getBigDecimal("amount"),
+          color = rs.getString("color") ?: CategoryConstants.UNKNOWN_CATEGORY_COLOR)
     }
   }
 
   private fun getSpendingByMonthCount(
-    userId: TypedId<UserId>,
-    excludeCategoryIds: List<TypedId<CategoryId>>
+      userId: TypedId<UserId>,
+      excludeCategoryIds: List<TypedId<CategoryId>>
   ): Long {
     val getSpendingByMonthCountSql =
-      sqlLoader
-        .loadSqlMustacheTemplate("reports/get_total_spending_by_month_count.sql")
-        .let(executeMustacheTemplate(excludeCategoryIds))
+        sqlLoader
+            .loadSqlMustacheTemplate("reports/get_total_spending_by_month_count.sql")
+            .let(executeMustacheTemplate(excludeCategoryIds))
     val params =
-      MapSqlParameterSource()
-        .addValue("userId", userId.uuid)
-        .let(addExcludeCategoryIdsParam(excludeCategoryIds))
+        MapSqlParameterSource()
+            .addValue("userId", userId.uuid)
+            .let(addExcludeCategoryIdsParam(excludeCategoryIds))
     return jdbcTemplate.queryForObject(getSpendingByMonthCountSql, params, Long::class.java)!!
   }
 
   private data class SpendingByCategoryQueryWrapper(val params: Map<String, Any>, val sql: String)
 
   private fun getSpendingByMonth(
-    userId: TypedId<UserId>,
-    request: ReportRequest,
-    excludeCategoryIds: List<TypedId<CategoryId>>
+      userId: TypedId<UserId>,
+      request: ReportRequest,
+      excludeCategoryIds: List<TypedId<CategoryId>>
   ): List<SpendingByMonth> {
     val getTotalSpendingByMonthSql =
-      sqlLoader
-        .loadSqlMustacheTemplate("reports/get_total_spending_by_month.sql")
-        .let(executeMustacheTemplate(excludeCategoryIds))
+        sqlLoader
+            .loadSqlMustacheTemplate("reports/get_total_spending_by_month.sql")
+            .let(executeMustacheTemplate(excludeCategoryIds))
     val totalSpendingByMonthParams =
-      MapSqlParameterSource()
-        .addValue("userId", userId.uuid)
-        .addValue("offset", request.pageNumber * request.pageSize)
-        .addValue("limit", request.pageSize)
-        .let(addExcludeCategoryIdsParam(excludeCategoryIds))
+        MapSqlParameterSource()
+            .addValue("userId", userId.uuid)
+            .addValue("offset", request.pageNumber * request.pageSize)
+            .addValue("limit", request.pageSize)
+            .let(addExcludeCategoryIdsParam(excludeCategoryIds))
     return jdbcTemplate.query(getTotalSpendingByMonthSql, totalSpendingByMonthParams) { rs, _ ->
       SpendingByMonth(
-        month = rs.getDate("month").toLocalDate(),
-        total = rs.getBigDecimal("total"),
-        categories = listOf())
+          month = rs.getDate("month").toLocalDate(),
+          total = rs.getBigDecimal("total"),
+          categories = listOf())
     }
   }
 }

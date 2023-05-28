@@ -13,16 +13,17 @@ class TypedIdDescriptor : AbstractTypeDescriptor<TypedId<*>>(TypedId::class.java
   override fun fromString(string: String): TypedId<*> = TypedId<Any>(string)
 
   override fun <X : Any> wrap(value: X?, options: WrapperOptions): TypedId<*>? =
-    value?.let { nonNullValue ->
-      when (nonNullValue) {
-        is ByteArray -> TypedId(UUIDTypeDescriptor.ToBytesTransformer.INSTANCE.parse(nonNullValue))
-        is String ->
-          TypedId<Any>(UUIDTypeDescriptor.ToStringTransformer.INSTANCE.parse(nonNullValue))
-        is UUID -> TypedId<Any>(nonNullValue)
-        else -> throw unknownWrap(nonNullValue::class.java)
+      value?.let { nonNullValue ->
+        when (nonNullValue) {
+          is ByteArray ->
+              TypedId(UUIDTypeDescriptor.ToBytesTransformer.INSTANCE.parse(nonNullValue))
+          is String ->
+              TypedId<Any>(UUIDTypeDescriptor.ToStringTransformer.INSTANCE.parse(nonNullValue))
+          is UUID -> TypedId<Any>(nonNullValue)
+          else -> throw unknownWrap(nonNullValue::class.java)
+        }
       }
-    }
 
   override fun <X : Any> unwrap(value: TypedId<*>, type: Class<X>, options: WrapperOptions): X =
-    UUIDTypeDescriptor.INSTANCE.unwrap(value.uuid, type, options)
+      UUIDTypeDescriptor.INSTANCE.unwrap(value.uuid, type, options)
 }

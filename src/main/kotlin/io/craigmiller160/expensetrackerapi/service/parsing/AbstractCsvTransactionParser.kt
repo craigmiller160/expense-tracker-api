@@ -11,9 +11,9 @@ import java.io.InputStream
 
 abstract class AbstractCsvTransactionParser : TransactionParser {
   override fun parse(userId: TypedId<UserId>, stream: InputStream): TryEither<List<Transaction>> =
-    CsvParser.parse(stream)
-      .flatMapKeepRight { data -> validateImportType(data.header) }
-      .flatMap { data -> data.records.map { parseRecord(userId, it) }.sequence() }
+      CsvParser.parse(stream)
+          .flatMapKeepRight { data -> validateImportType(data.header) }
+          .flatMap { data -> data.records.map { parseRecord(userId, it) }.sequence() }
 
   abstract fun parseRecord(userId: TypedId<UserId>, row: Array<String>): TryEither<Transaction>
 

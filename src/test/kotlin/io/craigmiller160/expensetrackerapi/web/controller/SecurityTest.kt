@@ -13,39 +13,39 @@ import org.springframework.test.web.servlet.get
 class SecurityTest
 @Autowired
 constructor(
-  private val mockMvc: MockMvc,
-  private val defaultUsers: DefaultUsers,
-  private val authHelper: AuthenticationHelper
+    private val mockMvc: MockMvc,
+    private val defaultUsers: DefaultUsers,
+    private val authHelper: AuthenticationHelper
 ) {
   @Test
   fun `allows valid token with access role`() {
     val token = defaultUsers.primaryUser.token
     mockMvc
-      .get("/transaction-import/types") {
-        secure = true
-        header("Authorization", "Bearer $token")
-      }
-      .andExpect { status { isOk() } }
+        .get("/transaction-import/types") {
+          secure = true
+          header("Authorization", "Bearer $token")
+        }
+        .andExpect { status { isOk() } }
   }
 
   @Test
   fun `rejects valid token without access role`() {
     val id = UUID.randomUUID().toString()
     val token =
-      authHelper.createUser("norole_$id@gmail.com", listOf()).let { authHelper.login(it) }.token
+        authHelper.createUser("norole_$id@gmail.com", listOf()).let { authHelper.login(it) }.token
     mockMvc
-      .get("/transaction-import/types") {
-        secure = true
-        header("Authorization", "Bearer $token")
-      }
-      .andExpect { status { isForbidden() } }
+        .get("/transaction-import/types") {
+          secure = true
+          header("Authorization", "Bearer $token")
+        }
+        .andExpect { status { isForbidden() } }
   }
 
   @Test
   fun `rejects no token`() {
     mockMvc
-      .get("/transaction-import/types") { secure = true }
-      .andExpect { status { isUnauthorized() } }
+        .get("/transaction-import/types") { secure = true }
+        .andExpect { status { isUnauthorized() } }
   }
 
   @Test

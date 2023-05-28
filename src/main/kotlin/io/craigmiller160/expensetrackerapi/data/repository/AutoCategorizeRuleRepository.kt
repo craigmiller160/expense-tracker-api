@@ -10,13 +10,13 @@ import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.query.Param
 
 interface AutoCategorizeRuleRepository :
-  JpaRepository<AutoCategorizeRule, TypedId<AutoCategorizeRuleId>>,
-  AutoCategorizeRuleRepositoryCustom {
+    JpaRepository<AutoCategorizeRule, TypedId<AutoCategorizeRuleId>>,
+    AutoCategorizeRuleRepositoryCustom {
   fun countAllByUserId(userId: TypedId<UserId>): Long
 
   fun findByUidAndUserId(
-    id: TypedId<AutoCategorizeRuleId>,
-    userId: TypedId<UserId>
+      id: TypedId<AutoCategorizeRuleId>,
+      userId: TypedId<UserId>
   ): AutoCategorizeRule?
 
   fun deleteByUidAndUserId(id: TypedId<AutoCategorizeRuleId>, userId: TypedId<UserId>)
@@ -24,7 +24,7 @@ interface AutoCategorizeRuleRepository :
   fun streamAllByUserIdOrderByOrdinal(userId: TypedId<UserId>): Stream<AutoCategorizeRule>
 
   @Query(
-    """
+      """
     SELECT COALESCE(MAX(r.ordinal), 0)
     FROM AutoCategorizeRule r
     WHERE r.userId = :userId

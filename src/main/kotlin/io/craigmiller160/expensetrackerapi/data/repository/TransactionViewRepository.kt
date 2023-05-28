@@ -16,12 +16,12 @@ interface TransactionViewRepository : JpaRepository<TransactionView, TypedId<Tra
   fun findByUidAndUserId(id: TypedId<TransactionId>, userId: TypedId<UserId>): TransactionView?
 
   fun findAllByUidInAndUserId(
-    transactionIds: List<TypedId<TransactionId>>,
-    userId: TypedId<UserId>
+      transactionIds: List<TypedId<TransactionId>>,
+      userId: TypedId<UserId>
   ): List<TransactionView>
 
   @Query(
-    """
+      """
     SELECT t1
     FROM TransactionView t1
     WHERE t1.contentHash IN (
@@ -35,8 +35,8 @@ interface TransactionViewRepository : JpaRepository<TransactionView, TypedId<Tra
     ORDER BY t1.updated DESC
   """)
   fun findAllDuplicates(
-    @Param("transactionId") transactionId: TypedId<TransactionId>,
-    @Param("userId") userId: TypedId<UserId>,
-    page: Pageable
+      @Param("transactionId") transactionId: TypedId<TransactionId>,
+      @Param("userId") userId: TypedId<UserId>,
+      page: Pageable
   ): Page<TransactionView>
 }

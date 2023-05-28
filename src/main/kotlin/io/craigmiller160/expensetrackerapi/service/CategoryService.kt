@@ -18,9 +18,9 @@ import org.springframework.transaction.annotation.Transactional
 
 @Service
 class CategoryService(
-  private val categoryRepository: CategoryRepository,
-  private val transactionRepository: TransactionRepository,
-  private val authService: AuthorizationService
+    private val categoryRepository: CategoryRepository,
+    private val transactionRepository: TransactionRepository,
+    private val authService: AuthorizationService
 ) {
   fun getAllCategories(): TryEither<List<CategoryResponse>> {
     val userId = authService.getAuthUserId()
@@ -32,7 +32,7 @@ class CategoryService(
   private fun validateRequest(request: CategoryRequest): TryEither<CategoryRequest> {
     if (CategoryConstants.UNKNOWN_CATEGORY_NAME == request.name) {
       return Either.Left(
-        BadRequestException("Illegal category name: ${CategoryConstants.UNKNOWN_CATEGORY_NAME}"))
+          BadRequestException("Illegal category name: ${CategoryConstants.UNKNOWN_CATEGORY_NAME}"))
     }
     return Either.Right(request)
   }
@@ -41,35 +41,36 @@ class CategoryService(
   fun createCategory(request: CategoryRequest): TryEither<CategoryResponse> {
     val userId = authService.getAuthUserId()
     return validateRequest(request)
-      .flatMapCatch {
-        categoryRepository.save(
-          Category(name = request.name, userId = userId, color = StringToColor.get(request.name)))
-      }
-      .map { CategoryResponse.from(it) }
+        .flatMapCatch {
+          categoryRepository.save(
+              Category(
+                  name = request.name, userId = userId, color = StringToColor.get(request.name)))
+        }
+        .map { CategoryResponse.from(it) }
   }
 
   @Transactional
   fun updateCategory(categoryId: TypedId<CategoryId>, request: CategoryRequest): TryEither<Unit> {
     val userId = authService.getAuthUserId()
     return validateRequest(request)
-      .flatMapCatch { categoryRepository.findByUidAndUserId(categoryId, userId) }
-      .flatMapCatch { nullableCategory ->
-        nullableCategory?.let { category ->
-          categoryRepository.save(
-            category.apply {
-              name = request.name
-              color = StringToColor.get(request.name)
-            })
+        .flatMapCatch { categoryRepository.findByUidAndUserId(categoryId, userId) }
+        .flatMapCatch { nullableCategory ->
+          nullableCategory?.let { category ->
+            categoryRepository.save(
+                category.apply {
+                  name = request.name
+                  color = StringToColor.get(request.name)
+                })
+          }
         }
-      }
   }
 
   @Transactional
   fun deleteCategory(categoryId: TypedId<CategoryId>): TryEither<Unit> {
     val userId = authService.getAuthUserId()
     return Either.catch {
-        transactionRepository.removeCategoryFromAllTransactions(userId, categoryId)
-      }
-      .flatMapCatch { categoryRepository.deleteByUidAndUserId(categoryId, userId) }
+          transactionRepository.removeCategoryFromAllTransactions(userId, categoryId)
+        }
+        .flatMapCatch { categoryRepository.deleteByUidAndUserId(categoryId, userId) }
   }
 }

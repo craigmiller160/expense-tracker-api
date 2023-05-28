@@ -7,7 +7,7 @@ import io.craigmiller160.expensetrackerapi.data.projection.LastRuleAppliedForTra
 
 interface LastRuleAppliedRepositoryCustom {
   fun getLastRuleDetailsForTransaction(
-    userId: TypedId<UserId>,
-    transactionId: TypedId<TransactionId>
+      userId: TypedId<UserId>,
+      transactionId: TypedId<TransactionId>
   ): LastRuleAppliedForTransaction?
 }

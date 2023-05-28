@@ -21,53 +21,53 @@ import org.springframework.stereotype.Component
 
 @Component
 class DataHelper(
-  private val transactionRepository: TransactionRepository,
-  private val categoryRepository: CategoryRepository,
-  private val autoCategorizeRuleRepository: AutoCategorizeRuleRepository,
-  private val lastRuleAppliedRepository: LastRuleAppliedRepository
+    private val transactionRepository: TransactionRepository,
+    private val categoryRepository: CategoryRepository,
+    private val autoCategorizeRuleRepository: AutoCategorizeRuleRepository,
+    private val lastRuleAppliedRepository: LastRuleAppliedRepository
 ) {
   private val faker = Faker()
   private var internalDate = LocalDate.now().minusDays(100)
 
   fun createLastRuleApplied(
-    userId: TypedId<UserId>,
-    transactionId: TypedId<TransactionId>,
-    ruleId: TypedId<AutoCategorizeRuleId>
+      userId: TypedId<UserId>,
+      transactionId: TypedId<TransactionId>,
+      ruleId: TypedId<AutoCategorizeRuleId>
   ): LastRuleApplied =
-    lastRuleAppliedRepository.save(
-      LastRuleApplied(userId = userId, transactionId = transactionId, ruleId = ruleId))
+      lastRuleAppliedRepository.save(
+          LastRuleApplied(userId = userId, transactionId = transactionId, ruleId = ruleId))
 
   fun createTransaction(
-    userId: TypedId<UserId>,
-    categoryId: TypedId<CategoryId>? = null
+      userId: TypedId<UserId>,
+      categoryId: TypedId<CategoryId>? = null
   ): Transaction {
     internalDate = internalDate.plusDays(1)
     val description = faker.company().name()
     val amount = BigDecimal(faker.commerce().price()) * BigDecimal("-1")
     return transactionRepository.saveAndFlush(
-      Transaction(
-        userId = userId,
-        expenseDate = internalDate,
-        description = description,
-        amount = amount,
-        categoryId = categoryId))
+        Transaction(
+            userId = userId,
+            expenseDate = internalDate,
+            description = description,
+            amount = amount,
+            categoryId = categoryId))
   }
 
   fun createRule(userId: TypedId<UserId>, categoryId: TypedId<CategoryId>): AutoCategorizeRule {
     val count = autoCategorizeRuleRepository.countAllByUserId(userId)
     val rule =
-      AutoCategorizeRule(
-        categoryId = categoryId, regex = ".*", ordinal = (count + 1).toInt(), userId = userId)
+        AutoCategorizeRule(
+            categoryId = categoryId, regex = ".*", ordinal = (count + 1).toInt(), userId = userId)
     return autoCategorizeRuleRepository.saveAndFlush(rule)
   }
 
   fun createCategory(userId: TypedId<UserId>, name: String): Category =
-    categoryRepository.saveAndFlush(
-      Category(userId = userId, name = name, color = StringToColor.get(name)))
+      categoryRepository.saveAndFlush(
+          Category(userId = userId, name = name, color = StringToColor.get(name)))
 
   fun createDefaultCategories(userId: TypedId<UserId>): List<Category> =
-    listOf(
-      createCategory(userId, "Shopping"),
-      createCategory(userId, "Restaurant"),
-      createCategory(userId, "Entertainment"))
+      listOf(
+          createCategory(userId, "Shopping"),
+          createCategory(userId, "Restaurant"),
+          createCategory(userId, "Entertainment"))
 }

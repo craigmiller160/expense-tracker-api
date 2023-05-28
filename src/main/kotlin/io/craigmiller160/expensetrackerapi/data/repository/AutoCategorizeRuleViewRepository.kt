@@ -7,10 +7,10 @@ import io.craigmiller160.expensetrackerapi.data.model.AutoCategorizeRuleView
 import org.springframework.data.jpa.repository.JpaRepository
 
 interface AutoCategorizeRuleViewRepository :
-  JpaRepository<AutoCategorizeRuleView, TypedId<AutoCategorizeRuleId>>,
-  AutoCategorizeRuleViewRepositoryCustom {
+    JpaRepository<AutoCategorizeRuleView, TypedId<AutoCategorizeRuleId>>,
+    AutoCategorizeRuleViewRepositoryCustom {
   fun findByUidAndUserId(
-    id: TypedId<AutoCategorizeRuleId>,
-    userId: TypedId<UserId>
+      id: TypedId<AutoCategorizeRuleId>,
+      userId: TypedId<UserId>
   ): AutoCategorizeRuleView?
 }

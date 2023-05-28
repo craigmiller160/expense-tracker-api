@@ -12,7 +12,7 @@ import javax.persistence.Table
 @Entity
 @Table(name = "last_rule_applied")
 class LastRuleApplied(
-  var userId: TypedId<UserId>,
-  var ruleId: TypedId<AutoCategorizeRuleId>,
-  var transactionId: TypedId<TransactionId>
+    var userId: TypedId<UserId>,
+    var ruleId: TypedId<AutoCategorizeRuleId>,
+    var transactionId: TypedId<TransactionId>
 ) : ImmutableTableEntity<LastRuleAppliedId>()

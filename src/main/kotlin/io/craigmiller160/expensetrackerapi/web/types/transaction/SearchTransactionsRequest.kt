@@ -11,17 +11,17 @@ import javax.validation.constraints.AssertTrue
 import org.springframework.format.annotation.DateTimeFormat
 
 data class SearchTransactionsRequest(
-  override val pageNumber: Int,
-  override val pageSize: Int,
-  override val sortKey: TransactionSortKey,
-  override val sortDirection: SortDirection,
-  @field:DateTimeFormat(pattern = DateUtils.DATE_PATTERN) val startDate: LocalDate? = null,
-  @field:DateTimeFormat(pattern = DateUtils.DATE_PATTERN) val endDate: LocalDate? = null,
-  val isConfirmed: Boolean? = null,
-  val isCategorized: Boolean? = null,
-  val isDuplicate: Boolean? = null,
-  val isPossibleRefund: Boolean? = null,
-  val categoryIds: Set<TypedId<CategoryId>>? = null,
+    override val pageNumber: Int,
+    override val pageSize: Int,
+    override val sortKey: TransactionSortKey,
+    override val sortDirection: SortDirection,
+    @field:DateTimeFormat(pattern = DateUtils.DATE_PATTERN) val startDate: LocalDate? = null,
+    @field:DateTimeFormat(pattern = DateUtils.DATE_PATTERN) val endDate: LocalDate? = null,
+    val isConfirmed: Boolean? = null,
+    val isCategorized: Boolean? = null,
+    val isDuplicate: Boolean? = null,
+    val isPossibleRefund: Boolean? = null,
+    val categoryIds: Set<TypedId<CategoryId>>? = null,
 ) : PageableRequest, SortableRequest<TransactionSortKey> {
 
   @AssertTrue(message = "Cannot set WITHOUT_CATEGORY and specify categoryIds")
@@ -33,19 +33,19 @@ data class SearchTransactionsRequest(
   }
 
   fun toQueryString(): String =
-    sequenceOf(
-        "pageNumber" to pageNumber,
-        "pageSize" to pageSize,
-        "sortKey" to sortKey.name,
-        "sortDirection" to sortDirection.name,
-        "startDate" to startDate?.let { DateUtils.format(it) },
-        "endDate" to endDate?.let { DateUtils.format(it) },
-        "isConfirmed" to isConfirmed,
-        "isCategorized" to isCategorized,
-        "isDuplicate" to isDuplicate,
-        "isPossibleRefund" to isPossibleRefund,
-        "categoryIds" to categoryIds?.joinToString(",") { it.toString() })
-      .filter { it.second != null }
-      .map { "${it.first}=${it.second}" }
-      .joinToString("&")
+      sequenceOf(
+              "pageNumber" to pageNumber,
+              "pageSize" to pageSize,
+              "sortKey" to sortKey.name,
+              "sortDirection" to sortDirection.name,
+              "startDate" to startDate?.let { DateUtils.format(it) },
+              "endDate" to endDate?.let { DateUtils.format(it) },
+              "isConfirmed" to isConfirmed,
+              "isCategorized" to isCategorized,
+              "isDuplicate" to isDuplicate,
+              "isPossibleRefund" to isPossibleRefund,
+              "categoryIds" to categoryIds?.joinToString(",") { it.toString() })
+          .filter { it.second != null }
+          .map { "${it.first}=${it.second}" }
+          .joinToString("&")
 }

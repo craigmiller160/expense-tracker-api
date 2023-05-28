@@ -11,21 +11,21 @@ import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.query.Param
 
 interface LastRuleAppliedRepository :
-  JpaRepository<LastRuleApplied, TypedId<LastRuleAppliedId>>, LastRuleAppliedRepositoryCustom {
+    JpaRepository<LastRuleApplied, TypedId<LastRuleAppliedId>>, LastRuleAppliedRepositoryCustom {
   fun findByUserIdAndTransactionId(
-    userId: TypedId<UserId>,
-    transactionId: TypedId<TransactionId>
+      userId: TypedId<UserId>,
+      transactionId: TypedId<TransactionId>
   ): LastRuleApplied?
 
   @Query(
-    """
+      """
     DELETE FROM LastRuleApplied lra
     WHERE lra.userId = :userId
     AND lra.transactionId IN (:transactionIds)
   """)
   @Modifying(flushAutomatically = true, clearAutomatically = true)
   fun deleteAllByUserIdAndTransactionIdIn(
-    @Param("userId") userId: TypedId<UserId>,
-    @Param("transactionIds") transactionIds: Collection<TypedId<TransactionId>>
+      @Param("userId") userId: TypedId<UserId>,
+      @Param("transactionIds") transactionIds: Collection<TypedId<TransactionId>>
   )
 }

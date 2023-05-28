@@ -22,26 +22,27 @@ import org.springframework.web.multipart.MultipartFile
 @RequestMapping("/transaction-import")
 class TransactionImportController(private val transactionImportService: TransactionImportService) {
   @ApiResponse(
-    responseCode = "200",
-    content =
-      [
-        Content(
-          mediaType = "application/json",
-          schema = Schema(implementation = ImportTransactionsResponse::class))])
+      responseCode = "200",
+      content =
+          [
+              Content(
+                  mediaType = "application/json",
+                  schema = Schema(implementation = ImportTransactionsResponse::class))])
   @PostMapping(consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])
   fun importTransactions(
-    @RequestParam("type") type: TransactionImportType,
-    @RequestPart("file") file: MultipartFile
+      @RequestParam("type") type: TransactionImportType,
+      @RequestPart("file") file: MultipartFile
   ): TryEither<ImportTransactionsResponse> =
-    transactionImportService.importTransactions(type, file.inputStream)
+      transactionImportService.importTransactions(type, file.inputStream)
 
   @ApiResponse(
-    responseCode = "200",
-    content =
-      [
-        Content(
-          mediaType = "application/json",
-          array = ArraySchema(schema = Schema(implementation = ImportTypeResponse::class)))])
+      responseCode = "200",
+      content =
+          [
+              Content(
+                  mediaType = "application/json",
+                  array =
+                      ArraySchema(schema = Schema(implementation = ImportTypeResponse::class)))])
   @GetMapping("/types")
   fun getImportTypes(): List<ImportTypeResponse> = transactionImportService.getImportTypes()
 }

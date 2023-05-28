@@ -13,27 +13,27 @@ import org.springframework.stereotype.Service
 
 @Service
 class TransactionImportService(
-  private val transactionRepository: TransactionRepository,
-  private val transactionParserManager: TransactionParserManager,
-  private val applyCategoriesToTransactionsService: ApplyCategoriesToTransactionsService,
-  private val authService: AuthorizationService
+    private val transactionRepository: TransactionRepository,
+    private val transactionParserManager: TransactionParserManager,
+    private val applyCategoriesToTransactionsService: ApplyCategoriesToTransactionsService,
+    private val authService: AuthorizationService
 ) {
   fun getImportTypes(): List<ImportTypeResponse> =
-    TransactionImportType.values().map { ImportTypeResponse(it.name, it.displayName) }
+      TransactionImportType.values().map { ImportTypeResponse(it.name, it.displayName) }
 
   @Transactional
   fun importTransactions(
-    type: TransactionImportType,
-    stream: InputStream
+      type: TransactionImportType,
+      stream: InputStream
   ): TryEither<ImportTransactionsResponse> {
     val parser = transactionParserManager.getParserForType(type)
     val userId = authService.getAuthUserId()
     return parser
-      .parse(userId, stream)
-      .flatMapCatch { transactions -> transactionRepository.saveAll(transactions) }
-      .flatMap { transactions ->
-        applyCategoriesToTransactionsService.applyCategoriesToTransactions(userId, transactions)
-      }
-      .map { transactions -> ImportTransactionsResponse(transactions.size) }
+        .parse(userId, stream)
+        .flatMapCatch { transactions -> transactionRepository.saveAll(transactions) }
+        .flatMap { transactions ->
+          applyCategoriesToTransactionsService.applyCategoriesToTransactions(userId, transactions)
+        }
+        .map { transactions -> ImportTransactionsResponse(transactions.size) }
   }
 }

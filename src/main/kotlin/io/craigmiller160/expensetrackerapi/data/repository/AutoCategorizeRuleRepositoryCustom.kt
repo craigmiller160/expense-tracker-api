@@ -7,16 +7,16 @@ import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.UserId
 interface AutoCategorizeRuleRepositoryCustom {
 
   fun decrementOrdinals(
-    userId: TypedId<UserId>,
-    minOrdinal: Int,
-    maxOrdinal: Int,
-    excludeId: TypedId<AutoCategorizeRuleId>? = null
+      userId: TypedId<UserId>,
+      minOrdinal: Int,
+      maxOrdinal: Int,
+      excludeId: TypedId<AutoCategorizeRuleId>? = null
   )
 
   fun incrementOrdinals(
-    userId: TypedId<UserId>,
-    minOrdinal: Int,
-    maxOrdinal: Int,
-    excludeId: TypedId<AutoCategorizeRuleId>? = null
+      userId: TypedId<UserId>,
+      minOrdinal: Int,
+      maxOrdinal: Int,
+      excludeId: TypedId<AutoCategorizeRuleId>? = null
   )
 }

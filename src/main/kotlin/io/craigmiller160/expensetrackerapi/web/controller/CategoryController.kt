@@ -25,41 +25,41 @@ import org.springframework.web.bind.annotation.RestController
 @RequestMapping("/categories")
 class CategoryController(private val categoryService: CategoryService) {
   @ApiResponse(
-    responseCode = "200",
-    content =
-      [
-        Content(
-          mediaType = "application/json",
-          array = ArraySchema(schema = Schema(implementation = CategoryResponse::class)))])
+      responseCode = "200",
+      content =
+          [
+              Content(
+                  mediaType = "application/json",
+                  array = ArraySchema(schema = Schema(implementation = CategoryResponse::class)))])
   @GetMapping
   fun getAllCategories(): TryEither<List<CategoryResponse>> = categoryService.getAllCategories()
 
   @ApiResponse(
-    responseCode = "200",
-    content =
-      [
-        Content(
-          mediaType = "application/json",
-          schema = Schema(implementation = CategoryResponse::class))])
+      responseCode = "200",
+      content =
+          [
+              Content(
+                  mediaType = "application/json",
+                  schema = Schema(implementation = CategoryResponse::class))])
   @PostMapping
   fun createCategory(@RequestBody request: CategoryRequest): TryEither<CategoryResponse> =
-    categoryService.createCategory(request)
+      categoryService.createCategory(request)
 
   @ApiResponse(
-    responseCode = "204",
-    content = [Content(mediaType = "application/json", schema = Schema(hidden = true))])
+      responseCode = "204",
+      content = [Content(mediaType = "application/json", schema = Schema(hidden = true))])
   @PutMapping("/{categoryId}")
   @ResponseStatus(HttpStatus.NO_CONTENT)
   fun updateCategory(
-    @PathVariable("categoryId") categoryId: TypedId<CategoryId>,
-    @RequestBody request: CategoryRequest
+      @PathVariable("categoryId") categoryId: TypedId<CategoryId>,
+      @RequestBody request: CategoryRequest
   ): TryEither<Unit> = categoryService.updateCategory(categoryId, request)
 
   @ApiResponse(
-    responseCode = "204",
-    content = [Content(mediaType = "application/json", schema = Schema(hidden = true))])
+      responseCode = "204",
+      content = [Content(mediaType = "application/json", schema = Schema(hidden = true))])
   @DeleteMapping("/{categoryId}")
   @ResponseStatus(HttpStatus.NO_CONTENT)
   fun deleteCategory(@PathVariable("categoryId") categoryId: TypedId<CategoryId>): TryEither<Unit> =
-    categoryService.deleteCategory(categoryId)
+      categoryService.deleteCategory(categoryId)
 }

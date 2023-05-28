@@ -11,35 +11,35 @@ import org.springframework.stereotype.Service
 
 @Service
 class NeedsAttentionService(
-  private val needsAttentionRepository: NeedsAttentionRepository,
-  private val authorizationService: AuthorizationService
+    private val needsAttentionRepository: NeedsAttentionRepository,
+    private val authorizationService: AuthorizationService
 ) {
   @org.springframework.transaction.annotation.Transactional
   fun getNeedsAttention(): TryEither<NeedsAttentionResponse> {
     val userId = authorizationService.getAuthUserId()
     return Either.catch {
       val needsAttentionCounts =
-        needsAttentionRepository.getAllNeedsAttentionCounts(userId).associateBy { it.type }
+          needsAttentionRepository.getAllNeedsAttentionCounts(userId).associateBy { it.type }
       val needsAttentionOldest =
-        needsAttentionRepository.getAllNeedsAttentionOldest(userId).associateBy { it.type }
+          needsAttentionRepository.getAllNeedsAttentionOldest(userId).associateBy { it.type }
 
       NeedsAttentionResponse(
-        unconfirmed =
-          CountAndOldest(
-            count = needsAttentionCounts[NeedsAttentionType.UNCONFIRMED]!!.count,
-            oldest = needsAttentionOldest[NeedsAttentionType.UNCONFIRMED]?.date),
-        uncategorized =
-          CountAndOldest(
-            count = needsAttentionCounts[NeedsAttentionType.UNCATEGORIZED]!!.count,
-            oldest = needsAttentionOldest[NeedsAttentionType.UNCATEGORIZED]?.date),
-        duplicate =
-          CountAndOldest(
-            count = needsAttentionCounts[NeedsAttentionType.DUPLICATE]!!.count,
-            oldest = needsAttentionOldest[NeedsAttentionType.DUPLICATE]?.date),
-        possibleRefund =
-          CountAndOldest(
-            count = needsAttentionCounts[NeedsAttentionType.POSSIBLE_REFUND]!!.count,
-            oldest = needsAttentionOldest[NeedsAttentionType.POSSIBLE_REFUND]?.date))
+          unconfirmed =
+              CountAndOldest(
+                  count = needsAttentionCounts[NeedsAttentionType.UNCONFIRMED]!!.count,
+                  oldest = needsAttentionOldest[NeedsAttentionType.UNCONFIRMED]?.date),
+          uncategorized =
+              CountAndOldest(
+                  count = needsAttentionCounts[NeedsAttentionType.UNCATEGORIZED]!!.count,
+                  oldest = needsAttentionOldest[NeedsAttentionType.UNCATEGORIZED]?.date),
+          duplicate =
+              CountAndOldest(
+                  count = needsAttentionCounts[NeedsAttentionType.DUPLICATE]!!.count,
+                  oldest = needsAttentionOldest[NeedsAttentionType.DUPLICATE]?.date),
+          possibleRefund =
+              CountAndOldest(
+                  count = needsAttentionCounts[NeedsAttentionType.POSSIBLE_REFUND]!!.count,
+                  oldest = needsAttentionOldest[NeedsAttentionType.POSSIBLE_REFUND]?.date))
     }
   }
 }

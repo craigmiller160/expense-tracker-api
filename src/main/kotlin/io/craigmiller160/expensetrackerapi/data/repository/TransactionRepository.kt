@@ -14,20 +14,20 @@ import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.query.Param
 
 interface TransactionRepository :
-  JpaRepository<Transaction, TypedId<TransactionId>>,
-  JpaSpecificationExecutor<Transaction>,
-  TransactionRepositoryCustom {
+    JpaRepository<Transaction, TypedId<TransactionId>>,
+    JpaSpecificationExecutor<Transaction>,
+    TransactionRepositoryCustom {
   fun findAllByUserIdOrderByExpenseDateAscDescriptionAsc(userId: TypedId<UserId>): List<Transaction>
 
   fun findAllByUserIdAndContentHashInOrderByCreated(
-    userId: TypedId<UserId>,
-    contentHash: Collection<String>
+      userId: TypedId<UserId>,
+      contentHash: Collection<String>
   ): List<Transaction>
 
   fun findByUidAndUserId(id: TypedId<TransactionId>, userId: TypedId<UserId>): Transaction?
 
   @Query(
-    """
+      """
     UPDATE Transaction t
     SET t.categoryId = (
         SELECT c.uid
@@ -43,13 +43,13 @@ interface TransactionRepository :
   """)
   @Modifying(flushAutomatically = true, clearAutomatically = true)
   fun setTransactionCategory(
-    @Param("transactionId") transactionId: TypedId<TransactionId>,
-    @Param("categoryId") categoryId: TypedId<CategoryId>,
-    @Param("userId") userId: TypedId<UserId>
+      @Param("transactionId") transactionId: TypedId<TransactionId>,
+      @Param("categoryId") categoryId: TypedId<CategoryId>,
+      @Param("userId") userId: TypedId<UserId>
   ): Int
 
   @Query(
-    """
+      """
       UPDATE Transaction t
       SET t.confirmed = :confirmed, 
         t.version = t.version + 1
@@ -59,25 +59,25 @@ interface TransactionRepository :
   """)
   @Modifying(flushAutomatically = true, clearAutomatically = true)
   fun confirmTransaction(
-    @Param("transactionId") transactionId: TypedId<TransactionId>,
-    @Param("confirmed") confirmed: Boolean,
-    @Param("userId") userId: TypedId<UserId>
+      @Param("transactionId") transactionId: TypedId<TransactionId>,
+      @Param("confirmed") confirmed: Boolean,
+      @Param("userId") userId: TypedId<UserId>
   ): Int
 
   @Query(
-    """
+      """
       DELETE FROM Transaction t
       WHERE t.uid IN (:transactionIds)
       AND t.userId = :userId
   """)
   @Modifying(flushAutomatically = true, clearAutomatically = true)
   fun deleteTransactions(
-    @Param("transactionIds") transactionIds: Set<TypedId<TransactionId>>,
-    @Param("userId") userId: TypedId<UserId>
+      @Param("transactionIds") transactionIds: Set<TypedId<TransactionId>>,
+      @Param("userId") userId: TypedId<UserId>
   )
 
   @Query(
-    """
+      """
       UPDATE Transaction t
       SET t.categoryId = null, 
         t.version = t.version + 1
@@ -91,12 +91,12 @@ interface TransactionRepository :
   """)
   @Modifying(flushAutomatically = true, clearAutomatically = true)
   fun removeCategoryFromAllTransactions(
-    @Param("userId") userId: TypedId<UserId>,
-    @Param("categoryId") categoryId: TypedId<CategoryId>
+      @Param("userId") userId: TypedId<UserId>,
+      @Param("categoryId") categoryId: TypedId<CategoryId>
   )
 
   @Query(
-    """
+      """
       UPDATE Transaction t
       SET t.categoryId = null
       WHERE t.uid = :transactionId
@@ -105,12 +105,12 @@ interface TransactionRepository :
   """)
   @Modifying(flushAutomatically = true, clearAutomatically = true)
   fun removeTransactionCategory(
-    @Param("transactionId") transactionId: TypedId<TransactionId>,
-    @Param("userId") userId: TypedId<UserId>
+      @Param("transactionId") transactionId: TypedId<TransactionId>,
+      @Param("userId") userId: TypedId<UserId>
   ): Int
 
   @Query(
-    """
+      """
     UPDATE Transaction t
     SET t.markNotDuplicateNano = :nano
     WHERE t.uid = :transactionId
@@ -118,13 +118,13 @@ interface TransactionRepository :
   """)
   @Modifying(flushAutomatically = true, clearAutomatically = true)
   fun markNotDuplicate(
-    @Param("nano") nano: Long,
-    @Param("transactionId") transactionId: TypedId<TransactionId>,
-    @Param("userId") userId: TypedId<UserId>,
+      @Param("nano") nano: Long,
+      @Param("transactionId") transactionId: TypedId<TransactionId>,
+      @Param("userId") userId: TypedId<UserId>,
   )
 
   @Query(
-    """
+      """
     SELECT t
     FROM Transaction t
     WHERE t.userId = :userId

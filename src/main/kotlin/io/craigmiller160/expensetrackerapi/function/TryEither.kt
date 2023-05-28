@@ -10,6 +10,6 @@ fun <A, B> TryEither<A>.flatMapCatch(block: (A) -> B): TryEither<B> = flatMap { 
 }
 
 fun <A> TryEither<A>.flatMapKeepRight(block: (A) -> TryEither<Any>): TryEither<A> =
-  flatMap { value ->
-    block(value).map { value }
-  }
+    flatMap { value ->
+      block(value).map { value }
+    }

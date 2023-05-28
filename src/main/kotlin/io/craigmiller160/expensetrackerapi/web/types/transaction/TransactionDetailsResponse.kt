@@ -9,29 +9,29 @@ import java.time.LocalDate
 import java.time.ZonedDateTime
 
 data class TransactionDetailsResponse(
-  val id: TypedId<TransactionId>,
-  val expenseDate: LocalDate,
-  val description: String,
-  val amount: BigDecimal,
-  val confirmed: Boolean,
-  val duplicate: Boolean,
-  val categoryId: TypedId<CategoryId>?,
-  val categoryName: String?,
-  val created: ZonedDateTime,
-  val updated: ZonedDateTime
+    val id: TypedId<TransactionId>,
+    val expenseDate: LocalDate,
+    val description: String,
+    val amount: BigDecimal,
+    val confirmed: Boolean,
+    val duplicate: Boolean,
+    val categoryId: TypedId<CategoryId>?,
+    val categoryName: String?,
+    val created: ZonedDateTime,
+    val updated: ZonedDateTime
 ) {
   companion object {
     fun from(transaction: TransactionView): TransactionDetailsResponse =
-      TransactionDetailsResponse(
-        id = transaction.uid,
-        expenseDate = transaction.expenseDate,
-        description = transaction.description,
-        amount = transaction.amount,
-        confirmed = transaction.confirmed,
-        duplicate = transaction.duplicate,
-        categoryId = transaction.categoryId,
-        categoryName = transaction.categoryName,
-        created = transaction.created,
-        updated = transaction.updated)
+        TransactionDetailsResponse(
+            id = transaction.uid,
+            expenseDate = transaction.expenseDate,
+            description = transaction.description,
+            amount = transaction.amount,
+            confirmed = transaction.confirmed,
+            duplicate = transaction.duplicate,
+            categoryId = transaction.categoryId,
+            categoryName = transaction.categoryName,
+            created = transaction.created,
+            updated = transaction.updated)
   }
 }

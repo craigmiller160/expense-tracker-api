@@ -16,19 +16,19 @@ class DiscoverCsvTransactionParser : AbstractCsvTransactionParser() {
   companion object {
     private val DATE_FORMAT = DateTimeFormatter.ofPattern("MM/dd/yyyy")
     private val HEADER_VALUES =
-      listOf("Trans. Date", "Post Date", "Description", "Amount", "Category")
+        listOf("Trans. Date", "Post Date", "Description", "Amount", "Category")
   }
 
   override fun parseRecord(userId: TypedId<UserId>, row: Array<String>): TryEither<Transaction> =
-    Either.catch {
-      val transactionDate = row[0]
-      val expenseDate = LocalDate.parse(transactionDate, DATE_FORMAT)
-      val description = row[2]
-      val rawAmount = row[3]
-      val amount = BigDecimal(rawAmount).times(BigDecimal("-1"))
-      Transaction(
-        userId = userId, expenseDate = expenseDate, description = description, amount = amount)
-    }
+      Either.catch {
+        val transactionDate = row[0]
+        val expenseDate = LocalDate.parse(transactionDate, DATE_FORMAT)
+        val description = row[2]
+        val rawAmount = row[3]
+        val amount = BigDecimal(rawAmount).times(BigDecimal("-1"))
+        Transaction(
+            userId = userId, expenseDate = expenseDate, description = description, amount = amount)
+      }
 
   override fun validateImportType(headerRow: Array<String>): TryEither<Unit> {
     if (headerRow.size == HEADER_VALUES.size) {

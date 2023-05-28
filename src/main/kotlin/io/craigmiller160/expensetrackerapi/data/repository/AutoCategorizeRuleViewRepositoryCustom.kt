@@ -8,7 +8,7 @@ import org.springframework.data.domain.Page
 
 interface AutoCategorizeRuleViewRepositoryCustom {
   fun searchForRules(
-    request: AutoCategorizeRulePageRequest,
-    userId: TypedId<UserId>
+      request: AutoCategorizeRulePageRequest,
+      userId: TypedId<UserId>
   ): Page<AutoCategorizeRuleView>
 }

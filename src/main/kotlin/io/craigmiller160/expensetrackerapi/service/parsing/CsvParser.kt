@@ -9,6 +9,6 @@ import java.io.InputStreamReader
 object CsvParser {
 
   fun parse(stream: InputStream): TryEither<CsvData> =
-    Either.catch { CSVReader(InputStreamReader(stream)).readAll() }
-      .map { allRows -> CsvData(header = allRows.first(), records = allRows.drop(1)) }
+      Either.catch { CSVReader(InputStreamReader(stream)).readAll() }
+          .map { allRows -> CsvData(header = allRows.first(), records = allRows.drop(1)) }
 }

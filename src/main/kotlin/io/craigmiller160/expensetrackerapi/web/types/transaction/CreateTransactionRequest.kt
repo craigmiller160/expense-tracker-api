@@ -6,8 +6,8 @@ import java.math.BigDecimal
 import java.time.LocalDate
 
 data class CreateTransactionRequest(
-  val expenseDate: LocalDate,
-  val description: String,
-  val amount: BigDecimal,
-  val categoryId: TypedId<CategoryId>?
+    val expenseDate: LocalDate,
+    val description: String,
+    val amount: BigDecimal,
+    val categoryId: TypedId<CategoryId>?
 )

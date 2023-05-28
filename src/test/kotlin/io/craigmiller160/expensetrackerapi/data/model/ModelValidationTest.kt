@@ -15,9 +15,9 @@ import org.springframework.dao.InvalidDataAccessApiUsageException
 class ModelValidationTest
 @Autowired
 constructor(
-  private val countryRepository: CountryRepository,
-  private val residentRepository: ResidentRepository,
-  private val entityManager: EntityManager
+    private val countryRepository: CountryRepository,
+    private val residentRepository: ResidentRepository,
+    private val entityManager: EntityManager
 ) {
   private val NOW = ZonedDateTime.now()
   @Test
@@ -38,9 +38,9 @@ constructor(
     assertThat(newCountry.name).isEqualTo(dbCountry.name)
 
     val ex =
-      assertThrows<InvalidDataAccessApiUsageException> {
-        countryRepository.saveAndFlush(newCountry)
-      }
+        assertThrows<InvalidDataAccessApiUsageException> {
+          countryRepository.saveAndFlush(newCountry)
+        }
     assertThat(ex.cause).isNotNull.isInstanceOf(IllegalStateException::class.java)
   }
 

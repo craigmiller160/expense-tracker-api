@@ -10,8 +10,8 @@ import org.springframework.data.domain.Pageable
 interface TransactionRepositoryCustom {
 
   fun searchForTransactions(
-    request: SearchTransactionsRequest,
-    userId: TypedId<UserId>,
-    page: Pageable
+      request: SearchTransactionsRequest,
+      userId: TypedId<UserId>,
+      page: Pageable
   ): Page<TransactionView>
 }

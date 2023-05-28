@@ -10,16 +10,16 @@ import org.springframework.stereotype.Service
 
 @Service
 class LastRuleAppliedService(
-  private val lastRuleAppliedRepository: LastRuleAppliedRepository,
-  private val authService: AuthorizationService
+    private val lastRuleAppliedRepository: LastRuleAppliedRepository,
+    private val authService: AuthorizationService
 ) {
   fun getLastAppliedRuleForTransaction(
-    transactionId: TypedId<TransactionId>
+      transactionId: TypedId<TransactionId>
   ): TryEither<LastRuleAppliedResponse?> {
     val userId = authService.getAuthUserId()
     return Either.catch {
-        lastRuleAppliedRepository.getLastRuleDetailsForTransaction(userId, transactionId)
-      }
-      .map { result -> result?.let { LastRuleAppliedResponse.from(it) } }
+          lastRuleAppliedRepository.getLastRuleDetailsForTransaction(userId, transactionId)
+        }
+        .map { result -> result?.let { LastRuleAppliedResponse.from(it) } }
   }
 }

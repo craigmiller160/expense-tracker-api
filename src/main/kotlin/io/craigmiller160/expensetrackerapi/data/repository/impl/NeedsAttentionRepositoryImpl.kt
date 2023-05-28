@@ -18,13 +18,13 @@ private val needsAttentionCountRowMapper: RowMapper<NeedsAttentionCount> = RowMa
 
 private val needsAttentionOldestRowMapper: RowMapper<NeedsAttentionOldest> = RowMapper { rs, _ ->
   NeedsAttentionOldest(
-    NeedsAttentionType.valueOf(rs.getString("type")), rs.getDate("oldest")?.toLocalDate())
+      NeedsAttentionType.valueOf(rs.getString("type")), rs.getDate("oldest")?.toLocalDate())
 }
 
 @Repository
 class NeedsAttentionRepositoryImpl(
-  private val jdbcTemplate: NamedParameterJdbcTemplate,
-  private val sqlLoader: SqlLoader
+    private val jdbcTemplate: NamedParameterJdbcTemplate,
+    private val sqlLoader: SqlLoader
 ) : NeedsAttentionRepository {
   override fun getAllNeedsAttentionCounts(userId: TypedId<UserId>): List<NeedsAttentionCount> {
     val countSql = sqlLoader.loadSql("needsAttention/get_all_needs_attention_counts.sql")

@@ -14,25 +14,25 @@ import javax.persistence.Table
 @Entity
 @Table(name = "transactions")
 class Transaction(
-  override var userId: TypedId<UserId>,
-  override var expenseDate: LocalDate,
-  override var description: String,
-  override var amount: BigDecimal,
-  @Column(name = "content_hash", insertable = false, updatable = false)
-  var contentHash: String = "",
-  var markNotDuplicateNano: Long? = null,
-  override var confirmed: Boolean = false,
-  override var categoryId: TypedId<CategoryId>? = null,
+    override var userId: TypedId<UserId>,
+    override var expenseDate: LocalDate,
+    override var description: String,
+    override var amount: BigDecimal,
+    @Column(name = "content_hash", insertable = false, updatable = false)
+    var contentHash: String = "",
+    var markNotDuplicateNano: Long? = null,
+    override var confirmed: Boolean = false,
+    override var categoryId: TypedId<CategoryId>? = null,
 ) : MutableTableEntity<TransactionId>(), TransactionCommon {
   constructor(
-    other: Transaction
+      other: Transaction
   ) : this(
-    userId = other.userId,
-    expenseDate = other.expenseDate,
-    description = other.description,
-    amount = other.amount,
-    contentHash = other.contentHash,
-    markNotDuplicateNano = other.markNotDuplicateNano,
-    confirmed = other.confirmed,
-    categoryId = other.categoryId)
+      userId = other.userId,
+      expenseDate = other.expenseDate,
+      description = other.description,
+      amount = other.amount,
+      contentHash = other.contentHash,
+      markNotDuplicateNano = other.markNotDuplicateNano,
+      confirmed = other.confirmed,
+      categoryId = other.categoryId)
 }

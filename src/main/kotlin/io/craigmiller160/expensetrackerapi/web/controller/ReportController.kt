@@ -15,13 +15,13 @@ import org.springframework.web.bind.annotation.RestController
 @RequestMapping("/reports")
 class ReportController(private val reportService: ReportService) {
   @ApiResponse(
-    responseCode = "200",
-    content =
-      [
-        Content(
-          mediaType = "application/json",
-          schema = Schema(implementation = ReportPageResponse::class))])
+      responseCode = "200",
+      content =
+          [
+              Content(
+                  mediaType = "application/json",
+                  schema = Schema(implementation = ReportPageResponse::class))])
   @GetMapping
   fun getSpendingByMonthAndCategory(request: ReportRequest): TryEither<ReportPageResponse> =
-    reportService.getSpendingByMonthAndCategory(request)
+      reportService.getSpendingByMonthAndCategory(request)
 }

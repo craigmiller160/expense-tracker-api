@@ -5,15 +5,15 @@ import java.math.BigDecimal
 import java.time.LocalDate
 
 data class ReportMonthResponse(
-  val date: LocalDate,
-  val total: BigDecimal,
-  val categories: List<ReportCategoryResponse>
+    val date: LocalDate,
+    val total: BigDecimal,
+    val categories: List<ReportCategoryResponse>
 ) {
   companion object {
     fun from(month: SpendingByMonth): ReportMonthResponse =
-      ReportMonthResponse(
-        date = month.month,
-        total = month.total,
-        categories = month.categories.map { ReportCategoryResponse.from(it, month.total) })
+        ReportMonthResponse(
+            date = month.month,
+            total = month.total,
+            categories = month.categories.map { ReportCategoryResponse.from(it, month.total) })
   }
 }

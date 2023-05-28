@@ -8,7 +8,7 @@ import org.springframework.data.domain.Page
 
 interface ReportRepository {
   fun getSpendingByMonthAndCategory(
-    userId: TypedId<UserId>,
-    request: ReportRequest
+      userId: TypedId<UserId>,
+      request: ReportRequest
   ): Page<SpendingByMonth>
 }
