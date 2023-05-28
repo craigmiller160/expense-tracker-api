@@ -57,3 +57,20 @@ dependencies {
     implementation("io.craigmiller160:spring-web-utils:1.2.0")
     testImplementation("org.mockito.kotlin:mockito-kotlin:4.0.0")
 }
+
+tasks.withType<KotlinCompile> {
+    kotlinOptions {
+        freeCompilerArgs = listOf("-Xjsr305=strict", "-Xcontext-receivers")
+        jvmTarget = "19"
+    }
+}
+
+tasks.withType<Test> {
+    useJUnitPlatform()
+}
+
+configure<SpotlessExtension> {
+    kotlin {
+        ktfmt("0.43")
+    }
+}
