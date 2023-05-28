@@ -34,7 +34,7 @@
 
     <properties>
         <keycloak.version>20.0.2</keycloak.version>
-        <kotlin.version>1.7.21</kotlin.version>
+        <kotlin.version>1.8.21</kotlin.version>
         <arrow.kt.version>1.1.2</arrow.kt.version>
         <kotest.arrow.version>1.2.5</kotest.arrow.version>
         <spring.arrow.kt.version>1.0.3</spring.arrow.kt.version>
