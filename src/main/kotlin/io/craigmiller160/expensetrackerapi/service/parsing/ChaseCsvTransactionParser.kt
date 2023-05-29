@@ -16,20 +16,26 @@ class ChaseCsvTransactionParser : AbstractCsvTransactionParser() {
   companion object {
     private val DATE_FORMAT = DateTimeFormatter.ofPattern("MM/dd/yyyy")
     private val HEADER_VALUES =
-      listOf(
-        "Details", "Posting Date", "Description", "Amount", "Type", "Balance", "Check or Slip #")
+        listOf(
+            "Details",
+            "Posting Date",
+            "Description",
+            "Amount",
+            "Type",
+            "Balance",
+            "Check or Slip #")
   }
 
   override fun parseRecord(userId: TypedId<UserId>, row: Array<String>): TryEither<Transaction> =
-    Either.catch {
-      val rawDate = row[1]
-      val expenseDate = LocalDate.parse(rawDate, DATE_FORMAT)
-      val description = row[2]
-      val rawAmount = row[3]
-      val amount = BigDecimal(rawAmount)
-      Transaction(
-        userId = userId, expenseDate = expenseDate, description = description, amount = amount)
-    }
+      Either.catch {
+        val rawDate = row[1]
+        val expenseDate = LocalDate.parse(rawDate, DATE_FORMAT)
+        val description = row[2]
+        val rawAmount = row[3]
+        val amount = BigDecimal(rawAmount)
+        Transaction(
+            userId = userId, expenseDate = expenseDate, description = description, amount = amount)
+      }
 
   override fun validateImportType(headerRow: Array<String>): TryEither<Unit> {
     if (headerRow.size == HEADER_VALUES.size) {

@@ -16,25 +16,25 @@ import org.springframework.security.web.authentication.session.SessionAuthentica
 class WebSecurityConfig : KeycloakWebSecurityConfigurerAdapter() {
   @Bean
   override fun sessionAuthenticationStrategy(): SessionAuthenticationStrategy =
-    NullAuthenticatedSessionStrategy()
+      NullAuthenticatedSessionStrategy()
 
   override fun configure(http: HttpSecurity) {
     super.configure(http)
     http
-      .csrf()
-      .disable()
-      .sessionManagement()
-      .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-      .and()
-      .requiresChannel()
-      .anyRequest()
-      .requiresSecure()
-      .and()
-      .authorizeRequests()
-      .antMatchers("/actuator/health", "/v3/api-docs", "/v3/api-docs/*", "/swagger-ui/*")
-      .permitAll()
-      .antMatchers("/**")
-      .hasAnyRole("access")
+        .csrf()
+        .disable()
+        .sessionManagement()
+        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+        .and()
+        .requiresChannel()
+        .anyRequest()
+        .requiresSecure()
+        .and()
+        .authorizeRequests()
+        .antMatchers("/actuator/health", "/v3/api-docs", "/v3/api-docs/*", "/swagger-ui/*")
+        .permitAll()
+        .antMatchers("/**")
+        .hasAnyRole("access")
   }
 
   override fun configure(auth: AuthenticationManagerBuilder) {

@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service
 @Service
 class AuthorizationService {
   fun getAuthUserId(): TypedId<UserId> =
-    (SecurityContextHolder.getContext().authentication.principal as KeycloakPrincipal<*>).name.let {
-      TypedId(it)
-    }
+      (SecurityContextHolder.getContext().authentication.principal as KeycloakPrincipal<*>)
+          .name
+          .let { TypedId(it) }
 }

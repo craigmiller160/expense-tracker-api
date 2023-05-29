@@ -6,10 +6,10 @@ import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.TransactionId
 import io.craigmiller160.expensetrackerapi.web.types.transaction.TransactionAndCategoryUpdateItem
 
 data class TransactionAndCategory(
-  override val transactionId: TypedId<TransactionId>,
-  override val categoryId: TypedId<CategoryId>? = null
+    override val transactionId: TypedId<TransactionId>,
+    override val categoryId: TypedId<CategoryId>? = null
 ) : TransactionAndCategoryUpdateItem
 
 data class CategorizeTransactionsRequest(
-  val transactionsAndCategories: Set<TransactionAndCategory>
+    val transactionsAndCategories: Set<TransactionAndCategory>
 )

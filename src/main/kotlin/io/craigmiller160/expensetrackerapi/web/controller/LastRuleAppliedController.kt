@@ -20,21 +20,22 @@ import org.springframework.web.bind.annotation.RestController
 class LastRuleAppliedController(private val lastRuleAppliedService: LastRuleAppliedService) {
 
   @ApiResponses(
-    value =
-      [
-        ApiResponse(
-          responseCode = "200",
-          content =
-            [
-              Content(
-                mediaType = "application/json",
-                schema = Schema(implementation = LastRuleAppliedResponse::class))]),
-        ApiResponse(responseCode = "204", content = [Content(schema = Schema(hidden = true))])])
+      value =
+          [
+              ApiResponse(
+                  responseCode = "200",
+                  content =
+                      [
+                          Content(
+                              mediaType = "application/json",
+                              schema = Schema(implementation = LastRuleAppliedResponse::class))]),
+              ApiResponse(
+                  responseCode = "204", content = [Content(schema = Schema(hidden = true))])])
   @GetMapping("/{transactionId}")
   fun getLastAppliedRuleForTransaction(
-    @PathVariable transactionId: TypedId<TransactionId>
+      @PathVariable transactionId: TypedId<TransactionId>
   ): TryEither<ResponseEntity<LastRuleAppliedResponse>> =
-    lastRuleAppliedService.getLastAppliedRuleForTransaction(transactionId).map { result ->
-      result?.let { ResponseEntity.ok(it) } ?: ResponseEntity.noContent().build()
-    }
+      lastRuleAppliedService.getLastAppliedRuleForTransaction(transactionId).map { result ->
+        result?.let { ResponseEntity.ok(it) } ?: ResponseEntity.noContent().build()
+      }
 }

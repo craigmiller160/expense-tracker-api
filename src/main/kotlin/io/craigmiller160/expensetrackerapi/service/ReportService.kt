@@ -10,13 +10,13 @@ import org.springframework.stereotype.Service
 
 @Service
 class ReportService(
-  private val reportRepository: ReportRepository,
-  private val authorizationService: AuthorizationService
+    private val reportRepository: ReportRepository,
+    private val authorizationService: AuthorizationService
 ) {
   @Transactional
   fun getSpendingByMonthAndCategory(request: ReportRequest): TryEither<ReportPageResponse> {
     val userId = authorizationService.getAuthUserId()
     return Either.catch { reportRepository.getSpendingByMonthAndCategory(userId, request) }
-      .map { ReportPageResponse.from(it) }
+        .map { ReportPageResponse.from(it) }
   }
 }

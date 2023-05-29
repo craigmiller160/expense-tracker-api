@@ -10,4 +10,4 @@ import javax.persistence.Table
 @Entity
 @Table(name = "categories")
 class Category(var name: String, var userId: TypedId<UserId>, var color: String) :
-  MutableTableEntity<CategoryId>()
+    MutableTableEntity<CategoryId>()

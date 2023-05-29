@@ -14,15 +14,15 @@ import javax.persistence.Table
 @Entity
 @Table(name = "transactions_view")
 class TransactionView(
-  override var userId: TypedId<UserId>,
-  override var expenseDate: LocalDate,
-  override var description: String,
-  override var amount: BigDecimal,
-  var contentHash: String,
-  override var categoryId: TypedId<CategoryId>?,
-  var categoryName: String?,
-  override var confirmed: Boolean,
-  var duplicate: Boolean,
-  var created: ZonedDateTime,
-  var updated: ZonedDateTime
+    override var userId: TypedId<UserId>,
+    override var expenseDate: LocalDate,
+    override var description: String,
+    override var amount: BigDecimal,
+    var contentHash: String,
+    override var categoryId: TypedId<CategoryId>?,
+    var categoryName: String?,
+    override var confirmed: Boolean,
+    var duplicate: Boolean,
+    var created: ZonedDateTime,
+    var updated: ZonedDateTime
 ) : ViewEntity<TransactionId>(), TransactionCommon

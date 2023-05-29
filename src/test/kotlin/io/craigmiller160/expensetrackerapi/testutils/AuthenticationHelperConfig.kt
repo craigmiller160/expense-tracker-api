@@ -17,6 +17,6 @@ class AuthenticationHelperConfig {
     val secondaryUser = authHelper.createUser("secondary@gmail.com").let { authHelper.login(it) }
     val tertiaryUser = authHelper.createUser("tertiary@gmail.com").let { authHelper.login(it) }
     return DefaultUsers(
-      primaryUser = primaryUser, secondaryUser = secondaryUser, tertiaryUser = tertiaryUser)
+        primaryUser = primaryUser, secondaryUser = secondaryUser, tertiaryUser = tertiaryUser)
   }
 }

@@ -4,8 +4,8 @@ import java.math.BigDecimal
 import java.time.LocalDate
 
 data class SpendingByCategory(
-  val month: LocalDate,
-  val categoryName: String,
-  val color: String,
-  val amount: BigDecimal
+    val month: LocalDate,
+    val categoryName: String,
+    val color: String,
+    val amount: BigDecimal
 )

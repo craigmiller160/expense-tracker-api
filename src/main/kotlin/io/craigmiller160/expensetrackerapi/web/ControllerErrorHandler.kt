@@ -58,24 +58,24 @@ class ControllerErrorHandler {
   private fun createErrorResponse(status: Int, message: String): ResponseEntity<ErrorResponse> {
     val (method, uri) = getMethodAndUri()
     val response =
-      ErrorResponse(
-        timestamp = ZonedDateTime.now(ZoneId.of("UTC")),
-        method = method,
-        path = uri,
-        message = message,
-        status = status)
+        ErrorResponse(
+            timestamp = ZonedDateTime.now(ZoneId.of("UTC")),
+            method = method,
+            path = uri,
+            message = message,
+            status = status)
     return ResponseEntity.status(status).body(response)
   }
 
   private fun getMethodAndUri(): Pair<String, String> =
-    RequestContextHolder.getRequestAttributes()
-      ?.let {
-        when (it) {
-          is ServletRequestAttributes -> it
-          else -> null
-        }
-      }
-      ?.request
-      ?.let { request -> Pair(request.method, request.requestURI) }
-      ?: Pair("", "")
+      RequestContextHolder.getRequestAttributes()
+          ?.let {
+            when (it) {
+              is ServletRequestAttributes -> it
+              else -> null
+            }
+          }
+          ?.request
+          ?.let { request -> Pair(request.method, request.requestURI) }
+          ?: Pair("", "")
 }

@@ -13,13 +13,13 @@ import javax.persistence.Table
 @Entity
 @Table(name = "auto_categorize_rules_view")
 class AutoCategorizeRuleView(
-  var categoryId: TypedId<CategoryId>,
-  var categoryName: String,
-  var userId: TypedId<UserId>,
-  var ordinal: Int,
-  var regex: String,
-  var startDate: LocalDate? = null,
-  var endDate: LocalDate? = null,
-  var minAmount: BigDecimal? = null,
-  var maxAmount: BigDecimal? = null
+    var categoryId: TypedId<CategoryId>,
+    var categoryName: String,
+    var userId: TypedId<UserId>,
+    var ordinal: Int,
+    var regex: String,
+    var startDate: LocalDate? = null,
+    var endDate: LocalDate? = null,
+    var minAmount: BigDecimal? = null,
+    var maxAmount: BigDecimal? = null
 ) : ViewEntity<AutoCategorizeRuleId>()

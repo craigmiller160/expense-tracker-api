@@ -15,92 +15,100 @@ import org.springframework.web.bind.annotation.*
 @RestController
 @RequestMapping("/categories/rules")
 class AutoCategorizeRuleController(
-  private val autoCategorizeRuleService: AutoCategorizeRuleService
+    private val autoCategorizeRuleService: AutoCategorizeRuleService
 ) {
   @ApiResponse(
-    responseCode = "200",
-    content =
-      [
-        Content(
-          mediaType = "application/json",
-          array =
-            ArraySchema(schema = Schema(implementation = AutoCategorizeRulePageResponse::class)))])
+      responseCode = "200",
+      content =
+          [
+              Content(
+                  mediaType = "application/json",
+                  array =
+                      ArraySchema(
+                          schema =
+                              Schema(implementation = AutoCategorizeRulePageResponse::class)))])
   @GetMapping
   fun getAllRules(
-    request: AutoCategorizeRulePageRequest
+      request: AutoCategorizeRulePageRequest
   ): TryEither<AutoCategorizeRulePageResponse> = autoCategorizeRuleService.getAllRules(request)
 
   @ApiResponse(
-    responseCode = "200",
-    content =
-      [
-        Content(
-          mediaType = "application/json",
-          array =
-            ArraySchema(schema = Schema(implementation = AutoCategorizeRuleResponse::class)))])
+      responseCode = "200",
+      content =
+          [
+              Content(
+                  mediaType = "application/json",
+                  array =
+                      ArraySchema(
+                          schema = Schema(implementation = AutoCategorizeRuleResponse::class)))])
   @PostMapping
   fun createRule(
-    @RequestBody request: AutoCategorizeRuleRequest
+      @RequestBody request: AutoCategorizeRuleRequest
   ): TryEither<AutoCategorizeRuleResponse> = autoCategorizeRuleService.createRule(request)
 
   @ApiResponse(
-    responseCode = "200",
-    content =
-      [
-        Content(
-          mediaType = "application/json",
-          array =
-            ArraySchema(schema = Schema(implementation = AutoCategorizeRuleResponse::class)))])
+      responseCode = "200",
+      content =
+          [
+              Content(
+                  mediaType = "application/json",
+                  array =
+                      ArraySchema(
+                          schema = Schema(implementation = AutoCategorizeRuleResponse::class)))])
   @PutMapping("/{ruleId}")
   fun updateRule(
-    @PathVariable ruleId: TypedId<AutoCategorizeRuleId>,
-    @RequestBody request: AutoCategorizeRuleRequest
+      @PathVariable ruleId: TypedId<AutoCategorizeRuleId>,
+      @RequestBody request: AutoCategorizeRuleRequest
   ): TryEither<AutoCategorizeRuleResponse> = autoCategorizeRuleService.updateRule(ruleId, request)
 
   @ApiResponse(
-    responseCode = "200",
-    content =
-      [
-        Content(
-          mediaType = "application/json",
-          array =
-            ArraySchema(schema = Schema(implementation = AutoCategorizeRuleResponse::class)))])
+      responseCode = "200",
+      content =
+          [
+              Content(
+                  mediaType = "application/json",
+                  array =
+                      ArraySchema(
+                          schema = Schema(implementation = AutoCategorizeRuleResponse::class)))])
   @GetMapping("/{ruleId}")
   fun getRule(
-    @PathVariable ruleId: TypedId<AutoCategorizeRuleId>
+      @PathVariable ruleId: TypedId<AutoCategorizeRuleId>
   ): TryEither<AutoCategorizeRuleResponse> = autoCategorizeRuleService.getRule(ruleId)
 
   @ApiResponse(
-    responseCode = "204",
-    content =
-      [
-        Content(
-          mediaType = "application/json", array = ArraySchema(schema = Schema(hidden = true)))])
+      responseCode = "204",
+      content =
+          [
+              Content(
+                  mediaType = "application/json",
+                  array = ArraySchema(schema = Schema(hidden = true)))])
   @DeleteMapping("/{ruleId}")
   @ResponseStatus(HttpStatus.NO_CONTENT)
   fun deleteRule(@PathVariable ruleId: TypedId<AutoCategorizeRuleId>): TryEither<Unit> =
-    autoCategorizeRuleService.deleteRule(ruleId)
+      autoCategorizeRuleService.deleteRule(ruleId)
 
   @ApiResponse(
-    responseCode = "204",
-    content =
-      [
-        Content(
-          mediaType = "application/json", array = ArraySchema(schema = Schema(hidden = true)))])
+      responseCode = "204",
+      content =
+          [
+              Content(
+                  mediaType = "application/json",
+                  array = ArraySchema(schema = Schema(hidden = true)))])
   @PutMapping("/{ruleId}/reOrder/{ordinal}")
   @ResponseStatus(HttpStatus.NO_CONTENT)
   fun reOrderRule(
-    @PathVariable ruleId: TypedId<AutoCategorizeRuleId>,
-    @PathVariable ordinal: Int
+      @PathVariable ruleId: TypedId<AutoCategorizeRuleId>,
+      @PathVariable ordinal: Int
   ): TryEither<Unit> = autoCategorizeRuleService.reOrderRule(ruleId, ordinal)
 
   @ApiResponse(
-    responseCode = "200",
-    content =
-      [
-        Content(
-          mediaType = "application/json",
-          array = ArraySchema(schema = Schema(implementation = MaxOrdinalResponse::class)))])
+      responseCode = "200",
+      content =
+          [
+              Content(
+                  mediaType = "application/json",
+                  array =
+                      ArraySchema(schema = Schema(implementation = MaxOrdinalResponse::class)))])
   @GetMapping("/maxOrdinal")
   fun getMaxOrdinal(): TryEither<MaxOrdinalResponse> = autoCategorizeRuleService.getMaxOrdinal()
 }

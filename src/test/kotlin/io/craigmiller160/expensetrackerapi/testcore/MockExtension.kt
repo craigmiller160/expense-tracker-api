@@ -23,11 +23,11 @@ class MockExtension : BeforeEachCallback, BeforeAllCallback {
 
       val springContext = SpringExtension.getApplicationContext(ctx)
       val mockedBeans =
-        springContext
-          .getBeansOfType(Object::class.java)
-          .values
-          .filter { MockUtil.isMock(it) }
-          .toSet()
+          springContext
+              .getBeansOfType(Object::class.java)
+              .values
+              .filter { MockUtil.isMock(it) }
+              .toSet()
       this.mockedBeans + mockedBeans
     }
   }

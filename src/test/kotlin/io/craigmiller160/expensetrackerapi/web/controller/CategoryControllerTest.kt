@@ -28,13 +28,13 @@ import org.springframework.test.web.servlet.put
 class CategoryControllerTest
 @Autowired
 constructor(
-  private val categoryRepository: CategoryRepository,
-  private val transactionRepository: TransactionRepository,
-  private val entityManager: EntityManager,
-  private val dataHelper: DataHelper,
-  private val mockMvc: MockMvc,
-  private val objectMapper: ObjectMapper,
-  private val defaultUsers: DefaultUsers
+    private val categoryRepository: CategoryRepository,
+    private val transactionRepository: TransactionRepository,
+    private val entityManager: EntityManager,
+    private val dataHelper: DataHelper,
+    private val mockMvc: MockMvc,
+    private val objectMapper: ObjectMapper,
+    private val defaultUsers: DefaultUsers
 ) {
 
   @Test
@@ -49,14 +49,14 @@ constructor(
     val expected = listOf(CategoryResponse.from(cat1), CategoryResponse.from(cat2))
 
     mockMvc
-      .get("/categories") {
-        secure = true
-        header("Authorization", "Bearer $token")
-      }
-      .andExpect {
-        status { isOk() }
-        content { json(objectMapper.writeValueAsString(expected), true) }
-      }
+        .get("/categories") {
+          secure = true
+          header("Authorization", "Bearer $token")
+        }
+        .andExpect {
+          status { isOk() }
+          content { json(objectMapper.writeValueAsString(expected), true) }
+        }
   }
 
   @Test
@@ -65,28 +65,28 @@ constructor(
     val request = CategoryRequest("The Category")
 
     val responseString =
-      mockMvc
-        .post("/categories") {
-          secure = true
-          header("Authorization", "Bearer $token")
-          contentType = MediaType.APPLICATION_JSON
-          content = objectMapper.writeValueAsString(request)
-        }
-        .andExpect { status { isOk() } }
-        .andReturn()
-        .response
-        .contentAsString
+        mockMvc
+            .post("/categories") {
+              secure = true
+              header("Authorization", "Bearer $token")
+              contentType = MediaType.APPLICATION_JSON
+              content = objectMapper.writeValueAsString(request)
+            }
+            .andExpect { status { isOk() } }
+            .andReturn()
+            .response
+            .contentAsString
     val response = objectMapper.readValue(responseString, CategoryResponse::class.java)
 
     assertThat(response).hasFieldOrPropertyWithValue("name", request.name)
 
     assertThat(categoryRepository.count()).isEqualTo(1)
     assertThat(categoryRepository.findById(response.id))
-      .isPresent
-      .get()
-      .hasFieldOrPropertyWithValue("name", request.name)
-      .hasFieldOrPropertyWithValue("userId", defaultUsers.primaryUser.userTypedId)
-      .hasFieldOrPropertyWithValue("color", StringToColor.get(request.name))
+        .isPresent
+        .get()
+        .hasFieldOrPropertyWithValue("name", request.name)
+        .hasFieldOrPropertyWithValue("userId", defaultUsers.primaryUser.userTypedId)
+        .hasFieldOrPropertyWithValue("color", StringToColor.get(request.name))
   }
 
   @Test
@@ -95,13 +95,13 @@ constructor(
     val request = CategoryRequest("Unknown")
 
     mockMvc
-      .post("/categories") {
-        secure = true
-        header("Authorization", "Bearer $token")
-        contentType = MediaType.APPLICATION_JSON
-        content = objectMapper.writeValueAsString(request)
-      }
-      .andExpect { status { isBadRequest() } }
+        .post("/categories") {
+          secure = true
+          header("Authorization", "Bearer $token")
+          contentType = MediaType.APPLICATION_JSON
+          content = objectMapper.writeValueAsString(request)
+        }
+        .andExpect { status { isBadRequest() } }
   }
 
   @Test
@@ -110,13 +110,13 @@ constructor(
     val cat1 = dataHelper.createCategory(defaultUsers.primaryUser.userTypedId, "Category 1")
     val request = CategoryRequest("Unknown")
     mockMvc
-      .put("/categories/${cat1.id}") {
-        secure = true
-        header("Authorization", "Bearer $token")
-        contentType = MediaType.APPLICATION_JSON
-        content = objectMapper.writeValueAsString(request)
-      }
-      .andExpect { status { isBadRequest() } }
+        .put("/categories/${cat1.id}") {
+          secure = true
+          header("Authorization", "Bearer $token")
+          contentType = MediaType.APPLICATION_JSON
+          content = objectMapper.writeValueAsString(request)
+        }
+        .andExpect { status { isBadRequest() } }
   }
 
   @Test
@@ -128,13 +128,13 @@ constructor(
     val request = CategoryRequest("Category B")
     val action: (TypedId<CategoryId>) -> Unit = { id ->
       mockMvc
-        .put("/categories/$id") {
-          secure = true
-          header("Authorization", "Bearer $token")
-          contentType = MediaType.APPLICATION_JSON
-          content = objectMapper.writeValueAsString(request)
-        }
-        .andExpect { status { isNoContent() } }
+          .put("/categories/$id") {
+            secure = true
+            header("Authorization", "Bearer $token")
+            contentType = MediaType.APPLICATION_JSON
+            content = objectMapper.writeValueAsString(request)
+          }
+          .andExpect { status { isNoContent() } }
     }
 
     action(cat1.uid)
@@ -142,13 +142,13 @@ constructor(
 
     val dbCat1 = categoryRepository.findById(cat1.uid).orElseThrow()
     assertThat(dbCat1)
-      .hasFieldOrPropertyWithValue("name", "Category B")
-      .hasFieldOrPropertyWithValue("color", StringToColor.get(request.name))
+        .hasFieldOrPropertyWithValue("name", "Category B")
+        .hasFieldOrPropertyWithValue("color", StringToColor.get(request.name))
 
     val dbCat2 = categoryRepository.findById(cat2.uid).orElseThrow()
     assertThat(dbCat2)
-      .hasFieldOrPropertyWithValue("name", "Category 2")
-      .hasFieldOrPropertyWithValue("color", StringToColor.get(cat2.name))
+        .hasFieldOrPropertyWithValue("name", "Category 2")
+        .hasFieldOrPropertyWithValue("color", StringToColor.get(cat2.name))
   }
 
   @Test
@@ -162,11 +162,11 @@ constructor(
 
     val action: (TypedId<CategoryId>) -> Unit = { id ->
       mockMvc
-        .delete("/categories/$id") {
-          secure = true
-          header("Authorization", "Bearer $token")
-        }
-        .andExpect { status { isNoContent() } }
+          .delete("/categories/$id") {
+            secure = true
+            header("Authorization", "Bearer $token")
+          }
+          .andExpect { status { isNoContent() } }
     }
 
     action(cat1.uid)
@@ -175,12 +175,12 @@ constructor(
     assertThat(categoryRepository.findById(cat1.uid)).isEmpty
     assertThat(categoryRepository.findById(cat2.uid)).isPresent
     assertThat(transactionRepository.findById(txn1.uid))
-      .isPresent
-      .get()
-      .hasFieldOrPropertyWithValue("categoryId", null)
+        .isPresent
+        .get()
+        .hasFieldOrPropertyWithValue("categoryId", null)
     assertThat(transactionRepository.findById(txn2.uid))
-      .isPresent
-      .get()
-      .hasFieldOrPropertyWithValue("categoryId", cat3.uid)
+        .isPresent
+        .get()
+        .hasFieldOrPropertyWithValue("categoryId", cat3.uid)
   }
 }

@@ -12,59 +12,59 @@ import org.springframework.stereotype.Repository
 
 @Repository
 class AutoCategorizeRuleRepositoryCustomImpl(
-  private val queryFactory: JPQLQueryFactory,
-  private val queryDslSupport: QueryDSLSupport
+    private val queryFactory: JPQLQueryFactory,
+    private val queryDslSupport: QueryDSLSupport
 ) : AutoCategorizeRuleRepositoryCustom {
 
   override fun decrementOrdinals(
-    userId: TypedId<UserId>,
-    minOrdinal: Int,
-    maxOrdinal: Int,
-    excludeId: TypedId<AutoCategorizeRuleId>?
+      userId: TypedId<UserId>,
+      minOrdinal: Int,
+      maxOrdinal: Int,
+      excludeId: TypedId<AutoCategorizeRuleId>?
   ) {
     val whereClause = createOrdinalUpdateWhereClause(userId, minOrdinal, maxOrdinal, excludeId)
     queryFactory
-      .update(QAutoCategorizeRule.autoCategorizeRule)
-      .set(
-        QAutoCategorizeRule.autoCategorizeRule.ordinal,
-        QAutoCategorizeRule.autoCategorizeRule.ordinal.subtract(1))
-      .set(
-        QAutoCategorizeRule.autoCategorizeRule.version,
-        QAutoCategorizeRule.autoCategorizeRule.version.add(1))
-      .where(whereClause)
-      .execute()
+        .update(QAutoCategorizeRule.autoCategorizeRule)
+        .set(
+            QAutoCategorizeRule.autoCategorizeRule.ordinal,
+            QAutoCategorizeRule.autoCategorizeRule.ordinal.subtract(1))
+        .set(
+            QAutoCategorizeRule.autoCategorizeRule.version,
+            QAutoCategorizeRule.autoCategorizeRule.version.add(1))
+        .where(whereClause)
+        .execute()
   }
 
   private fun createOrdinalUpdateWhereClause(
-    userId: TypedId<UserId>,
-    minOrdinal: Int,
-    maxOrdinal: Int,
-    excludeId: TypedId<AutoCategorizeRuleId>?
+      userId: TypedId<UserId>,
+      minOrdinal: Int,
+      maxOrdinal: Int,
+      excludeId: TypedId<AutoCategorizeRuleId>?
   ): BooleanBuilder =
-    BooleanBuilder(QAutoCategorizeRule.autoCategorizeRule.userId.eq(userId))
-      .and(QAutoCategorizeRule.autoCategorizeRule.ordinal.loe(maxOrdinal))
-      .and(QAutoCategorizeRule.autoCategorizeRule.ordinal.goe(minOrdinal))
-      .let(
-        QueryDSLSupport.andIfNotNull(excludeId) { id ->
-          QAutoCategorizeRule.autoCategorizeRule.uid.ne(id)
-        })
+      BooleanBuilder(QAutoCategorizeRule.autoCategorizeRule.userId.eq(userId))
+          .and(QAutoCategorizeRule.autoCategorizeRule.ordinal.loe(maxOrdinal))
+          .and(QAutoCategorizeRule.autoCategorizeRule.ordinal.goe(minOrdinal))
+          .let(
+              QueryDSLSupport.andIfNotNull(excludeId) { id ->
+                QAutoCategorizeRule.autoCategorizeRule.uid.ne(id)
+              })
 
   override fun incrementOrdinals(
-    userId: TypedId<UserId>,
-    minOrdinal: Int,
-    maxOrdinal: Int,
-    excludeId: TypedId<AutoCategorizeRuleId>?
+      userId: TypedId<UserId>,
+      minOrdinal: Int,
+      maxOrdinal: Int,
+      excludeId: TypedId<AutoCategorizeRuleId>?
   ) {
     val whereClause = createOrdinalUpdateWhereClause(userId, minOrdinal, maxOrdinal, excludeId)
     queryFactory
-      .update(QAutoCategorizeRule.autoCategorizeRule)
-      .set(
-        QAutoCategorizeRule.autoCategorizeRule.ordinal,
-        QAutoCategorizeRule.autoCategorizeRule.ordinal.add(1))
-      .set(
-        QAutoCategorizeRule.autoCategorizeRule.version,
-        QAutoCategorizeRule.autoCategorizeRule.version.add(1))
-      .where(whereClause)
-      .execute()
+        .update(QAutoCategorizeRule.autoCategorizeRule)
+        .set(
+            QAutoCategorizeRule.autoCategorizeRule.ordinal,
+            QAutoCategorizeRule.autoCategorizeRule.ordinal.add(1))
+        .set(
+            QAutoCategorizeRule.autoCategorizeRule.version,
+            QAutoCategorizeRule.autoCategorizeRule.version.add(1))
+        .where(whereClause)
+        .execute()
   }
 }

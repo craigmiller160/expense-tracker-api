@@ -10,16 +10,16 @@ import java.math.BigDecimal
 import java.time.LocalDate
 
 data class LastRuleAppliedForTransaction(
-  val uid: TypedId<LastRuleAppliedId>,
-  val ruleId: TypedId<AutoCategorizeRuleId>,
-  val transactionId: TypedId<TransactionId>,
-  val userId: TypedId<UserId>,
-  val categoryId: TypedId<CategoryId>,
-  val categoryName: String,
-  val ordinal: Int,
-  val regex: String,
-  val startDate: LocalDate? = null,
-  val endDate: LocalDate? = null,
-  val minAmount: BigDecimal? = null,
-  val maxAmount: BigDecimal? = null
+    val uid: TypedId<LastRuleAppliedId>,
+    val ruleId: TypedId<AutoCategorizeRuleId>,
+    val transactionId: TypedId<TransactionId>,
+    val userId: TypedId<UserId>,
+    val categoryId: TypedId<CategoryId>,
+    val categoryName: String,
+    val ordinal: Int,
+    val regex: String,
+    val startDate: LocalDate? = null,
+    val endDate: LocalDate? = null,
+    val minAmount: BigDecimal? = null,
+    val maxAmount: BigDecimal? = null
 )

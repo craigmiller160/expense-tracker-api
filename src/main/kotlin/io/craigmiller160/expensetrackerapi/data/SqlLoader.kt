@@ -14,12 +14,12 @@ class SqlLoader(private val resourceLoader: ResourceLoader) {
   private val mustacheFactory = DefaultMustacheFactory()
 
   private fun openSqlReader(fileName: String): Reader =
-    resourceLoader.getResource("classpath:sql/$fileName").inputStream.reader()
+      resourceLoader.getResource("classpath:sql/$fileName").inputStream.reader()
   fun loadSql(fileName: String): String =
-    rawSqlCache.computeIfAbsent(fileName) { openSqlReader(fileName).readText() }
+      rawSqlCache.computeIfAbsent(fileName) { openSqlReader(fileName).readText() }
 
   fun loadSqlMustacheTemplate(fileName: String): MustacheSqlTemplate =
-    sqlMustacheCache.computeIfAbsent(fileName) {
-      mustacheFactory.compile(openSqlReader(fileName), fileName).let { MustacheSqlTemplate(it) }
-    }
+      sqlMustacheCache.computeIfAbsent(fileName) {
+        mustacheFactory.compile(openSqlReader(fileName), fileName).let { MustacheSqlTemplate(it) }
+      }
 }
