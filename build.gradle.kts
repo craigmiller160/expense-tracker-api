@@ -1,5 +1,6 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import com.diffplug.gradle.spotless.SpotlessExtension
+import org.springframework.boot.gradle.tasks.run.BootRun
 
 val projectGroup: String by project
 val projectVersion: String by project
@@ -80,4 +81,10 @@ configure<SpotlessExtension> {
     kotlin {
         ktfmt("0.43")
     }
+}
+
+tasks.withType<BootRun> {
+    args = listOf(
+        "--spring.profiles.active=dev"
+    )
 }
