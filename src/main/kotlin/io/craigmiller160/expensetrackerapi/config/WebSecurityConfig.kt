@@ -13,10 +13,6 @@ import org.springframework.security.web.DefaultSecurityFilterChain
 class WebSecurityConfig(
     private val keycloakOAuth2ResourceServerProvider: KeycloakOAuth2ResourceServerProvider
 ) {
-  //  @Bean
-  //  override fun sessionAuthenticationStrategy(): SessionAuthenticationStrategy =
-  //      NullAuthenticatedSessionStrategy()
-  //
   @Bean
   fun configure(http: HttpSecurity): DefaultSecurityFilterChain =
       http
@@ -32,10 +28,4 @@ class WebSecurityConfig(
                 .hasAnyRole("access")
           }
           .build()
-  //
-  //  override fun configure(auth: AuthenticationManagerBuilder) {
-  //    val provider = keycloakAuthenticationProvider()
-  //    provider.setGrantedAuthoritiesMapper(SimpleAuthorityMapper())
-  //    auth.authenticationProvider(provider)
-  //  }
 }
