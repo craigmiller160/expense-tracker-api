@@ -6,7 +6,7 @@ val projectGroup: String by project
 val projectVersion: String by project
 
 plugins {
-    id("org.springframework.boot") version "2.7.7"
+    id("org.springframework.boot") version "3.1.0"
     id("io.spring.dependency-management") version "1.1.0"
     kotlin("jvm")
     kotlin("plugin.spring")
@@ -38,7 +38,7 @@ dependencies {
     implementation("org.springdoc:springdoc-openapi-kotlin:$springDocVersion")
     implementation("org.springdoc:springdoc-openapi-ui:$springDocVersion")
     implementation("com.querydsl:querydsl-jpa:$queryDslVersion")
-    implementation("com.opencsv:opencsv:5.6")
+    implementation("com.opencsv:opencsv:5.7.1")
     testImplementation("com.github.javafaker:javafaker:1.0.2") {
         exclude("org.yaml", "snakeyaml")
     }
