@@ -16,12 +16,6 @@ plugins {
     `maven-publish`
 }
 
-dependencyManagement {
-    imports {
-        mavenBom("org.keycloak.bom:keycloak-adapter-bom:20.0.2")
-    }
-}
-
 group = projectGroup
 version = projectVersion
 java.sourceCompatibility = JavaVersion.VERSION_19
@@ -30,9 +24,9 @@ dependencies {
     val springDocVersion: String by project
     val queryDslVersion: String by project
 
+    implementation("io.craigmiller160:spring-keycloak-oauth2-resource-server:1.0.0-SNAPSHOT")
     testImplementation("io.craigmiller160:testcontainers-common:1.2.0-SNAPSHOT")
     implementation("org.springframework.boot:spring-boot-starter-validation")
-    testImplementation("org.keycloak:keycloak-admin-client")
     implementation("com.github.spullara.mustache.java:compiler:0.9.10")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springdoc:springdoc-openapi-kotlin:$springDocVersion")
@@ -42,7 +36,6 @@ dependencies {
     testImplementation("com.github.javafaker:javafaker:1.0.2") {
         exclude("org.yaml", "snakeyaml")
     }
-    implementation("org.keycloak:keycloak-spring-boot-starter")
     implementation("org.springframework.boot:spring-boot-starter-security")
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.springframework.boot:spring-boot-starter-web")
