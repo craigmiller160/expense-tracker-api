@@ -31,7 +31,6 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springdoc:springdoc-openapi-kotlin:$springDocVersion")
     implementation("org.springdoc:springdoc-openapi-ui:$springDocVersion")
-    implementation("com.querydsl:querydsl-jpa:$queryDslVersion")
     implementation("com.opencsv:opencsv:5.7.1")
     testImplementation("com.github.javafaker:javafaker:1.0.2") {
         exclude("org.yaml", "snakeyaml")
@@ -52,11 +51,14 @@ dependencies {
     implementation("io.github.craigmiller160:spring-fp-result-kt:2.0.0")
     implementation("io.craigmiller160:spring-web-utils:1.2.0")
     testImplementation("org.mockito.kotlin:mockito-kotlin:4.0.0")
-    kapt("com.querydsl:querydsl-apt:$queryDslVersion")
+
+    implementation("com.querydsl:querydsl-jpa:$queryDslVersion")
+    kapt("com.querydsl:querydsl-apt:$queryDslVersion:jpa")
 }
 
 kapt {
-    annotationProcessor("com.querydsl.apt.jpa.JPAAnnotationProcessor")
+    generateStubs = true
+//    annotationProcessor("com.querydsl.apt.jpa.JPAAnnotationProcessor")
 }
 
 tasks.withType<KotlinCompile> {
