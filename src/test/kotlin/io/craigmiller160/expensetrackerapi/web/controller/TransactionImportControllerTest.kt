@@ -15,9 +15,9 @@ import io.craigmiller160.expensetrackerapi.testutils.ResourceUtils
 import io.craigmiller160.expensetrackerapi.testutils.userTypedId
 import io.craigmiller160.expensetrackerapi.web.types.importing.ImportTypeResponse
 import io.kotest.assertions.arrow.core.shouldBeRight
+import jakarta.persistence.EntityManager
 import java.math.BigDecimal
 import java.time.LocalDate
-import javax.persistence.EntityManager
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach

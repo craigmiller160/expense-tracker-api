@@ -13,8 +13,8 @@ import io.craigmiller160.expensetrackerapi.testutils.DefaultUsers
 import io.craigmiller160.expensetrackerapi.testutils.userTypedId
 import io.craigmiller160.expensetrackerapi.web.types.CountAndOldest
 import io.craigmiller160.expensetrackerapi.web.types.NeedsAttentionResponse
+import jakarta.persistence.EntityManager
 import java.math.BigDecimal
-import javax.persistence.EntityManager
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired

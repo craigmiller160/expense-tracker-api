@@ -5,10 +5,10 @@ import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.AutoCategoriz
 import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.CategoryId
 import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.UserId
 import io.craigmiller160.expensetrackerapi.data.model.core.MutableTableEntity
+import jakarta.persistence.Entity
+import jakarta.persistence.Table
 import java.math.BigDecimal
 import java.time.LocalDate
-import javax.persistence.Entity
-import javax.persistence.Table
 
 @Entity
 @Table(name = "auto_categorize_rules")
