@@ -50,7 +50,7 @@ dependencies {
     }
     implementation("io.arrow-kt:arrow-core:1.1.2")
     implementation("io.github.craigmiller160:spring-fp-result-kt:2.0.0")
-    implementation("io.craigmiller160:spring-web-utils:1.2.0")
+    implementation("io.craigmiller160:spring-web-utils:1.3.0-SNAPSHOT")
     testImplementation("org.mockito.kotlin:mockito-kotlin:4.0.0")
 
     implementation("com.querydsl:querydsl-jpa:$queryDslVersion:jakarta")

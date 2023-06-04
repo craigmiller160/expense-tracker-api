@@ -11,7 +11,6 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
     basePackages = ["io.craigmiller160.webutils.controller", "io.craigmiller160.webutils.security"])
 class WebUtilsConfig(private val requestLogger: RequestLogger) : WebMvcConfigurer {
   override fun addInterceptors(registry: InterceptorRegistry) {
-    // TODO need to find a way to restore request logger
-    //    registry.addInterceptor(requestLogger).addPathPatterns("/**")
+    registry.addInterceptor(requestLogger).addPathPatterns("/**")
   }
 }
