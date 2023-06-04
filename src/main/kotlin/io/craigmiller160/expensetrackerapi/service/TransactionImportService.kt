@@ -7,8 +7,8 @@ import io.craigmiller160.expensetrackerapi.function.flatMapCatch
 import io.craigmiller160.expensetrackerapi.service.parsing.TransactionParserManager
 import io.craigmiller160.expensetrackerapi.web.types.importing.ImportTransactionsResponse
 import io.craigmiller160.expensetrackerapi.web.types.importing.ImportTypeResponse
+import jakarta.transaction.Transactional
 import java.io.InputStream
-import javax.transaction.Transactional
 import org.springframework.stereotype.Service
 
 @Service

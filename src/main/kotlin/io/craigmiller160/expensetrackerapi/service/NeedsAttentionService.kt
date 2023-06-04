@@ -6,7 +6,7 @@ import io.craigmiller160.expensetrackerapi.data.repository.NeedsAttentionReposit
 import io.craigmiller160.expensetrackerapi.function.TryEither
 import io.craigmiller160.expensetrackerapi.web.types.CountAndOldest
 import io.craigmiller160.expensetrackerapi.web.types.NeedsAttentionResponse
-import javax.transaction.Transactional
+import jakarta.transaction.Transactional
 import org.springframework.stereotype.Service
 
 @Service
