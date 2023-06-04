@@ -35,7 +35,7 @@ abstract class DatabaseRecord<T> : Persistable<TypedId<T>> {
   @PreUpdate open fun onPreUpdate() {}
 
   override fun equals(other: Any?): Boolean {
-    if (other !is TableEntity<*>) return false
+    if (other !is DatabaseRecord<*>) return false
     return other.uid == this.uid
   }
   override fun hashCode(): Int = this.uid.hashCode()
