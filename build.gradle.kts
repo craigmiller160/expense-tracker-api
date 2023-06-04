@@ -53,8 +53,8 @@ dependencies {
     implementation("io.craigmiller160:spring-web-utils:1.2.0")
     testImplementation("org.mockito.kotlin:mockito-kotlin:4.0.0")
 
-    implementation("com.querydsl:querydsl-jpa:$queryDslVersion")
-//    kapt("com.querydsl:querydsl-apt:$queryDslVersion:jpa")
+    implementation("com.querydsl:querydsl-jpa:$queryDslVersion:jakarta")
+//    kapt("com.querydsl:querydsl-apt:$queryDslVersion:jpa:jakarta")
 }
 
 kapt {
