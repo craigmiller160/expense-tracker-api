@@ -2,6 +2,7 @@ package io.craigmiller160.expensetrackerapi.data.model.core
 
 import io.craigmiller160.expensetrackerapi.common.data.typedid.TypedId
 import io.craigmiller160.expensetrackerapi.common.data.typedid.jpatype.TypedIdConverter
+import jakarta.persistence.Column
 import jakarta.persistence.Convert
 import jakarta.persistence.Id
 import jakarta.persistence.MappedSuperclass
@@ -12,7 +13,10 @@ import org.springframework.data.domain.Persistable
 
 @MappedSuperclass
 abstract class DatabaseRecord<T> : Persistable<TypedId<T>> {
-  @Id @Convert(converter = TypedIdConverter::class) var uid: TypedId<T> = TypedId()
+  @Id
+  @Convert(converter = TypedIdConverter::class)
+  @Column(name = "uid", columnDefinition = "uuid")
+  var uid: TypedId<T> = TypedId()
   @Transient private var innerIsNew: Boolean = true
   override fun getId(): TypedId<T> = uid
 

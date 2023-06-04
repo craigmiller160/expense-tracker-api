@@ -5,7 +5,9 @@ import jakarta.persistence.AttributeConverter
 import java.util.UUID
 
 class TypedIdConverter : AttributeConverter<TypedId<*>, UUID> {
-  override fun convertToDatabaseColumn(attribute: TypedId<*>?): UUID? = attribute?.uuid
+  override fun convertToDatabaseColumn(attribute: TypedId<*>?): UUID? {
+    return attribute?.uuid
+  }
 
   override fun convertToEntityAttribute(dbData: UUID?): TypedId<*>? =
       dbData?.let { TypedId<Any>(it) }
