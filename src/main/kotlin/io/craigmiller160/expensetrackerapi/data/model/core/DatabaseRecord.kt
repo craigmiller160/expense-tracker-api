@@ -12,11 +12,9 @@ import jakarta.persistence.PreUpdate
 import org.springframework.data.domain.Persistable
 
 @MappedSuperclass
+@Convert(attributeName = "uid", converter = TypedIdConverter::class)
 abstract class DatabaseRecord<T> : Persistable<TypedId<T>> {
-  @Id
-  @Convert(converter = TypedIdConverter::class)
-  @Column(name = "uid", columnDefinition = "uuid")
-  var uid: TypedId<T> = TypedId()
+  @Id @Column(name = "uid", columnDefinition = "uuid") var uid: TypedId<T> = TypedId()
   @Transient private var innerIsNew: Boolean = true
   override fun getId(): TypedId<T> = uid
 
