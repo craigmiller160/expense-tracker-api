@@ -54,7 +54,7 @@ dependencies {
     testImplementation("org.mockito.kotlin:mockito-kotlin:4.0.0")
 
     implementation("com.querydsl:querydsl-jpa:$queryDslVersion:jakarta")
-//    kapt("com.querydsl:querydsl-apt:$queryDslVersion:jpa:jakarta")
+    kapt("com.querydsl:querydsl-apt:$queryDslVersion:jakarta")
 }
 
 kapt {
