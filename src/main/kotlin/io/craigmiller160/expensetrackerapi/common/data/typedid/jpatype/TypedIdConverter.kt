@@ -8,10 +8,18 @@ import java.util.UUID
 
 @Converter(autoApply = true)
 class TypedIdConverter : AttributeConverter<TypedId<*>, UUID> {
-  override fun convertToDatabaseColumn(attribute: TypedId<*>?): UUID? = attribute?.uuid
+  init {
+    println("CREATING CONVERTER")
+  }
+  override fun convertToDatabaseColumn(attribute: TypedId<*>?): UUID? {
+    println("CONVERTING TO DB")
+    return attribute?.uuid
+  }
 
-  override fun convertToEntityAttribute(dbData: UUID?): TypedId<*>? =
-      dbData?.let { TypedId<Any>(it) }
+  override fun convertToEntityAttribute(dbData: UUID?): TypedId<*>? {
+    println("CONVERTING FROM DB")
+    return dbData?.let { TypedId<Any>(it) }
+  }
 }
 
 class TypedIdConverter2 : AttributeConverter<TypedId<*>, ByteArray> {
