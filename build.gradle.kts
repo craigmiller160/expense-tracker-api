@@ -26,6 +26,7 @@ dependencies {
 
     implementation("io.craigmiller160:spring-keycloak-oauth2-resource-server:1.0.0-SNAPSHOT")
     testImplementation("io.craigmiller160:testcontainers-common:1.2.0-SNAPSHOT")
+    implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
     implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("com.github.spullara.mustache.java:compiler:0.9.10")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
@@ -53,7 +54,7 @@ dependencies {
     testImplementation("org.mockito.kotlin:mockito-kotlin:4.0.0")
 
     implementation("com.querydsl:querydsl-jpa:$queryDslVersion")
-    kapt("com.querydsl:querydsl-apt:$queryDslVersion:jpa")
+//    kapt("com.querydsl:querydsl-apt:$queryDslVersion:jpa")
 }
 
 kapt {
