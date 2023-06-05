@@ -55,6 +55,12 @@ dependencies {
 
     implementation("com.querydsl:querydsl-jpa:$queryDslVersion:jakarta")
     kapt("com.querydsl:querydsl-apt:$queryDslVersion:jakarta")
+
+    constraints {
+        implementation("org.hibernate:hibernate-core:6.2.4.Final") {
+            because("Trying to fix inheritance bug with Types")
+        }
+    }
 }
 
 kapt {
