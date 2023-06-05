@@ -4,15 +4,12 @@ import io.craigmiller160.expensetrackerapi.common.data.typedid.TypedId
 import org.hibernate.engine.spi.SharedSessionContractImplementor
 import org.hibernate.internal.util.IndexedConsumer
 import org.hibernate.metamodel.mapping.Bindable
-import org.hibernate.type.AbstractSingleColumnStandardBasicType
+import org.hibernate.type.AbstractStandardBasicType
 import org.hibernate.type.descriptor.jdbc.UUIDJdbcType
 
 class TypedIdJpaType :
-    AbstractSingleColumnStandardBasicType<TypedId<*>>(
-        UUIDJdbcType.INSTANCE, TypedIdJavaType.INSTANCE) {
-  override fun getName(): String {
-    TODO("Not yet implemented")
-  }
+    AbstractStandardBasicType<TypedId<*>>(UUIDJdbcType.INSTANCE, TypedIdJavaType.INSTANCE) {
+  override fun getName(): String = "typed-id"
 
   override fun forEachJdbcType(offset: Int, action: IndexedConsumer<*>?): Int {
     TODO("Not yet implemented")
