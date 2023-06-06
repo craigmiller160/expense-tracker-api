@@ -27,7 +27,6 @@ private fun addCategoryIdsParam(
   else params
 }
 
-// TODO update sql
 private fun executeMustacheTemplate(
     categoryIdType: ReportCategoryIdFilterType,
     categoryIds: List<TypedId<CategoryId>>
