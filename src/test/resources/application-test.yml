@@ -1,8 +1,6 @@
 spring:
-  profiles:
-    active: test
   datasource:
-    url: ${testcontainers.common.postgres.url}
+    url: ${testcontainers.common.postgres.jdbcUrl}
     username: ${testcontainers.common.postgres.user}
     password: ${testcontainers.common.postgres.password}
   jpa:
