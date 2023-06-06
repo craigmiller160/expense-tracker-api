@@ -32,9 +32,9 @@ private fun executeMustacheTemplate(
     categoryIds: List<TypedId<CategoryId>>
 ): (MustacheSqlTemplate) -> String = { template ->
   if (categoryIds.isNotEmpty() && ReportCategoryIdFilterType.INCLUDE == categoryIdType) {
-    template.executeWithParams("excludeCategoryIds")
-  } else if (categoryIds.isNotEmpty() && ReportCategoryIdFilterType.EXCLUDE == categoryIdType) {
     template.executeWithParams("includeCategoryIds")
+  } else if (categoryIds.isNotEmpty() && ReportCategoryIdFilterType.EXCLUDE == categoryIdType) {
+    template.executeWithParams("excludeCategoryIds")
   } else {
     template.executeWithParams()
   }
