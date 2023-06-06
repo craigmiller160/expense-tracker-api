@@ -10,6 +10,7 @@ plugins {
     id("io.spring.dependency-management") version "1.1.0"
     kotlin("jvm")
     kotlin("plugin.spring")
+    kotlin("plugin.jpa")
     kotlin("kapt")
     id("io.craigmiller160.gradle.defaults") version "1.1.0"
     id("com.diffplug.spotless") version "6.17.0"
@@ -56,7 +57,7 @@ dependencies {
         exclude("org.junit.vintage", "junit-vintage-engine")
     }
     implementation("io.arrow-kt:arrow-core:1.1.2")
-    implementation("io.github.craigmiller160:spring-fp-result-kt:2.0.0")
+    implementation("io.github.craigmiller160:spring-arrow-kt:1.0.3")
     implementation("io.craigmiller160:spring-web-utils:1.2.0")
     testImplementation("org.mockito.kotlin:mockito-kotlin:4.0.0")
     kapt("com.querydsl:querydsl-apt:$queryDslVersion")
