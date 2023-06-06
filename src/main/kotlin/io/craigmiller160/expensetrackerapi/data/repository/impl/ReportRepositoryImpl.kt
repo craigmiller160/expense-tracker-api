@@ -44,14 +44,14 @@ class ReportRepositoryImpl(
       userId: TypedId<UserId>,
       request: ReportRequest
   ): Page<SpendingByMonth> {
-    val spendingByMonth = getSpendingByMonth(userId, request, request.excludeCategoryIds)
-    val spendingByMonthCount = getSpendingByMonthCount(userId, request.excludeCategoryIds)
+    val spendingByMonth = getSpendingByMonth(userId, request, request.categoryIds)
+    val spendingByMonthCount = getSpendingByMonthCount(userId, request.categoryIds)
     val months = spendingByMonth.map { it.month }
 
     val fullResults =
         if (months.isNotEmpty()) {
           val spendingByCategory =
-              getSpendingByCategoryForMonths(userId, months, request.excludeCategoryIds)
+              getSpendingByCategoryForMonths(userId, months, request.categoryIds)
           spendingByMonth.map { monthRecord ->
             monthRecord.copy(
                 categories =
