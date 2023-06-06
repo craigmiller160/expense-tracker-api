@@ -12,6 +12,7 @@ class TypedIdJpaType :
   override fun getName(): String = "typed-id"
 
   override fun forEachJdbcType(offset: Int, action: IndexedConsumer<*>?): Int {
+    super.forEachJdbcType(offset, action)
     TODO("Not yet implemented")
   }
 
