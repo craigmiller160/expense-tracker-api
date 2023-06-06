@@ -7,6 +7,6 @@ import io.craigmiller160.expensetrackerapi.web.types.PageableRequest
 data class ReportRequest(
     override val pageNumber: Int,
     override val pageSize: Int,
-    val categoryIdType: ReportCategoryIdFilterType,
+    val categoryIdType: ReportCategoryIdFilterType = ReportCategoryIdFilterType.INCLUDE,
     val categoryIds: List<TypedId<CategoryId>> = listOf()
 ) : PageableRequest

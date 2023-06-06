@@ -209,7 +209,7 @@ constructor(
                     })
     mockMvc
         .get(
-            "/reports?pageNumber=0&pageSize=100&excludeCategoryIds=${categories[0].id},${categories[1].id}") {
+            "/reports?pageNumber=0&pageSize=100&categoryIds=${categories[0].id},${categories[1].id}") {
               secure = true
               header("Authorization", "Bearer $token")
             }
@@ -240,7 +240,7 @@ constructor(
                 })
 
     mockMvc
-        .get("/reports?pageNumber=0&pageSize=100&excludeCategoryIds=${categories[1].id}") {
+        .get("/reports?pageNumber=0&pageSize=100&categoryIds=${categories[1].id}") {
           secure = true
           header("Authorization", "Bearer $token")
         }
