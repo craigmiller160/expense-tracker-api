@@ -57,7 +57,7 @@ dependencies {
         exclude("org.junit.vintage", "junit-vintage-engine")
     }
     implementation("io.arrow-kt:arrow-core:1.1.2")
-    implementation("io.github.craigmiller160:spring-fp-result-kt:2.0.0")
+    implementation("io.github.craigmiller160:spring-arrow-kt:1.0.3")
     implementation("io.craigmiller160:spring-web-utils:1.2.0")
     testImplementation("org.mockito.kotlin:mockito-kotlin:4.0.0")
     kapt("com.querydsl:querydsl-apt:$queryDslVersion")
