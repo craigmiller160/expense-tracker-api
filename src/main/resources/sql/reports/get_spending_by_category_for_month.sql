@@ -8,7 +8,7 @@ AND tv.user_id = :userId
 AND (tv.category_id IS NULL OR tv.category_id NOT IN (:categoryIds))
 {{/excludeCategoryIds}}
 {{#includeCategoryIds}}
-AND (tv.category_id IS NULL OR tv.category_id IN (:categoryIds))
+AND tv.category_id IN (:categoryIds)
 {{/includeCategoryIds}}
 GROUP BY tv.category_name, c.color
 ORDER BY tv.category_name ASC;

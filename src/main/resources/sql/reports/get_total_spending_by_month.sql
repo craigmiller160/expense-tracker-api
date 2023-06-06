@@ -5,7 +5,7 @@ WHERE user_id = :userId
 AND (category_id IS NULL OR category_id NOT IN (:categoryIds))
 {{/excludeCategoryIds}}
 {{#includeCategoryIds}}
-AND (category_id IS NULL OR category_id IN (:categoryIds))
+AND category_id IN (:categoryIds)
 {{/includeCategoryIds}}
 GROUP BY month
 ORDER BY month DESC
