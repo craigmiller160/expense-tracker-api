@@ -281,4 +281,36 @@ constructor(
           content { json(objectMapper.writeValueAsString(response), true) }
         }
   }
+
+  @Test
+  fun getReports_includeCategory() {
+    val response =
+        expectedResponse.copy(
+            reports =
+                expectedResponse.reports.mapIndexed { index, report ->
+                  val newTotal =
+                      report.total -
+                          when (index) {
+                            0 -> transactions[3].amount
+                            else -> transactions[1].amount
+                          }
+                  report.copy(
+                      categories =
+                          report.categories
+                              .filter { it.name == categories[1].name }
+                              .map { it.copy(percent = it.amount / newTotal) },
+                      total = newTotal)
+                })
+
+    mockMvc
+        .get(
+            "/reports?pageNumber=0&pageSize=100&categoryIdType=INCLUDE&categoryIds=${categories[1].id}") {
+              secure = true
+              header("Authorization", "Bearer $token")
+            }
+        .andExpect {
+          status { isOk() }
+          content { json(objectMapper.writeValueAsString(response), true) }
+        }
+  }
 }
