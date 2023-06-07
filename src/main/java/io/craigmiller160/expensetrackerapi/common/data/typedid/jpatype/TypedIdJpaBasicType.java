@@ -6,10 +6,10 @@ import org.hibernate.type.descriptor.jdbc.UUIDJdbcType;
 import org.springframework.stereotype.Component;
 
 @Component
-public class TypedIdJpaType extends AbstractSingleColumnStandardBasicType<TypedId<?>> {
-  public static final TypedIdJpaType INSTANCE = new TypedIdJpaType();
+public class TypedIdJpaBasicType extends AbstractSingleColumnStandardBasicType<TypedId<?>> {
+  public static final TypedIdJpaBasicType INSTANCE = new TypedIdJpaBasicType();
 
-  public TypedIdJpaType() {
+  public TypedIdJpaBasicType() {
     super(UUIDJdbcType.INSTANCE, TypedIdJavaType.getINSTANCE());
   }
 
