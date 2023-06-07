@@ -9,7 +9,5 @@ data class TypedId<T>(val uuid: UUID = UUID.randomUUID()) : Serializable, Compar
   constructor(id: String) : this(UUID.fromString(id))
 
   override fun compareTo(other: TypedId<T>): Int = this.uuid.compareTo(other.uuid)
-
-  // TODO revert this
-  override fun toString(): String = "HELLO" + uuid.toString()
+  override fun toString(): String = uuid.toString()
 }
