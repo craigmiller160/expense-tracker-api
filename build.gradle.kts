@@ -84,6 +84,9 @@ configure<SpotlessExtension> {
     kotlin {
         ktfmt("0.43")
     }
+    java {
+        googleJavaFormat()
+    }
 }
 
 tasks.withType<BootRun> {
