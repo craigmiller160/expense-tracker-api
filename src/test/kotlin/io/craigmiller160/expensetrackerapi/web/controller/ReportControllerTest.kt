@@ -13,6 +13,7 @@ import io.craigmiller160.expensetrackerapi.testutils.userTypedId
 import io.craigmiller160.expensetrackerapi.web.types.report.ReportCategoryResponse
 import io.craigmiller160.expensetrackerapi.web.types.report.ReportMonthResponse
 import io.craigmiller160.expensetrackerapi.web.types.report.ReportPageResponse
+import java.math.BigDecimal
 import java.time.LocalDate
 import javax.persistence.EntityManager
 import org.junit.jupiter.api.BeforeEach
@@ -288,17 +289,12 @@ constructor(
         expectedResponse.copy(
             reports =
                 expectedResponse.reports.mapIndexed { index, report ->
-                  val newTotal =
-                      report.total -
-                          when (index) {
-                            0 -> transactions[3].amount
-                            else -> transactions[1].amount
-                          }
+                  val newTotal = if (index == 0) transactions[3].amount else transactions[1].amount
                   report.copy(
                       categories =
                           report.categories
                               .filter { it.name == categories[1].name }
-                              .map { it.copy(percent = it.amount / newTotal) },
+                              .map { it.copy(percent = BigDecimal("1.0")) },
                       total = newTotal)
                 })
 
