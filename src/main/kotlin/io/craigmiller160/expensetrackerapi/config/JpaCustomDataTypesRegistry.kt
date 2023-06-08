@@ -8,14 +8,12 @@ import org.hibernate.boot.spi.SessionFactoryBuilderImplementor
 
 /** This is registered in META-INF/services/org.hibernate.boot.spi.SessionFactoryBuilderFactory */
 class JpaCustomDataTypesRegistry : SessionFactoryBuilderFactory {
-  init {
-    println("HELLO WORLD") // TODO delete this
-  }
   override fun getSessionFactoryBuilder(
       metadata: MetadataImplementor,
       defaultBuilder: SessionFactoryBuilderImplementor
   ): SessionFactoryBuilder {
-    metadata.typeConfiguration.basicTypeRegistry.register(TypedIdJpaBasicType.INSTANCE)
+    println("REGISTERING") // TODO delete this
+    metadata.typeConfiguration.basicTypeRegistry.register(TypedIdJpaBasicType.INSTANCE, "typed-id")
     return defaultBuilder
   }
 }

@@ -6,11 +6,18 @@ import jakarta.persistence.MappedSuperclass
 import jakarta.persistence.PostLoad
 import jakarta.persistence.PrePersist
 import jakarta.persistence.PreUpdate
+import org.hibernate.annotations.Parameter
+import org.hibernate.annotations.Type
+import org.hibernate.usertype.UserTypeLegacyBridge
 import org.springframework.data.domain.Persistable
 
 @MappedSuperclass
 abstract class DatabaseRecord<T> : Persistable<TypedId<T>> {
-  @Id var uid: TypedId<T> = TypedId()
+  @Id
+  @Type(
+      value = UserTypeLegacyBridge::class,
+      parameters = [Parameter(name = UserTypeLegacyBridge.TYPE_NAME_PARAM_KEY, value = "typed-id")])
+  var uid: TypedId<T> = TypedId()
   @Transient private var innerIsNew: Boolean = true
   override fun getId(): TypedId<T> = uid
 
