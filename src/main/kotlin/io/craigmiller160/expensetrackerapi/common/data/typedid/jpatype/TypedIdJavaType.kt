@@ -6,9 +6,9 @@ import org.hibernate.type.descriptor.java.AbstractClassJavaType
 import org.hibernate.type.descriptor.java.UUIDJavaType
 
 class TypedIdJavaType : AbstractClassJavaType<TypedId<*>>(TypedId::class.java) {
-  override fun <X : Any?> unwrap(value: TypedId<*>?, type: Class<X>, options: WrapperOptions?): X =
-      UUIDJavaType.INSTANCE.unwrap(value?.uuid, type, options)
+  override fun <X : Any?> unwrap(value: TypedId<*>?, type: Class<X>, options: WrapperOptions?): X? =
+      value?.let { UUIDJavaType.INSTANCE.unwrap(it.uuid, type, options) }
 
-  override fun <X : Any?> wrap(value: X, options: WrapperOptions?): TypedId<*> =
-      TypedId<Any>(UUIDJavaType.INSTANCE.wrap(value, options))
+  override fun <X : Any?> wrap(value: X?, options: WrapperOptions?): TypedId<*>? =
+      value?.let { TypedId<Any>(UUIDJavaType.INSTANCE.wrap(it, options)) }
 }
