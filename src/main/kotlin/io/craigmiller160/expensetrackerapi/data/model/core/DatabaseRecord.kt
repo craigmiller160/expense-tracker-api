@@ -1,22 +1,22 @@
 package io.craigmiller160.expensetrackerapi.data.model.core
 
 import io.craigmiller160.expensetrackerapi.common.data.typedid.TypedId
+import io.craigmiller160.expensetrackerapi.common.data.typedid.jpatype.TypedIdJavaType
 import jakarta.persistence.Id
 import jakarta.persistence.MappedSuperclass
 import jakarta.persistence.PostLoad
 import jakarta.persistence.PrePersist
 import jakarta.persistence.PreUpdate
-import org.hibernate.annotations.Parameter
-import org.hibernate.annotations.Type
-import org.hibernate.usertype.UserTypeLegacyBridge
+import org.hibernate.annotations.JavaType
+import org.hibernate.annotations.JdbcType
+import org.hibernate.type.descriptor.jdbc.UUIDJdbcType
 import org.springframework.data.domain.Persistable
 
 @MappedSuperclass
 abstract class DatabaseRecord<T> : Persistable<TypedId<T>> {
   @Id
-  @Type(
-      value = UserTypeLegacyBridge::class,
-      parameters = [Parameter(name = UserTypeLegacyBridge.TYPE_NAME_PARAM_KEY, value = "typed-id")])
+  @JavaType(TypedIdJavaType::class)
+  @JdbcType(UUIDJdbcType::class)
   var uid: TypedId<T> = TypedId()
   @Transient private var innerIsNew: Boolean = true
   override fun getId(): TypedId<T> = uid
