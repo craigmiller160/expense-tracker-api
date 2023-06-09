@@ -5,11 +5,7 @@ import org.hibernate.type.descriptor.WrapperOptions
 import org.hibernate.type.descriptor.java.AbstractClassJavaType
 import org.hibernate.type.descriptor.java.UUIDJavaType
 
-class TypedIdJavaType private constructor() :
-    AbstractClassJavaType<TypedId<*>>(TypedId::class.java) {
-  companion object {
-    @JvmStatic val INSTANCE = TypedIdJavaType()
-  }
+class TypedIdJavaType : AbstractClassJavaType<TypedId<*>>(TypedId::class.java) {
   override fun <X : Any?> unwrap(value: TypedId<*>?, type: Class<X>, options: WrapperOptions?): X =
       UUIDJavaType.INSTANCE.unwrap(value?.uuid, type, options)
 
