@@ -6,6 +6,7 @@ import io.craigmiller160.expensetrackerapi.common.utils.DateUtils
 import io.craigmiller160.expensetrackerapi.web.types.PageableRequest
 import io.craigmiller160.expensetrackerapi.web.types.SortDirection
 import io.craigmiller160.expensetrackerapi.web.types.SortableRequest
+import io.swagger.v3.oas.annotations.Hidden
 import jakarta.validation.constraints.AssertTrue
 import java.time.LocalDate
 import org.springframework.format.annotation.DateTimeFormat
@@ -24,6 +25,7 @@ data class SearchTransactionsRequest(
     val categoryIds: Set<TypedId<CategoryId>>? = null,
 ) : PageableRequest, SortableRequest<TransactionSortKey> {
 
+  @Hidden
   @AssertTrue(message = "Cannot set WITHOUT_CATEGORY and specify categoryIds")
   fun isCategoryPropsValid(): Boolean {
     if (isCategorized == false) {
