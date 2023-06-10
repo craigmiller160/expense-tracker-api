@@ -16,7 +16,7 @@ AND CASE
     )
     ELSE true = true
 END
-GROUP BY tv.month
-ORDER BY tv.month DESC
+GROUP BY month
+ORDER BY month DESC
 OFFSET :offset
 LIMIT :limit;
