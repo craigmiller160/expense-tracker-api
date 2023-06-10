@@ -12,7 +12,6 @@ import io.craigmiller160.expensetrackerapi.web.types.report.ReportCategoryIdFilt
 import io.craigmiller160.expensetrackerapi.web.types.report.ReportRequest
 import jakarta.transaction.Transactional
 import java.time.LocalDate
-import java.util.UUID
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.PageRequest
@@ -145,7 +144,7 @@ class ReportRepositoryImpl(
       categoryIds: List<TypedId<CategoryId>>
   ): MapSqlParameterSource {
     if (categoryIds.isEmpty()) {
-      return this.addValue("categoryIdType", "ALL").addValue("categoryIds", listOf<UUID>())
+      return this.addValue("categoryIdType", "ALL").addValue("categoryIds", null)
     }
 
     return this.addValue("categoryIdType", categoryIdType.name)
