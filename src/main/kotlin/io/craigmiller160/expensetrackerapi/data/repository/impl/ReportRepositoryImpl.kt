@@ -11,6 +11,7 @@ import io.craigmiller160.expensetrackerapi.data.repository.ReportRepository
 import io.craigmiller160.expensetrackerapi.web.types.report.ReportCategoryIdFilterType
 import io.craigmiller160.expensetrackerapi.web.types.report.ReportRequest
 import jakarta.transaction.Transactional
+import java.lang.IllegalArgumentException
 import java.time.LocalDate
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageImpl
@@ -143,18 +144,42 @@ class ReportRepositoryImpl(
       categoryIdType: ReportCategoryIdFilterType,
       categoryIds: List<TypedId<CategoryId>>
   ): MapSqlParameterSource {
-    if (categoryIds.isEmpty()) {
-      return this.addValue("categoryIdType", "NONE")
-          .addValue("unknownCategoryType", "NONE")
-          .addValue("categoryIds", null)
-    }
-
     val (unknownCategoryIds, otherCategoryIds) =
         categoryIds.partition { categoryId -> CategoryConstants.UNKNOWN_CATEGORY.id == categoryId }
-    val unknownCategoryType = if (unknownCategoryIds.isNotEmpty()) categoryIdType.name else "NONE"
+    val queryType =
+        categoryIdType.toQueryType(unknownCategoryIds.isNotEmpty(), otherCategoryIds.isNotEmpty())
 
-    return this.addValue("categoryIdType", categoryIdType.name)
-        .addValue("unknownCategoryType", unknownCategoryType)
-        .addValue("categoryIds", otherCategoryIds.map { it.uuid })
+    val queryCategoryIds = otherCategoryIds.map { it.uuid }.ifEmpty { null }
+
+    return this.addValue("categoryIdType", queryType.name).addValue("categoryIds", queryCategoryIds)
   }
 }
+
+private enum class ReportQueryCategoryFilterType {
+  INCLUDE_NO_UNKNOWN,
+  INCLUDE_WITH_UNKNOWN,
+  EXCLUDE_NO_UNKNOWN,
+  EXCLUDE_WITH_UNKNOWN,
+  ALL_NO_UNKNOWN,
+  ALL_WITH_UNKNOWN
+}
+
+private fun ReportCategoryIdFilterType.toQueryType(
+    hasUnknownId: Boolean,
+    hasOtherIds: Boolean
+): ReportQueryCategoryFilterType =
+    if (!hasOtherIds && hasUnknownId) {
+      ReportQueryCategoryFilterType.ALL_WITH_UNKNOWN
+    } else if (!hasOtherIds && !hasUnknownId) {
+      ReportQueryCategoryFilterType.ALL_NO_UNKNOWN
+    } else if (ReportCategoryIdFilterType.INCLUDE == this && hasUnknownId) {
+      ReportQueryCategoryFilterType.INCLUDE_WITH_UNKNOWN
+    } else if (ReportCategoryIdFilterType.INCLUDE == this && !hasUnknownId) {
+      ReportQueryCategoryFilterType.INCLUDE_NO_UNKNOWN
+    } else if (ReportCategoryIdFilterType.EXCLUDE == this && hasUnknownId) {
+      ReportQueryCategoryFilterType.EXCLUDE_WITH_UNKNOWN
+    } else if (ReportCategoryIdFilterType.EXCLUDE == this && !hasUnknownId) {
+      ReportQueryCategoryFilterType.EXCLUDE_NO_UNKNOWN
+    } else {
+      throw IllegalArgumentException("Invalid combination of query filter values")
+    }
