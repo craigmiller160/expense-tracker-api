@@ -17,22 +17,26 @@ plugins {
     `maven-publish`
 }
 
+dependencyManagement {
+    imports {
+        mavenBom("org.springdoc:springdoc-openapi:2.0.3")
+    }
+}
+
 group = projectGroup
 version = projectVersion
 java.sourceCompatibility = JavaVersion.VERSION_19
 
 dependencies {
-    val springDocVersion: String by project
     val queryDslVersion: String by project
 
     implementation("io.craigmiller160:spring-keycloak-oauth2-resource-server:1.0.0-SNAPSHOT")
     testImplementation("io.craigmiller160:testcontainers-common:1.2.0-SNAPSHOT")
+    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui")
     implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
     implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("com.github.spullara.mustache.java:compiler:0.9.10")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
-    implementation("org.springdoc:springdoc-openapi-kotlin:$springDocVersion")
-    implementation("org.springdoc:springdoc-openapi-ui:$springDocVersion")
     implementation("com.opencsv:opencsv:5.7.1")
     testImplementation("com.github.javafaker:javafaker:1.0.2") {
         exclude("org.yaml", "snakeyaml")
@@ -66,7 +70,6 @@ dependencies {
 
 kapt {
     generateStubs = true
-//    annotationProcessor("com.querydsl.apt.jpa.JPAAnnotationProcessor")
 }
 
 tasks.withType<KotlinCompile> {
