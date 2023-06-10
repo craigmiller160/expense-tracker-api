@@ -313,7 +313,10 @@ constructor(
   @Test
   fun getReports_includeUnknown() {
     val unknownCategoryId = CategoryConstants.UNKNOWN_CATEGORY.id
-    val response: ReportPageResponse = TODO()
+    val category = expectedResponse.reports[1].categories[4].copy(percent = BigDecimal("1.0"))
+    val report =
+        expectedResponse.reports[1].copy(total = category.amount, categories = listOf(category))
+    val response = expectedResponse.copy(totalItems = 1, reports = listOf(report))
     mockMvc
         .get(
             "/reports?pageNumber=0&pageSize=100&categoryIdType=INCLUDE&categoryIds=$unknownCategoryId") {
