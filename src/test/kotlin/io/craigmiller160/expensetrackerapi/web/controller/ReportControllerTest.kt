@@ -403,6 +403,50 @@ constructor(
 
   @Test
   fun getReports_excludeCategoryAndUnknown() {
-    TODO()
+    val month2Total = expectedResponse.reports[0].categories[0].amount
+    val month2Report =
+        expectedResponse.reports[0].copy(
+            total = month2Total,
+            categories =
+                listOf(expectedResponse.reports[0].categories[0].copy(percent = BigDecimal("1.0"))))
+
+    val month1Total =
+        expectedResponse.reports[1].total -
+            expectedResponse.reports[1].categories[1].amount -
+            expectedResponse.reports[1].categories[4].amount
+    val month1Report =
+        expectedResponse.reports[1].copy(
+            total = month1Total,
+            categories =
+                listOf(
+                    expectedResponse.reports[1]
+                        .categories[0]
+                        .copy(
+                            percent =
+                                expectedResponse.reports[1].categories[0].amount / month1Total),
+                    expectedResponse.reports[1]
+                        .categories[2]
+                        .copy(
+                            percent =
+                                expectedResponse.reports[1].categories[2].amount / month1Total),
+                    expectedResponse.reports[1]
+                        .categories[3]
+                        .copy(
+                            percent =
+                                expectedResponse.reports[1].categories[3].amount / month1Total)))
+
+    val response = expectedResponse.copy(reports = listOf(month2Report, month1Report))
+
+    val unknownCategoryId = CategoryConstants.UNKNOWN_CATEGORY.id
+    val categoryIds = listOf(unknownCategoryId, categories[1].id).joinToString(",")
+    mockMvc
+        .get("/reports?pageNumber=0&pageSize=100&categoryIdType=EXCLUDE&categoryIds=$categoryIds") {
+          secure = true
+          header("Authorization", "Bearer $token")
+        }
+        .andExpect {
+          status { isOk() }
+          content { json(objectMapper.writeValueAsString(response), true) }
+        }
   }
 }
