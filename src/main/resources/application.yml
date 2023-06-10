@@ -27,16 +27,13 @@ spring:
     multipart:
       max-file-size: 10MB
       max-request-size: 11MB
-
-keycloak:
-  realm: apps-dev
-  auth-server-url: https://auth-craigmiller160.ddns.net
-  ssl-required: all
-  resource: expense-tracker-api
-  use-resource-role-mappings: true
-  credentials:
-    secret: CQ60kzXcV7F31JfW8dX2MINjVIKOIxpJ
-  bearer-only: true
+  security:
+    keycloak:
+      oauth2:
+        resourceserver:
+          host: https://auth-craigmiller160.ddns.net
+          realm: apps-dev
+          client-id: expense-tracker-api
 
 logging:
   level:

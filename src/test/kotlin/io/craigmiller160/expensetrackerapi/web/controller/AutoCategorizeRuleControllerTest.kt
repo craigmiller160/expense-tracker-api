@@ -18,9 +18,9 @@ import io.craigmiller160.expensetrackerapi.web.types.rules.AutoCategorizeRulePag
 import io.craigmiller160.expensetrackerapi.web.types.rules.AutoCategorizeRuleRequest
 import io.craigmiller160.expensetrackerapi.web.types.rules.AutoCategorizeRuleResponse
 import io.craigmiller160.expensetrackerapi.web.types.rules.MaxOrdinalResponse
+import jakarta.persistence.EntityManager
 import java.math.BigDecimal
 import java.time.LocalDate
-import javax.persistence.EntityManager
 import org.assertj.core.api.Assertions.assertThat
 import org.hamcrest.Matchers.equalTo
 import org.junit.jupiter.api.BeforeEach

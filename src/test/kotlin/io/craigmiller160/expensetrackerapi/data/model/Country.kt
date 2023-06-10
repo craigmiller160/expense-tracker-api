@@ -1,8 +1,8 @@
 package io.craigmiller160.expensetrackerapi.data.model
 
 import io.craigmiller160.expensetrackerapi.data.model.core.ImmutableTableEntity
-import javax.persistence.Entity
-import javax.persistence.Table
+import jakarta.persistence.Entity
+import jakarta.persistence.Table
 
 @Entity
 @Table(name = "countries")

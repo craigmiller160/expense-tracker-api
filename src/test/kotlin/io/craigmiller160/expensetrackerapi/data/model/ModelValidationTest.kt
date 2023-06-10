@@ -2,8 +2,8 @@ package io.craigmiller160.expensetrackerapi.data.model
 
 import io.craigmiller160.expensetrackerapi.extension.flushAndClear
 import io.craigmiller160.expensetrackerapi.testcore.ExpenseTrackerIntegrationTest
+import jakarta.persistence.EntityManager
 import java.time.ZonedDateTime
-import javax.persistence.EntityManager
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows

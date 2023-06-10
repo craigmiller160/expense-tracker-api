@@ -13,7 +13,7 @@ import io.craigmiller160.expensetrackerapi.testutils.userTypedId
 import io.craigmiller160.expensetrackerapi.utils.StringToColor
 import io.craigmiller160.expensetrackerapi.web.types.category.CategoryRequest
 import io.craigmiller160.expensetrackerapi.web.types.category.CategoryResponse
-import javax.persistence.EntityManager
+import jakarta.persistence.EntityManager
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired

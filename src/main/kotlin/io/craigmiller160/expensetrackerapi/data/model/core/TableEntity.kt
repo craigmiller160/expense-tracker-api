@@ -1,7 +1,7 @@
 package io.craigmiller160.expensetrackerapi.data.model.core
 
+import jakarta.persistence.MappedSuperclass
 import java.time.ZonedDateTime
-import javax.persistence.MappedSuperclass
 
 @MappedSuperclass
 abstract class TableEntity<T> : DatabaseRecord<T>() {

@@ -4,7 +4,7 @@ import com.querydsl.core.BooleanBuilder
 import com.querydsl.core.types.dsl.BooleanExpression
 import com.querydsl.core.types.dsl.PathBuilderFactory
 import com.querydsl.jpa.JPQLQuery
-import javax.persistence.EntityManager
+import jakarta.persistence.EntityManager
 import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.repository.support.Querydsl
 import org.springframework.stereotype.Component
