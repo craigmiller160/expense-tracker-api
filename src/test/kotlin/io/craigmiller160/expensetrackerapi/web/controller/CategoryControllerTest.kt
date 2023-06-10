@@ -3,6 +3,7 @@ package io.craigmiller160.expensetrackerapi.web.controller
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.craigmiller160.expensetrackerapi.common.data.typedid.TypedId
 import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.CategoryId
+import io.craigmiller160.expensetrackerapi.data.constants.CategoryConstants
 import io.craigmiller160.expensetrackerapi.data.repository.CategoryRepository
 import io.craigmiller160.expensetrackerapi.data.repository.TransactionRepository
 import io.craigmiller160.expensetrackerapi.extension.flushAndClear
@@ -50,6 +51,22 @@ constructor(
 
     mockMvc
         .get("/categories") {
+          secure = true
+          header("Authorization", "Bearer $token")
+        }
+        .andExpect {
+          status { isOk() }
+          content { json(objectMapper.writeValueAsString(expected), true) }
+        }
+  }
+
+  @Test
+  fun getUnknownCategory() {
+    val token = defaultUsers.primaryUser.token
+    val expected = CategoryResponse.from(CategoryConstants.UNKNOWN_CATEGORY)
+
+    mockMvc
+        .get("/categories/unknown") {
           secure = true
           header("Authorization", "Bearer $token")
         }

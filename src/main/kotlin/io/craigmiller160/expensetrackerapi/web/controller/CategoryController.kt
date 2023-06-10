@@ -34,6 +34,9 @@ class CategoryController(private val categoryService: CategoryService) {
   @GetMapping
   fun getAllCategories(): TryEither<List<CategoryResponse>> = categoryService.getAllCategories()
 
+  @GetMapping("/unknown")
+  fun getUnknownCategory(): CategoryResponse = categoryService.getUnknownCategory()
+
   @ApiResponse(
       responseCode = "200",
       content =

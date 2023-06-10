@@ -29,6 +29,9 @@ class CategoryService(
     }
   }
 
+  fun getUnknownCategory(): CategoryResponse =
+      CategoryResponse.from(CategoryConstants.UNKNOWN_CATEGORY)
+
   private fun validateRequest(request: CategoryRequest): TryEither<CategoryRequest> {
     if (CategoryConstants.UNKNOWN_CATEGORY.name == request.name) {
       return Either.Left(
