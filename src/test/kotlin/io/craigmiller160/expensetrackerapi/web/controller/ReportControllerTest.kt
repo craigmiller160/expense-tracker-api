@@ -137,8 +137,8 @@ constructor(
                                     amount = txn7.amount,
                                     percent = txn7.amount / month1Total),
                                 ReportCategoryResponse(
-                                    name = CategoryConstants.UNKNOWN_CATEGORY_NAME,
-                                    color = CategoryConstants.UNKNOWN_CATEGORY_COLOR,
+                                    name = CategoryConstants.UNKNOWN_CATEGORY.name,
+                                    color = CategoryConstants.UNKNOWN_CATEGORY.color,
                                     amount = txn6.amount,
                                     percent = txn6.amount / month1Total)))))
   }

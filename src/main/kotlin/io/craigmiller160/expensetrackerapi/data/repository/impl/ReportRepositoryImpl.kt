@@ -119,9 +119,9 @@ class ReportRepositoryImpl(
     return jdbcTemplate.query(finalWrapper.sql, params) { rs, _ ->
       SpendingByCategory(
           month = rs.getDate("month").toLocalDate(),
-          categoryName = rs.getString("category_name") ?: CategoryConstants.UNKNOWN_CATEGORY_NAME,
+          categoryName = rs.getString("category_name") ?: CategoryConstants.UNKNOWN_CATEGORY.name,
           amount = rs.getBigDecimal("amount"),
-          color = rs.getString("color") ?: CategoryConstants.UNKNOWN_CATEGORY_COLOR)
+          color = rs.getString("color") ?: CategoryConstants.UNKNOWN_CATEGORY.color)
     }
   }
 

@@ -30,9 +30,9 @@ class CategoryService(
   }
 
   private fun validateRequest(request: CategoryRequest): TryEither<CategoryRequest> {
-    if (CategoryConstants.UNKNOWN_CATEGORY_NAME == request.name) {
+    if (CategoryConstants.UNKNOWN_CATEGORY.name == request.name) {
       return Either.Left(
-          BadRequestException("Illegal category name: ${CategoryConstants.UNKNOWN_CATEGORY_NAME}"))
+          BadRequestException("Illegal category name: ${CategoryConstants.UNKNOWN_CATEGORY.name}"))
     }
     return Either.Right(request)
   }
