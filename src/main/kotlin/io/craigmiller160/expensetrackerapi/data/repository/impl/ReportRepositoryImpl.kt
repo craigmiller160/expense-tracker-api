@@ -9,6 +9,7 @@ import io.craigmiller160.expensetrackerapi.data.mustache.MustacheSqlTemplate
 import io.craigmiller160.expensetrackerapi.data.projection.SpendingByCategory
 import io.craigmiller160.expensetrackerapi.data.projection.SpendingByMonth
 import io.craigmiller160.expensetrackerapi.data.repository.ReportRepository
+import io.craigmiller160.expensetrackerapi.web.types.report.ReportCategoryIdFilterType
 import io.craigmiller160.expensetrackerapi.web.types.report.ReportRequest
 import jakarta.transaction.Transactional
 import java.time.LocalDate
@@ -19,19 +20,24 @@ import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.stereotype.Repository
 
-private fun addExcludeCategoryIdsParam(
-    excludeCategoryIds: List<TypedId<CategoryId>>
+private fun addCategoryIdsParam(
+    categoryIds: List<TypedId<CategoryId>>
 ): (MapSqlParameterSource) -> MapSqlParameterSource = { params ->
-  if (excludeCategoryIds.isNotEmpty())
-      params.addValue("excludeCategoryIds", excludeCategoryIds.map { it.uuid })
+  if (categoryIds.isNotEmpty()) params.addValue("categoryIds", categoryIds.map { it.uuid })
   else params
 }
 
 private fun executeMustacheTemplate(
-    excludeCategoryIds: List<TypedId<CategoryId>>
+    categoryIdType: ReportCategoryIdFilterType,
+    categoryIds: List<TypedId<CategoryId>>
 ): (MustacheSqlTemplate) -> String = { template ->
-  if (excludeCategoryIds.isNotEmpty()) template.executeWithParams("excludeCategoryIds")
-  else template.executeWithParams()
+  if (categoryIds.isNotEmpty() && ReportCategoryIdFilterType.INCLUDE == categoryIdType) {
+    template.executeWithParams("includeCategoryIds")
+  } else if (categoryIds.isNotEmpty() && ReportCategoryIdFilterType.EXCLUDE == categoryIdType) {
+    template.executeWithParams("excludeCategoryIds")
+  } else {
+    template.executeWithParams()
+  }
 }
 
 @Repository
@@ -44,14 +50,17 @@ class ReportRepositoryImpl(
       userId: TypedId<UserId>,
       request: ReportRequest
   ): Page<SpendingByMonth> {
-    val spendingByMonth = getSpendingByMonth(userId, request, request.excludeCategoryIds)
-    val spendingByMonthCount = getSpendingByMonthCount(userId, request.excludeCategoryIds)
+    val spendingByMonth =
+        getSpendingByMonth(userId, request, request.categoryIdType, request.categoryIds)
+    val spendingByMonthCount =
+        getSpendingByMonthCount(userId, request.categoryIdType, request.categoryIds)
     val months = spendingByMonth.map { it.month }
 
     val fullResults =
         if (months.isNotEmpty()) {
           val spendingByCategory =
-              getSpendingByCategoryForMonths(userId, months, request.excludeCategoryIds)
+              getSpendingByCategoryForMonths(
+                  userId, months, request.categoryIdType, request.categoryIds)
           spendingByMonth.map { monthRecord ->
             monthRecord.copy(
                 categories =
@@ -71,12 +80,13 @@ class ReportRepositoryImpl(
   private fun getSpendingByCategoryForMonths(
       userId: TypedId<UserId>,
       months: List<LocalDate>,
-      excludeCategoryIds: List<TypedId<CategoryId>>
+      categoryIdType: ReportCategoryIdFilterType,
+      categoryIds: List<TypedId<CategoryId>>
   ): List<SpendingByCategory> {
     val getSpendingByCategoryForMonthSql =
         sqlLoader
             .loadSqlMustacheTemplate("reports/get_spending_by_category_for_month.sql")
-            .let(executeMustacheTemplate(excludeCategoryIds))
+            .let(executeMustacheTemplate(categoryIdType, categoryIds))
     val finalWrapper =
         months
             .mapIndexed { index, month ->
@@ -105,7 +115,7 @@ class ReportRepositoryImpl(
         MapSqlParameterSource()
             .addValues(finalWrapper.params)
             .addValue("userId", userId.uuid)
-            .let(addExcludeCategoryIdsParam(excludeCategoryIds))
+            .let(addCategoryIdsParam(categoryIds))
     return jdbcTemplate.query(finalWrapper.sql, params) { rs, _ ->
       SpendingByCategory(
           month = rs.getDate("month").toLocalDate(),
@@ -117,16 +127,17 @@ class ReportRepositoryImpl(
 
   private fun getSpendingByMonthCount(
       userId: TypedId<UserId>,
-      excludeCategoryIds: List<TypedId<CategoryId>>
+      categoryIdType: ReportCategoryIdFilterType,
+      categoryIds: List<TypedId<CategoryId>>
   ): Long {
     val getSpendingByMonthCountSql =
         sqlLoader
             .loadSqlMustacheTemplate("reports/get_total_spending_by_month_count.sql")
-            .let(executeMustacheTemplate(excludeCategoryIds))
+            .let(executeMustacheTemplate(categoryIdType, categoryIds))
     val params =
         MapSqlParameterSource()
             .addValue("userId", userId.uuid)
-            .let(addExcludeCategoryIdsParam(excludeCategoryIds))
+            .let(addCategoryIdsParam(categoryIds))
     return jdbcTemplate.queryForObject(getSpendingByMonthCountSql, params, Long::class.java)!!
   }
 
@@ -135,18 +146,19 @@ class ReportRepositoryImpl(
   private fun getSpendingByMonth(
       userId: TypedId<UserId>,
       request: ReportRequest,
-      excludeCategoryIds: List<TypedId<CategoryId>>
+      categoryIdType: ReportCategoryIdFilterType,
+      categoryIds: List<TypedId<CategoryId>>
   ): List<SpendingByMonth> {
     val getTotalSpendingByMonthSql =
         sqlLoader
             .loadSqlMustacheTemplate("reports/get_total_spending_by_month.sql")
-            .let(executeMustacheTemplate(excludeCategoryIds))
+            .let(executeMustacheTemplate(categoryIdType, categoryIds))
     val totalSpendingByMonthParams =
         MapSqlParameterSource()
             .addValue("userId", userId.uuid)
             .addValue("offset", request.pageNumber * request.pageSize)
             .addValue("limit", request.pageSize)
-            .let(addExcludeCategoryIdsParam(excludeCategoryIds))
+            .let(addCategoryIdsParam(categoryIds))
     return jdbcTemplate.query(getTotalSpendingByMonthSql, totalSpendingByMonthParams) { rs, _ ->
       SpendingByMonth(
           month = rs.getDate("month").toLocalDate(),

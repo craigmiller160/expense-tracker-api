@@ -14,6 +14,7 @@ import io.craigmiller160.expensetrackerapi.web.types.report.ReportCategoryRespon
 import io.craigmiller160.expensetrackerapi.web.types.report.ReportMonthResponse
 import io.craigmiller160.expensetrackerapi.web.types.report.ReportPageResponse
 import jakarta.persistence.EntityManager
+import java.math.BigDecimal
 import java.time.LocalDate
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -209,7 +210,39 @@ constructor(
                     })
     mockMvc
         .get(
-            "/reports?pageNumber=0&pageSize=100&excludeCategoryIds=${categories[0].id},${categories[1].id}") {
+            "/reports?pageNumber=0&pageSize=100&categoryIds=${categories[0].id},${categories[1].id}") {
+              secure = true
+              header("Authorization", "Bearer $token")
+            }
+        .andExpect {
+          status { isOk() }
+          content { json(objectMapper.writeValueAsString(response), true) }
+        }
+  }
+
+  @Test
+  fun getReports_excludeCategory_explicitType() {
+    val response =
+        expectedResponse.copy(
+            reports =
+                expectedResponse.reports.mapIndexed { index, report ->
+                  val newTotal =
+                      report.total -
+                          when (index) {
+                            0 -> transactions[3].amount
+                            else -> transactions[1].amount
+                          }
+                  report.copy(
+                      categories =
+                          report.categories
+                              .filter { it.name != categories[1].name }
+                              .map { it.copy(percent = it.amount / newTotal) },
+                      total = newTotal)
+                })
+
+    mockMvc
+        .get(
+            "/reports?pageNumber=0&pageSize=100&categoryIdType=EXCLUDE&categoryIds=${categories[1].id}") {
               secure = true
               header("Authorization", "Bearer $token")
             }
@@ -240,10 +273,37 @@ constructor(
                 })
 
     mockMvc
-        .get("/reports?pageNumber=0&pageSize=100&excludeCategoryIds=${categories[1].id}") {
+        .get("/reports?pageNumber=0&pageSize=100&categoryIds=${categories[1].id}") {
           secure = true
           header("Authorization", "Bearer $token")
         }
+        .andExpect {
+          status { isOk() }
+          content { json(objectMapper.writeValueAsString(response), true) }
+        }
+  }
+
+  @Test
+  fun getReports_includeCategory() {
+    val response =
+        expectedResponse.copy(
+            reports =
+                expectedResponse.reports.mapIndexed { index, report ->
+                  val newTotal = if (index == 0) transactions[3].amount else transactions[1].amount
+                  report.copy(
+                      categories =
+                          report.categories
+                              .filter { it.name == categories[1].name }
+                              .map { it.copy(percent = BigDecimal("1.0")) },
+                      total = newTotal)
+                })
+
+    mockMvc
+        .get(
+            "/reports?pageNumber=0&pageSize=100&categoryIdType=INCLUDE&categoryIds=${categories[1].id}") {
+              secure = true
+              header("Authorization", "Bearer $token")
+            }
         .andExpect {
           status { isOk() }
           content { json(objectMapper.writeValueAsString(response), true) }
