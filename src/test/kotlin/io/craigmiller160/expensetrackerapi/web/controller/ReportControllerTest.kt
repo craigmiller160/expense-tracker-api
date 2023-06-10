@@ -332,7 +332,18 @@ constructor(
   @Test
   fun getReports_excludeUnknown() {
     val unknownCategoryId = CategoryConstants.UNKNOWN_CATEGORY.id
-    val response: ReportPageResponse = TODO()
+    val newMonth1Total =
+        expectedResponse.reports[1].total - expectedResponse.reports[1].categories[4].amount
+    val newMonth1Report =
+        expectedResponse.reports[1].copy(
+            total = newMonth1Total,
+            categories =
+                expectedResponse.reports[1].categories.slice(0..3).map { cat ->
+                  cat.copy(percent = cat.amount / newMonth1Total)
+                })
+
+    val response =
+        expectedResponse.copy(reports = listOf(expectedResponse.reports[0], newMonth1Report))
     mockMvc
         .get(
             "/reports?pageNumber=0&pageSize=100&categoryIdType=EXCLUDE&categoryIds=$unknownCategoryId") {
