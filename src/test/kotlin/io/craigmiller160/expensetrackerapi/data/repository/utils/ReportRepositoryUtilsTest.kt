@@ -8,7 +8,49 @@ import org.junit.jupiter.params.provider.MethodSource
 
 class ReportRepositoryUtilsTest {
   companion object {
-    @JvmStatic fun queryFilterTypeConfigs(): Stream<QueryFilterTypeConfig> = TODO()
+    @JvmStatic
+    fun queryFilterTypeConfigs(): Stream<QueryFilterTypeConfig> =
+        Stream.of(
+            QueryFilterTypeConfig(
+                ReportCategoryIdFilterType.INCLUDE,
+                true,
+                true,
+                ReportQueryCategoryFilterType.INCLUDE_WITH_UNKNOWN),
+            QueryFilterTypeConfig(
+                ReportCategoryIdFilterType.INCLUDE,
+                true,
+                false,
+                ReportQueryCategoryFilterType.NONE_WITH_UNKNOWN),
+            QueryFilterTypeConfig(
+                ReportCategoryIdFilterType.INCLUDE,
+                false,
+                true,
+                ReportQueryCategoryFilterType.INCLUDE_NO_UNKNOWN),
+            QueryFilterTypeConfig(
+                ReportCategoryIdFilterType.INCLUDE,
+                false,
+                false,
+                ReportQueryCategoryFilterType.ALL_WITH_UNKNOWN),
+            QueryFilterTypeConfig(
+                ReportCategoryIdFilterType.EXCLUDE,
+                true,
+                true,
+                ReportQueryCategoryFilterType.EXCLUDE_NO_UNKNOWN),
+            QueryFilterTypeConfig(
+                ReportCategoryIdFilterType.EXCLUDE,
+                true,
+                false,
+                ReportQueryCategoryFilterType.ALL_NO_UNKNOWN),
+            QueryFilterTypeConfig(
+                ReportCategoryIdFilterType.EXCLUDE,
+                false,
+                true,
+                ReportQueryCategoryFilterType.EXCLUDE_WITH_UNKNOWN),
+            QueryFilterTypeConfig(
+                ReportCategoryIdFilterType.EXCLUDE,
+                false,
+                false,
+                ReportQueryCategoryFilterType.ALL_WITH_UNKNOWN))
   }
   @ParameterizedTest
   @MethodSource("queryFilterTypeConfigs")

@@ -8,12 +8,11 @@ enum class ReportQueryCategoryFilterType {
   INCLUDE_WITH_UNKNOWN,
   EXCLUDE_NO_UNKNOWN,
   EXCLUDE_WITH_UNKNOWN,
-  ALL_NO_UNKNOWN, // TODO might not be necessary
+  ALL_NO_UNKNOWN,
   ALL_WITH_UNKNOWN,
   NONE_WITH_UNKNOWN
 }
 
-// TODO probably want tests for this
 fun ReportCategoryIdFilterType.toQueryType(
     hasUnknownId: Boolean,
     hasOtherIds: Boolean
