@@ -15,42 +15,42 @@ class ReportRepositoryUtilsTest {
                 ReportCategoryIdFilterType.INCLUDE,
                 true,
                 true,
-                ReportQueryCategoryFilterType.INCLUDE_WITH_UNKNOWN),
+                ReportCategoryFilterType.INCLUDE_WITH_UNKNOWN),
             QueryFilterTypeConfig(
                 ReportCategoryIdFilterType.INCLUDE,
                 true,
                 false,
-                ReportQueryCategoryFilterType.NONE_WITH_UNKNOWN),
+                ReportCategoryFilterType.NONE_WITH_UNKNOWN),
             QueryFilterTypeConfig(
                 ReportCategoryIdFilterType.INCLUDE,
                 false,
                 true,
-                ReportQueryCategoryFilterType.INCLUDE_NO_UNKNOWN),
+                ReportCategoryFilterType.INCLUDE_NO_UNKNOWN),
             QueryFilterTypeConfig(
                 ReportCategoryIdFilterType.INCLUDE,
                 false,
                 false,
-                ReportQueryCategoryFilterType.ALL_WITH_UNKNOWN),
+                ReportCategoryFilterType.ALL_WITH_UNKNOWN),
             QueryFilterTypeConfig(
                 ReportCategoryIdFilterType.EXCLUDE,
                 true,
                 true,
-                ReportQueryCategoryFilterType.EXCLUDE_NO_UNKNOWN),
+                ReportCategoryFilterType.EXCLUDE_NO_UNKNOWN),
             QueryFilterTypeConfig(
                 ReportCategoryIdFilterType.EXCLUDE,
                 true,
                 false,
-                ReportQueryCategoryFilterType.ALL_NO_UNKNOWN),
+                ReportCategoryFilterType.ALL_NO_UNKNOWN),
             QueryFilterTypeConfig(
                 ReportCategoryIdFilterType.EXCLUDE,
                 false,
                 true,
-                ReportQueryCategoryFilterType.EXCLUDE_WITH_UNKNOWN),
+                ReportCategoryFilterType.EXCLUDE_WITH_UNKNOWN),
             QueryFilterTypeConfig(
                 ReportCategoryIdFilterType.EXCLUDE,
                 false,
                 false,
-                ReportQueryCategoryFilterType.ALL_WITH_UNKNOWN))
+                ReportCategoryFilterType.ALL_WITH_UNKNOWN))
   }
   @ParameterizedTest
   @MethodSource("queryFilterTypeConfigs")
@@ -65,5 +65,5 @@ data class QueryFilterTypeConfig(
     val categoryIdFilterType: ReportCategoryIdFilterType,
     val hasUnknown: Boolean,
     val hasOtherIds: Boolean,
-    val expectedResult: ReportQueryCategoryFilterType
+    val expectedResult: ReportCategoryFilterType
 )

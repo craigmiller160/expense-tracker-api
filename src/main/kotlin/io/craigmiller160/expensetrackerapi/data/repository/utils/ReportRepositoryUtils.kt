@@ -3,7 +3,7 @@ package io.craigmiller160.expensetrackerapi.data.repository.utils
 import io.craigmiller160.expensetrackerapi.web.types.report.ReportCategoryIdFilterType
 import java.lang.IllegalArgumentException
 
-enum class ReportQueryCategoryFilterType {
+enum class ReportCategoryFilterType {
   INCLUDE_NO_UNKNOWN,
   INCLUDE_WITH_UNKNOWN,
   EXCLUDE_NO_UNKNOWN,
@@ -16,37 +16,37 @@ enum class ReportQueryCategoryFilterType {
 fun ReportCategoryIdFilterType.toQueryType(
     hasUnknownId: Boolean,
     hasOtherIds: Boolean
-): ReportQueryCategoryFilterType {
+): ReportCategoryFilterType {
   if (ReportCategoryIdFilterType.INCLUDE == this) {
     if (hasUnknownId && hasOtherIds) {
-      return ReportQueryCategoryFilterType.INCLUDE_WITH_UNKNOWN
+      return ReportCategoryFilterType.INCLUDE_WITH_UNKNOWN
     }
 
     if (!hasUnknownId && hasOtherIds) {
-      return ReportQueryCategoryFilterType.INCLUDE_NO_UNKNOWN
+      return ReportCategoryFilterType.INCLUDE_NO_UNKNOWN
     }
 
     if (hasUnknownId && !hasOtherIds) {
-      return ReportQueryCategoryFilterType.NONE_WITH_UNKNOWN
+      return ReportCategoryFilterType.NONE_WITH_UNKNOWN
     }
 
-    return ReportQueryCategoryFilterType.ALL_WITH_UNKNOWN
+    return ReportCategoryFilterType.ALL_WITH_UNKNOWN
   }
 
   if (ReportCategoryIdFilterType.EXCLUDE == this) {
     if (hasUnknownId && hasOtherIds) {
-      return ReportQueryCategoryFilterType.EXCLUDE_NO_UNKNOWN
+      return ReportCategoryFilterType.EXCLUDE_NO_UNKNOWN
     }
 
     if (!hasUnknownId && hasOtherIds) {
-      return ReportQueryCategoryFilterType.EXCLUDE_WITH_UNKNOWN
+      return ReportCategoryFilterType.EXCLUDE_WITH_UNKNOWN
     }
 
     if (!hasUnknownId && !hasOtherIds) {
-      return ReportQueryCategoryFilterType.ALL_WITH_UNKNOWN
+      return ReportCategoryFilterType.ALL_WITH_UNKNOWN
     }
 
-    return ReportQueryCategoryFilterType.ALL_NO_UNKNOWN
+    return ReportCategoryFilterType.ALL_NO_UNKNOWN
   }
 
   throw IllegalArgumentException("Invalid combination of query filter values")
