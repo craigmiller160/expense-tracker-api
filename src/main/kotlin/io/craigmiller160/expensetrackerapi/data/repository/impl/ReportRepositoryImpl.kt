@@ -177,9 +177,9 @@ private fun ReportCategoryIdFilterType.toQueryType(
     } else if (ReportCategoryIdFilterType.INCLUDE == this && !hasUnknownId) {
       ReportQueryCategoryFilterType.INCLUDE_NO_UNKNOWN
     } else if (ReportCategoryIdFilterType.EXCLUDE == this && hasUnknownId) {
-      ReportQueryCategoryFilterType.EXCLUDE_WITH_UNKNOWN
-    } else if (ReportCategoryIdFilterType.EXCLUDE == this && !hasUnknownId) {
       ReportQueryCategoryFilterType.EXCLUDE_NO_UNKNOWN
+    } else if (ReportCategoryIdFilterType.EXCLUDE == this && !hasUnknownId) {
+      ReportQueryCategoryFilterType.EXCLUDE_WITH_UNKNOWN
     } else {
       throw IllegalArgumentException("Invalid combination of query filter values")
     }
