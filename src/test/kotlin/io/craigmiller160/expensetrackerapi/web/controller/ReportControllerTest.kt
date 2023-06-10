@@ -312,11 +312,33 @@ constructor(
 
   @Test
   fun getReports_includeUnknown() {
-    TODO()
+    val unknownCategoryId = CategoryConstants.UNKNOWN_CATEGORY.id
+    val response: ReportPageResponse = TODO()
+    mockMvc
+        .get(
+            "/reports?pageNumber=0&pageSize=100&categoryIdType=INCLUDE&categoryIds=$unknownCategoryId") {
+              secure = true
+              header("Authorization", "Bearer $token")
+            }
+        .andExpect {
+          status { isOk() }
+          content { json(objectMapper.writeValueAsString(response), true) }
+        }
   }
 
   @Test
   fun getReports_excludeUnknown() {
-    TODO()
+    val unknownCategoryId = CategoryConstants.UNKNOWN_CATEGORY.id
+    val response: ReportPageResponse = TODO()
+    mockMvc
+        .get(
+            "/reports?pageNumber=0&pageSize=100&categoryIdType=EXCLUDE&categoryIds=$unknownCategoryId") {
+              secure = true
+              header("Authorization", "Bearer $token")
+            }
+        .andExpect {
+          status { isOk() }
+          content { json(objectMapper.writeValueAsString(response), true) }
+        }
   }
 }
