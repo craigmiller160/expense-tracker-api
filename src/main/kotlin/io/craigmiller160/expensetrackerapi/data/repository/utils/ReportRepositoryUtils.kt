@@ -9,7 +9,8 @@ enum class ReportQueryCategoryFilterType {
   EXCLUDE_NO_UNKNOWN,
   EXCLUDE_WITH_UNKNOWN,
   ALL_NO_UNKNOWN, // TODO might not be necessary
-  ALL_WITH_UNKNOWN
+  ALL_WITH_UNKNOWN,
+  NONE_WITH_UNKNOWN
 }
 
 // TODO probably want tests for this
@@ -38,7 +39,11 @@ fun ReportCategoryIdFilterType.toQueryType(
       return ReportQueryCategoryFilterType.EXCLUDE_WITH_UNKNOWN
     }
 
-    return ReportQueryCategoryFilterType.ALL_WITH_UNKNOWN
+    if (!hasUnknownId && !hasOtherIds) {
+      return ReportQueryCategoryFilterType.ALL_WITH_UNKNOWN
+    }
+
+    return ReportQueryCategoryFilterType.NONE_WITH_UNKNOWN
   }
 
   throw IllegalArgumentException("Invalid combination of query filter values")

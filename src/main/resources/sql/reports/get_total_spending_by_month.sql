@@ -20,6 +20,9 @@ AND CASE
     WHEN :categoryIdType = 'ALL_WITH_UNKNOWN' THEN (
         true = true
     )
+    WHEN :categoryIdType = 'NONE_WITH_UNKNOWN' THEN (
+        tv.category_id IS NULL
+    )
     ELSE true = true
 END
 GROUP BY month
