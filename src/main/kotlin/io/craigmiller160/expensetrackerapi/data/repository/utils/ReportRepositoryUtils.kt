@@ -8,7 +8,7 @@ enum class ReportQueryCategoryFilterType {
   INCLUDE_WITH_UNKNOWN,
   EXCLUDE_NO_UNKNOWN,
   EXCLUDE_WITH_UNKNOWN,
-  ALL_NO_UNKNOWN,
+  ALL_NO_UNKNOWN, // TODO might not be necessary
   ALL_WITH_UNKNOWN
 }
 
@@ -23,7 +23,7 @@ fun ReportCategoryIdFilterType.toQueryType(
     }
 
     if (!hasUnknownId && hasOtherIds) {
-      return ReportQueryCategoryFilterType.ALL_NO_UNKNOWN
+      return ReportQueryCategoryFilterType.INCLUDE_NO_UNKNOWN
     }
 
     return ReportQueryCategoryFilterType.ALL_WITH_UNKNOWN
