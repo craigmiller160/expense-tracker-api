@@ -7,7 +7,7 @@ AND CASE
     ELSE true = true
 END
 AND CASE
-    WHEN :unknownCategoryType = 'INCLUDE' THEN tv.category_id IS NULL
-    WHEN :unknownCategoryType = 'EXCLUDE' THEN tv.category_id IS NOT NULL
+    WHEN :unknownCategoryType = 'INCLUDE' THEN category_id IS NULL
+    WHEN :unknownCategoryType = 'EXCLUDE' THEN category_id IS NOT NULL
     ELSE true = true
 END;
