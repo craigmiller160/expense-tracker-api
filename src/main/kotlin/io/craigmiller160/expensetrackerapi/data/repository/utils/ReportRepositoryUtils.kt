@@ -27,6 +27,10 @@ fun ReportCategoryIdFilterType.toQueryType(
       return ReportQueryCategoryFilterType.INCLUDE_NO_UNKNOWN
     }
 
+    if (hasUnknownId && !hasOtherIds) {
+      return ReportQueryCategoryFilterType.NONE_WITH_UNKNOWN
+    }
+
     return ReportQueryCategoryFilterType.ALL_WITH_UNKNOWN
   }
 
@@ -43,7 +47,7 @@ fun ReportCategoryIdFilterType.toQueryType(
       return ReportQueryCategoryFilterType.ALL_WITH_UNKNOWN
     }
 
-    return ReportQueryCategoryFilterType.NONE_WITH_UNKNOWN
+    return ReportQueryCategoryFilterType.ALL_NO_UNKNOWN
   }
 
   throw IllegalArgumentException("Invalid combination of query filter values")
