@@ -331,7 +331,47 @@ constructor(
 
   @Test
   fun getReports_includeCategoryAndUnknown() {
-    TODO()
+    val month2ReportTotal = expectedResponse.reports[0].categories[1].amount
+    val month2Report =
+        expectedResponse.reports[0].copy(
+            total = month2ReportTotal,
+            categories =
+                listOf(expectedResponse.reports[0].categories[1].copy(percent = BigDecimal("1.0"))))
+
+    val month1ReportTotal =
+        expectedResponse.reports[1].categories[1].amount +
+            expectedResponse.reports[1].categories[4].amount
+    val month1Report =
+        expectedResponse.reports[1].copy(
+            total = month1ReportTotal,
+            categories =
+                listOf(
+                    expectedResponse.reports[1]
+                        .categories[1]
+                        .copy(
+                            percent =
+                                expectedResponse.reports[1].categories[1].amount /
+                                    month1ReportTotal),
+                    expectedResponse.reports[1]
+                        .categories[4]
+                        .copy(
+                            percent =
+                                expectedResponse.reports[1].categories[4].amount /
+                                    month1ReportTotal)))
+
+    val response = expectedResponse.copy(reports = listOf(month2Report, month1Report))
+
+    val unknownCategoryId = CategoryConstants.UNKNOWN_CATEGORY.id
+    val categoryIds = listOf(unknownCategoryId, categories[1].id).joinToString(",")
+    mockMvc
+        .get("/reports?pageNumber=0&pageSize=100&categoryIdType=INCLUDE&categoryIds=$categoryIds") {
+          secure = true
+          header("Authorization", "Bearer $token")
+        }
+        .andExpect {
+          status { isOk() }
+          content { json(objectMapper.writeValueAsString(response), true) }
+        }
   }
 
   @Test
