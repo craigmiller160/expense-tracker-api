@@ -13,6 +13,8 @@ import io.craigmiller160.expensetrackerapi.testutils.userTypedId
 import io.craigmiller160.expensetrackerapi.web.types.report.ReportCategoryResponse
 import io.craigmiller160.expensetrackerapi.web.types.report.ReportMonthResponse
 import io.craigmiller160.expensetrackerapi.web.types.report.ReportPageResponse
+import jakarta.persistence.EntityManager
+import java.math.BigDecimal
 import java.time.LocalDate
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
