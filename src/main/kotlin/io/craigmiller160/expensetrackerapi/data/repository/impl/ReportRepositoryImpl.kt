@@ -5,7 +5,6 @@ import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.CategoryId
 import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.UserId
 import io.craigmiller160.expensetrackerapi.data.SqlLoader
 import io.craigmiller160.expensetrackerapi.data.constants.CategoryConstants
-import io.craigmiller160.expensetrackerapi.data.mustache.MustacheSqlTemplate
 import io.craigmiller160.expensetrackerapi.data.projection.SpendingByCategory
 import io.craigmiller160.expensetrackerapi.data.projection.SpendingByMonth
 import io.craigmiller160.expensetrackerapi.data.repository.ReportRepository
@@ -19,26 +18,6 @@ import org.springframework.data.domain.PageRequest
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.stereotype.Repository
-
-private fun addCategoryIdsParam(
-    categoryIds: List<TypedId<CategoryId>>
-): (MapSqlParameterSource) -> MapSqlParameterSource = { params ->
-  if (categoryIds.isNotEmpty()) params.addValue("categoryIds", categoryIds.map { it.uuid })
-  else params
-}
-
-private fun executeMustacheTemplate(
-    categoryIdType: ReportCategoryIdFilterType,
-    categoryIds: List<TypedId<CategoryId>>
-): (MustacheSqlTemplate) -> String = { template ->
-  if (categoryIds.isNotEmpty() && ReportCategoryIdFilterType.INCLUDE == categoryIdType) {
-    template.executeWithParams("includeCategoryIds")
-  } else if (categoryIds.isNotEmpty() && ReportCategoryIdFilterType.EXCLUDE == categoryIdType) {
-    template.executeWithParams("excludeCategoryIds")
-  } else {
-    template.executeWithParams()
-  }
-}
 
 @Repository
 class ReportRepositoryImpl(
@@ -84,9 +63,7 @@ class ReportRepositoryImpl(
       categoryIds: List<TypedId<CategoryId>>
   ): List<SpendingByCategory> {
     val getSpendingByCategoryForMonthSql =
-        sqlLoader
-            .loadSqlMustacheTemplate("reports/get_spending_by_category_for_month.sql")
-            .let(executeMustacheTemplate(categoryIdType, categoryIds))
+        sqlLoader.loadSql("reports/get_spending_by_category_for_month.sql")
     val finalWrapper =
         months
             .mapIndexed { index, month ->
@@ -115,7 +92,7 @@ class ReportRepositoryImpl(
         MapSqlParameterSource()
             .addValues(finalWrapper.params)
             .addValue("userId", userId.uuid)
-            .let(addCategoryIdsParam(categoryIds))
+            .addCategoryIds(categoryIdType, categoryIds)
     return jdbcTemplate.query(finalWrapper.sql, params) { rs, _ ->
       SpendingByCategory(
           month = rs.getDate("month").toLocalDate(),
@@ -131,13 +108,11 @@ class ReportRepositoryImpl(
       categoryIds: List<TypedId<CategoryId>>
   ): Long {
     val getSpendingByMonthCountSql =
-        sqlLoader
-            .loadSqlMustacheTemplate("reports/get_total_spending_by_month_count.sql")
-            .let(executeMustacheTemplate(categoryIdType, categoryIds))
+        sqlLoader.loadSql("reports/get_total_spending_by_month_count.sql")
     val params =
         MapSqlParameterSource()
             .addValue("userId", userId.uuid)
-            .let(addCategoryIdsParam(categoryIds))
+            .addCategoryIds(categoryIdType, categoryIds)
     return jdbcTemplate.queryForObject(getSpendingByMonthCountSql, params, Long::class.java)!!
   }
 
@@ -149,21 +124,30 @@ class ReportRepositoryImpl(
       categoryIdType: ReportCategoryIdFilterType,
       categoryIds: List<TypedId<CategoryId>>
   ): List<SpendingByMonth> {
-    val getTotalSpendingByMonthSql =
-        sqlLoader
-            .loadSqlMustacheTemplate("reports/get_total_spending_by_month.sql")
-            .let(executeMustacheTemplate(categoryIdType, categoryIds))
+    val getTotalSpendingByMonthSql = sqlLoader.loadSql("reports/get_total_spending_by_month.sql")
     val totalSpendingByMonthParams =
         MapSqlParameterSource()
             .addValue("userId", userId.uuid)
             .addValue("offset", request.pageNumber * request.pageSize)
             .addValue("limit", request.pageSize)
-            .let(addCategoryIdsParam(categoryIds))
+            .addCategoryIds(categoryIdType, categoryIds)
     return jdbcTemplate.query(getTotalSpendingByMonthSql, totalSpendingByMonthParams) { rs, _ ->
       SpendingByMonth(
           month = rs.getDate("month").toLocalDate(),
           total = rs.getBigDecimal("total"),
           categories = listOf())
     }
+  }
+
+  private fun MapSqlParameterSource.addCategoryIds(
+      categoryIdType: ReportCategoryIdFilterType,
+      categoryIds: List<TypedId<CategoryId>>
+  ): MapSqlParameterSource {
+    if (categoryIds.isEmpty()) {
+      return this.addValue("categoryIdType", "ALL").addValue("categoryIds", null)
+    }
+
+    return this.addValue("categoryIdType", categoryIdType.name)
+        .addValue("categoryIds", categoryIds.map { it.uuid })
   }
 }

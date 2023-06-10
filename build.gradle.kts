@@ -35,7 +35,6 @@ dependencies {
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui")
     implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
     implementation("org.springframework.boot:spring-boot-starter-validation")
-    implementation("com.github.spullara.mustache.java:compiler:0.9.10")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("com.opencsv:opencsv:5.7.1")
     testImplementation("com.github.javafaker:javafaker:1.0.2") {
