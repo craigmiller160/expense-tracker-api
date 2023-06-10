@@ -108,13 +108,12 @@ class ReportRepositoryImpl(
       categoryIds: List<TypedId<CategoryId>>
   ): Long {
     val getSpendingByMonthCountSql =
-        sqlLoader
-            .loadSqlMustacheTemplate("reports/get_total_spending_by_month_count.sql")
-            .let(executeMustacheTemplate(categoryIdType, categoryIds))
+        sqlLoader.loadSql("reports/get_total_spending_by_month_count.sql")
     val params =
         MapSqlParameterSource()
             .addValue("userId", userId.uuid)
-            .let(addCategoryIdsParam(categoryIds))
+            .addValue("categoryIds", categoryIds.map { it.uuid })
+            .addValue("categoryIdType", categoryIdType.name)
     return jdbcTemplate.queryForObject(getSpendingByMonthCountSql, params, Long::class.java)!!
   }
 
@@ -132,7 +131,7 @@ class ReportRepositoryImpl(
             .addValue("userId", userId.uuid)
             .addValue("offset", request.pageNumber * request.pageSize)
             .addValue("limit", request.pageSize)
-            .addValue("categoryIds", request.categoryIds)
+            .addValue("categoryIds", request.categoryIds.map { it.uuid })
             .addValue("categoryIdType", request.categoryIdType.name)
     return jdbcTemplate.query(getTotalSpendingByMonthSql, totalSpendingByMonthParams) { rs, _ ->
       SpendingByMonth(
