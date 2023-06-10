@@ -5,17 +5,23 @@ WHERE tv.expense_date >= DATE_TRUNC('month', :theDate::date)
 AND tv.expense_date <= (DATE_TRUNC('month', :theDate::date) + interval '1 month - 1 day')
 AND tv.user_id = :userId
 AND CASE
-    WHEN :categoryIdType = 'INCLUDE' AND :unknownCategoryType = 'INCLUDE' THEN (
-        tv.category_id IN (:categoryIds) OR tv.category_id IS NULL
-    )
-    WHEN :categoryIdType = 'INCLUDE' AND :unknownCategoryType <> 'INCLUDE' THEN (
+    WHEN :categoryIdType = 'INCLUDE_NO_UNKNOWN' THEN (
         tv.category_id IN (:categoryIds)
     )
-    WHEN :categoryIdType = 'EXCLUDE' AND :unknownCategoryType = 'EXCLUDE' THEN (
+    WHEN :categoryIdType = 'INCLUDE_WITH_UNKNOWN' THEN (
+        tv.category_id IN (:categoryIds) OR tv.category_id IS NULL
+    )
+    WHEN :categoryIdType = 'EXCLUDE_NO_UNKNOWN' THEN (
         tv.category_id NOT IN (:categoryIds) AND tv.category_id IS NOT NULL
     )
-    WHEN :categoryIdType = 'EXCLUDE' AND :unknownCategoryType <> 'EXCLUDE' THEN (
+    WHEN :categoryIdType = 'EXCLUDE_WITH_UNKNOWN' THEN (
         tv.category_id NOT IN (:categoryIds) OR tv.category_id IS NULL
+    )
+    WHEN :categoryIdType = 'ALL_NO_UNKNOWN' THEN (
+        tv.category_id IS NOT NULL
+    )
+    WHEN :categoryIdType = 'ALL_WITH_UNKNOWN' THEN (
+        true = true
     )
     ELSE true = true
 END
