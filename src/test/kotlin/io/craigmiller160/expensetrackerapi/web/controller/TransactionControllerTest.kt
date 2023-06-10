@@ -1255,8 +1255,8 @@ constructor(
         }
     val expected =
         baseExpected.copy(
-            created = baseExpected.created.withZoneSameInstant(ZoneId.of("UTC")),
-            updated = baseExpected.updated.withZoneSameInstant(ZoneId.of("UTC")))
+            created = baseExpected.created.withZoneSameInstant(ZoneId.of("Z")),
+            updated = baseExpected.updated.withZoneSameInstant(ZoneId.of("Z")))
     assertEquals(expected, response)
   }
 
