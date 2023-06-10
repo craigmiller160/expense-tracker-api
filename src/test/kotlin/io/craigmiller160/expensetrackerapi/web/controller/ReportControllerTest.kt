@@ -330,6 +330,11 @@ constructor(
   }
 
   @Test
+  fun getReports_includeCategoryAndUnknown() {
+    TODO()
+  }
+
+  @Test
   fun getReports_excludeUnknown() {
     val unknownCategoryId = CategoryConstants.UNKNOWN_CATEGORY.id
     val newMonth1Total =
@@ -354,5 +359,10 @@ constructor(
           status { isOk() }
           content { json(objectMapper.writeValueAsString(response), true) }
         }
+  }
+
+  @Test
+  fun getReports_excludeCategoryAndUnknown() {
+    TODO()
   }
 }
