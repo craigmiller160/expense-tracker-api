@@ -250,7 +250,7 @@ constructor(
             totalItems = 2)
 
     mockMvc
-        .get("/transactions/?${request.toQueryString()}") {
+        .get("/transactions?${request.toQueryString()}") {
           secure = true
           header("Authorization", "Bearer $token")
         }
