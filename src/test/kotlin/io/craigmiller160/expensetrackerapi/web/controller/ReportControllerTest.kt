@@ -309,4 +309,14 @@ constructor(
           content { json(objectMapper.writeValueAsString(response), true) }
         }
   }
+
+  @Test
+  fun getReports_includeUnknown() {
+    TODO()
+  }
+
+  @Test
+  fun getReports_excludeUnknown() {
+    TODO()
+  }
 }
