@@ -1,7 +1,7 @@
 package io.craigmiller160.expensetrackerapi.data.model.core
 
+import jakarta.persistence.MappedSuperclass
 import java.lang.IllegalStateException
-import javax.persistence.MappedSuperclass
 
 @MappedSuperclass
 abstract class ViewEntity<T> : DatabaseRecord<T>() {

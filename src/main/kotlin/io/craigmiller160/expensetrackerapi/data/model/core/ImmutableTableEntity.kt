@@ -1,6 +1,6 @@
 package io.craigmiller160.expensetrackerapi.data.model.core
 
-import javax.persistence.MappedSuperclass
+import jakarta.persistence.MappedSuperclass
 
 @MappedSuperclass
 abstract class ImmutableTableEntity<T> : TableEntity<T>() {

@@ -1,16 +1,23 @@
 package io.craigmiller160.expensetrackerapi.data.model.core
 
 import io.craigmiller160.expensetrackerapi.common.data.typedid.TypedId
-import io.craigmiller160.expensetrackerapi.common.data.typedid.jpatype.TypedIdJpaType
-import javax.persistence.*
-import kotlin.jvm.Transient
-import org.hibernate.annotations.TypeDef
+import io.craigmiller160.expensetrackerapi.common.data.typedid.jpatype.TypedIdJavaType
+import jakarta.persistence.Id
+import jakarta.persistence.MappedSuperclass
+import jakarta.persistence.PostLoad
+import jakarta.persistence.PrePersist
+import jakarta.persistence.PreUpdate
+import org.hibernate.annotations.JavaType
+import org.hibernate.annotations.JdbcType
+import org.hibernate.type.descriptor.jdbc.UUIDJdbcType
 import org.springframework.data.domain.Persistable
 
 @MappedSuperclass
-@TypeDef(defaultForType = TypedId::class, typeClass = TypedIdJpaType::class)
 abstract class DatabaseRecord<T> : Persistable<TypedId<T>> {
-  @Id var uid: TypedId<T> = TypedId()
+  @Id
+  @JavaType(TypedIdJavaType::class)
+  @JdbcType(UUIDJdbcType::class)
+  var uid: TypedId<T> = TypedId()
   @Transient private var innerIsNew: Boolean = true
   override fun getId(): TypedId<T> = uid
 
@@ -33,7 +40,7 @@ abstract class DatabaseRecord<T> : Persistable<TypedId<T>> {
   @PreUpdate open fun onPreUpdate() {}
 
   override fun equals(other: Any?): Boolean {
-    if (other !is TableEntity<*>) return false
+    if (other !is DatabaseRecord<*>) return false
     return other.uid == this.uid
   }
   override fun hashCode(): Int = this.uid.hashCode()

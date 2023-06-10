@@ -1,8 +1,8 @@
 package io.craigmiller160.expensetrackerapi.data.model.core
 
+import jakarta.persistence.MappedSuperclass
+import jakarta.persistence.Version
 import java.time.ZonedDateTime
-import javax.persistence.MappedSuperclass
-import javax.persistence.Version
 
 @MappedSuperclass
 abstract class MutableTableEntity<T> : TableEntity<T>() {

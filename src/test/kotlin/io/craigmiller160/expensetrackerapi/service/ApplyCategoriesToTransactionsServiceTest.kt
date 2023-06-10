@@ -16,9 +16,9 @@ import io.craigmiller160.expensetrackerapi.testutils.DataHelper
 import io.craigmiller160.expensetrackerapi.testutils.DefaultUsers
 import io.craigmiller160.expensetrackerapi.testutils.userTypedId
 import io.kotest.assertions.arrow.core.shouldBeRight
+import jakarta.persistence.EntityManager
 import java.math.BigDecimal
 import java.time.LocalDate
-import javax.persistence.EntityManager
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test

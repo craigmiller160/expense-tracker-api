@@ -11,8 +11,8 @@ import io.craigmiller160.expensetrackerapi.data.projection.SpendingByMonth
 import io.craigmiller160.expensetrackerapi.data.repository.ReportRepository
 import io.craigmiller160.expensetrackerapi.web.types.report.ReportCategoryIdFilterType
 import io.craigmiller160.expensetrackerapi.web.types.report.ReportRequest
+import jakarta.transaction.Transactional
 import java.time.LocalDate
-import javax.transaction.Transactional
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.PageRequest

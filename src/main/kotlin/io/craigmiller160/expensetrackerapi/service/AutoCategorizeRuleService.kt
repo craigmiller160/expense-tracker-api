@@ -17,9 +17,9 @@ import io.craigmiller160.expensetrackerapi.data.repository.CategoryRepository
 import io.craigmiller160.expensetrackerapi.function.TryEither
 import io.craigmiller160.expensetrackerapi.function.flatMapCatch
 import io.craigmiller160.expensetrackerapi.web.types.rules.*
+import jakarta.transaction.Transactional
 import java.math.BigDecimal
 import java.time.LocalDate
-import javax.transaction.Transactional
 import org.springframework.stereotype.Service
 
 @Service

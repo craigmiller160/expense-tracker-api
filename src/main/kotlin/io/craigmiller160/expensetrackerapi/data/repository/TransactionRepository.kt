@@ -5,6 +5,8 @@ import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.CategoryId
 import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.TransactionId
 import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.UserId
 import io.craigmiller160.expensetrackerapi.data.model.Transaction
+import java.time.ZoneId
+import java.time.ZonedDateTime
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.repository.JpaRepository
@@ -35,7 +37,7 @@ interface TransactionRepository :
         WHERE c.uid = :categoryId 
         AND c.userId = :userId
     ), 
-        t.updated = current_timestamp,
+        t.updated = :now,
         t.version = t.version + 1
     WHERE t.uid = :transactionId
     AND t.userId = :userId
@@ -45,7 +47,8 @@ interface TransactionRepository :
   fun setTransactionCategory(
       @Param("transactionId") transactionId: TypedId<TransactionId>,
       @Param("categoryId") categoryId: TypedId<CategoryId>,
-      @Param("userId") userId: TypedId<UserId>
+      @Param("userId") userId: TypedId<UserId>,
+      @Param("now") now: ZonedDateTime = ZonedDateTime.now(ZoneId.of("UTC"))
   ): Int
 
   @Query(

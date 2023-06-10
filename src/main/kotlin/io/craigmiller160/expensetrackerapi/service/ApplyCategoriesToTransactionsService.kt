@@ -14,8 +14,8 @@ import io.craigmiller160.expensetrackerapi.data.repository.LastRuleAppliedReposi
 import io.craigmiller160.expensetrackerapi.data.repository.TransactionRepository
 import io.craigmiller160.expensetrackerapi.function.TryEither
 import io.craigmiller160.expensetrackerapi.function.flatMapCatch
+import jakarta.transaction.Transactional
 import java.time.LocalDate
-import javax.transaction.Transactional
 import org.slf4j.LoggerFactory
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort

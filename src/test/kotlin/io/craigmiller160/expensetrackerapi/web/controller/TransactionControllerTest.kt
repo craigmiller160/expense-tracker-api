@@ -18,12 +18,12 @@ import io.craigmiller160.expensetrackerapi.testutils.DefaultUsers
 import io.craigmiller160.expensetrackerapi.testutils.userTypedId
 import io.craigmiller160.expensetrackerapi.web.types.*
 import io.craigmiller160.expensetrackerapi.web.types.transaction.*
+import jakarta.persistence.EntityManager
 import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.ZoneId
 import java.util.Comparator
 import java.util.UUID
-import javax.persistence.EntityManager
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
@@ -250,7 +250,7 @@ constructor(
             totalItems = 2)
 
     mockMvc
-        .get("/transactions/?${request.toQueryString()}") {
+        .get("/transactions?${request.toQueryString()}") {
           secure = true
           header("Authorization", "Bearer $token")
         }

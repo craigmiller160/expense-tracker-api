@@ -10,15 +10,16 @@ spring:
   flyway:
     default-schema: ${testcontainers.common.postgres.schema}
     init-sqls: SET schema '${testcontainers.common.postgres.schema}'
-keycloak:
-  auth-server-url: ${testcontainers.common.keycloak.url}
-  realm: ${testcontainers.common.keycloak.realm}
-  resource: ${testcontainers.common.keycloak.client.id}
-  credentials:
-    secret: ${testcontainers.common.keycloak.client.secret}
+  security:
+    keycloak:
+      oauth2:
+        resourceserver:
+          host: ${testcontainers.common.keycloak.url}
+          realm: ${testcontainers.common.keycloak.realm}
+          client-id: ${testcontainers.common.keycloak.client.id}
 logging:
   level:
     org.hibernate.SQL: DEBUG
-    org.hibernate.type.descriptor.sql.BasicBinder: DEBUG
+#    org.hibernate.orm.jdbc.bind: TRACE
     org.springframework.jdbc.core: TRACE
     org.springframework.web.client.RestTemplate: DEBUG
