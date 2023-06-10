@@ -12,6 +12,7 @@ import io.craigmiller160.expensetrackerapi.web.types.report.ReportCategoryIdFilt
 import io.craigmiller160.expensetrackerapi.web.types.report.ReportRequest
 import jakarta.transaction.Transactional
 import java.time.LocalDate
+import java.util.UUID
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.PageRequest
@@ -92,8 +93,7 @@ class ReportRepositoryImpl(
         MapSqlParameterSource()
             .addValues(finalWrapper.params)
             .addValue("userId", userId.uuid)
-            .addValue("categoryIds", categoryIds.map { it.uuid })
-            .addValue("categoryIdType", categoryIdType.name)
+            .addCategoryIds(categoryIdType, categoryIds)
     return jdbcTemplate.query(finalWrapper.sql, params) { rs, _ ->
       SpendingByCategory(
           month = rs.getDate("month").toLocalDate(),
@@ -113,8 +113,7 @@ class ReportRepositoryImpl(
     val params =
         MapSqlParameterSource()
             .addValue("userId", userId.uuid)
-            .addValue("categoryIds", categoryIds.map { it.uuid })
-            .addValue("categoryIdType", categoryIdType.name)
+            .addCategoryIds(categoryIdType, categoryIds)
     return jdbcTemplate.queryForObject(getSpendingByMonthCountSql, params, Long::class.java)!!
   }
 
@@ -132,13 +131,24 @@ class ReportRepositoryImpl(
             .addValue("userId", userId.uuid)
             .addValue("offset", request.pageNumber * request.pageSize)
             .addValue("limit", request.pageSize)
-            .addValue("categoryIds", request.categoryIds.map { it.uuid })
-            .addValue("categoryIdType", request.categoryIdType.name)
+            .addCategoryIds(categoryIdType, categoryIds)
     return jdbcTemplate.query(getTotalSpendingByMonthSql, totalSpendingByMonthParams) { rs, _ ->
       SpendingByMonth(
           month = rs.getDate("month").toLocalDate(),
           total = rs.getBigDecimal("total"),
           categories = listOf())
     }
+  }
+
+  private fun MapSqlParameterSource.addCategoryIds(
+      categoryIdType: ReportCategoryIdFilterType,
+      categoryIds: List<TypedId<CategoryId>>
+  ): MapSqlParameterSource {
+    if (categoryIds.isEmpty()) {
+      return this.addValue("categoryIdType", "ALL").addValue("categoryIds", listOf<UUID>())
+    }
+
+    return this.addValue("categoryIdType", categoryIdType.name)
+        .addValue("categoryIds", categoryIds.map { it.uuid })
   }
 }
