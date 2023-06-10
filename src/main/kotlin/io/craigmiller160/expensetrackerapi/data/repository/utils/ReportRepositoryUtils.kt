@@ -8,7 +8,7 @@ enum class ReportQueryCategoryFilterType {
   INCLUDE_WITH_UNKNOWN,
   EXCLUDE_NO_UNKNOWN,
   EXCLUDE_WITH_UNKNOWN,
-  ALL_NO_UNKNOWN, // TODO probably not a factor
+  ALL_NO_UNKNOWN,
   ALL_WITH_UNKNOWN
 }
 
@@ -22,6 +22,22 @@ fun ReportCategoryIdFilterType.toQueryType(
       return ReportQueryCategoryFilterType.INCLUDE_WITH_UNKNOWN
     }
 
+    if (!hasUnknownId && hasOtherIds) {
+      return ReportQueryCategoryFilterType.ALL_NO_UNKNOWN
+    }
+
+    return ReportQueryCategoryFilterType.ALL_WITH_UNKNOWN
+  }
+
+  if (ReportCategoryIdFilterType.EXCLUDE == this) {
+    if (hasUnknownId && hasOtherIds) {
+      return ReportQueryCategoryFilterType.EXCLUDE_NO_UNKNOWN
+    }
+
+    if (!hasUnknownId && hasOtherIds) {
+      return ReportQueryCategoryFilterType.EXCLUDE_WITH_UNKNOWN
+    }
+
     return ReportQueryCategoryFilterType.ALL_WITH_UNKNOWN
   }
 
@@ -29,19 +45,5 @@ fun ReportCategoryIdFilterType.toQueryType(
     return ReportQueryCategoryFilterType.INCLUDE_WITH_UNKNOWN
   }
 
-  if (!hasOtherIds) {
-    ReportQueryCategoryFilterType.ALL_WITH_UNKNOWN
-  } else if (ReportCategoryIdFilterType.INCLUDE == this && hasUnknownId) {
-    ReportQueryCategoryFilterType.INCLUDE_WITH_UNKNOWN
-  } else if (ReportCategoryIdFilterType.INCLUDE == this && !hasUnknownId) {
-    ReportQueryCategoryFilterType.INCLUDE_NO_UNKNOWN
-  } else if (ReportCategoryIdFilterType.EXCLUDE == this && hasUnknownId) {
-    ReportQueryCategoryFilterType.EXCLUDE_NO_UNKNOWN
-  } else if (ReportCategoryIdFilterType.EXCLUDE == this && !hasUnknownId) {
-    ReportQueryCategoryFilterType.EXCLUDE_WITH_UNKNOWN
-  } else {
-    throw IllegalArgumentException("Invalid combination of query filter values")
-  }
-
-  TODO()
+  throw IllegalArgumentException("Invalid combination of query filter values")
 }
