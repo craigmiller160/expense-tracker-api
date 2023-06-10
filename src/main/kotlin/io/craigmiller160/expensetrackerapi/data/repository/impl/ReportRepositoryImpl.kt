@@ -144,10 +144,17 @@ class ReportRepositoryImpl(
       categoryIds: List<TypedId<CategoryId>>
   ): MapSqlParameterSource {
     if (categoryIds.isEmpty()) {
-      return this.addValue("categoryIdType", "ALL").addValue("categoryIds", null)
+      return this.addValue("categoryIdType", "NONE")
+          .addValue("unknownCategoryType", "NONE")
+          .addValue("categoryIds", null)
     }
 
+    val (unknownCategoryIds, otherCategoryIds) =
+        categoryIds.partition { categoryId -> CategoryConstants.UNKNOWN_CATEGORY.id == categoryId }
+    val unknownCategoryType = if (unknownCategoryIds.isNotEmpty()) categoryIdType.name else "NONE"
+
     return this.addValue("categoryIdType", categoryIdType.name)
-        .addValue("categoryIds", categoryIds.map { it.uuid })
+        .addValue("unknownCategoryType", unknownCategoryType)
+        .addValue("categoryIds", otherCategoryIds.map { it.uuid })
   }
 }
