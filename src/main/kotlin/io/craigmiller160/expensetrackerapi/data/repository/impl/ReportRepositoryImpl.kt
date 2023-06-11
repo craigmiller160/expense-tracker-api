@@ -8,6 +8,7 @@ import io.craigmiller160.expensetrackerapi.data.constants.CategoryConstants
 import io.craigmiller160.expensetrackerapi.data.projection.SpendingByCategory
 import io.craigmiller160.expensetrackerapi.data.projection.SpendingByMonth
 import io.craigmiller160.expensetrackerapi.data.repository.ReportRepository
+import io.craigmiller160.expensetrackerapi.data.repository.utils.toQueryType
 import io.craigmiller160.expensetrackerapi.web.types.report.ReportCategoryIdFilterType
 import io.craigmiller160.expensetrackerapi.web.types.report.ReportRequest
 import jakarta.transaction.Transactional
@@ -96,9 +97,9 @@ class ReportRepositoryImpl(
     return jdbcTemplate.query(finalWrapper.sql, params) { rs, _ ->
       SpendingByCategory(
           month = rs.getDate("month").toLocalDate(),
-          categoryName = rs.getString("category_name") ?: CategoryConstants.UNKNOWN_CATEGORY_NAME,
+          categoryName = rs.getString("category_name") ?: CategoryConstants.UNKNOWN_CATEGORY.name,
           amount = rs.getBigDecimal("amount"),
-          color = rs.getString("color") ?: CategoryConstants.UNKNOWN_CATEGORY_COLOR)
+          color = rs.getString("color") ?: CategoryConstants.UNKNOWN_CATEGORY.color)
     }
   }
 
@@ -143,11 +144,13 @@ class ReportRepositoryImpl(
       categoryIdType: ReportCategoryIdFilterType,
       categoryIds: List<TypedId<CategoryId>>
   ): MapSqlParameterSource {
-    if (categoryIds.isEmpty()) {
-      return this.addValue("categoryIdType", "ALL").addValue("categoryIds", null)
-    }
+    val (unknownCategoryIds, otherCategoryIds) =
+        categoryIds.partition { categoryId -> CategoryConstants.UNKNOWN_CATEGORY.id == categoryId }
+    val queryType =
+        categoryIdType.toQueryType(unknownCategoryIds.isNotEmpty(), otherCategoryIds.isNotEmpty())
 
-    return this.addValue("categoryIdType", categoryIdType.name)
-        .addValue("categoryIds", categoryIds.map { it.uuid })
+    val queryCategoryIds = otherCategoryIds.map { it.uuid }.ifEmpty { null }
+
+    return this.addValue("categoryIdType", queryType.name).addValue("categoryIds", queryCategoryIds)
   }
 }

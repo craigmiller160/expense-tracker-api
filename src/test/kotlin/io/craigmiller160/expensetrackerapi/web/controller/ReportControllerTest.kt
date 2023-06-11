@@ -137,8 +137,8 @@ constructor(
                                     amount = txn7.amount,
                                     percent = txn7.amount / month1Total),
                                 ReportCategoryResponse(
-                                    name = CategoryConstants.UNKNOWN_CATEGORY_NAME,
-                                    color = CategoryConstants.UNKNOWN_CATEGORY_COLOR,
+                                    name = CategoryConstants.UNKNOWN_CATEGORY.name,
+                                    color = CategoryConstants.UNKNOWN_CATEGORY.color,
                                     amount = txn6.amount,
                                     percent = txn6.amount / month1Total)))))
   }
@@ -304,6 +304,146 @@ constructor(
               secure = true
               header("Authorization", "Bearer $token")
             }
+        .andExpect {
+          status { isOk() }
+          content { json(objectMapper.writeValueAsString(response), true) }
+        }
+  }
+
+  @Test
+  fun getReports_includeUnknown() {
+    val unknownCategoryId = CategoryConstants.UNKNOWN_CATEGORY.id
+    val category = expectedResponse.reports[1].categories[4].copy(percent = BigDecimal("1.0"))
+    val report =
+        expectedResponse.reports[1].copy(total = category.amount, categories = listOf(category))
+    val response = expectedResponse.copy(totalItems = 1, reports = listOf(report))
+    mockMvc
+        .get(
+            "/reports?pageNumber=0&pageSize=100&categoryIdType=INCLUDE&categoryIds=$unknownCategoryId") {
+              secure = true
+              header("Authorization", "Bearer $token")
+            }
+        .andExpect {
+          status { isOk() }
+          content { json(objectMapper.writeValueAsString(response), true) }
+        }
+  }
+
+  @Test
+  fun getReports_includeCategoryAndUnknown() {
+    val month2ReportTotal = expectedResponse.reports[0].categories[1].amount
+    val month2Report =
+        expectedResponse.reports[0].copy(
+            total = month2ReportTotal,
+            categories =
+                listOf(expectedResponse.reports[0].categories[1].copy(percent = BigDecimal("1.0"))))
+
+    val month1ReportTotal =
+        expectedResponse.reports[1].categories[1].amount +
+            expectedResponse.reports[1].categories[4].amount
+    val month1Report =
+        expectedResponse.reports[1].copy(
+            total = month1ReportTotal,
+            categories =
+                listOf(
+                    expectedResponse.reports[1]
+                        .categories[1]
+                        .copy(
+                            percent =
+                                expectedResponse.reports[1].categories[1].amount /
+                                    month1ReportTotal),
+                    expectedResponse.reports[1]
+                        .categories[4]
+                        .copy(
+                            percent =
+                                expectedResponse.reports[1].categories[4].amount /
+                                    month1ReportTotal)))
+
+    val response = expectedResponse.copy(reports = listOf(month2Report, month1Report))
+
+    val unknownCategoryId = CategoryConstants.UNKNOWN_CATEGORY.id
+    val categoryIds = listOf(unknownCategoryId, categories[1].id).joinToString(",")
+    mockMvc
+        .get("/reports?pageNumber=0&pageSize=100&categoryIdType=INCLUDE&categoryIds=$categoryIds") {
+          secure = true
+          header("Authorization", "Bearer $token")
+        }
+        .andExpect {
+          status { isOk() }
+          content { json(objectMapper.writeValueAsString(response), true) }
+        }
+  }
+
+  @Test
+  fun getReports_excludeUnknown() {
+    val unknownCategoryId = CategoryConstants.UNKNOWN_CATEGORY.id
+    val newMonth1Total =
+        expectedResponse.reports[1].total - expectedResponse.reports[1].categories[4].amount
+    val newMonth1Report =
+        expectedResponse.reports[1].copy(
+            total = newMonth1Total,
+            categories =
+                expectedResponse.reports[1].categories.slice(0..3).map { cat ->
+                  cat.copy(percent = cat.amount / newMonth1Total)
+                })
+
+    val response =
+        expectedResponse.copy(reports = listOf(expectedResponse.reports[0], newMonth1Report))
+    mockMvc
+        .get(
+            "/reports?pageNumber=0&pageSize=100&categoryIdType=EXCLUDE&categoryIds=$unknownCategoryId") {
+              secure = true
+              header("Authorization", "Bearer $token")
+            }
+        .andExpect {
+          status { isOk() }
+          content { json(objectMapper.writeValueAsString(response), true) }
+        }
+  }
+
+  @Test
+  fun getReports_excludeCategoryAndUnknown() {
+    val month2Total = expectedResponse.reports[0].categories[0].amount
+    val month2Report =
+        expectedResponse.reports[0].copy(
+            total = month2Total,
+            categories =
+                listOf(expectedResponse.reports[0].categories[0].copy(percent = BigDecimal("1.0"))))
+
+    val month1Total =
+        expectedResponse.reports[1].total -
+            expectedResponse.reports[1].categories[1].amount -
+            expectedResponse.reports[1].categories[4].amount
+    val month1Report =
+        expectedResponse.reports[1].copy(
+            total = month1Total,
+            categories =
+                listOf(
+                    expectedResponse.reports[1]
+                        .categories[0]
+                        .copy(
+                            percent =
+                                expectedResponse.reports[1].categories[0].amount / month1Total),
+                    expectedResponse.reports[1]
+                        .categories[2]
+                        .copy(
+                            percent =
+                                expectedResponse.reports[1].categories[2].amount / month1Total),
+                    expectedResponse.reports[1]
+                        .categories[3]
+                        .copy(
+                            percent =
+                                expectedResponse.reports[1].categories[3].amount / month1Total)))
+
+    val response = expectedResponse.copy(reports = listOf(month2Report, month1Report))
+
+    val unknownCategoryId = CategoryConstants.UNKNOWN_CATEGORY.id
+    val categoryIds = listOf(unknownCategoryId, categories[1].id).joinToString(",")
+    mockMvc
+        .get("/reports?pageNumber=0&pageSize=100&categoryIdType=EXCLUDE&categoryIds=$categoryIds") {
+          secure = true
+          header("Authorization", "Bearer $token")
+        }
         .andExpect {
           status { isOk() }
           content { json(objectMapper.writeValueAsString(response), true) }

@@ -4,10 +4,6 @@ LEFT JOIN categories c ON tv.category_id = c.uid AND c.user_id = :userId
 WHERE tv.expense_date >= DATE_TRUNC('month', :theDate::date)
 AND tv.expense_date <= (DATE_TRUNC('month', :theDate::date) + interval '1 month - 1 day')
 AND tv.user_id = :userId
-AND CASE
-    WHEN :categoryIdType = 'INCLUDE' THEN tv.category_id IN (:categoryIds)
-    WHEN :categoryIdType = 'EXCLUDE' THEN (tv.category_id IS NULL OR tv.category_id NOT IN (:categoryIds))
-    ELSE true = true
-END
+AND is_report_category_allowed(tv.category_id, :categoryIdType::report_category_filter_type, ARRAY[:categoryIds]::UUID[])
 GROUP BY tv.category_name, c.color
 ORDER BY tv.category_name ASC;
