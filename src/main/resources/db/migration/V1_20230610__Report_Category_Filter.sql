@@ -23,10 +23,10 @@ $$
         WHEN filter_type = 'INCLUDE_WITH_UNKNOWN'::report_category_filter_type THEN (
             category_id = ANY(category_ids) OR category_id IS NULL
         )
-        WHEN filter_type = 'EXCLUDE_NO_UNKNOWN'::report_category_filter_type THEN (
+        WHEN filter_type = 'EXCLUDE_WITH_UNKNOWN'::report_category_filter_type THEN (
             NOT(category_id = ANY(category_ids)) AND category_id IS NOT NULL
         )
-        WHEN filter_type = 'EXCLUDE_WITH_UNKNOWN'::report_category_filter_type THEN (
+        WHEN filter_type = 'EXCLUDE_NO_UNKNOWN'::report_category_filter_type THEN (
             NOT(category_id = ANY(category_ids)) OR category_id IS NULL
         )
         WHEN filter_type = 'ALL_NO_UNKNOWN'::report_category_filter_type THEN (

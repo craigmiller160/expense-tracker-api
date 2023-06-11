@@ -35,7 +35,7 @@ class ReportRepositoryUtilsTest {
                 ReportCategoryIdFilterType.EXCLUDE,
                 true,
                 true,
-                ReportCategoryFilterType.EXCLUDE_NO_UNKNOWN),
+                ReportCategoryFilterType.EXCLUDE_WITH_UNKNOWN),
             QueryFilterTypeConfig(
                 ReportCategoryIdFilterType.EXCLUDE,
                 true,
@@ -45,7 +45,7 @@ class ReportRepositoryUtilsTest {
                 ReportCategoryIdFilterType.EXCLUDE,
                 false,
                 true,
-                ReportCategoryFilterType.EXCLUDE_WITH_UNKNOWN),
+                ReportCategoryFilterType.EXCLUDE_NO_UNKNOWN),
             QueryFilterTypeConfig(
                 ReportCategoryIdFilterType.EXCLUDE,
                 false,
