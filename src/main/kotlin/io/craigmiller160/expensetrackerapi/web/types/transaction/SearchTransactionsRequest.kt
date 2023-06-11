@@ -6,6 +6,7 @@ import io.craigmiller160.expensetrackerapi.common.utils.DateUtils
 import io.craigmiller160.expensetrackerapi.web.types.PageableRequest
 import io.craigmiller160.expensetrackerapi.web.types.SortDirection
 import io.craigmiller160.expensetrackerapi.web.types.SortableRequest
+import io.craigmiller160.expensetrackerapi.web.types.YesNoFilter
 import io.swagger.v3.oas.annotations.Hidden
 import jakarta.validation.constraints.AssertTrue
 import java.time.LocalDate
@@ -18,17 +19,17 @@ data class SearchTransactionsRequest(
     override val sortDirection: SortDirection,
     @field:DateTimeFormat(pattern = DateUtils.DATE_PATTERN) val startDate: LocalDate? = null,
     @field:DateTimeFormat(pattern = DateUtils.DATE_PATTERN) val endDate: LocalDate? = null,
-    val isConfirmed: Boolean? = null,
-    val isCategorized: Boolean? = null,
-    val isDuplicate: Boolean? = null,
-    val isPossibleRefund: Boolean? = null,
+    val confirmed: YesNoFilter,
+    val categorized: YesNoFilter,
+    val duplicate: YesNoFilter,
+    val possibleRefund: YesNoFilter,
     val categoryIds: Set<TypedId<CategoryId>>? = null,
 ) : PageableRequest, SortableRequest<TransactionSortKey> {
 
   @Hidden
-  @AssertTrue(message = "Cannot set WITHOUT_CATEGORY and specify categoryIds")
+  @AssertTrue(message = "Cannot set categorized to NO and specify categoryIds")
   fun isCategoryPropsValid(): Boolean {
-    if (isCategorized == false) {
+    if (YesNoFilter.NO == categorized) {
       return categoryIds.isNullOrEmpty()
     }
     return true
@@ -42,10 +43,10 @@ data class SearchTransactionsRequest(
               "sortDirection" to sortDirection.name,
               "startDate" to startDate?.let { DateUtils.format(it) },
               "endDate" to endDate?.let { DateUtils.format(it) },
-              "isConfirmed" to isConfirmed,
-              "isCategorized" to isCategorized,
-              "isDuplicate" to isDuplicate,
-              "isPossibleRefund" to isPossibleRefund,
+              "confirmed" to confirmed.name,
+              "categorized" to categorized.name,
+              "duplicate" to duplicate,
+              "possibleRefund" to possibleRefund,
               "categoryIds" to categoryIds?.joinToString(",") { it.toString() })
           .filter { it.second != null }
           .map { "${it.first}=${it.second}" }
