@@ -3,10 +3,10 @@ package io.craigmiller160.expensetrackerapi.web.types.transaction
 import io.craigmiller160.expensetrackerapi.common.data.typedid.TypedId
 import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.CategoryId
 import io.craigmiller160.expensetrackerapi.common.utils.DateUtils
+import io.craigmiller160.expensetrackerapi.data.model.YesNoFilter
 import io.craigmiller160.expensetrackerapi.web.types.PageableRequest
 import io.craigmiller160.expensetrackerapi.web.types.SortDirection
 import io.craigmiller160.expensetrackerapi.web.types.SortableRequest
-import io.craigmiller160.expensetrackerapi.web.types.YesNoFilter
 import io.swagger.v3.oas.annotations.Hidden
 import jakarta.validation.constraints.AssertTrue
 import java.time.LocalDate

@@ -8,9 +8,9 @@ import io.craigmiller160.expensetrackerapi.common.data.typedid.TypedId
 import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.UserId
 import io.craigmiller160.expensetrackerapi.data.model.QTransactionView
 import io.craigmiller160.expensetrackerapi.data.model.TransactionView
+import io.craigmiller160.expensetrackerapi.data.model.YesNoFilter
 import io.craigmiller160.expensetrackerapi.data.querydsl.QueryDSLSupport
 import io.craigmiller160.expensetrackerapi.data.repository.TransactionRepositoryCustom
-import io.craigmiller160.expensetrackerapi.web.types.YesNoFilter
 import io.craigmiller160.expensetrackerapi.web.types.transaction.SearchTransactionsRequest
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageImpl
@@ -38,15 +38,16 @@ class TransactionRepositoryCustomImpl(
                 QueryDSLSupport.andIfNotNull(request.endDate) {
                   QTransactionView.transactionView.expenseDate.loe(it)
                 })
-            .let {}
             .let(
-                QueryDSLSupport.andIfNotNull(request.isConfirmed) {
-                  QTransactionView.transactionView.confirmed.eq(it)
-                })
+                QueryDSLSupport.andYesNoFilter(
+                    value = request.confirmed,
+                    ifYes = QTransactionView.transactionView.confirmed.eq(true),
+                    ifNo = QTransactionView.transactionView.confirmed.eq(false)))
             .let(
-                QueryDSLSupport.andIfNotNull(request.isDuplicate) {
-                  QTransactionView.transactionView.duplicate.eq(it)
-                })
+                QueryDSLSupport.andYesNoFilter(
+                    value = request.duplicate,
+                    ifYes = QTransactionView.transactionView.duplicate.eq(true),
+                    ifNo = QTransactionView.transactionView.duplicate.eq(false)))
             .let(
                 QueryDSLSupport.andIfNotNull(request.categoryIds) {
                   QTransactionView.transactionView.categoryId.`in`(it)
