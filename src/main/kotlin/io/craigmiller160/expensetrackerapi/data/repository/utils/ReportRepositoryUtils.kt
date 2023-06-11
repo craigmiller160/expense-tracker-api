@@ -3,11 +3,12 @@ package io.craigmiller160.expensetrackerapi.data.repository.utils
 import io.craigmiller160.expensetrackerapi.web.types.report.ReportCategoryIdFilterType
 import java.lang.IllegalArgumentException
 
+// TODO rename items
 enum class ReportCategoryFilterType {
   INCLUDE_NO_UNKNOWN,
   INCLUDE_WITH_UNKNOWN,
   EXCLUDE_NO_UNKNOWN,
-  EXCLUDE_WITH_UNKNOWN,
+  EXCLUDE_WITH_UNKNOWN, // TODO this is the most confusing name
   ALL_NO_UNKNOWN,
   ALL_WITH_UNKNOWN,
   NONE_WITH_UNKNOWN
