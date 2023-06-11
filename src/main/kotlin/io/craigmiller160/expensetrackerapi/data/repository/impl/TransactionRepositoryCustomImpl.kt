@@ -53,21 +53,15 @@ class TransactionRepositoryCustomImpl(
                   QTransactionView.transactionView.categoryId.`in`(it)
                 })
             .let(
-                QueryDSLSupport.andIfNotNull(request.isCategorized) {
-                  if (it) {
-                    QTransactionView.transactionView.categoryId.isNotNull
-                  } else {
-                    QTransactionView.transactionView.categoryId.isNull
-                  }
-                })
+                QueryDSLSupport.andYesNoFilter(
+                    value = request.categorized,
+                    ifYes = QTransactionView.transactionView.categoryId.isNotNull,
+                    ifNo = QTransactionView.transactionView.categoryId.isNull))
             .let(
-                QueryDSLSupport.andIfNotNull(request.isPossibleRefund) {
-                  if (it) {
-                    QTransactionView.transactionView.amount.gt(0)
-                  } else {
-                    QTransactionView.transactionView.amount.loe(0)
-                  }
-                })
+                QueryDSLSupport.andYesNoFilter(
+                    value = request.possibleRefund,
+                    ifYes = QTransactionView.transactionView.amount.gt(0),
+                    ifNo = QTransactionView.transactionView.amount.loe(0)))
 
     val baseQuery = queryFactory.query().from(QTransactionView.transactionView).where(whereClause)
 
