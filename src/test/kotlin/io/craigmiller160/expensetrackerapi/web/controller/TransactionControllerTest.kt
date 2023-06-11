@@ -8,6 +8,7 @@ import io.craigmiller160.expensetrackerapi.data.model.AutoCategorizeRule
 import io.craigmiller160.expensetrackerapi.data.model.Category
 import io.craigmiller160.expensetrackerapi.data.model.Transaction
 import io.craigmiller160.expensetrackerapi.data.model.TransactionCommon
+import io.craigmiller160.expensetrackerapi.data.model.YesNoFilter
 import io.craigmiller160.expensetrackerapi.data.repository.LastRuleAppliedRepository
 import io.craigmiller160.expensetrackerapi.data.repository.TransactionRepository
 import io.craigmiller160.expensetrackerapi.data.repository.TransactionViewRepository
@@ -103,7 +104,7 @@ constructor(
   fun `search - with no categories, sort by EXPENSE_DATE DESC`() {
     val request =
         SearchTransactionsRequest(
-            isCategorized = false,
+            categorized = YesNoFilter.NO,
             pageNumber = 0,
             pageSize = 100,
             sortKey = TransactionSortKey.EXPENSE_DATE,
@@ -134,7 +135,7 @@ constructor(
   fun `search - with categories`() {
     val request =
         SearchTransactionsRequest(
-            isCategorized = true,
+            categorized = YesNoFilter.YES,
             pageNumber = 0,
             pageSize = 100,
             sortKey = TransactionSortKey.EXPENSE_DATE,
@@ -166,7 +167,7 @@ constructor(
   fun `search - with categories, but with more items than on the first page`() {
     val request =
         SearchTransactionsRequest(
-            isCategorized = true,
+            categorized = YesNoFilter.YES,
             pageNumber = 0,
             pageSize = 2,
             sortKey = TransactionSortKey.EXPENSE_DATE,
@@ -196,7 +197,7 @@ constructor(
   fun `search - with no categories`() {
     val request =
         SearchTransactionsRequest(
-            isCategorized = false,
+            categorized = YesNoFilter.NO,
             pageNumber = 0,
             pageSize = 100,
             sortKey = TransactionSortKey.EXPENSE_DATE,
@@ -234,7 +235,7 @@ constructor(
 
     val request =
         SearchTransactionsRequest(
-            isPossibleRefund = true,
+            possibleRefund = YesNoFilter.YES,
             pageNumber = 0,
             pageSize = 100,
             sortKey = TransactionSortKey.EXPENSE_DATE,
@@ -268,7 +269,7 @@ constructor(
 
     val request =
         SearchTransactionsRequest(
-            isDuplicate = true,
+            duplicate = YesNoFilter.YES,
             pageNumber = 0,
             pageSize = 100,
             sortKey = TransactionSortKey.EXPENSE_DATE,
@@ -298,7 +299,7 @@ constructor(
   fun `search - invalid category options`() {
     val request =
         SearchTransactionsRequest(
-            isCategorized = false,
+            categorized = YesNoFilter.NO,
             categoryIds = setOf(user1Categories[0].uid),
             pageNumber = 0,
             pageSize = 100,
@@ -319,7 +320,7 @@ constructor(
     transactionRepository.saveAndFlush(Transaction(txn1))
     val request =
         SearchTransactionsRequest(
-            isDuplicate = false,
+            duplicate = YesNoFilter.NO,
             pageNumber = 0,
             pageSize = 100,
             sortKey = TransactionSortKey.EXPENSE_DATE,
@@ -360,7 +361,7 @@ constructor(
     transactionRepository.saveAndFlush(user2Transactions.first().apply { confirmed = true })
     val request =
         SearchTransactionsRequest(
-            isConfirmed = true,
+            confirmed = YesNoFilter.YES,
             pageNumber = 0,
             pageSize = 100,
             sortKey = TransactionSortKey.EXPENSE_DATE,
@@ -396,7 +397,7 @@ constructor(
     transactionRepository.saveAndFlush(user1Transactions[1].apply { confirmed = true })
     val request =
         SearchTransactionsRequest(
-            isConfirmed = false,
+            confirmed = YesNoFilter.NO,
             pageNumber = 0,
             pageSize = 100,
             sortKey = TransactionSortKey.EXPENSE_DATE,

@@ -19,10 +19,10 @@ data class SearchTransactionsRequest(
     override val sortDirection: SortDirection,
     @field:DateTimeFormat(pattern = DateUtils.DATE_PATTERN) val startDate: LocalDate? = null,
     @field:DateTimeFormat(pattern = DateUtils.DATE_PATTERN) val endDate: LocalDate? = null,
-    val confirmed: YesNoFilter,
-    val categorized: YesNoFilter,
-    val duplicate: YesNoFilter,
-    val possibleRefund: YesNoFilter,
+    val confirmed: YesNoFilter = YesNoFilter.ALL,
+    val categorized: YesNoFilter = YesNoFilter.ALL,
+    val duplicate: YesNoFilter = YesNoFilter.ALL,
+    val possibleRefund: YesNoFilter = YesNoFilter.ALL,
     val categoryIds: Set<TypedId<CategoryId>>? = null,
 ) : PageableRequest, SortableRequest<TransactionSortKey> {
 
