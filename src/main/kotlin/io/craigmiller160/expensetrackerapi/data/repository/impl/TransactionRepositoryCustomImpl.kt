@@ -1,11 +1,14 @@
 package io.craigmiller160.expensetrackerapi.data.repository.impl
 
 import com.querydsl.core.BooleanBuilder
+import com.querydsl.core.types.dsl.BooleanExpression
+import com.querydsl.core.types.dsl.Expressions
 import com.querydsl.jpa.impl.JPAQueryFactory
 import io.craigmiller160.expensetrackerapi.common.data.typedid.TypedId
 import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.UserId
 import io.craigmiller160.expensetrackerapi.data.model.QTransactionView
 import io.craigmiller160.expensetrackerapi.data.model.TransactionView
+import io.craigmiller160.expensetrackerapi.data.model.YesNoFilter
 import io.craigmiller160.expensetrackerapi.data.querydsl.QueryDSLSupport
 import io.craigmiller160.expensetrackerapi.data.repository.TransactionRepositoryCustom
 import io.craigmiller160.expensetrackerapi.web.types.transaction.SearchTransactionsRequest
@@ -36,33 +39,29 @@ class TransactionRepositoryCustomImpl(
                   QTransactionView.transactionView.expenseDate.loe(it)
                 })
             .let(
-                QueryDSLSupport.andIfNotNull(request.isConfirmed) {
-                  QTransactionView.transactionView.confirmed.eq(it)
-                })
+                QueryDSLSupport.andYesNoFilter(
+                    value = request.confirmed,
+                    ifYes = QTransactionView.transactionView.confirmed.eq(true),
+                    ifNo = QTransactionView.transactionView.confirmed.eq(false)))
             .let(
-                QueryDSLSupport.andIfNotNull(request.isDuplicate) {
-                  QTransactionView.transactionView.duplicate.eq(it)
-                })
+                QueryDSLSupport.andYesNoFilter(
+                    value = request.duplicate,
+                    ifYes = QTransactionView.transactionView.duplicate.eq(true),
+                    ifNo = QTransactionView.transactionView.duplicate.eq(false)))
             .let(
                 QueryDSLSupport.andIfNotNull(request.categoryIds) {
                   QTransactionView.transactionView.categoryId.`in`(it)
                 })
             .let(
-                QueryDSLSupport.andIfNotNull(request.isCategorized) {
-                  if (it) {
-                    QTransactionView.transactionView.categoryId.isNotNull
-                  } else {
-                    QTransactionView.transactionView.categoryId.isNull
-                  }
-                })
+                QueryDSLSupport.andYesNoFilter(
+                    value = request.categorized,
+                    ifYes = QTransactionView.transactionView.categoryId.isNotNull,
+                    ifNo = QTransactionView.transactionView.categoryId.isNull))
             .let(
-                QueryDSLSupport.andIfNotNull(request.isPossibleRefund) {
-                  if (it) {
-                    QTransactionView.transactionView.amount.gt(0)
-                  } else {
-                    QTransactionView.transactionView.amount.loe(0)
-                  }
-                })
+                QueryDSLSupport.andYesNoFilter(
+                    value = request.possibleRefund,
+                    ifYes = QTransactionView.transactionView.amount.gt(0),
+                    ifNo = QTransactionView.transactionView.amount.loe(0)))
 
     val baseQuery = queryFactory.query().from(QTransactionView.transactionView).where(whereClause)
 
@@ -75,4 +74,16 @@ class TransactionRepositoryCustomImpl(
 
     return PageImpl(results, page, count)
   }
+}
+
+private fun yesNoFilter(
+    value: YesNoFilter,
+    ifYes: () -> BooleanExpression,
+    ifNo: () -> BooleanExpression
+): (BooleanBuilder) -> BooleanBuilder = { builder ->
+  when (value) {
+    YesNoFilter.YES -> ifYes()
+    YesNoFilter.NO -> ifNo()
+    YesNoFilter.ALL -> Expressions.TRUE
+  }.let { builder.and(it) }
 }
