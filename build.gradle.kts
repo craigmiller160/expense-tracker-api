@@ -12,7 +12,7 @@ plugins {
     kotlin("plugin.spring")
     kotlin("plugin.jpa")
     kotlin("kapt")
-    id("io.craigmiller160.gradle.defaults") version "1.1.0"
+    id("io.craigmiller160.gradle.defaults") version "1.2.0"
     id("com.diffplug.spotless") version "6.17.0"
     `maven-publish`
 }
