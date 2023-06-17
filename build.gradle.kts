@@ -30,8 +30,8 @@ java.sourceCompatibility = JavaVersion.VERSION_19
 dependencies {
     val queryDslVersion: String by project
 
-    implementation("io.craigmiller160:spring-keycloak-oauth2-resource-server:1.0.0-SNAPSHOT")
-    testImplementation("io.craigmiller160:testcontainers-common:1.2.0-SNAPSHOT")
+    implementation("io.craigmiller160:spring-keycloak-oauth2-resource-server:1.0.0")
+    testImplementation("io.craigmiller160:testcontainers-common:1.2.0")
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui")
     implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
     implementation("org.springframework.boot:spring-boot-starter-validation")
@@ -54,7 +54,7 @@ dependencies {
     }
     implementation("io.arrow-kt:arrow-core:1.1.2")
     implementation("io.github.craigmiller160:spring-fp-result-kt:2.0.0")
-    implementation("io.craigmiller160:spring-web-utils:1.3.0-SNAPSHOT")
+    implementation("io.craigmiller160:spring-web-utils:2.0.0")
     testImplementation("org.mockito.kotlin:mockito-kotlin:4.0.0")
 
     implementation("com.querydsl:querydsl-jpa:$queryDslVersion:jakarta")
