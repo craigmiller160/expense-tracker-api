@@ -9,7 +9,6 @@ import io.craigmiller160.expensetrackerapi.data.projection.SpendingByCategory
 import io.craigmiller160.expensetrackerapi.data.projection.SpendingByMonth
 import io.craigmiller160.expensetrackerapi.data.repository.ReportRepository
 import io.craigmiller160.expensetrackerapi.data.repository.utils.toQueryType
-import io.craigmiller160.expensetrackerapi.extension.getTypedId
 import io.craigmiller160.expensetrackerapi.web.types.report.ReportCategoryIdFilterType
 import io.craigmiller160.expensetrackerapi.web.types.report.ReportRequest
 import jakarta.transaction.Transactional
@@ -97,7 +96,8 @@ class ReportRepositoryImpl(
             .addCategoryIds(categoryIdType, categoryIds)
     return jdbcTemplate.query(finalWrapper.sql, params) { rs, _ ->
       SpendingByCategory(
-          categoryId = rs.getTypedId("category_id"),
+          categoryId = rs.getString("category_id")?.let { TypedId(it) }
+                  ?: CategoryConstants.UNKNOWN_CATEGORY.id,
           month = rs.getDate("month").toLocalDate(),
           categoryName = rs.getString("category_name") ?: CategoryConstants.UNKNOWN_CATEGORY.name,
           amount = rs.getBigDecimal("amount"),
