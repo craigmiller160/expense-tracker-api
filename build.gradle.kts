@@ -68,7 +68,7 @@ dependencies {
 }
 
 kapt {
-    generateStubs = true
+    generateStubs = false
 }
 
 tasks.withType<KotlinCompile> {
