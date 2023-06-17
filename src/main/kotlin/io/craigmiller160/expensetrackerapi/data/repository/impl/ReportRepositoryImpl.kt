@@ -96,6 +96,8 @@ class ReportRepositoryImpl(
             .addCategoryIds(categoryIdType, categoryIds)
     return jdbcTemplate.query(finalWrapper.sql, params) { rs, _ ->
       SpendingByCategory(
+          categoryId = rs.getString("category_id")?.let { TypedId(it) }
+                  ?: CategoryConstants.UNKNOWN_CATEGORY.id,
           month = rs.getDate("month").toLocalDate(),
           categoryName = rs.getString("category_name") ?: CategoryConstants.UNKNOWN_CATEGORY.name,
           amount = rs.getBigDecimal("amount"),

@@ -102,11 +102,13 @@ constructor(
                         categories =
                             listOf(
                                 ReportCategoryResponse(
+                                    id = cat1.id,
                                     name = cat1.name,
                                     color = cat1.color,
                                     amount = txn3.amount,
                                     percent = txn3.amount / month2Total),
                                 ReportCategoryResponse(
+                                    id = cat2.id,
                                     name = cat2.name,
                                     color = cat2.color,
                                     amount = txn4.amount,
@@ -117,26 +119,31 @@ constructor(
                         categories =
                             listOf(
                                 ReportCategoryResponse(
+                                    id = cat1.id,
                                     name = cat1.name,
                                     color = cat1.color,
                                     amount = txn1.amount,
                                     percent = txn1.amount / month1Total),
                                 ReportCategoryResponse(
+                                    id = cat2.id,
                                     name = cat2.name,
                                     color = cat2.color,
                                     amount = txn2.amount,
                                     percent = txn2.amount / month1Total),
                                 ReportCategoryResponse(
+                                    id = cat4.id,
                                     name = cat4.name,
                                     color = cat4.color,
                                     amount = txn8.amount,
                                     percent = txn8.amount / month1Total),
                                 ReportCategoryResponse(
+                                    id = cat5.id,
                                     name = cat5.name,
                                     color = cat5.color,
                                     amount = txn7.amount,
                                     percent = txn7.amount / month1Total),
                                 ReportCategoryResponse(
+                                    id = CategoryConstants.UNKNOWN_CATEGORY.id,
                                     name = CategoryConstants.UNKNOWN_CATEGORY.name,
                                     color = CategoryConstants.UNKNOWN_CATEGORY.color,
                                     amount = txn6.amount,
