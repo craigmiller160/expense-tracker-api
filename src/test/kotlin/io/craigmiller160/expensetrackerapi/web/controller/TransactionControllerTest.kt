@@ -1281,4 +1281,13 @@ constructor(
         }
         .andExpect { status { isBadRequest() } }
   }
+
+  @Test
+  fun `delete all unconfirmed transactions`() {
+    //        mockMvc.delete("/transactions/unconfirmed") {
+    //            secure = true
+    //            header("Authorization", "Bearer $token")
+    //        }
+    TODO()
+  }
 }
