@@ -131,5 +131,6 @@ class TransactionController(private val transactionService: TransactionService) 
                   mediaType = "application/json",
                   schema = Schema(implementation = DeleteTransactionsResponse::class))])
   @DeleteMapping("/unconfirmed")
-  fun deleteAllUnconfirmed(): TryEither<DeleteTransactionsResponse> = TODO()
+  fun deleteAllUnconfirmed(): TryEither<DeleteTransactionsResponse> =
+      transactionService.deleteAllUnconfirmed()
 }
