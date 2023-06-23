@@ -122,4 +122,15 @@ class TransactionController(private val transactionService: TransactionService) 
   fun getTransactionDetails(
       @PathVariable transactionId: TypedId<TransactionId>
   ): TryEither<TransactionDetailsResponse> = transactionService.getTransactionDetails(transactionId)
+
+  @ApiResponse(
+      responseCode = "200",
+      content =
+          [
+              Content(
+                  mediaType = "application/json",
+                  schema = Schema(implementation = DeleteTransactionsResponse::class))])
+  @DeleteMapping("/unconfirmed")
+  fun deleteAllUnconfirmed(): TryEither<DeleteTransactionsResponse> =
+      transactionService.deleteAllUnconfirmed()
 }

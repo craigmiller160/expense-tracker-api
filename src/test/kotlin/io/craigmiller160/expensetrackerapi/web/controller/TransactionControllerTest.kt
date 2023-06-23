@@ -20,6 +20,7 @@ import io.craigmiller160.expensetrackerapi.testutils.userTypedId
 import io.craigmiller160.expensetrackerapi.web.types.*
 import io.craigmiller160.expensetrackerapi.web.types.transaction.*
 import jakarta.persistence.EntityManager
+import java.lang.AssertionError
 import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.ZoneId
@@ -1280,5 +1281,29 @@ constructor(
           header("Authorization", "Bearer $token")
         }
         .andExpect { status { isBadRequest() } }
+  }
+
+  @Test
+  fun `delete all unconfirmed transactions`() {
+    val startingTransactionCount = transactionRepository.count()
+    val unconfirmed = user1Transactions.filter { !it.confirmed }
+    val response = DeleteTransactionsResponse(transactionsDeleted = unconfirmed.size)
+    mockMvc
+        .delete("/transactions/unconfirmed") {
+          secure = true
+          header("Authorization", "Bearer $token")
+        }
+        .andExpect {
+          status { isOk() }
+          content { json(objectMapper.writeValueAsString(response)) }
+        }
+
+    val endingTransactionCount = transactionRepository.count()
+    assertEquals(startingTransactionCount - unconfirmed.size, endingTransactionCount)
+    transactionRepository.findAll().forEach { transaction ->
+      if (unconfirmed.any { it.uid === transaction.uid }) {
+        throw AssertionError("Unconfirmed transaction for User 1 still exists")
+      }
+    }
   }
 }

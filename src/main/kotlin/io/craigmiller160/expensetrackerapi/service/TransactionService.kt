@@ -238,4 +238,11 @@ class TransactionService(
         }
         .map { TransactionDetailsResponse.from(it) }
   }
+
+  @Transactional
+  fun deleteAllUnconfirmed(): TryEither<DeleteTransactionsResponse> {
+    val userId = authService.getAuthUserId()
+    return Either.catch { transactionRepository.deleteAllUnconfirmed(userId) }
+        .map { DeleteTransactionsResponse(it) }
+  }
 }

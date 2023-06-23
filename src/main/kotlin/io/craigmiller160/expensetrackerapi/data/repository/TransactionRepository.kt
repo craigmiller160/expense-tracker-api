@@ -5,6 +5,7 @@ import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.CategoryId
 import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.TransactionId
 import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.UserId
 import io.craigmiller160.expensetrackerapi.data.model.Transaction
+import jakarta.transaction.Transactional
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import org.springframework.data.domain.Page
@@ -134,4 +135,14 @@ interface TransactionRepository :
     AND t.confirmed = false
   """)
   fun findAllUnconfirmed(userId: TypedId<UserId>, page: Pageable): Page<Transaction>
+
+  @Query(
+      """
+      DELETE FROM Transaction t
+      WHERE t.userId = :userId
+      AND t.confirmed = false
+  """)
+  @Transactional
+  @Modifying(flushAutomatically = true, clearAutomatically = true)
+  fun deleteAllUnconfirmed(@Param("userId") userId: TypedId<UserId>): Int
 }
