@@ -9,11 +9,14 @@ import io.craigmiller160.expensetrackerapi.web.types.SortDirection
 import io.craigmiller160.expensetrackerapi.web.types.SortableRequest
 import io.swagger.v3.oas.annotations.Hidden
 import jakarta.validation.constraints.AssertTrue
+import jakarta.validation.constraints.Min
+import java.net.URLEncoder
+import java.nio.charset.StandardCharsets
 import java.time.LocalDate
 import org.springframework.format.annotation.DateTimeFormat
 
 data class SearchTransactionsRequest(
-    override val pageNumber: Int,
+    @Min(0) override val pageNumber: Int,
     override val pageSize: Int,
     override val sortKey: TransactionSortKey,
     override val sortDirection: SortDirection,
@@ -36,19 +39,20 @@ data class SearchTransactionsRequest(
   }
 
   fun toQueryString(): String =
-      sequenceOf(
-              "pageNumber" to pageNumber,
-              "pageSize" to pageSize,
+      sequenceOf<Pair<String, String?>>(
+              "pageNumber" to pageNumber.toString(),
+              "pageSize" to pageSize.toString(),
               "sortKey" to sortKey.name,
               "sortDirection" to sortDirection.name,
               "startDate" to startDate?.let { DateUtils.format(it) },
               "endDate" to endDate?.let { DateUtils.format(it) },
               "confirmed" to confirmed.name,
               "categorized" to categorized.name,
-              "duplicate" to duplicate,
-              "possibleRefund" to possibleRefund,
+              "duplicate" to duplicate?.name,
+              "possibleRefund" to possibleRefund?.name,
               "categoryIds" to categoryIds?.joinToString(",") { it.toString() })
           .filter { it.second != null }
+          .map { (first, second) -> first to URLEncoder.encode(second, StandardCharsets.UTF_8) }
           .map { "${it.first}=${it.second}" }
           .joinToString("&")
 }

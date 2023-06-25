@@ -52,6 +52,9 @@ constructor(
     private val entityManager: EntityManager,
     private val defaultUsers: DefaultUsers
 ) {
+
+  companion object {}
+
   private val transactionComparator: Comparator<TransactionCommon> = Comparator { txn1, txn2 ->
     val expenseDateCompare = txn1.expenseDate.compareTo(txn2.expenseDate)
     if (expenseDateCompare == 0) {
