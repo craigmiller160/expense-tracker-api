@@ -10,14 +10,19 @@ import io.craigmiller160.expensetrackerapi.testcore.ExpenseTrackerIntegrationTes
 import io.craigmiller160.expensetrackerapi.testutils.DataHelper
 import io.craigmiller160.expensetrackerapi.testutils.DefaultUsers
 import io.craigmiller160.expensetrackerapi.testutils.userTypedId
+import io.craigmiller160.expensetrackerapi.web.types.report.ReportCategoryIdFilterType
 import io.craigmiller160.expensetrackerapi.web.types.report.ReportCategoryResponse
 import io.craigmiller160.expensetrackerapi.web.types.report.ReportMonthResponse
 import io.craigmiller160.expensetrackerapi.web.types.report.ReportPageResponse
+import io.craigmiller160.expensetrackerapi.web.types.report.ReportRequest
 import jakarta.persistence.EntityManager
 import java.math.BigDecimal
 import java.time.LocalDate
+import java.util.stream.Stream
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.MethodSource
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.get
@@ -33,6 +38,22 @@ constructor(
     private val entityManager: EntityManager,
     private val defaultUsers: DefaultUsers
 ) {
+  companion object {
+    @JvmStatic
+    fun reportRequestValidation(): Stream<ControllerValidationConfig<ReportRequest>> {
+      val request =
+          ReportRequest(
+              pageNumber = 0,
+              pageSize = 50,
+              categoryIdType = ReportCategoryIdFilterType.INCLUDE,
+              categoryIds = listOf())
+
+      return Stream.of(
+          ControllerValidationConfig(request, 200),
+          ControllerValidationConfig(request.copy(pageNumber = -1), 400, "pageNumber: "),
+          ControllerValidationConfig(request.copy(pageSize = 150), 400, "pageSize: "))
+    }
+  }
 
   private lateinit var token: String
 
@@ -457,4 +478,8 @@ constructor(
           content { json(objectMapper.writeValueAsString(response), true) }
         }
   }
+
+  @ParameterizedTest
+  @MethodSource("reportRequestValidation")
+  fun `validate report request`(config: ControllerValidationConfig<ReportRequest>) {}
 }

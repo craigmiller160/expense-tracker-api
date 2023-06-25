@@ -5,14 +5,13 @@ import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.CategoryId
 import io.craigmiller160.expensetrackerapi.common.utils.DateUtils
 import io.craigmiller160.expensetrackerapi.data.model.YesNoFilter
 import io.craigmiller160.expensetrackerapi.web.types.PageableRequest
+import io.craigmiller160.expensetrackerapi.web.types.QueryObject
 import io.craigmiller160.expensetrackerapi.web.types.SortDirection
 import io.craigmiller160.expensetrackerapi.web.types.SortableRequest
 import io.swagger.v3.oas.annotations.Hidden
 import jakarta.validation.constraints.AssertTrue
 import jakarta.validation.constraints.Max
 import jakarta.validation.constraints.Min
-import java.net.URLEncoder
-import java.nio.charset.StandardCharsets
 import java.time.LocalDate
 import org.springframework.format.annotation.DateTimeFormat
 
@@ -28,7 +27,7 @@ data class SearchTransactionsRequest(
     val duplicate: YesNoFilter = YesNoFilter.ALL,
     val possibleRefund: YesNoFilter = YesNoFilter.ALL,
     val categoryIds: Set<TypedId<CategoryId>>? = null,
-) : PageableRequest, SortableRequest<TransactionSortKey> {
+) : PageableRequest, SortableRequest<TransactionSortKey>, QueryObject {
 
   @Hidden
   @AssertTrue(message = "Cannot set categorized to NO and specify categoryIds")
@@ -39,21 +38,17 @@ data class SearchTransactionsRequest(
     return true
   }
 
-  fun toQueryString(): String =
-      sequenceOf<Pair<String, String?>>(
-              "pageNumber" to pageNumber.toString(),
-              "pageSize" to pageSize.toString(),
-              "sortKey" to sortKey.name,
-              "sortDirection" to sortDirection.name,
-              "startDate" to startDate?.let { DateUtils.format(it) },
-              "endDate" to endDate?.let { DateUtils.format(it) },
-              "confirmed" to confirmed.name,
-              "categorized" to categorized.name,
-              "duplicate" to duplicate?.name,
-              "possibleRefund" to possibleRefund?.name,
-              "categoryIds" to categoryIds?.joinToString(",") { it.toString() })
-          .filter { it.second != null }
-          .map { (first, second) -> first to URLEncoder.encode(second, StandardCharsets.UTF_8) }
-          .map { "${it.first}=${it.second}" }
-          .joinToString("&")
+  override fun fieldsToQueryParams(): List<Pair<String, String?>> =
+      listOf(
+          "pageNumber" to pageNumber.toString(),
+          "pageSize" to pageSize.toString(),
+          "sortKey" to sortKey.name,
+          "sortDirection" to sortDirection.name,
+          "startDate" to startDate?.let { DateUtils.format(it) },
+          "endDate" to endDate?.let { DateUtils.format(it) },
+          "confirmed" to confirmed.name,
+          "categorized" to categorized.name,
+          "duplicate" to duplicate?.name,
+          "possibleRefund" to possibleRefund?.name,
+          "categoryIds" to categoryIds?.joinToString(",") { it.toString() })
 }
