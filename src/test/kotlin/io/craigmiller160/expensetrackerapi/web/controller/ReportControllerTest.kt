@@ -33,6 +33,7 @@ constructor(
     private val entityManager: EntityManager,
     private val defaultUsers: DefaultUsers
 ) {
+
   private lateinit var token: String
 
   private lateinit var expectedResponse: ReportPageResponse

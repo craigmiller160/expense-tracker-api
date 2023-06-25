@@ -28,7 +28,6 @@ import java.util.Comparator
 import java.util.UUID
 import java.util.stream.Stream
 import org.assertj.core.api.Assertions.assertThat
-import org.hamcrest.CoreMatchers.equalTo
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -59,7 +58,8 @@ constructor(
 
   companion object {
     @JvmStatic
-    fun searchRequestValidationConfigs(): Stream<SearchRequestValidationConfig> {
+    fun searchRequestValidationConfigs():
+        Stream<ControllerValidationConfig<SearchTransactionsRequest>> {
       val validConfig =
           SearchTransactionsRequest(
               pageNumber = 0,
@@ -67,14 +67,14 @@ constructor(
               sortKey = TransactionSortKey.EXPENSE_DATE,
               sortDirection = SortDirection.ASC)
       return Stream.of(
-          SearchRequestValidationConfig(validConfig, 200),
-          SearchRequestValidationConfig(
+          ControllerValidationConfig(validConfig, 200),
+          ControllerValidationConfig(
               validConfig.copy(pageNumber = -1),
               400,
               "pageNumber: must be greater than or equal to 0"),
-          SearchRequestValidationConfig(
+          ControllerValidationConfig(
               validConfig.copy(pageSize = 200), 400, "pageSize: must be less than or equal to 100"),
-          SearchRequestValidationConfig(
+          ControllerValidationConfig(
               validConfig.copy(categorized = YesNoFilter.NO, categoryIds = setOf(TypedId())),
               400,
               "categorizedValidation: Cannot set categorized to NO and specify categoryIds"))
@@ -1319,25 +1319,14 @@ constructor(
 
   @ParameterizedTest
   @MethodSource("searchRequestValidationConfigs")
-  fun `validating search transactions request`(config: SearchRequestValidationConfig) {
-    mockMvc
-        .get("/transactions?${config.request.toQueryString()}") {
-          secure = true
-          header("Authorization", "Bearer $token")
-        }
-        .andExpect {
-          status { isEqualTo(config.status) }
-          content {
-            if (config.status != 200) {
-              jsonPath("$.message", equalTo(config.errorMessage))
-            }
-          }
-        }
+  fun `validating search transactions request`(
+      config: ControllerValidationConfig<SearchTransactionsRequest>
+  ) {
+    ControllerValidationSupport.validate(config) {
+      mockMvc.get("/transactions?${config.request.toQueryString()}") {
+        secure = true
+        header("Authorization", "Bearer $token")
+      }
+    }
   }
 }
-
-data class SearchRequestValidationConfig(
-    val request: SearchTransactionsRequest,
-    val status: Int,
-    val errorMessage: String? = null
-)
