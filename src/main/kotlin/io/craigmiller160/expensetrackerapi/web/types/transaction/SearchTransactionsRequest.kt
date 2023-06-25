@@ -17,8 +17,8 @@ import java.time.LocalDate
 import org.springframework.format.annotation.DateTimeFormat
 
 data class SearchTransactionsRequest(
-    @Min(0) override val pageNumber: Int,
-    @Max(100) override val pageSize: Int,
+    @field:Min(0) override val pageNumber: Int,
+    @field:Max(100) override val pageSize: Int,
     override val sortKey: TransactionSortKey,
     override val sortDirection: SortDirection,
     @field:DateTimeFormat(pattern = DateUtils.DATE_PATTERN) val startDate: LocalDate? = null,
