@@ -28,6 +28,7 @@ import java.util.Comparator
 import java.util.UUID
 import java.util.stream.Stream
 import org.assertj.core.api.Assertions.assertThat
+import org.hamcrest.CoreMatchers.equalTo
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -1328,7 +1329,7 @@ constructor(
           status { isEqualTo(config.status) }
           content {
             if (config.status != 200) {
-              json("", true)
+              jsonPath("$.message", equalTo(config.errorMessage))
             }
           }
         }
