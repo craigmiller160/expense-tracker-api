@@ -50,8 +50,10 @@ constructor(
 
       return Stream.of(
           ControllerValidationConfig(request, 200),
-          ControllerValidationConfig(request.copy(pageNumber = -1), 400, "pageNumber: "),
-          ControllerValidationConfig(request.copy(pageSize = 150), 400, "pageSize: "))
+          ControllerValidationConfig(
+              request.copy(pageNumber = -1), 400, "pageNumber: must be greater than or equal to 0"),
+          ControllerValidationConfig(
+              request.copy(pageSize = 150), 400, "pageSize: must be less than or equal to 100"))
     }
   }
 
@@ -483,7 +485,7 @@ constructor(
   @MethodSource("reportRequestValidation")
   fun `validate report request`(config: ControllerValidationConfig<ReportRequest>) {
     ControllerValidationSupport.validate(config) {
-      mockMvc.get("/reports${config.request.toQueryString()}") {
+      mockMvc.get("/reports?${config.request.toQueryString()}") {
         secure = true
         header("Authorization", "Bearer $token")
       }

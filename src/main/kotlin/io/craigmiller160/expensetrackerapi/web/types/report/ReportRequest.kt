@@ -8,8 +8,8 @@ import jakarta.validation.constraints.Max
 import jakarta.validation.constraints.Min
 
 data class ReportRequest(
-    @Min(0) override val pageNumber: Int,
-    @Max(100) override val pageSize: Int,
+    @field:Min(0) override val pageNumber: Int,
+    @field:Max(100) override val pageSize: Int,
     val categoryIdType: ReportCategoryIdFilterType = ReportCategoryIdFilterType.EXCLUDE,
     val categoryIds: List<TypedId<CategoryId>> = listOf()
 ) : PageableRequest, QueryObject {
