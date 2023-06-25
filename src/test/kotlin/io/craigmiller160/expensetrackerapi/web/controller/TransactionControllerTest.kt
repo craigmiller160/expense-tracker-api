@@ -67,12 +67,16 @@ constructor(
               sortDirection = SortDirection.ASC)
       return Stream.of(
           SearchRequestValidationConfig(validConfig, 200),
-          SearchRequestValidationConfig(validConfig.copy(pageNumber = -1), 400, ""),
-          SearchRequestValidationConfig(validConfig.copy(pageSize = 200), 400, ""),
+          SearchRequestValidationConfig(
+              validConfig.copy(pageNumber = -1),
+              400,
+              "pageNumber: must be greater than or equal to 0"),
+          SearchRequestValidationConfig(
+              validConfig.copy(pageSize = 200), 400, "pageSize: must be less than or equal to 100"),
           SearchRequestValidationConfig(
               validConfig.copy(categorized = YesNoFilter.NO, categoryIds = setOf(TypedId())),
               400,
-              ""))
+              "categoryPropsValid: Cannot set categorized to NO and specify categoryIds"))
     }
   }
 

@@ -39,7 +39,11 @@ class ControllerErrorHandler {
 
   @ExceptionHandler(BindException::class)
   fun bindException(ex: BindException): ResponseEntity<ErrorResponse> {
-    val message = ex.bindingResult.allErrors.joinToString("; ") { it.defaultMessage ?: "" }
+    log.error(ex.message, ex)
+    val globalErrors = ex.bindingResult.globalErrors.joinToString(";")
+    val fieldErrors =
+        ex.bindingResult.fieldErrors.joinToString(";") { "${it.field}: ${it.defaultMessage}" }
+    val message = listOf(globalErrors, fieldErrors).filter { it.isNotBlank() }.joinToString(";")
     return createErrorResponse(400, message)
   }
 
