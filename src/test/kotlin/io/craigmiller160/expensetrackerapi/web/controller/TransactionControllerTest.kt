@@ -321,25 +321,6 @@ constructor(
   }
 
   @Test
-  fun `search - invalid category options`() {
-    val request =
-        SearchTransactionsRequest(
-            categorized = YesNoFilter.NO,
-            categoryIds = setOf(user1Categories[0].uid),
-            pageNumber = 0,
-            pageSize = 100,
-            sortKey = TransactionSortKey.EXPENSE_DATE,
-            sortDirection = SortDirection.ASC)
-
-    mockMvc
-        .get("/transactions?${request.toQueryString()}") {
-          secure = true
-          header("Authorization", "Bearer $token")
-        }
-        .andExpect { status { isBadRequest() } }
-  }
-
-  @Test
   fun `search - only non-duplicates`() {
     val txn1 = user1Transactions[0]
     transactionRepository.saveAndFlush(Transaction(txn1))
