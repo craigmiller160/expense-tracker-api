@@ -1334,7 +1334,19 @@ constructor(
   @ParameterizedTest
   @MethodSource("searchRequestValidationConfigs")
   fun `validating search transactions request`(config: SearchRequestValidationConfig) {
-    TODO()
+    mockMvc
+        .get("/transactions?${config.request.toQueryString()}") {
+          secure = true
+          header("Authorization", "Bearer $token")
+        }
+        .andExpect {
+          status { isEqualTo(config.status) }
+          content {
+            if (config.status != 200) {
+              json("", true)
+            }
+          }
+        }
   }
 }
 
