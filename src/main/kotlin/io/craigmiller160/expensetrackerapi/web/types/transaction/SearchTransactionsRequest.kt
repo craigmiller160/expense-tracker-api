@@ -24,6 +24,7 @@ data class SearchTransactionsRequest(
     val duplicate: YesNoFilter = YesNoFilter.ALL,
     val possibleRefund: YesNoFilter = YesNoFilter.ALL,
     val categoryIds: Set<TypedId<CategoryId>>? = null,
+    val descriptionRegex: String? = null
 ) : PageableRequest, SortableRequest<TransactionSortKey> {
 
   @Hidden
