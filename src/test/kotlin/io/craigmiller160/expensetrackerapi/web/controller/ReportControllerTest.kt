@@ -481,5 +481,7 @@ constructor(
 
   @ParameterizedTest
   @MethodSource("reportRequestValidation")
-  fun `validate report request`(config: ControllerValidationConfig<ReportRequest>) {}
+  fun `validate report request`(config: ControllerValidationConfig<ReportRequest>) {
+    TODO()
+  }
 }
