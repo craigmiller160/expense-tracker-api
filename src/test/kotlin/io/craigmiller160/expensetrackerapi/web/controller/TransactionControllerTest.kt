@@ -26,10 +26,13 @@ import java.time.LocalDate
 import java.time.ZoneId
 import java.util.Comparator
 import java.util.UUID
+import java.util.stream.Stream
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.MethodSource
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.PageRequest
 import org.springframework.http.MediaType
@@ -53,7 +56,25 @@ constructor(
     private val defaultUsers: DefaultUsers
 ) {
 
-  companion object {}
+  companion object {
+    @JvmStatic
+    fun searchRequestValidationConfigs(): Stream<SearchRequestValidationConfig> {
+      val validConfig =
+          SearchTransactionsRequest(
+              pageNumber = 0,
+              pageSize = 10,
+              sortKey = TransactionSortKey.EXPENSE_DATE,
+              sortDirection = SortDirection.ASC)
+      return Stream.of(
+          SearchRequestValidationConfig(validConfig, 200),
+          SearchRequestValidationConfig(validConfig.copy(pageNumber = -1), 400, ""),
+          SearchRequestValidationConfig(validConfig.copy(pageSize = 200), 400, ""),
+          SearchRequestValidationConfig(
+              validConfig.copy(categorized = YesNoFilter.NO, categoryIds = setOf(TypedId())),
+              400,
+              ""))
+    }
+  }
 
   private val transactionComparator: Comparator<TransactionCommon> = Comparator { txn1, txn2 ->
     val expenseDateCompare = txn1.expenseDate.compareTo(txn2.expenseDate)
@@ -1309,4 +1330,16 @@ constructor(
       }
     }
   }
+
+  @ParameterizedTest
+  @MethodSource("searchRequestValidationConfigs")
+  fun `validating search transactions request`(config: SearchRequestValidationConfig) {
+    TODO()
+  }
 }
+
+data class SearchRequestValidationConfig(
+    val request: SearchTransactionsRequest,
+    val status: Int,
+    val errorMessage: String? = null
+)

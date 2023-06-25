@@ -9,6 +9,7 @@ import io.craigmiller160.expensetrackerapi.web.types.SortDirection
 import io.craigmiller160.expensetrackerapi.web.types.SortableRequest
 import io.swagger.v3.oas.annotations.Hidden
 import jakarta.validation.constraints.AssertTrue
+import jakarta.validation.constraints.Max
 import jakarta.validation.constraints.Min
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
@@ -17,7 +18,7 @@ import org.springframework.format.annotation.DateTimeFormat
 
 data class SearchTransactionsRequest(
     @Min(0) override val pageNumber: Int,
-    override val pageSize: Int,
+    @Max(100) override val pageSize: Int,
     override val sortKey: TransactionSortKey,
     override val sortDirection: SortDirection,
     @field:DateTimeFormat(pattern = DateUtils.DATE_PATTERN) val startDate: LocalDate? = null,
