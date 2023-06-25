@@ -482,6 +482,11 @@ constructor(
   @ParameterizedTest
   @MethodSource("reportRequestValidation")
   fun `validate report request`(config: ControllerValidationConfig<ReportRequest>) {
-    TODO()
+    ControllerValidationSupport.validate(config) {
+      mockMvc.get("/reports${config.request.toQueryString()}") {
+        secure = true
+        header("Authorization", "Bearer $token")
+      }
+    }
   }
 }
