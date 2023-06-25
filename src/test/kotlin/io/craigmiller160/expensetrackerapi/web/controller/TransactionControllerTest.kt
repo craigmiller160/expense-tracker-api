@@ -77,7 +77,7 @@ constructor(
           SearchRequestValidationConfig(
               validConfig.copy(categorized = YesNoFilter.NO, categoryIds = setOf(TypedId())),
               400,
-              "categoryPropsValid: Cannot set categorized to NO and specify categoryIds"))
+              "categorizedValidation: Cannot set categorized to NO and specify categoryIds"))
     }
   }
 

@@ -32,7 +32,7 @@ data class SearchTransactionsRequest(
 
   @Hidden
   @AssertTrue(message = "Cannot set categorized to NO and specify categoryIds")
-  fun isCategoryPropsValid(): Boolean {
+  fun isCategorizedValidation(): Boolean {
     if (YesNoFilter.NO == categorized) {
       return categoryIds.isNullOrEmpty()
     }
