@@ -1,6 +1,6 @@
 package io.craigmiller160.expensetrackerapi.testutils
 
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.jacksonTypeRef
 import io.craigmiller160.expensetrackerapi.common.utils.DateUtils
 import io.craigmiller160.expensetrackerapi.web.types.QueryObject
@@ -9,10 +9,10 @@ import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
 import java.time.LocalDate
 
-private val objectMapper = jacksonObjectMapper()
 private val mapTypeRef = jacksonTypeRef<Map<String, Any?>>()
 
-fun QueryObject.toQueryString(): String {
+fun QueryObject.toQueryString(objectMapper: ObjectMapper): String {
+  println("JSON: " + objectMapper.writeValueAsString(this)) // TODO delete this
   val map: Map<String, Any?> =
       objectMapper.writeValueAsString(this).let { objectMapper.readValue(it, mapTypeRef) }
   return map.entries

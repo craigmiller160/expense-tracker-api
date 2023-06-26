@@ -486,7 +486,7 @@ constructor(
   @MethodSource("reportRequestValidation")
   fun `validate report request`(config: ControllerValidationConfig<ReportRequest>) {
     ControllerValidationSupport.validate(config) {
-      mockMvc.get("/reports?${config.request.toQueryString()}") {
+      mockMvc.get("/reports?${config.request.toQueryString(objectMapper)}") {
         secure = true
         header("Authorization", "Bearer $token")
       }

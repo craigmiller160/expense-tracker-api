@@ -152,7 +152,7 @@ constructor(
             totalItems = 3)
 
     mockMvc
-        .get("/transactions?${request.toQueryString()}") {
+        .get("/transactions?${request.toQueryString(objectMapper)}") {
           secure = true
           header("Authorization", "Bearer $token")
         }
@@ -184,7 +184,7 @@ constructor(
             totalItems = 4)
 
     mockMvc
-        .get("/transactions?${request.toQueryString()}") {
+        .get("/transactions?${request.toQueryString(objectMapper)}") {
           secure = true
           header("Authorization", "Bearer $token")
         }
@@ -214,7 +214,7 @@ constructor(
             totalItems = 4)
 
     mockMvc
-        .get("/transactions?${request.toQueryString()}") {
+        .get("/transactions?${request.toQueryString(objectMapper)}") {
           secure = true
           header("Authorization", "Bearer $token")
         }
@@ -245,7 +245,7 @@ constructor(
             totalItems = 3)
 
     mockMvc
-        .get("/transactions?${request.toQueryString()}") {
+        .get("/transactions?${request.toQueryString(objectMapper)}") {
           secure = true
           header("Authorization", "Bearer $token")
         }
@@ -282,7 +282,7 @@ constructor(
             totalItems = 2)
 
     mockMvc
-        .get("/transactions?${request.toQueryString()}") {
+        .get("/transactions?${request.toQueryString(objectMapper)}") {
           secure = true
           header("Authorization", "Bearer $token")
         }
@@ -316,7 +316,7 @@ constructor(
             totalItems = 2)
 
     mockMvc
-        .get("/transactions?${request.toQueryString()}") {
+        .get("/transactions?${request.toQueryString(objectMapper)}") {
           secure = true
           header("Authorization", "Bearer $token")
         }
@@ -351,7 +351,7 @@ constructor(
             totalItems = nonDuplicateTransactions.size.toLong())
 
     mockMvc
-        .get("/transactions?${request.toQueryString()}") {
+        .get("/transactions?${request.toQueryString(objectMapper)}") {
           secure = true
           header("Authorization", "Bearer $token")
         }
@@ -389,7 +389,7 @@ constructor(
             totalItems = 2)
 
     mockMvc
-        .get("/transactions?${request.toQueryString()}") {
+        .get("/transactions?${request.toQueryString(objectMapper)}") {
           secure = true
           header("Authorization", "Bearer $token")
         }
@@ -428,7 +428,7 @@ constructor(
             totalItems = 5)
 
     mockMvc
-        .get("/transactions?${request.toQueryString()}") {
+        .get("/transactions?${request.toQueryString(objectMapper)}") {
           secure = true
           header("Authorization", "Bearer $token")
         }
@@ -468,7 +468,7 @@ constructor(
             totalItems = expected.size.toLong())
 
     mockMvc
-        .get("/transactions?${request.toQueryString()}") {
+        .get("/transactions?${request.toQueryString(objectMapper)}") {
           secure = true
           header("Authorization", "Bearer $token")
         }
@@ -504,7 +504,7 @@ constructor(
             sortDirection = SortDirection.ASC)
 
     mockMvc
-        .get("/transactions?${request.toQueryString()}") {
+        .get("/transactions?${request.toQueryString(objectMapper)}") {
           secure = true
           header("Authorization", "Bearer $token")
         }
@@ -1324,7 +1324,7 @@ constructor(
       config: ControllerValidationConfig<SearchTransactionsRequest>
   ) {
     ControllerValidationSupport.validate(config) {
-      mockMvc.get("/transactions?${config.request.toQueryString()}") {
+      mockMvc.get("/transactions?${config.request.toQueryString(objectMapper)}") {
         secure = true
         header("Authorization", "Bearer $token")
       }
