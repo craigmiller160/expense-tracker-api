@@ -11,8 +11,8 @@ import io.craigmiller160.expensetrackerapi.testcore.ExpenseTrackerIntegrationTes
 import io.craigmiller160.expensetrackerapi.testutils.DataHelper
 import io.craigmiller160.expensetrackerapi.testutils.DefaultUsers
 import io.craigmiller160.expensetrackerapi.testutils.userTypedId
-import io.craigmiller160.expensetrackerapi.web.types.CountAndOldest
-import io.craigmiller160.expensetrackerapi.web.types.NeedsAttentionResponse
+import io.craigmiller160.expensetrackerapi.web.types.transaction.CountAndOldest
+import io.craigmiller160.expensetrackerapi.web.types.transaction.NeedsAttentionResponse
 import jakarta.persistence.EntityManager
 import java.math.BigDecimal
 import org.junit.jupiter.api.BeforeEach

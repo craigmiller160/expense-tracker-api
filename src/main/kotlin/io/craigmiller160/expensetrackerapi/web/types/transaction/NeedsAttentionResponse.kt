@@ -1,4 +1,4 @@
-package io.craigmiller160.expensetrackerapi.web.types
+package io.craigmiller160.expensetrackerapi.web.types.transaction
 
 import java.time.LocalDate
 
