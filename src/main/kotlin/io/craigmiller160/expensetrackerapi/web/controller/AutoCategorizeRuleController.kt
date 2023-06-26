@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.media.ArraySchema
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
+import jakarta.validation.Valid
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
 
@@ -29,7 +30,7 @@ class AutoCategorizeRuleController(
                               Schema(implementation = AutoCategorizeRulePageResponse::class)))])
   @GetMapping
   fun getAllRules(
-      request: AutoCategorizeRulePageRequest
+      @Valid request: AutoCategorizeRulePageRequest
   ): TryEither<AutoCategorizeRulePageResponse> = autoCategorizeRuleService.getAllRules(request)
 
   @ApiResponse(
@@ -43,7 +44,7 @@ class AutoCategorizeRuleController(
                           schema = Schema(implementation = AutoCategorizeRuleResponse::class)))])
   @PostMapping
   fun createRule(
-      @RequestBody request: AutoCategorizeRuleRequest
+      @RequestBody @Valid request: AutoCategorizeRuleRequest
   ): TryEither<AutoCategorizeRuleResponse> = autoCategorizeRuleService.createRule(request)
 
   @ApiResponse(
@@ -58,7 +59,7 @@ class AutoCategorizeRuleController(
   @PutMapping("/{ruleId}")
   fun updateRule(
       @PathVariable ruleId: TypedId<AutoCategorizeRuleId>,
-      @RequestBody request: AutoCategorizeRuleRequest
+      @RequestBody @Valid request: AutoCategorizeRuleRequest
   ): TryEither<AutoCategorizeRuleResponse> = autoCategorizeRuleService.updateRule(ruleId, request)
 
   @ApiResponse(

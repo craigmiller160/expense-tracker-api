@@ -13,7 +13,9 @@ import io.craigmiller160.expensetrackerapi.extension.flushAndClear
 import io.craigmiller160.expensetrackerapi.testcore.ExpenseTrackerIntegrationTest
 import io.craigmiller160.expensetrackerapi.testutils.DataHelper
 import io.craigmiller160.expensetrackerapi.testutils.DefaultUsers
+import io.craigmiller160.expensetrackerapi.testutils.toQueryString
 import io.craigmiller160.expensetrackerapi.testutils.userTypedId
+import io.craigmiller160.expensetrackerapi.web.types.rules.AutoCategorizeRulePageRequest
 import io.craigmiller160.expensetrackerapi.web.types.rules.AutoCategorizeRulePageResponse
 import io.craigmiller160.expensetrackerapi.web.types.rules.AutoCategorizeRuleRequest
 import io.craigmiller160.expensetrackerapi.web.types.rules.AutoCategorizeRuleResponse
@@ -21,10 +23,13 @@ import io.craigmiller160.expensetrackerapi.web.types.rules.MaxOrdinalResponse
 import jakarta.persistence.EntityManager
 import java.math.BigDecimal
 import java.time.LocalDate
+import java.util.stream.Stream
 import org.assertj.core.api.Assertions.assertThat
 import org.hamcrest.Matchers.equalTo
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.MethodSource
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.MediaType
 import org.springframework.test.web.servlet.*
@@ -42,6 +47,33 @@ constructor(
     private val autoCategorizeRuleViewRepository: AutoCategorizeRuleViewRepository,
     private val defaultUsers: DefaultUsers
 ) {
+  companion object {
+    @JvmStatic
+    fun rulePageRequestValidation():
+        Stream<ControllerValidationConfig<AutoCategorizeRulePageRequest>> {
+      val request = AutoCategorizeRulePageRequest(pageNumber = 0, pageSize = 10)
+      return Stream.of(
+          ControllerValidationConfig(request, 200),
+          ControllerValidationConfig(
+              request.copy(pageNumber = -1), 400, "pageNumber: must be greater than or equal to 0"),
+          ControllerValidationConfig(
+              request.copy(pageSize = 150), 400, "pageSize: must be less than or equal to 100"),
+          ControllerValidationConfig(
+              request.copy(pageSize = -1), 400, "pageSize: must be greater than or equal to 0"))
+    }
+
+    @JvmStatic
+    fun ruleRequestValidation(): Stream<ControllerValidationConfig<AutoCategorizeRuleRequest>> {
+      val request = AutoCategorizeRuleRequest(categoryId = TypedId(), regex = "^Hello$")
+      return Stream.of(
+          ControllerValidationConfig(request, 200),
+          ControllerValidationConfig(request.copy(ordinal = 1), 200),
+          ControllerValidationConfig(
+              request.copy(ordinal = 0), 400, "ordinal: must be greater than or equal to 1"),
+          ControllerValidationConfig(
+              request.copy(regex = "***"), 400, "regex: String is not valid regular expression"))
+    }
+  }
 
   private lateinit var token: String
 
@@ -782,6 +814,52 @@ constructor(
           status { isOk() }
           content { json(objectMapper.writeValueAsString(expectedResponse), true) }
         }
+  }
+
+  @ParameterizedTest
+  @MethodSource("rulePageRequestValidation")
+  fun `validate rules page request`(
+      config: ControllerValidationConfig<AutoCategorizeRulePageRequest>
+  ) {
+    ControllerValidationSupport.validate(config) {
+      mockMvc.get("/categories/rules?${config.request.toQueryString(objectMapper)}") {
+        secure = true
+        header("Authorization", "Bearer $token")
+      }
+    }
+  }
+
+  @ParameterizedTest
+  @MethodSource("ruleRequestValidation")
+  fun `validate create rule request`(
+      config: ControllerValidationConfig<AutoCategorizeRuleRequest>
+  ) {
+    val request = config.request.copy(categoryId = cat1.uid)
+    ControllerValidationSupport.validate(config) {
+      mockMvc.post("/categories/rules") {
+        secure = true
+        header("Authorization", "Bearer $token")
+        contentType = MediaType.APPLICATION_JSON
+        content = objectMapper.writeValueAsString(request)
+      }
+    }
+  }
+
+  @ParameterizedTest
+  @MethodSource("ruleRequestValidation")
+  fun `validate update rule request`(
+      config: ControllerValidationConfig<AutoCategorizeRuleRequest>
+  ) {
+    val rule = dataHelper.createRule(defaultUsers.primaryUser.userTypedId, cat1.uid)
+    val request = config.request.copy(categoryId = cat1.uid)
+    ControllerValidationSupport.validate(config) {
+      mockMvc.put("/categories/rules/${rule.uid}") {
+        secure = true
+        header("Authorization", "Bearer $token")
+        contentType = MediaType.APPLICATION_JSON
+        content = objectMapper.writeValueAsString(request)
+      }
+    }
   }
 
   private fun createRulesForOrdinalValidation(): List<AutoCategorizeRule> {
