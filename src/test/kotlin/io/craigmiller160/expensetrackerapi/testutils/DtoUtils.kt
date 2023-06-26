@@ -26,7 +26,8 @@ private fun convertQueryValue(value: Any): String =
       is Int,
       is Long,
       is Float,
-      is Double -> URLEncoder.encode(value.toString(), StandardCharsets.UTF_8)
+      is Double,
+      is Boolean -> URLEncoder.encode(value.toString(), StandardCharsets.UTF_8)
       is String -> URLEncoder.encode(value, StandardCharsets.UTF_8)
       is Collection<*> ->
           value.joinToString(",") { URLEncoder.encode(it.toString(), StandardCharsets.UTF_8) }
