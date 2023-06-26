@@ -153,6 +153,7 @@ constructor(
 
   @Test
   fun `search - by description regex`() {
+    // TODO need to validate that regex works, not just literal
     val request =
         SearchTransactionsRequest(
             pageNumber = 0,
