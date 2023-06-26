@@ -9,7 +9,8 @@ import jakarta.validation.constraints.Min
 
 data class AutoCategorizeRulePageRequest(
     @field:Min(0) override val pageNumber: Int,
-    @field:Max(100) override val pageSize: Int,
+    // TODO update tests for min
+    @field:Min(0) @field:Max(100) override val pageSize: Int,
     val categoryId: TypedId<CategoryId>? = null,
     // This is used to lookup literal regexes in the database and doesn't need regex validation
     val regex: String? = null
