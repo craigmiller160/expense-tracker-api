@@ -7,7 +7,6 @@ import io.craigmiller160.expensetrackerapi.web.types.QueryObject
 import jakarta.validation.constraints.Max
 import jakarta.validation.constraints.Min
 
-// TODO needs validation
 data class AutoCategorizeRulePageRequest(
     @field:Min(0) override val pageNumber: Int,
     @field:Max(100) override val pageSize: Int,
