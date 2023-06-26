@@ -68,7 +68,8 @@ constructor(
           ControllerValidationConfig(request.copy(ordinal = 1), 200),
           ControllerValidationConfig(
               request.copy(ordinal = 0), 400, "ordinal: must be greater than or equal to 1"),
-          ControllerValidationConfig(request.copy(regex = "Hello$$"), 400, ""))
+          ControllerValidationConfig(
+              request.copy(regex = "***"), 400, "regex: String is not valid regular expression"))
     }
   }
 
