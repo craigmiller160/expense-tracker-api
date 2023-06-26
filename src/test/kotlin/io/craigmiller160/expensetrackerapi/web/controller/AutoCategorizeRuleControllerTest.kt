@@ -59,6 +59,14 @@ constructor(
           ControllerValidationConfig(
               request.copy(pageSize = 150), 400, "pageSize: must be less than or equal to 100"))
     }
+
+    @JvmStatic
+    fun ruleRequestValidation(): Stream<ControllerValidationConfig<AutoCategorizeRuleRequest>> {
+      val request = AutoCategorizeRuleRequest(categoryId = TypedId(), regex = "^Hello$")
+      return Stream.of(
+          ControllerValidationConfig(request, 200),
+          ControllerValidationConfig(request.copy(regex = "Hello$$"), 400, ""))
+    }
   }
 
   private lateinit var token: String
@@ -816,6 +824,7 @@ constructor(
   }
 
   @ParameterizedTest
+  @MethodSource("ruleRequestValidation")
   fun `validate create rule request`(
       config: ControllerValidationConfig<AutoCategorizeRuleRequest>
   ) {
@@ -823,6 +832,7 @@ constructor(
   }
 
   @ParameterizedTest
+  @MethodSource("ruleRequestValidation")
   fun `validate update rule request`(
       config: ControllerValidationConfig<AutoCategorizeRuleRequest>
   ) {
