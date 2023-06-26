@@ -26,12 +26,12 @@ private fun convertQueryValue(value: Any): String =
       is Int,
       is Long,
       is Float,
-      is Double -> value.toString()
-      is String -> value
+      is Double -> URLEncoder.encode(value.toString(), StandardCharsets.UTF_8)
+      is String -> URLEncoder.encode(value, StandardCharsets.UTF_8)
       is Collection<*> ->
           value.joinToString(",") { URLEncoder.encode(it.toString(), StandardCharsets.UTF_8) }
-      is Enum<*> -> value.name
-      is LocalDate -> DateUtils.format(value)
+      is Enum<*> -> URLEncoder.encode(value.name, StandardCharsets.UTF_8)
+      is LocalDate -> URLEncoder.encode(DateUtils.format(value), StandardCharsets.UTF_8)
       else ->
           throw IllegalArgumentException(
               "Invalid value to convert for query string: ${value.javaClass.name}")
