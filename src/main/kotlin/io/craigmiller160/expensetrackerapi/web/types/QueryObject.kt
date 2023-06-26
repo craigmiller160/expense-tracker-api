@@ -23,7 +23,7 @@ private fun convertValue(value: Any): String =
       is Float,
       is Double -> value.toString()
       is String -> value
-      is List<*> ->
+      is Collection<*> ->
           value.joinToString(",") { URLEncoder.encode(it.toString(), StandardCharsets.UTF_8) }
       is Enum<*> -> value.name
       is LocalDate -> DateUtils.format(value)
