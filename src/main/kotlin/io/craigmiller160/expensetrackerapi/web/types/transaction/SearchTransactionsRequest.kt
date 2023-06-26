@@ -40,8 +40,8 @@ data class SearchTransactionsRequest(
 
   override fun fieldsToQueryParams(): List<Pair<String, Any?>> =
       listOf(
-          "pageNumber" to pageNumber.toString(),
-          "pageSize" to pageSize.toString(),
+          "pageNumber" to pageNumber,
+          "pageSize" to pageSize,
           "sortKey" to sortKey.name,
           "sortDirection" to sortDirection,
           "startDate" to startDate,
