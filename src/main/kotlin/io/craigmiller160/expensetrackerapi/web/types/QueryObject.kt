@@ -18,6 +18,10 @@ interface QueryObject {
 
 private fun convertValue(value: Any): String =
     when (value) {
+      is Int,
+      is Long,
+      is Float,
+      is Double -> value.toString()
       is String -> value
       is List<*> ->
           value.joinToString(",") { URLEncoder.encode(it.toString(), StandardCharsets.UTF_8) }

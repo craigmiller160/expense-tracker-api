@@ -43,7 +43,7 @@ data class SearchTransactionsRequest(
           "pageNumber" to pageNumber.toString(),
           "pageSize" to pageSize.toString(),
           "sortKey" to sortKey.name,
-          "sortDirection" to sortDirection.name,
+          "sortDirection" to sortDirection,
           "startDate" to startDate,
           "endDate" to endDate,
           "confirmed" to confirmed,
