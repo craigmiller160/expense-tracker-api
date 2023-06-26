@@ -44,7 +44,7 @@ class AutoCategorizeRuleController(
                           schema = Schema(implementation = AutoCategorizeRuleResponse::class)))])
   @PostMapping
   fun createRule(
-      @RequestBody request: AutoCategorizeRuleRequest
+      @RequestBody @Valid request: AutoCategorizeRuleRequest
   ): TryEither<AutoCategorizeRuleResponse> = autoCategorizeRuleService.createRule(request)
 
   @ApiResponse(
@@ -59,7 +59,7 @@ class AutoCategorizeRuleController(
   @PutMapping("/{ruleId}")
   fun updateRule(
       @PathVariable ruleId: TypedId<AutoCategorizeRuleId>,
-      @RequestBody request: AutoCategorizeRuleRequest
+      @RequestBody @Valid request: AutoCategorizeRuleRequest
   ): TryEither<AutoCategorizeRuleResponse> = autoCategorizeRuleService.updateRule(ruleId, request)
 
   @ApiResponse(

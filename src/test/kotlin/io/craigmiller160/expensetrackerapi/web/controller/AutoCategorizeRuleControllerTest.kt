@@ -815,6 +815,20 @@ constructor(
     }
   }
 
+  @ParameterizedTest
+  fun `validate create rule request`(
+      config: ControllerValidationConfig<AutoCategorizeRuleRequest>
+  ) {
+    TODO()
+  }
+
+  @ParameterizedTest
+  fun `validate update rule request`(
+      config: ControllerValidationConfig<AutoCategorizeRuleRequest>
+  ) {
+    TODO()
+  }
+
   private fun createRulesForOrdinalValidation(): List<AutoCategorizeRule> {
     val rules =
         (1..5).map { ordinal ->
