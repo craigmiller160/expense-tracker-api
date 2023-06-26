@@ -6,7 +6,6 @@ import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.TransactionId
 import java.math.BigDecimal
 import java.time.LocalDate
 
-// TODO needs validation
 data class UpdateTransactionDetailsRequest(
     override val transactionId: TypedId<TransactionId>,
     override val confirmed: Boolean,

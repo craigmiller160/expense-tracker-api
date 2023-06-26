@@ -10,5 +10,4 @@ data class TransactionToUpdate(
     override val categoryId: TypedId<CategoryId>? = null
 ) : TransactionAndCategoryUpdateItem, TransactionAndConfirmUpdateItem
 
-// TODO needs validation
 data class UpdateTransactionsRequest(val transactions: Set<TransactionToUpdate>)
