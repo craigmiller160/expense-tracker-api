@@ -28,8 +28,7 @@ data class SearchTransactionsRequest(
     val duplicate: YesNoFilter = YesNoFilter.ALL,
     val possibleRefund: YesNoFilter = YesNoFilter.ALL,
     val categoryIds: Set<TypedId<CategoryId>>? = null,
-    @field:ValidRegex // TODO add to validation test
-    val descriptionRegex: String? = null
+    @field:ValidRegex val descriptionRegex: String? = null
 ) : PageableRequest, SortableRequest<TransactionSortKey>, QueryObject {
 
   @Hidden
