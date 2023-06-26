@@ -17,7 +17,6 @@ import org.springframework.format.annotation.DateTimeFormat
 
 data class SearchTransactionsRequest(
     @field:Min(0) override val pageNumber: Int,
-    // TODO update tests for min
     @field:Min(0) @field:Max(100) override val pageSize: Int,
     override val sortKey: TransactionSortKey,
     override val sortDirection: SortDirection,

@@ -76,6 +76,8 @@ constructor(
           ControllerValidationConfig(
               validConfig.copy(pageSize = 200), 400, "pageSize: must be less than or equal to 100"),
           ControllerValidationConfig(
+              validConfig.copy(pageSize = -1), 400, "pageSize: must be greater than or equal to 0"),
+          ControllerValidationConfig(
               validConfig.copy(categorized = YesNoFilter.NO, categoryIds = setOf(TypedId())),
               400,
               "categorizedValidation: Cannot set categorized to NO and specify categoryIds"))
