@@ -148,7 +148,7 @@ constructor(
   }
 
   @Test
-  fun `search - by regex`() {
+  fun `search - by description regex`() {
     TODO()
   }
 
