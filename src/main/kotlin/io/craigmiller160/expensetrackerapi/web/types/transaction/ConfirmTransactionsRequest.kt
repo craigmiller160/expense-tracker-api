@@ -8,5 +8,4 @@ data class TransactionToConfirm(
     override val confirmed: Boolean
 ) : TransactionAndConfirmUpdateItem
 
-// TODO needs validation
 data class ConfirmTransactionsRequest(val transactionsToConfirm: Set<TransactionToConfirm>)
