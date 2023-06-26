@@ -16,6 +16,7 @@ import io.craigmiller160.expensetrackerapi.extension.flushAndClear
 import io.craigmiller160.expensetrackerapi.testcore.ExpenseTrackerIntegrationTest
 import io.craigmiller160.expensetrackerapi.testutils.DataHelper
 import io.craigmiller160.expensetrackerapi.testutils.DefaultUsers
+import io.craigmiller160.expensetrackerapi.testutils.toQueryString
 import io.craigmiller160.expensetrackerapi.testutils.userTypedId
 import io.craigmiller160.expensetrackerapi.web.types.*
 import io.craigmiller160.expensetrackerapi.web.types.transaction.*
@@ -26,10 +27,13 @@ import java.time.LocalDate
 import java.time.ZoneId
 import java.util.Comparator
 import java.util.UUID
+import java.util.stream.Stream
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.MethodSource
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.PageRequest
 import org.springframework.http.MediaType
@@ -52,6 +56,48 @@ constructor(
     private val entityManager: EntityManager,
     private val defaultUsers: DefaultUsers
 ) {
+
+  companion object {
+    @JvmStatic
+    fun searchRequestValidationConfigs():
+        Stream<ControllerValidationConfig<SearchTransactionsRequest>> {
+      val validConfig =
+          SearchTransactionsRequest(
+              pageNumber = 0,
+              pageSize = 10,
+              sortKey = TransactionSortKey.EXPENSE_DATE,
+              sortDirection = SortDirection.ASC)
+      return Stream.of(
+          ControllerValidationConfig(validConfig, 200),
+          ControllerValidationConfig(
+              validConfig.copy(pageNumber = -1),
+              400,
+              "pageNumber: must be greater than or equal to 0"),
+          ControllerValidationConfig(
+              validConfig.copy(pageSize = 200), 400, "pageSize: must be less than or equal to 100"),
+          ControllerValidationConfig(
+              validConfig.copy(pageSize = -1), 400, "pageSize: must be greater than or equal to 0"),
+          ControllerValidationConfig(
+              validConfig.copy(categorized = YesNoFilter.NO, categoryIds = setOf(TypedId())),
+              400,
+              "categorizedValidation: Cannot set categorized to NO and specify categoryIds"))
+    }
+
+    @JvmStatic
+    fun getPossibleDuplicatesValidationConfigs():
+        Stream<ControllerValidationConfig<GetPossibleDuplicatesRequest>> {
+      val request = GetPossibleDuplicatesRequest(pageNumber = 0, pageSize = 50)
+      return Stream.of(
+          ControllerValidationConfig(request, 200),
+          ControllerValidationConfig(
+              request.copy(pageNumber = -1), 400, "pageNumber: must be greater than or equal to 0"),
+          ControllerValidationConfig(
+              request.copy(pageSize = -1), 400, "pageSize: must be greater than or equal to 0"),
+          ControllerValidationConfig(
+              request.copy(pageSize = 150), 400, "pageSize: must be less than or equal to 100"))
+    }
+  }
+
   private val transactionComparator: Comparator<TransactionCommon> = Comparator { txn1, txn2 ->
     val expenseDateCompare = txn1.expenseDate.compareTo(txn2.expenseDate)
     if (expenseDateCompare == 0) {
@@ -122,7 +168,7 @@ constructor(
             totalItems = 3)
 
     mockMvc
-        .get("/transactions?${request.toQueryString()}") {
+        .get("/transactions?${request.toQueryString(objectMapper)}") {
           secure = true
           header("Authorization", "Bearer $token")
         }
@@ -154,7 +200,7 @@ constructor(
             totalItems = 4)
 
     mockMvc
-        .get("/transactions?${request.toQueryString()}") {
+        .get("/transactions?${request.toQueryString(objectMapper)}") {
           secure = true
           header("Authorization", "Bearer $token")
         }
@@ -184,7 +230,7 @@ constructor(
             totalItems = 4)
 
     mockMvc
-        .get("/transactions?${request.toQueryString()}") {
+        .get("/transactions?${request.toQueryString(objectMapper)}") {
           secure = true
           header("Authorization", "Bearer $token")
         }
@@ -215,7 +261,7 @@ constructor(
             totalItems = 3)
 
     mockMvc
-        .get("/transactions?${request.toQueryString()}") {
+        .get("/transactions?${request.toQueryString(objectMapper)}") {
           secure = true
           header("Authorization", "Bearer $token")
         }
@@ -252,7 +298,7 @@ constructor(
             totalItems = 2)
 
     mockMvc
-        .get("/transactions?${request.toQueryString()}") {
+        .get("/transactions?${request.toQueryString(objectMapper)}") {
           secure = true
           header("Authorization", "Bearer $token")
         }
@@ -286,7 +332,7 @@ constructor(
             totalItems = 2)
 
     mockMvc
-        .get("/transactions?${request.toQueryString()}") {
+        .get("/transactions?${request.toQueryString(objectMapper)}") {
           secure = true
           header("Authorization", "Bearer $token")
         }
@@ -294,25 +340,6 @@ constructor(
           status { isOk() }
           content { json(objectMapper.writeValueAsString(response), true) }
         }
-  }
-
-  @Test
-  fun `search - invalid category options`() {
-    val request =
-        SearchTransactionsRequest(
-            categorized = YesNoFilter.NO,
-            categoryIds = setOf(user1Categories[0].uid),
-            pageNumber = 0,
-            pageSize = 100,
-            sortKey = TransactionSortKey.EXPENSE_DATE,
-            sortDirection = SortDirection.ASC)
-
-    mockMvc
-        .get("/transactions?${request.toQueryString()}") {
-          secure = true
-          header("Authorization", "Bearer $token")
-        }
-        .andExpect { status { isBadRequest() } }
   }
 
   @Test
@@ -340,7 +367,7 @@ constructor(
             totalItems = nonDuplicateTransactions.size.toLong())
 
     mockMvc
-        .get("/transactions?${request.toQueryString()}") {
+        .get("/transactions?${request.toQueryString(objectMapper)}") {
           secure = true
           header("Authorization", "Bearer $token")
         }
@@ -378,7 +405,7 @@ constructor(
             totalItems = 2)
 
     mockMvc
-        .get("/transactions?${request.toQueryString()}") {
+        .get("/transactions?${request.toQueryString(objectMapper)}") {
           secure = true
           header("Authorization", "Bearer $token")
         }
@@ -417,7 +444,7 @@ constructor(
             totalItems = 5)
 
     mockMvc
-        .get("/transactions?${request.toQueryString()}") {
+        .get("/transactions?${request.toQueryString(objectMapper)}") {
           secure = true
           header("Authorization", "Bearer $token")
         }
@@ -457,7 +484,7 @@ constructor(
             totalItems = expected.size.toLong())
 
     mockMvc
-        .get("/transactions?${request.toQueryString()}") {
+        .get("/transactions?${request.toQueryString(objectMapper)}") {
           secure = true
           header("Authorization", "Bearer $token")
         }
@@ -493,7 +520,7 @@ constructor(
             sortDirection = SortDirection.ASC)
 
     mockMvc
-        .get("/transactions?${request.toQueryString()}") {
+        .get("/transactions?${request.toQueryString(objectMapper)}") {
           secure = true
           header("Authorization", "Bearer $token")
         }
@@ -1304,6 +1331,33 @@ constructor(
       if (unconfirmed.any { it.uid === transaction.uid }) {
         throw AssertionError("Unconfirmed transaction for User 1 still exists")
       }
+    }
+  }
+
+  @ParameterizedTest
+  @MethodSource("searchRequestValidationConfigs")
+  fun `validating search transactions request`(
+      config: ControllerValidationConfig<SearchTransactionsRequest>
+  ) {
+    ControllerValidationSupport.validate(config) {
+      mockMvc.get("/transactions?${config.request.toQueryString(objectMapper)}") {
+        secure = true
+        header("Authorization", "Bearer $token")
+      }
+    }
+  }
+
+  @ParameterizedTest
+  @MethodSource("getPossibleDuplicatesValidationConfigs")
+  fun `validate get possible duplicates request`(
+      config: ControllerValidationConfig<GetPossibleDuplicatesRequest>
+  ) {
+    ControllerValidationSupport.validate(config) {
+      mockMvc.get(
+          "/transactions/${user1Transactions[0].uid}/duplicates?${config.request.toQueryString(objectMapper)}") {
+            secure = true
+            header("Authorization", "Bearer $token")
+          }
     }
   }
 }

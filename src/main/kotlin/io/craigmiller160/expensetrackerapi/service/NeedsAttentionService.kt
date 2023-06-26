@@ -4,9 +4,8 @@ import arrow.core.Either
 import io.craigmiller160.expensetrackerapi.data.projection.NeedsAttentionType
 import io.craigmiller160.expensetrackerapi.data.repository.NeedsAttentionRepository
 import io.craigmiller160.expensetrackerapi.function.TryEither
-import io.craigmiller160.expensetrackerapi.web.types.CountAndOldest
-import io.craigmiller160.expensetrackerapi.web.types.NeedsAttentionResponse
-import jakarta.transaction.Transactional
+import io.craigmiller160.expensetrackerapi.web.types.transaction.CountAndOldest
+import io.craigmiller160.expensetrackerapi.web.types.transaction.NeedsAttentionResponse
 import org.springframework.stereotype.Service
 
 @Service
