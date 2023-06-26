@@ -57,7 +57,9 @@ constructor(
           ControllerValidationConfig(
               request.copy(pageNumber = -1), 400, "pageNumber: must be greater than or equal to 0"),
           ControllerValidationConfig(
-              request.copy(pageSize = 150), 400, "pageSize: must be less than or equal to 100"))
+              request.copy(pageSize = 150), 400, "pageSize: must be less than or equal to 100"),
+          ControllerValidationConfig(
+              request.copy(pageSize = -1), 400, "pageSize: must be greater than or equal to 0"))
     }
 
     @JvmStatic
