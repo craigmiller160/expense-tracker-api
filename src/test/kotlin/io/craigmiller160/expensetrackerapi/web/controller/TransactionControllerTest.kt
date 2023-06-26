@@ -69,7 +69,10 @@ constructor(
               sortDirection = SortDirection.ASC)
       return Stream.of(
           ControllerValidationConfig(validConfig, 200),
-          ControllerValidationConfig(validConfig.copy(descriptionRegex = "***"), 400, ""),
+          ControllerValidationConfig(
+              validConfig.copy(descriptionRegex = "***"),
+              400,
+              "descriptionRegex: String is not valid regular expression"),
           ControllerValidationConfig(
               validConfig.copy(pageNumber = -1),
               400,
