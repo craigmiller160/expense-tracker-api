@@ -12,11 +12,4 @@ data class ReportRequest(
     @field:Max(100) override val pageSize: Int,
     val categoryIdType: ReportCategoryIdFilterType = ReportCategoryIdFilterType.EXCLUDE,
     val categoryIds: List<TypedId<CategoryId>> = listOf()
-) : PageableRequest, QueryObject {
-  override fun fieldsToQueryParams(): List<Pair<String, Any?>> =
-      listOf(
-          "pageNumber" to pageNumber,
-          "pageSize" to pageSize,
-          "categoryIdType" to categoryIdType,
-          "categoryIds" to categoryIds)
-}
+) : PageableRequest, QueryObject

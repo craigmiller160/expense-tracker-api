@@ -37,18 +37,4 @@ data class SearchTransactionsRequest(
     }
     return true
   }
-
-  override fun fieldsToQueryParams(): List<Pair<String, Any?>> =
-      listOf(
-          "pageNumber" to pageNumber,
-          "pageSize" to pageSize,
-          "sortKey" to sortKey.name,
-          "sortDirection" to sortDirection,
-          "startDate" to startDate,
-          "endDate" to endDate,
-          "confirmed" to confirmed,
-          "categorized" to categorized,
-          "duplicate" to duplicate,
-          "possibleRefund" to possibleRefund,
-          "categoryIds" to categoryIds)
 }
