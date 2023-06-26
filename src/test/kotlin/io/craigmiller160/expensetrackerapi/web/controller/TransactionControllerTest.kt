@@ -149,7 +149,28 @@ constructor(
 
   @Test
   fun `search - by description regex`() {
-    TODO()
+    val request =
+        SearchTransactionsRequest(
+            pageNumber = 0,
+            pageSize = 100,
+            descriptionRegex = user1Transactions[0].description,
+            sortKey = TransactionSortKey.EXPENSE_DATE,
+            sortDirection = SortDirection.DESC)
+    val response =
+        TransactionsPageResponse(
+            transactions = listOf(TransactionResponse.from(user1Transactions[0])),
+            pageNumber = 0,
+            totalItems = 1)
+
+    mockMvc
+        .get("/transactions?${request.toQueryString(objectMapper)}") {
+          secure = true
+          header("Authorization", "Bearer $token")
+        }
+        .andExpect {
+          status { isOk() }
+          content { json(objectMapper.writeValueAsString(response), true) }
+        }
   }
 
   @Test
