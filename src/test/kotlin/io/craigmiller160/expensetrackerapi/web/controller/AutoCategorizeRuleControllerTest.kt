@@ -828,7 +828,14 @@ constructor(
   fun `validate create rule request`(
       config: ControllerValidationConfig<AutoCategorizeRuleRequest>
   ) {
-    TODO()
+    ControllerValidationSupport.validate(config) {
+      mockMvc.post("/categories/rules") {
+        secure = true
+        header("Authorization", "Bearer $token")
+        contentType = MediaType.APPLICATION_JSON
+        content = objectMapper.writeValueAsString(config.request)
+      }
+    }
   }
 
   @ParameterizedTest
@@ -836,7 +843,15 @@ constructor(
   fun `validate update rule request`(
       config: ControllerValidationConfig<AutoCategorizeRuleRequest>
   ) {
-    TODO()
+    val rule = dataHelper.createRule(defaultUsers.primaryUser.userTypedId, cat1.uid)
+    ControllerValidationSupport.validate(config) {
+      mockMvc.put("/categories/rules/${rule.uid}") {
+        secure = true
+        header("Authorization", "Bearer $token")
+        contentType = MediaType.APPLICATION_JSON
+        content = objectMapper.writeValueAsString(config.request)
+      }
+    }
   }
 
   private fun createRulesForOrdinalValidation(): List<AutoCategorizeRule> {
