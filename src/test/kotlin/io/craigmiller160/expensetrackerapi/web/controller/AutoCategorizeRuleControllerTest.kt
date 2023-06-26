@@ -828,12 +828,13 @@ constructor(
   fun `validate create rule request`(
       config: ControllerValidationConfig<AutoCategorizeRuleRequest>
   ) {
+    val request = config.request.copy(categoryId = cat1.uid)
     ControllerValidationSupport.validate(config) {
       mockMvc.post("/categories/rules") {
         secure = true
         header("Authorization", "Bearer $token")
         contentType = MediaType.APPLICATION_JSON
-        content = objectMapper.writeValueAsString(config.request)
+        content = objectMapper.writeValueAsString(request)
       }
     }
   }
@@ -844,12 +845,13 @@ constructor(
       config: ControllerValidationConfig<AutoCategorizeRuleRequest>
   ) {
     val rule = dataHelper.createRule(defaultUsers.primaryUser.userTypedId, cat1.uid)
+    val request = config.request.copy(categoryId = cat1.uid)
     ControllerValidationSupport.validate(config) {
       mockMvc.put("/categories/rules/${rule.uid}") {
         secure = true
         header("Authorization", "Bearer $token")
         contentType = MediaType.APPLICATION_JSON
-        content = objectMapper.writeValueAsString(config.request)
+        content = objectMapper.writeValueAsString(request)
       }
     }
   }
