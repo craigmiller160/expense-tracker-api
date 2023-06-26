@@ -12,7 +12,6 @@ import java.time.LocalDate
 private val mapTypeRef = jacksonTypeRef<Map<String, Any?>>()
 
 fun QueryObject.toQueryString(objectMapper: ObjectMapper): String {
-  println("JSON: " + objectMapper.writeValueAsString(this)) // TODO delete this
   val map: Map<String, Any?> =
       objectMapper.writeValueAsString(this).let { objectMapper.readValue(it, mapTypeRef) }
   return map.entries
