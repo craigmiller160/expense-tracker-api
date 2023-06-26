@@ -80,6 +80,17 @@ constructor(
               400,
               "categorizedValidation: Cannot set categorized to NO and specify categoryIds"))
     }
+
+    @JvmStatic
+    fun getPossibleDuplicatesValidationConfigs():
+        Stream<ControllerValidationConfig<GetPossibleDuplicatesRequest>> {
+      val request = GetPossibleDuplicatesRequest(pageNumber = 0, pageSize = 50)
+      return Stream.of(
+          ControllerValidationConfig(request, 200),
+          ControllerValidationConfig(request.copy(pageNumber = -1), 400, ""),
+          ControllerValidationConfig(request.copy(pageSize = -1), 400, ""),
+          ControllerValidationConfig(request.copy(pageSize = 150), 400, ""))
+    }
   }
 
   private val transactionComparator: Comparator<TransactionCommon> = Comparator { txn1, txn2 ->
@@ -1328,6 +1339,20 @@ constructor(
         secure = true
         header("Authorization", "Bearer $token")
       }
+    }
+  }
+
+  @ParameterizedTest
+  @MethodSource("getPossibleDuplicatesValidationConfigs")
+  fun `validate get possible duplicates request`(
+      config: ControllerValidationConfig<GetPossibleDuplicatesRequest>
+  ) {
+    ControllerValidationSupport.validate(config) {
+      mockMvc.get(
+          "/transactions/${user1Transactions[0].uid}/duplicates?${config.request.toQueryString(objectMapper)}") {
+            secure = true
+            header("Authorization", "Bearer $token")
+          }
     }
   }
 }
