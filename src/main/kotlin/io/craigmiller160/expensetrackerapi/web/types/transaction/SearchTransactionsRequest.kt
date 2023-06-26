@@ -38,17 +38,17 @@ data class SearchTransactionsRequest(
     return true
   }
 
-  override fun fieldsToQueryParams(): List<Pair<String, String?>> =
+  override fun fieldsToQueryParams(): List<Pair<String, Any?>> =
       listOf(
           "pageNumber" to pageNumber.toString(),
           "pageSize" to pageSize.toString(),
           "sortKey" to sortKey.name,
           "sortDirection" to sortDirection.name,
-          "startDate" to startDate?.let { DateUtils.format(it) },
-          "endDate" to endDate?.let { DateUtils.format(it) },
-          "confirmed" to confirmed.name,
-          "categorized" to categorized.name,
-          "duplicate" to duplicate?.name,
-          "possibleRefund" to possibleRefund?.name,
-          "categoryIds" to categoryIds?.joinToString(",") { it.toString() })
+          "startDate" to startDate,
+          "endDate" to endDate,
+          "confirmed" to confirmed,
+          "categorized" to categorized,
+          "duplicate" to duplicate,
+          "possibleRefund" to possibleRefund,
+          "categoryIds" to categoryIds)
 }
