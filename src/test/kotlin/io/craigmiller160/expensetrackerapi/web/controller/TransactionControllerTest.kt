@@ -148,6 +148,11 @@ constructor(
   }
 
   @Test
+  fun `search - by regex`() {
+    TODO()
+  }
+
+  @Test
   fun `search - with no categories, sort by EXPENSE_DATE DESC`() {
     val request =
         SearchTransactionsRequest(
