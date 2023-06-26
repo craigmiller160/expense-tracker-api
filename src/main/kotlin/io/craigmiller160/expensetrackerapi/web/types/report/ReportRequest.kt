@@ -13,10 +13,10 @@ data class ReportRequest(
     val categoryIdType: ReportCategoryIdFilterType = ReportCategoryIdFilterType.EXCLUDE,
     val categoryIds: List<TypedId<CategoryId>> = listOf()
 ) : PageableRequest, QueryObject {
-  override fun fieldsToQueryParams(): List<Pair<String, String?>> =
+  override fun fieldsToQueryParams(): List<Pair<String, Any?>> =
       listOf(
-          "pageNumber" to pageNumber.toString(),
-          "pageSize" to pageSize.toString(),
-          "categoryIdType" to categoryIdType.name,
-          "categoryIds" to categoryIds.joinToString(",") { it.toString() })
+          "pageNumber" to pageNumber,
+          "pageSize" to pageSize,
+          "categoryIdType" to categoryIdType,
+          "categoryIds" to categoryIds)
 }
