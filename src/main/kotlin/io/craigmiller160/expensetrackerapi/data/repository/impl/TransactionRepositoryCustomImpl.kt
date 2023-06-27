@@ -62,19 +62,10 @@ class TransactionRepositoryCustomImpl(
                     value = request.possibleRefund,
                     ifYes = QTransactionView.transactionView.amount.gt(0),
                     ifNo = QTransactionView.transactionView.amount.loe(0)))
-            .let { builder ->
-              // TODO refactor and cleanup
-              if (request.descriptionRegex != null) {
-                val exp =
-                    Expressions.booleanTemplate(
-                        "REGEXP_LIKE({0}, '{1}', 'i')",
-                        QTransactionView.transactionView.description,
-                        request.descriptionRegex)
-                builder.and(exp)
-              } else {
-                builder
-              }
-            }
+            .let(
+                QueryDSLSupport.andIfNotNull(request.description) {
+                  QTransactionView.transactionView.description.like("%$it%")
+                })
 
     val baseQuery = queryFactory.query().from(QTransactionView.transactionView).where(whereClause)
 

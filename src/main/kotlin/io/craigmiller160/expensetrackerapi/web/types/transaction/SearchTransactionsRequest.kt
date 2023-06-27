@@ -4,7 +4,6 @@ import io.craigmiller160.expensetrackerapi.common.data.typedid.TypedId
 import io.craigmiller160.expensetrackerapi.common.data.typedid.ids.CategoryId
 import io.craigmiller160.expensetrackerapi.common.utils.DateUtils
 import io.craigmiller160.expensetrackerapi.data.model.YesNoFilter
-import io.craigmiller160.expensetrackerapi.data.validation.ValidRegex
 import io.craigmiller160.expensetrackerapi.web.types.PageableRequest
 import io.craigmiller160.expensetrackerapi.web.types.QueryObject
 import io.craigmiller160.expensetrackerapi.web.types.SortDirection
@@ -28,7 +27,7 @@ data class SearchTransactionsRequest(
     val duplicate: YesNoFilter = YesNoFilter.ALL,
     val possibleRefund: YesNoFilter = YesNoFilter.ALL,
     val categoryIds: Set<TypedId<CategoryId>>? = null,
-    @field:ValidRegex val descriptionRegex: String? = null
+    val description: String? = null
 ) : PageableRequest, SortableRequest<TransactionSortKey>, QueryObject {
 
   @Hidden

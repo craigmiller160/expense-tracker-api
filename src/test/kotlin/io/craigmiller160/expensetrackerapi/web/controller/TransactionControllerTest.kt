@@ -70,7 +70,7 @@ constructor(
       return Stream.of(
           ControllerValidationConfig(validConfig, 200),
           ControllerValidationConfig(
-              validConfig.copy(descriptionRegex = "***"),
+              validConfig.copy(description = "***"),
               400,
               "descriptionRegex: String is not valid regular expression"),
           ControllerValidationConfig(
@@ -158,7 +158,7 @@ constructor(
         SearchTransactionsRequest(
             pageNumber = 0,
             pageSize = 100,
-            descriptionRegex = user1Transactions[0].description,
+            description = user1Transactions[0].description,
             sortKey = TransactionSortKey.EXPENSE_DATE,
             sortDirection = SortDirection.DESC)
     val response =
