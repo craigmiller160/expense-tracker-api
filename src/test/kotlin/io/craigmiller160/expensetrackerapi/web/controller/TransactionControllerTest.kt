@@ -96,6 +96,15 @@ constructor(
           ControllerValidationConfig(
               request.copy(pageSize = 150), 400, "pageSize: must be less than or equal to 100"))
     }
+
+    @JvmStatic
+    fun getSearchByDescriptionConfigs(): Stream<SearchByDescriptionConfig> {
+      val description = "Hello World"
+      return Stream.of(
+          SearchByDescriptionConfig(description, "Hello World"),
+          SearchByDescriptionConfig(description, "hello world"),
+          SearchByDescriptionConfig(description, "Hello"))
+    }
   }
 
   private val transactionComparator: Comparator<TransactionCommon> = Comparator { txn1, txn2 ->
@@ -147,51 +156,25 @@ constructor(
     rule = dataHelper.createRule(defaultUsers.primaryUser.userTypedId, user1Categories[0].uid)
   }
 
-  @Test
-  fun `search - by description`() {
-    // TODO need to validate that regex works, not just literal
-    val request =
-        SearchTransactionsRequest(
-            pageNumber = 0,
-            pageSize = 100,
-            description = user1Transactions[0].description,
-            sortKey = TransactionSortKey.EXPENSE_DATE,
-            sortDirection = SortDirection.DESC)
-    val response =
-        TransactionsPageResponse(
-            transactions =
-                listOf(TransactionResponse.from(user1Transactions[0], user1Categories[0])),
-            pageNumber = 0,
-            totalItems = 1)
-
-    mockMvc
-        .get("/transactions?${request.toQueryString(objectMapper)}") {
-          secure = true
-          header("Authorization", "Bearer $token")
-        }
-        .andExpect {
-          status { isOk() }
-          content { json(objectMapper.writeValueAsString(response), true) }
-        }
-  }
-
-  @Test
-  fun `search - by description pattern`() {
+  @ParameterizedTest
+  @MethodSource("getSearchByDescriptionConfigs")
+  fun `search - by description`(config: SearchByDescriptionConfig) {
     val transaction =
         user1Transactions[0]
-            .apply { description = "Hello World" }
+            .apply { description = config.actualDescription }
             .let { transactionRepository.saveAndFlush(it) }
 
     val request =
         SearchTransactionsRequest(
             pageNumber = 0,
             pageSize = 100,
-            description = "Hello%ld",
+            description = config.searchDescription,
             sortKey = TransactionSortKey.EXPENSE_DATE,
             sortDirection = SortDirection.DESC)
     val response =
         TransactionsPageResponse(
-            transactions = listOf(TransactionResponse.from(transaction, user1Categories[0])),
+            transactions =
+                listOf(TransactionResponse.from(user1Transactions[0], user1Categories[0])),
             pageNumber = 0,
             totalItems = 1)
 
@@ -1420,3 +1403,5 @@ constructor(
     }
   }
 }
+
+data class SearchByDescriptionConfig(val actualDescription: String, val searchDescription: String)
