@@ -5,8 +5,6 @@ import com.fasterxml.jackson.module.kotlin.jacksonTypeRef
 import io.craigmiller160.expensetrackerapi.common.utils.DateUtils
 import io.craigmiller160.expensetrackerapi.web.types.QueryObject
 import java.lang.IllegalArgumentException
-import java.net.URLEncoder
-import java.nio.charset.StandardCharsets
 import java.time.LocalDate
 
 private val mapTypeRef = jacksonTypeRef<Map<String, Any?>>()
@@ -26,12 +24,11 @@ private fun convertQueryValue(value: Any): String =
       is Long,
       is Float,
       is Double,
-      is Boolean -> URLEncoder.encode(value.toString(), StandardCharsets.UTF_8)
-      is String -> URLEncoder.encode(value, StandardCharsets.UTF_8)
-      is Collection<*> ->
-          value.joinToString(",") { URLEncoder.encode(it.toString(), StandardCharsets.UTF_8) }
-      is Enum<*> -> URLEncoder.encode(value.name, StandardCharsets.UTF_8)
-      is LocalDate -> URLEncoder.encode(DateUtils.format(value), StandardCharsets.UTF_8)
+      is Boolean -> value.toString()
+      is String -> value
+      is Collection<*> -> value.joinToString(",") { it.toString() }
+      is Enum<*> -> value.name
+      is LocalDate -> DateUtils.format(value)
       else ->
           throw IllegalArgumentException(
               "Invalid value to convert for query string: ${value.javaClass.name}")

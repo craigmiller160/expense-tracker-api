@@ -62,6 +62,12 @@ class TransactionRepositoryCustomImpl(
                     value = request.possibleRefund,
                     ifYes = QTransactionView.transactionView.amount.gt(0),
                     ifNo = QTransactionView.transactionView.amount.loe(0)))
+            .let(
+                QueryDSLSupport.andIfNotNull(request.description) {
+                  QTransactionView.transactionView.description
+                      .toLowerCase()
+                      .like("%${it.lowercase()}%")
+                })
 
     val baseQuery = queryFactory.query().from(QTransactionView.transactionView).where(whereClause)
 
