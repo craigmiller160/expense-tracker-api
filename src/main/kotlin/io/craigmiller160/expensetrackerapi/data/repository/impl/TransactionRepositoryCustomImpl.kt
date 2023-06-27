@@ -64,7 +64,9 @@ class TransactionRepositoryCustomImpl(
                     ifNo = QTransactionView.transactionView.amount.loe(0)))
             .let(
                 QueryDSLSupport.andIfNotNull(request.description) {
-                  QTransactionView.transactionView.description.like("%$it%")
+                  QTransactionView.transactionView.description
+                      .toLowerCase()
+                      .like("%${it.lowercase()}%")
                 })
 
     val baseQuery = queryFactory.query().from(QTransactionView.transactionView).where(whereClause)
