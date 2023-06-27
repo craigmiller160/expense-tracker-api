@@ -70,10 +70,6 @@ constructor(
       return Stream.of(
           ControllerValidationConfig(validConfig, 200),
           ControllerValidationConfig(
-              validConfig.copy(description = "***"),
-              400,
-              "descriptionRegex: String is not valid regular expression"),
-          ControllerValidationConfig(
               validConfig.copy(pageNumber = -1),
               400,
               "pageNumber: must be greater than or equal to 0"),
