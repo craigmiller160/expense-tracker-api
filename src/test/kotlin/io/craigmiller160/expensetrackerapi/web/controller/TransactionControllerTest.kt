@@ -148,7 +148,7 @@ constructor(
   }
 
   @Test
-  fun `search - by description regex`() {
+  fun `search - by description`() {
     // TODO need to validate that regex works, not just literal
     val request =
         SearchTransactionsRequest(
@@ -161,6 +161,37 @@ constructor(
         TransactionsPageResponse(
             transactions =
                 listOf(TransactionResponse.from(user1Transactions[0], user1Categories[0])),
+            pageNumber = 0,
+            totalItems = 1)
+
+    mockMvc
+        .get("/transactions?${request.toQueryString(objectMapper)}") {
+          secure = true
+          header("Authorization", "Bearer $token")
+        }
+        .andExpect {
+          status { isOk() }
+          content { json(objectMapper.writeValueAsString(response), true) }
+        }
+  }
+
+  @Test
+  fun `search - by description pattern`() {
+    val transaction =
+        user1Transactions[0]
+            .apply { description = "Hello World" }
+            .let { transactionRepository.saveAndFlush(it) }
+
+    val request =
+        SearchTransactionsRequest(
+            pageNumber = 0,
+            pageSize = 100,
+            description = "Hello%ld",
+            sortKey = TransactionSortKey.EXPENSE_DATE,
+            sortDirection = SortDirection.DESC)
+    val response =
+        TransactionsPageResponse(
+            transactions = listOf(TransactionResponse.from(transaction, user1Categories[0])),
             pageNumber = 0,
             totalItems = 1)
 
