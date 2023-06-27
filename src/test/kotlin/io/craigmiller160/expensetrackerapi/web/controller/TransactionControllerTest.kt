@@ -159,7 +159,8 @@ constructor(
             sortDirection = SortDirection.DESC)
     val response =
         TransactionsPageResponse(
-            transactions = listOf(TransactionResponse.from(user1Transactions[0])),
+            transactions =
+                listOf(TransactionResponse.from(user1Transactions[0], user1Categories[0])),
             pageNumber = 0,
             totalItems = 1)
 
