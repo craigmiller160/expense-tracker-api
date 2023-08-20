@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import jakarta.validation.Valid
+import org.springdoc.core.annotations.ParameterObject
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
@@ -23,6 +24,7 @@ class ReportController(private val reportService: ReportService) {
                   mediaType = "application/json",
                   schema = Schema(implementation = ReportPageResponse::class))])
   @GetMapping
-  fun getSpendingByMonthAndCategory(@Valid request: ReportRequest): TryEither<ReportPageResponse> =
-      reportService.getSpendingByMonthAndCategory(request)
+  fun getSpendingByMonthAndCategory(
+      @Valid @ParameterObject request: ReportRequest
+  ): TryEither<ReportPageResponse> = reportService.getSpendingByMonthAndCategory(request)
 }

@@ -101,7 +101,7 @@ class TransactionController(private val transactionService: TransactionService) 
   @GetMapping("/{transactionId}/duplicates")
   fun getPossibleDuplicates(
       @PathVariable transactionId: TypedId<TransactionId>,
-      @Valid request: GetPossibleDuplicatesRequest
+      @Valid @ParameterObject request: GetPossibleDuplicatesRequest
   ): TryEither<TransactionDuplicatePageResponse> =
       transactionService.getPossibleDuplicates(transactionId, request)
 
