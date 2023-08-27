@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import jakarta.validation.Valid
+import org.springdoc.core.annotations.ParameterObject
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
@@ -32,8 +33,9 @@ class TransactionController(private val transactionService: TransactionService) 
                   mediaType = "application/json",
                   schema = Schema(implementation = TransactionsPageResponse::class))])
   @GetMapping
-  fun search(@Valid request: SearchTransactionsRequest): TryEither<TransactionsPageResponse> =
-      transactionService.search(request)
+  fun search(
+      @Valid @ParameterObject request: SearchTransactionsRequest
+  ): TryEither<TransactionsPageResponse> = transactionService.search(request)
 
   @ApiResponse(
       responseCode = "200",
@@ -99,7 +101,7 @@ class TransactionController(private val transactionService: TransactionService) 
   @GetMapping("/{transactionId}/duplicates")
   fun getPossibleDuplicates(
       @PathVariable transactionId: TypedId<TransactionId>,
-      @Valid request: GetPossibleDuplicatesRequest
+      @Valid @ParameterObject request: GetPossibleDuplicatesRequest
   ): TryEither<TransactionDuplicatePageResponse> =
       transactionService.getPossibleDuplicates(transactionId, request)
 
