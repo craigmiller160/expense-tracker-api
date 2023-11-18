@@ -42,3 +42,4 @@ deploy/chart/charts
 
 *.tgz
 .terraform
+*.private.env.json
