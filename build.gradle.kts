@@ -25,7 +25,7 @@ dependencyManagement {
 
 group = projectGroup
 version = projectVersion
-java.sourceCompatibility = JavaVersion.VERSION_19
+java.sourceCompatibility = JavaVersion.VERSION_21
 
 dependencies {
     val queryDslVersion: String by project
