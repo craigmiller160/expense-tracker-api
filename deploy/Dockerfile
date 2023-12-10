@@ -1,4 +1,4 @@
-FROM openjdk:20-slim
+FROM openjdk:21-slim
 
 COPY build/expense-tracker-api-*.jar /expense-tracker-api.jar
 
