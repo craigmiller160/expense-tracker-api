@@ -31,7 +31,7 @@ spring:
     keycloak:
       oauth2:
         resourceserver:
-          host: https://auth-craigmiller160.ddns.net
+          host: https://auth.craigmiller160.us
           realm: apps-dev
           client-id: expense-tracker-api
 
